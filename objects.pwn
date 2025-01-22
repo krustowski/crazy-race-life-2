@@ -1,5 +1,6 @@
 //------------------------admin house
-vytah = CreateObject(5837, 2303.207, 1174.944, 80.285, 0.0, 0.0, 142.812);
+gAdminElevator = CreateObject(5837, 2303.207, 1174.944, 80.285, 0.0, 0.0, 142.812);
+
 CreateObject(1219, 2298.66, 1171.64, 10.92, 0, 0, 0); //paleta
 						      //CreateObject(2528,0,0,0,0,0,0);//zachod xD
 CreateDynamicObject(980, 2308.141, 1150.977, 87.661, 0.0, 0.0, -161.797);

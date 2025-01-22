@@ -60,7 +60,7 @@
 
   --------------------------------
 
-  [ Povolani ] [ iPlayerRole ]
+  [ Povolani ] [ gPlayerData[playerid][E_PLAYER_DATA_TEAM] ]
 
   [ 0 ] Nezamìstnaný
   [ 1 ] Lamy [ LV ]
@@ -143,6 +143,9 @@ EnableStuntBonusForAll(0);  		//vypne stunt bonusy aspon mylsim:)
 #define RC_TANK    	564
 #define RC_CAM      	594
 
+new const GAMEMODE_NAME[] = "CrazyRaceLife2";
+new const VEHICLE_PLATE[] = "-CRL-2-";
+
 //
 // Advertisement.
 //
@@ -169,6 +172,13 @@ forward DrawClockText();
 
 #include "clock.pwn"
 
+//
+// Drag race.
+//
+
+forward StartDragRace();
+
+#include "drag.pwn"
 //
 // Paintball minigame.
 //
@@ -204,25 +214,17 @@ forward OffRadarCheckpoint(playerid);
 //
 //
 
-forward drag();
-forward RESET();
+//forward RESET();
 
 //
-//
-//
-
-new const GAMEMODE_NAME[] = "CrazyRaceLife2";
-new const VEHICLE_PLATE[] = "-CRL2-";
-
-//
-//
+// Global static objects.
 //
 
-new dlistek[MAX_PLAYERS];
-new lvl[MAX_PLAYERS];
-new iPlayerRole[MAX_PLAYERS];
+new gAdminElevator;
 
-new vytah;
+//
+// Global static team objects.
+//
 
 new lamer;
 new Menu:menulamer;
@@ -760,8 +762,8 @@ dcmd_ulozit(playerid, params[])
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Neplatna castka!");
 
 	if (IsPlayerInSphere(playerid, 1519.4808, 1053.7301, 10.8203, 15) ||
-		IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) || 
-		IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15))
+			IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) || 
+			IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15))
 	{
 		gPlayerData[playerid][E_PLAYER_DATA_BANK] += amount;
 		GivePlayerMoney(playerid, -amount);
@@ -805,8 +807,8 @@ dcmd_stav(playerid, params[])
 {
 #pragma unused params
 	if (IsPlayerInSphere(playerid, 1519.4808, 1053.7301, 10.8203, 15) ||
-		IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) ||
-		IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15))
+			IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) ||
+			IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15))
 	{
 		new stringToPrint[256];
 
@@ -822,7 +824,7 @@ dcmd_ccmd(playerid, params[])
 #pragma unused params
 	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 1) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
-	
+
 	SendClientMessage(playerid, COLOR_ZELZLUT, "[ i ][CAM] KAMERY: /cam1 (pyramida dole), /cam2 (banka atd), /camoff");
 
 	return 1;
@@ -886,12 +888,12 @@ dcmd_fakechat(playerid, params[])
 	if (!sizeof(params) || sizeof(params) < 2 || !IsNumeric(params[0]))
 		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /fakechat [playerID] [text]");
 
-	new targetId = strval(params[0]), targetText[256] = params[1:];
+	new targetId = strval(params[0]); //targetText[256] = params;
 
 	if (!IsPlayerConnected(targetId)) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac se zadanym id neni pripojen.");
 
-	SendPlayerMessageToAll(targetId, targetText);
+	SendPlayerMessageToAll(targetId, params);
 
 	SendClientMessage(playerid, COLOR_BILA, "[ i ] Falesna zprava byla uspesne odeslana!");
 
@@ -909,7 +911,7 @@ dcmd_ban(playerid, params[])
 	new adminName[MAX_PLAYER_NAME], playerIdToBan = strval(params[0]), playerName[MAX_PLAYER_NAME], stringToPrint[256];
 
 	if (!IsPlayerConnected(playerIdToBan))
-	       	return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac s danym ID neni na serveru!");
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac s danym ID neni na serveru!");
 
 	// Get participated nicknames.
 	GetPlayerName(playerid, adminName, sizeof(adminName));
@@ -954,7 +956,7 @@ dcmd_admins(playerid, params[])
 		SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Zadny admin neni pritomen na serveru!");
 		return 0;
 	}
-	
+
 	return 1;
 }
 
@@ -1027,7 +1029,7 @@ dcmd_lvl(playerid, params[])
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Rozsah levelu je pouze 0-4!");
 
 	if (targetLvl == gPlayerData[targetId][E_PLAYER_DATA_ADMIN_LVL])
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Dany hrac jiz vlastni dany admin level!")
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Dany hrac jiz vlastni dany admin level!");
 
 	new adminName[MAX_PLAYER_NAME], playerName[MAX_PLAYER_NAME], stringToPrint[128];
 
@@ -1077,6 +1079,43 @@ dcmd_goto(playerid, params[])
 		default:
 			{
 				SetPlayerPos(playerid, x, y, z);
+			}
+	}
+
+	return 1;
+}
+
+dcmd_get(playerid, params[])
+{
+	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 2) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
+
+	if (!sizeof(params) || !IsNumeric(params[0])) 
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /get [ID]!");
+
+	new targetId = strval(params[0]), Float:x, Float:y, Float:z;
+
+	if (!IsPlayerConnected(targetId)) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+
+	if (targetId == playerid)
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Neni mozne teleportovat sebe sama!");
+
+	GetPlayerPos(playerid, x, y, z);
+
+	new targetPlayerState = GetPlayerState(targetId), targetVehicleId = GetPlayerVehicleID(targetId);
+
+	SetPlayerInterior(targetId, 0);
+
+	switch (targetPlayerState)
+	{
+		case PLAYER_STATE_DRIVER:
+			{
+				SetVehiclePos(targetVehicleId, x, y, z);
+			}
+		default:
+			{
+				SetPlayerPos(targetId, x, y, z);
 			}
 	}
 
@@ -1208,57 +1247,43 @@ dcmd_admincol(playerid, params[])
 dcmd_ucet(playerid, params[])
 {
 #pragma unused params
-	new string[256], string2[256], string3[265];
-	format(string,  sizeof(string), "[ INFO ] [ VYPIS HERNIHO UCTU ] ***");
-	format(string2, sizeof(string2), "[ INFO ] [ Penize | %d ], [ Banka | %d ], [ WL | %d, ], [ Skin | %d ], [ Tym | %d ]", GetPlayerMoney(playerid), gPlayerData[playerid], GetPlayerWantedLevel(playerid), GetPlayerSkin(playerid), iPlayerRole[playerid]);
-	format(string3, sizeof(string3), "[ INFO ] [ AdminLVL | %d ], [ Joint | %dks ], [ Zapik | %d ], [ Marihuana | %dg ], [ Tabak | %dks ]", lvl[playerid], joint[playerid], zapik[playerid], marihuana[playerid], tabak[playerid]);
-	SCM(playerid, COLOR_SEDA, string);
-	SCM(playerid, COLOR_SEDA, string2);
-	SCM(playerid, COLOR_SEDA, string3);
-	return 1;
-}
-//----------------------------------------
-dcmd_get(playerid, params[])
-{
-	if (!IsPlayerAdmin(playerid) && lvl[playerid] < 2) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-	else if (!strlen(params) || !IsNumeric(params)) return SCM(playerid, MODRA, "[ i ]Pouití /get [ID]!");
-	new ZadaneID = strval(params), Float:a, Float:b, Float:c;
-	if (!IsPlayerConnected(ZadaneID)) return SCM(playerid, COLOR_CERVENA, "[ ! ]Hráè [ID] není na serveru");
-	else if (ZadaneID != playerid) return SCM(playerid, COLOR_CERVENA, "[ ! ]Neni ti divne teleportovat sám sebe? :D");
+	new lineToPrint1[256], lineToPrint2[256], lineToPrint3[265];
 
-	GetPlayerPos(playerid, a, b, c);
-	new typauta = GetPlayerVehicleID(ZadaneID);
-	new State = GetPlayerState(ZadaneID);
-	SetPlayerInterior(ZadaneID, 0);
+	format(lineToPrint1, sizeof(lineToPrint1), "[ INFO ] [ VYPIS HERNIHO UCTU ] ***");
+	format(lineToPrint2, sizeof(lineToPrint2), "[ INFO ] [ Penize | %d € ], [ Banka | %d € ], [ Wanted level | %d ], [ Skin | %d ], [ Tym | %d ]", GetPlayerMoney(playerid), gPlayerData[playerid][E_PLAYER_DATA_BANK], GetPlayerWantedLevel(playerid), GetPlayerSkin(playerid), gPlayerData[playerid][E_PLAYER_DATA_TEAM]);
+	format(lineToPrint3, sizeof(lineToPrint3), "[ INFO ] [ Admin level | %d ], [ Joint | %d ks ], [ Zapik | %d ks ], [ Marihuana | %d g ], [ Tabak | %d ks ]", gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL], joint[playerid], zapik[playerid], marihuana[playerid], tabak[playerid]);
 
-	if (State != PLAYER_STATE_DRIVER)
-	{
-		SetPlayerPos(ZadaneID, a, b, c);
-	}
-	if (IsPlayerInVehicle(ZadaneID, typauta) == 1)
-	{
-		SetVehiclePos(typauta, a, b, c);
-	}
-	else
-	{
-		SetPlayerPos(ZadaneID, a, b, c);
-	}
+	SendClientMessage(playerid, COLOR_SEDA, lineToPrint1);
+	SendClientMessage(playerid, COLOR_SEDA, lineToPrint2);
+	SendClientMessage(playerid, COLOR_SEDA, lineToPrint3);
 
 	return 1;
 }
+
 //----------------------------------------
 dcmd_flip(playerid, params[])
 {
-	if (!IsPlayerAdmin(playerid) && lvl[playerid] < 1) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-	else if (!strlen(params) || !IsNumeric(params)) return SCM(playerid, MODRA, "[ i ]Pouití /flip [ID]!");
-	new ZadaneID = strval(params), Float:z;
-	if (!IsPlayerConnected(ZadaneID)) return SCM(playerid, COLOR_CERVENA, "[ ! ]Hráè [ID] není na serveru");
+	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 1) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
 
-	else if (IsPlayerInAnyVehicle(ZadaneID)) return SCM(playerid, COLOR_CERVENA, "[ ! ] Zadane ID se nenachazi v autì ! ");
-	{
-		GetVehicleZAngle(GetPlayerVehicleID(ZadaneID), z);
-		SetVehicleZAngle(GetPlayerVehicleID(ZadaneID), z);
-	}
+	if (!sizeof(params) || !IsNumeric(params[0])) 
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /flip [ID]!");
+
+	new targetId = strval(params[0]), Float:z;
+
+	if (!IsPlayerConnected(targetId)) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+
+	if (!IsPlayerInAnyVehicle(targetId)) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac s danym ID se nenachazi v aute!");
+
+	if (GetPlayerState(targetId) != PLAYER_STATE_DRIVER) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac s danym ID se sice nachazi v aute, ale neni ridicem!");
+
+	// Flip player's vehicle.
+	GetVehicleZAngle(GetPlayerVehicleID(targetId), z);
+	SetVehicleZAngle(GetPlayerVehicleID(targetId), z);
+
 	return 1;
 }
 //----------------------------------------
@@ -1266,43 +1291,97 @@ dcmd_flip(playerid, params[])
 //----------------------------------------
 dcmd_djoin(playerid, params[])
 {
-#pragma unused params
-	if (!IsPlayerInAnyVehicle(playerid) || dlistek[playerid] == 1)
+	if (!sizeof(params) || !IsNumeric(params[0]))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /djoin [ID zavodu]");
+
+	new dragRaceId = strval(params[0]), stringToPrint[128];
+
+	if (!IsPlayerInAnyVehicle(playerid))
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Pro prihlaseni do dragu je treba byt v aute!");
+
+	// Check if already joined such race.
+	if (gDragRace[playerid][dragRaceId])
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Do daneho zavodu jsi jiz prihlasen!");
+
+	switch (dragRaceId)
 	{
-		SCM(playerid, COLOR_CERVENA, "[ ! ]Nejsi v aute nebo u jsi v dragu pøihláen");
-	}
-	else
-	{
-		dlistek[playerid] = 1;
-		SCM(playerid, COLOR_ZELZLUT, "[ i ]Má lístek na drag [ -300  ]. Portni se na drag [ /dwarp ] ");
-		GivePlayerMoney(playerid, -300);
+		case E_DRAG_RACE_ID_LV_PYRAMID:
+			{
+				gDragRace[playerid][dragRaceId] = true;	
+				GivePlayerMoney(playerid, -300);
+
+				SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Uspesne prihlasen do daneho zavodu (prihlaska 300 €)!");
+			}
+		default:
+			{
+				format(stringToPrint, sizeof(stringToPrint), "[ i ] Drag zavod s danym ID neni pripraven!");
+				return SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+			}
 	}
 
 	return 1;
 }
-//----------------------------------------
+
+dcmd_cam(playerid, params[])
+{
+	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 2) 
+		return SendClientMessage(playerid, COLOR_SEDA, "[ ! ] Nedostatecny Admin level!");
+
+	switch (strval(params))
+	{
+		case 1:
+			{
+				SetPlayerCameraPos(playerid, 2219.87, 1266.13, 12.53);
+				SetPlayerCameraLookAt(playerid, 2219.89, 1266.13, 12.53);
+
+				SendClientMessage(playerid, MODRA, "[CAM] Kamera 1 zap. [/ccmd][/camoff]");
+			}
+		case 2:
+			{
+				SetPlayerCameraPos(playerid, 2035.62, 1303.53, 10.41);
+				SetPlayerCameraLookAt(playerid, 2056.07, 1318.53, 10.41);
+
+				SendClientMessage(playerid, MODRA, "[CAM] Kamera 2 zap. [/ccmd][/camoff]");
+			}
+		case 3: 
+			{
+				SetPlayerCameraPos(playerid, 2254.22, 1207.01, 10.38);
+				SetPlayerCameraLookAt(playerid, 2254.22, 1207.01, 10.38);
+
+				SendClientMessage(playerid, MODRA, "[CAM] Kamera 3 zap. [/ccmd][/camoff]");
+			}
+		default:
+			{
+				SetCameraBehindPlayer(playerid);
+
+				SendClientMessage(playerid, MODRA, "[CAM] Kamera vypnuta [/ccmd]");
+			}
+	}
+
+	return 1;
+}
+
 dcmd_cmd(playerid, params[])
 {
 #pragma unused params
-	SCM(playerid, COLOR_SVZEL, "[ PRIKAZY: ]");
-	SCM(playerid, COLOR_SVZEL, "[ /cmd /rules /help /balicek /kill /afk  /lock /unlock ]"); //prikazy
-	SCM(playerid, COLOR_SVZEL, "[ /register /login /mp3 /mp3s /djoin(jeste neni hotovo) /dwarp /skydrive ]"); //prikazy 2 radek
-	SCM(playerid, COLOR_SVZEL, "[ /admins /paintball /locate /wanted ]");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ PRIKAZY: ]");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ /cmd /rules /help /balicek /kill /afk  /lock /unlock ]");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ /register /login /mp3 /mp3s /djoin(jeste neni hotovo) /dwarp /skydrive ]");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ /admins /paintball /locate /wanted ]");
+
 	return 1;
 }
-//-----------------------------------------
-stock SendMessageToAdmins(color, const string[])
+
+stock SendMessageToAdmins(colorId, const messageString[])
 {
 	for (new i = 0; i <= MAX_PLAYERS; i++)
 	{
-		if (IsPlayerConnected(i) == 1)
+		if (IsPlayerConnected(i) && (IsPlayerAdmin(i) || gPlayerData[i][E_PLAYER_DATA_ADMIN_LVL] >= 3))
 		{
-			if (IsPlayerAdmin(i) || lvl[i] >= 4)
-			{
-				SendClientMessage(i, color, string);
-			}
+			SendClientMessage(i, colorId, messageString);
 		}
 	}
+
 	return 1;
 }
 
@@ -1352,61 +1431,11 @@ public OnGameModeInit()
 	SetTimer("UpdatePlayerScore", 1000, 1);
 	SetTimer("SendPlayerSalary", 300000, 1);
 
-	//------------------------
-	//CreatePickup(1274, 1,2029.54, 1320.78, 10.82);
-	//	CreatePickup(362, 1,2017.58,1338.44,10.82);
+	//
+	// Create pickups, static objects and static vehicles.
+	//
 
-	polisilv = CreatePickup(1239, 1, 2171.22, 1397.11, 11.06);
-	menupolisi = CreateMenu("Fizly xD", 1, 150.0, 100.0, 250.0, 150.0);
-	AddMenuItem(menupolisi, 0, "Polisi");
-
-	love = CreatePickup(1240, 1, 2302.85, 1155.93, 85.94); //v admin mistnosti
-							       //------------------------
-	lamer = CreatePickup(1239, 1, 2252.11, 1285.30, 19.17);
-	menulamer = CreateMenu("Kravinec", 1, 150.0, 100.0, 250.0, 150.0); //LV pod pyramidu na "prdeli" swingy
-	AddMenuItem(menulamer, 0, "Club Lamy");
-
-	borec = CreatePickup(1239, 1, 2304.43, 1151.95, 85.94);
-	menuborec = CreateMenu("Admin Zona", 1, 150.0, 100.0, 250.0, 150.0); // LV admin mistnost LV
-	AddMenuItem(menuborec, 0, "Admin - Borci");
-
-	benzinak = CreatePickup(1239, 1, 2637.36, 1127.04, 11.18);
-	benzinakmenu = CreateMenu("Benzina", 1, 150.0, 100.0, 250.0, 150.0); // LV benzinky
-	AddMenuItem(benzinakmenu, 0, "Benzinak xD");
-
-	dragster = CreatePickup(1239, 1, 2620.14, 1195.76, 10.81);
-	dragstermenu = CreateMenu("Dragy", 1, 150.0, 100.0, 250.0, 150.0); // LV zacatek dragu
-	AddMenuItem(dragstermenu, 0, "DRaGsTeR");
-
-	tulak = CreatePickup(1581, 1, 2892.8, -2127.9, 3.2);
-	menutulak = CreateMenu("Tulaci", 1, 150.0, 100.0, 250.0, 150.0); // LS plaz
-	AddMenuItem(menutulak, 0, "Tulaci");
-
-	pizzaboy = CreatePickup(1581, 1, 2101.70, -1810.05, 13.55);
-	menupizza = CreateMenu("Pizza", 1, 150.0, 100.0, 250.0, 150.0); // LS u pizza
-	AddMenuItem(menupizza, 0, "PizzaBoy");
-
-	hackeri = CreatePickup(1581, 1, 2838.10, -2130.26, 0.19);
-	hackerimenu = CreateMenu("Hacker",  1, 150.0, 100.0, 250.0, 150.0); // LS za tulakama
-	AddMenuItem(hackerimenu, 0, "Hackeri");
-
-	//technik = CreatePickup(1581,1, );
-	menutechnik = CreateMenu("Technik", 1, 150.0, 100.0, 250.0, 150.0);
-	AddMenuItem(menutechnik, 0, "Technik");
-
-	//pyrotechnik = CreatePickup(1581,1, );
-	menupyrotechnik = CreateMenu("Pyrotechnik", 1, 150.0, 100.0, 250.0, 150.0);
-	AddMenuItem(menupyrotechnik, 0, "Pyrotechnik");
-
-	interiertulaci = CreatePickup(1318, 1, 2866.62, -2125.24, 5.72);
-	tulacizpatky = CreatePickup(1318, 1, 2853.09, -2125.16, 0.19);
-	pytelpenez = CreatePickup(1550, 1, 2838.59, -2141.25, 0.19);
-	picktunel = CreatePickup(1318, 1, 2263.41, -755.52, 38.04);
-
-	duledvera = CreatePickup(1318, 1, 995.78, -1158.06, 23.87);
-	navrchuadmin = CreatePickup(1318, 1, 1007.30, -1160.62, 50.95);
-
-	// Include objects and vehicles
+#include "pickups.pwn"
 #include "objects.pwn"
 #include "vehicles.pwn"
 
@@ -1638,14 +1667,13 @@ public OnPlayerText(playerid, text[])
 		format(string, sizeof(string), "%s[Team Chat]: %s", name, text[1]);
 		for (new i = 0; i < MAX_PLAYERS; i++)
 		{
-			if (IsPlayerConnected(i))
-			{
-				if (iPlayerRole[i] == iPlayerRole[playerid])
-					SendClientMessage(i, GetPlayerColor(playerid), string);
-			}
+			if (IsPlayerConnected(i) && gPlayerData[i][E_PLAYER_DATA_TEAM] == gPlayerData[playerid][E_PLAYER_DATA_TEAM])
+				SendClientMessage(i, GetPlayerColor(playerid), string);
 		}
+
 		return 0;
 	}
+
 	return 1;
 }
 
@@ -1698,7 +1726,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	dcmd(cmd, 3, cmdtext);            //all
 	dcmd(help, 4, cmdtext);           //all
 	dcmd(djoin, 5, cmdtext);          //all
-	dcmd(skydrive, 8, cmdtext);       //all
+	dcmd(skydive, 8, cmdtext);       //all
 	dcmd(flip, 4, cmdtext);           //all
 	dcmd(odpocet, 7, cmdtext);        //all
 	dcmd(admins, 6, cmdtext);         //all
@@ -1712,6 +1740,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	dcmd(fakechat, 8, cmdtext);       //rcon + lvl 2
 	dcmd(smazat, 6, cmdtext);         //rcon +
 	dcmd(admincol, 8, cmdtext);       //rcon +
+	dcmd(cam, 3, cmdtext);
 	dcmd(acmd, 4, cmdtext);           //rcon + lvl 1
 	dcmd(ccmd, 4, cmdtext);           //rcon + lvl 1
 	dcmd(ban, 3, cmdtext);            //rcon + lvl 4
@@ -1801,60 +1830,62 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	//----------------------------------------
 	if (strcmp(cmdtext, "/vup", true) == 0)
 	{
-		if (!IsPlayerAdmin(playerid) && lvl[playerid] < 3) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-		{
-			new name[30];
-			new string[68];
-			MoveObject(vytah, 2303.207, 1174.944, 80.285, 3.0, 0.0, 0.0, 142.812);
-			GetPlayerName(playerid, name, sizeof(name));
-			format(string, sizeof(string), "[ AV ]Admin %s rozjel vytah", name);
-			SendClientMessageToAll(COLOR_ZLUTA, string);
-		}//else if(
+		if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 3) 
+			return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
+
+		new name[30];
+		new string[68];
+		MoveObject(gAdminElevator, 2303.207, 1174.944, 80.285, 3.0, 0.0, 0.0, 142.812);
+		GetPlayerName(playerid, name, sizeof(name));
+		format(string, sizeof(string), "[ AV ]Admin %s rozjel gAdminElevator", name);
+		SendClientMessageToAll(COLOR_ZLUTA, string);
 
 		return 1;
 	}
 	//----------------------------------------
 	if (strcmp(cmdtext, "/vstop", true) == 0)
 	{
-		if (!IsPlayerAdmin(playerid) && lvl[playerid] < 4) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-		{
-			new string[100];
-			StopObject(vytah);
-			format(string, sizeof(string), "[ ! ]Výtah se zasekl ! Kontaktujte technika ! ");
-			SendClientMessageToAll(COLOR_CERVENA, string);
-		}
+		if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 4) 
+			return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
+
+		new string[100];
+		StopObject(gAdminElevator);
+		format(string, sizeof(string), "[ ! ]Výtah se zasekl ! Kontaktujte technika ! ");
+		SendClientMessageToAll(COLOR_CERVENA, string);
+
 		return 1;
 	}
 
 	//----------------------------------------
 	if (strcmp(cmdtext, "/vdown", true) == 0)
 	{
-		if (!IsPlayerAdmin(playerid) && lvl[playerid] < 3) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-		{
-			new name[30];
-			new string[68];
-			MoveObject(vytah, 2303.207, 1174.944, 11.260, 3.0, 0.0, 0.0, 0.0);
-			GetPlayerName(playerid, name, sizeof(name));
-			format(string, sizeof(string), "[ AV ]Admin %s poslal výtah dolù ", name);
-			SendClientMessageToAll(COLOR_ZLUTA, string);
-		}
+		if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 3) 
+			return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
+
+		new name[30];
+		new string[68];
+		MoveObject(gAdminElevator, 2303.207, 1174.944, 11.260, 3.0, 0.0, 0.0, 0.0);
+		GetPlayerName(playerid, name, sizeof(name));
+		format(string, sizeof(string), "[ AV ]Admin %s poslal výtah dolù ", name);
+		SendClientMessageToAll(COLOR_ZLUTA, string);
+
 		return 1;
 	}
 	//----------------------------------------
-	if (strcmp("/reset", cmdtext, true) == 0)
-	{
-		if (IsPlayerAdmin(playerid) && lvl[playerid] < 4) return SCM(playerid, COLOR_SEDA, "] ! ] Nedostateèný Admin-level");
-		{
-			if (lvl[playerid] == 1)
-			{
-				new string[100];
-				format(string, 256, "[ ! ][ SERVER ][ ! ]OPUSTE SERVER ZA 10 SEKUND RESTART SERVERU[ ! ]");
-				SendClientMessageToAll(COLOR_CERVENA, string);
-				SetTimer("RESET", 10000, true);
-			}
-		}
-		return 1;
-	}
+	/*if (strcmp("/reset", cmdtext, true) == 0)
+	  {
+	  if (IsPlayerAdmin(playerid) && lvl[playerid] < 4) return SCM(playerid, COLOR_SEDA, "] ! ] Nedostateèný Admin-level");
+	  {
+	  if (lvl[playerid] == 1)
+	  {
+	  new string[100];
+	  format(string, 256, "[ ! ][ SERVER ][ ! ]OPUSTE SERVER ZA 10 SEKUND RESTART SERVERU[ ! ]");
+	  SendClientMessageToAll(COLOR_CERVENA, string);
+	  SetTimer("RESET", 10000, true);
+	  }
+	  }
+	  return 1;
+	  }*/
 	//----------------------------------------
 	if (strcmp("/paintball", cmdtext, true, 10) == 0)
 	{
@@ -1897,7 +1928,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	//----------------------------------------
 	if (strcmp(cmdtext, "/wanted", true) == 0)
 	{
-		if (iPlayerRole[playerid] == 3 || IsPlayerAdmin(playerid) || lvl[playerid] > 1)
+		if (gPlayerData[playerid][E_PLAYER_DATA_TEAM] == E_PLAYER_TEAM_POLICE || IsPlayerAdmin(playerid) || gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] > 1)
 		{
 			new string[256];
 			for (new i = 0; i <= GetMaxPlayers(); i++)
@@ -1964,61 +1995,20 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		}
 		return 1;
 	}
-	//----------------------------------------
-	if (strcmp("/cam1", cmdtext, true, 10) == 0)
-	{
-		if (!IsPlayerAdmin(playerid) && lvl[playerid] < 2) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-		{
-			SetPlayerCameraPos(playerid, 2219.87, 1266.13, 12.53);
-			SetPlayerCameraLookAt(playerid, 2219.89, 1266.13, 12.53);
-			SCM(playerid, MODRA, "[CAM]Kamera 1 zap. [/ccmd][/camoff]");
-		}
-		return 1;
-	}
-	//--------------------------------------------
-	if (strcmp("/cam2", cmdtext, true, 10) == 0)
-	{
-		if (!IsPlayerAdmin(playerid) && lvl[playerid] < 2) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-		{
-			SetPlayerCameraPos(playerid, 2035.62, 1303.53, 10.41);
-			SetPlayerCameraLookAt(playerid, 2056.07, 1318.53, 10.41);
-			SCM(playerid, MODRA, "[CAM]Kamera 2 zap. [/ccmd][/camoff]");
-		}
-		return 1;
-	}
-	//--------------------------------------------
-	if (strcmp(cmdtext, "/cam3", true, 10) == 0)
-	{
-		if (!IsPlayerAdmin(playerid) && lvl[playerid] < 2) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-		{
-			SetPlayerCameraPos(playerid, 2254.22, 1207.01, 10.38);
-			SetPlayerCameraLookAt(playerid, 2254.22, 1207.01, 10.38);
-			SCM(playerid, MODRA, "[CAM]Kamera 3 zap. [/ccmd][/camoff]");
-		}
-		return 1;
-	}
-	//--------------------------------------------
-	if (strcmp("/camoff", cmdtext, true, 10) == 0)
-	{
-		if (!IsPlayerAdmin(playerid) && lvl[playerid] < 2) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-		{
-			SetCameraBehindPlayer(playerid);
-			SCM(playerid, MODRA, "[CAM]Kamera vypnuta [/ccmd]");
-		}
-		return 1;
-	}
 	//---------------------------------------------
 	//---------------------------------------------
 
 	//----------------------------------------
 	if (strcmp(cmdtext, "/hp", true) == 0)
 	{
-		if (!IsPlayerAdmin(playerid) && lvl[playerid] < 1) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-		{
+		if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 1) 
+			return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostateèný Admin level!");
+
 			SetPlayerHealth(playerid, 100.0);
 			SetPlayerArmour(playerid, 100.0);
-			SCM(playerid, COLOR_SEDA, "[ ! ]Zdravi: 100.0, Vesta: 100.0");
-		}
+
+			SendClientMessage(playerid, COLOR_SEDA, "[ ! ] Zdravi: 100.0, Vesta: 100.0");
+
 		return 1;
 	}
 	//----------------------------------------
@@ -2039,21 +2029,23 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	//----------------------------------------
 	if (strcmp(cmdtext, "/hide", true) == 0)
 	{
-		if (iPlayerRole[playerid] != 2) return SCM(playerid, COLOR_CERVENA, "[ ! ]Nejsi Admin-borec tým !");
-		{
-			SetPlayerColor(hrac, COLOR_NEVIDITEL);
-			SCM(hrac, COLOR_ZLUTA, "[ HIDE ]Nejsi vidìt na mapì! ");
-		}
+		if (gPlayerData[playerid][E_PLAYER_DATA_TEAM] != E_PLAYER_TEAM_ADMINZ) 
+			return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nejsi v tymu Adminz!");
+
+		SetPlayerColor(playerid, COLOR_NEVIDITEL);
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ HIDE ] Nyni nejsi videt na mape!");
+
 		return 1;
 	}
 	//----------------------------------------
 	if (strcmp(cmdtext, "/unhide", true) == 0)
 	{
-		if (iPlayerRole[playerid] != 2) return SCM(playerid, COLOR_CERVENA, "[ ! ]Nejsi Admin-borec tým !");
-		{
-			SetPlayerColor(hrac, COLOR_SVZEL);
-			SCM(hrac, COLOR_ZLUTA, "[ HIDE ]Teï jsi vidìt na mapì! ");
-		}
+		if (gPlayerData[playerid][E_PLAYER_DATA_TEAM] != E_PLAYER_TEAM_ADMINZ) 
+			return SCM(playerid, COLOR_CERVENA, "[ ! ] Nejsi v tymu Adminz!");
+
+		SetPlayerColor(playerid, COLOR_SVZEL);
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ HIDE ] Jsi opet videt na mape!");
+
 		return 1;
 	}
 	//----------------------------------------
@@ -2477,14 +2469,15 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	//----------------------------------------
 	if (strcmp(cmdtext, "/vybava", true) == 0)
 	{
-		if (!IsPlayerAdmin(playerid) && lvl[playerid] < 2) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-		{
+		if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 2) 
+			return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostateèný Admin level!");
+
 			GivePlayerWeapon(playerid, 28, 400);
 			GivePlayerWeapon(playerid, 26, 400);
 			GivePlayerWeapon(playerid, 31, 400);
 			GivePlayerWeapon(playerid, 46, 1);
 			GivePlayerWeapon(playerid, 43, 1);
-		}
+
 		return 1;
 	}
 
@@ -2703,7 +2696,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 					SendClientMessageToAll(COLOR_ZLUTA, string);
 					printf(string); //
 					ResetPlayerWeapons(playerid); //restartuj hracovi zbrane-MUETE VYMAZAT
-					iPlayerRole[playerid] = 1; //promenna na povolani cislo 1
+					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_LAME; //promenna na povolani cislo 1
 					SetPlayerSkin(playerid, 200); // hracUV skin
 					SetPlayerColor(playerid, COLOR_ZLUTA); //hracovo barva
 									       //SetPlayerPos(playerid,,-2024.5919,145.2734,28.8359); //(,-2024.5919,145.2734,28.8359) teleportuje pri prihlaseni zamestnani
@@ -2724,7 +2717,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 					SendClientMessageToAll(COLOR_ZLUTA, string);
 					printf(string); //vytiskne to do logu
 					SetPlayerSkin(playerid, 29);
-					iPlayerRole[playerid] = 2; //promenna na povolani cislo 2
+					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_ADMINZ; //promenna na povolani cislo 2
 					SetPlayerColor(playerid, COLOR_SVZEL); //hracovo barva
 									       //SetPlayerPos(playerid,,-2024.5919,145.2734,28.8359); //(,-2024.5919,145.2734,28.8359) teleportuje pri prihlaseni zamestnani
 				}
@@ -2739,14 +2732,14 @@ public OnPlayerSelectedMenuRow(playerid, row)
 				{
 					new pname[MAX_PLAYER_NAME];
 					GetPlayerName(playerid, pname, MAX_PLAYER_NAME);
-					format(string, sizeof(string), "[!] Hrac %s se pripojil k POLIUM", pname); //UVIDI VSICHNI
+					format(string, sizeof(string), "[!] Hrac %s se pripojil k POLISUM", pname); //UVIDI VSICHNI
 					GivePlayerWeapon(playerid, 32, 111); //PRIDA HRACOVI ZBRAN ID,NABOJU
 					GivePlayerWeapon(playerid, 31, 100);
 					GivePlayerWeapon(playerid, 30, 100);
 					SendClientMessageToAll(COLOR_ZLUTA, string);
 					printf(string); //vytiskne to do logu
 					SetPlayerSkin(playerid, 285);
-					iPlayerRole[playerid] = 3; //promenna na povolani cislo 3
+					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_POLICE; //promenna na povolani cislo 3
 					SetPlayerColor(playerid, MODRA); //hracovo barva
 				}
 		}
@@ -2765,7 +2758,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 					GivePlayerWeapon(playerid, 32, 1); //PRIDA HRACOVI ZBRAN ID,NABOJU
 					SendClientMessageToAll(COLOR_ZLUTA, string);
 					printf(string); //vytiskne to do logu
-					iPlayerRole[playerid] = 4; //promenna na povolani cislo 4
+					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_GASMAN; //promenna na povolani cislo 4
 					SetPlayerColor(playerid, COLOR_CERVENA); //hracovo barva
 					SetPlayerSkin(playerid, 50);
 					//SetPlayerPos(playerid,,-2024.5919,145.2734,28.8359); //(,-2024.5919,145.2734,28.8359) teleportuje pri prihlaseni zamestnani
@@ -2788,7 +2781,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 					GivePlayerWeapon(playerid, 5, 1);
 					SendClientMessageToAll(COLOR_ZLUTA, string);
 					printf(string); //tisk
-					iPlayerRole[playerid] = 5; //promenna na povolani cislo 5
+					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_DRAGSTER; //promenna na povolani cislo 5
 					SetPlayerSkin(playerid, 107);
 					SetPlayerColor(playerid, COLOR_ORANZOVA);
 				}
@@ -2809,7 +2802,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 					SetPlayerSkin(playerid, 230) || SetPlayerSkin(playerid, 137);
 					SendClientMessageToAll(COLOR_ZLUTA, string);
 					printf(string); //vytiskne to do logu
-					iPlayerRole[playerid] = 6; //promenna na povolani cislo 6
+					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_GARBAGE; //promenna na povolani cislo 6
 					SetPlayerColor(playerid, COLOR_SVZEL); //hracovo barva
 									       //SetPlayerPos(playerid,,-2024.5919,145.2734,28.8359); //(,-2024.5919,145.2734,28.8359) teleportuje pri prihlaseni zamestnani
 				}
@@ -2830,7 +2823,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 					SendClientMessageToAll(COLOR_ZLUTA, string);
 					printf(string); //vytiskne to do logu
 					SetPlayerSkin(playerid, 250);
-					iPlayerRole[playerid] = 7; //promenna na povolani cislo 7
+					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_PIZZABOY; //promenna na povolani cislo 7
 					SetPlayerColor(playerid, COLOR_ZELZLUT); //hracovo barva
 										 //SetPlayerPos(playerid,,-2024.5919,145.2734,28.8359); //(,-2024.5919,145.2734,28.8359) teleportuje pri prihlaseni zamestnani
 				}
@@ -2851,7 +2844,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 					SetPlayerSkin(playerid, 170);
 					SendClientMessageToAll(COLOR_ZLUTA, string);
 					printf(string); //vytiskne to do logu
-					iPlayerRole[playerid] = 8; //promenna na povolani cislo 8
+					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_HACKER; //promenna na povolani cislo 8
 					SetPlayerColor(playerid, COLOR_BILA); //hracovo barva
 									      //SetPlayerPos(playerid,,-2024.5919,145.2734,28.8359); //(,-2024.5919,145.2734,28.8359) teleportuje pri prihlaseni zamestnani
 				}
@@ -2872,7 +2865,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 					SetPlayerSkin(playerid, 50);
 					SendClientMessageToAll(COLOR_ZLUTA, string);
 					printf(string); //vytiskne to do logu
-					iPlayerRole[playerid] = 9; //promenna na povolani cislo 9
+					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_CAR_REPAIR; //promenna na povolani cislo 9
 					SetPlayerColor(playerid, COLOR_SEDA); //hracovo barva
 									      //SetPlayerPos(playerid,,-2024.5919,145.2734,28.8359); //(,-2024.5919,145.2734,28.8359) teleportuje pri prihlaseni zamestnani
 				}
@@ -2894,7 +2887,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 					SetPlayerSkin(playerid, 230);
 					SendClientMessageToAll(COLOR_ZLUTA, string);
 					printf(string); //vytiskne to do logu
-					iPlayerRole[playerid] = 10; //promenna na povolani cislo 10
+					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_PYRO; //promenna na povolani cislo 10
 					SetPlayerColor(playerid, COLOR_SEDA); //hracovo barva
 									      //SetPlayerPos(playerid,,-2024.5919,145.2734,28.8359); //(,-2024.5919,145.2734,28.8359) teleportuje pri prihlaseni zamestnani
 				}
@@ -3031,11 +3024,11 @@ stock TestPrint(print[])
 #endif
 }
 
-public RESET()
-{
-	SendRconCommand("gmx");
-	return 1;
-}
+/*public RESET()
+  {
+  SendRconCommand("gmx");
+  return 1;
+  }*/
 
 /*
    public stavA()

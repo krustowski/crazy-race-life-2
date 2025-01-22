@@ -1,0 +1,11 @@
+{
+	"user": "vxn",
+	"repo": "crazy-and-race-life-2",
+	"tag": "0.0.1",
+	"entry": "main.pwn",
+	"output": "gamemodes/crl.amx",
+	"dependencies": [
+		"pawn-lang/samp-stdlib"
+	],
+	"local": true
+}

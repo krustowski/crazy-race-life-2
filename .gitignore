@@ -1,0 +1,6 @@
+announce
+dependencies/*
+gamemodes/*
+samp03svr
+samp-npc
+server.cfg

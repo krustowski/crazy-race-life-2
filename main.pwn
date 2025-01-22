@@ -143,31 +143,67 @@ EnableStuntBonusForAll(0);  		//vypne stunt bonusy aspon mylsim:)
 #define RC_TANK    	564
 #define RC_CAM      	594
 
-//---------------------[ INCLUDY DEFINICE PARAGMY ]---------------------------//
+//
+// Advertisement.
+//
 
 forward ShowAdvert();
+
+#include "advert.pwn"
+
+//
+// Anticheating.
+//
+
+forward AntiJetPack();
+forward AntiCheatWeapon();
+
+#include "anticheat.pwn"
+
+//
+// Clock text (re)drawing.
+//
+
+forward DrawClockText();
+
+#include "clock.pwn"
+
+//
+// Paintball minigame.
+//
 
 forward StartPaintball();
 forward GetPaintballScoreboard();
 forward EndPaintball();
 
-forward DrawClockText();
+#include "paintball.pwn"
+
+//
+// Player data management.
+//
+
+forward BatchSavePlayerData();
+forward SavePlayerData(playerid);
+forward SendPlayerSalary();
+forward UpdatePlayerScore();
+
+#include "player.pwn"
+
+//
+// Radar + Vehicle velocity.
+//
+
+forward OnRadarCheckpoint();
+forward OffRadarCheckpoint(playerid);
+
+#include "radar.pwn"
 
 //
 //
 //
-
-forward AntiJetPack();
-forward Weapon_Anti_Cheat();
 
 forward Machine();
-forward radarCH();
-forward radarEX(playerid);
-forward ulozeni(playerid);
-forward ScoreUpdate();
 forward drag();
-forward Vyplata(playerid);
-
 forward RESET();
 
 //
@@ -177,29 +213,15 @@ forward RESET();
 new const GAMEMODE_NAME[] = "CrazyRaceLife2";
 new const VEHICLE_PLATE[] = "-CRL2-";
 
-// The very game clock's text.
-new Text:gClockText;
-
 //
 //
 //
 
-enum SPS
-{
-      Float:X_r,
-      Float:Y_r,
-      Float:Z_r
-}
-
-
-new PlayerPos[200][SPS];
-new Text:KPH[MAX_PLAYERS];
-new Text:KPHR[MAX_PLAYERS];
-new Radarovany[MAX_PLAYERS];
 new bank[MAX_PLAYERS];
 new dlistek[MAX_PLAYERS];
 new lvl[MAX_PLAYERS];
 new iPlayerRole[MAX_PLAYERS];
+
 new vytah;
 new lamer;
 new Menu:menulamer;
@@ -230,25 +252,15 @@ new picktunel;
 new hackeri;
 new Menu:hackerimenu;
 
+//
+//
+//
+
 new marihuana[MAX_PLAYERS];
 new tabak[MAX_PLAYERS];
 new papirek[MAX_PLAYERS];
 new zapik[MAX_PLAYERS];
 new joint[MAX_PLAYERS];
-
-//
-// Paintball
-//
-
-enum E_PAINTBALL
-{
-	E_PAINTBALL_INGAME,
-	E_PAINTBALL_SCORE
-}
-
-new gPaintball[MAX_PLAYERS][E_PAINTBALL];
-
-#include "paintball.pwn"
 
 //
 //
@@ -261,11 +273,8 @@ enum ACCOUNT
 
 static Hrac[MAX_PLAYERS][ACCOUNT];
 
-//----------------------------------------------------|
 new AdminAuto;
-//new gPlayerAuth[MAX_PLAYERS];
 
-new gPlayerAuth[MAX_PLAYERS];
 
 /*new VehicleName[][] = {
   "Landstalker",
@@ -597,42 +606,40 @@ dcmd_unlock(playerid, params[])
 
 dcmd_register(playerid, params[])
 {
-
 	if (gPlayerAuth[playerid])
-		return SystemMsg(playerid, "[SERVER] REGISTRACE OK - /login *heslo*");
-	if (udb_Exists(PlayerName(playerid)))
-		return SystemMsg(playerid, "[SERVER] ÚÈET U TADY MÁ - POUIJ /login *heslo*.");
-	if (strlen(params) == 0)
-		return SystemMsg(playerid, "[SERVER] REGISTRUJ SE /register *heslo*");
-	if (udb_Create(PlayerName(playerid), params))
-		return SystemMsg(playerid, "[SERVER] ÚÈET VYTVOØEN - /login *heslo*.");
-	return true;
+		return SystemMsg(playerid, "[SERVER] Registrace herniho uctu probehla uspesne! --> /login *heslo*");
 
+	if (udb_Exists(PlayerName(playerid)))
+		return SystemMsg(playerid, "[SERVER] Neni treba se znovu registrovat --> /login *heslo*.");
+
+	if (strlen(params) == 0)
+		return SystemMsg(playerid, "[SERVER] Registrace je povinna --> /register *heslo*");
+
+	if (udb_Create(PlayerName(playerid), params))
+		return SystemMsg(playerid, "[SERVER] Herni ucet uspesne vytvoren --> /login *heslo*.");
+
+	return 1;
 }
 
 dcmd_login(playerid, params[])
 {
-	if (gPlayerAuth[playerid]) return SystemMsg(playerid, "[SERVER] U jsi pøihláen.");
+	if (gPlayerAuth[playerid]) 
+		return SystemMsg(playerid, "[SERVER] Uz jsi prihlasen.");
 
-	if (!udb_Exists(PlayerName(playerid))) return SystemMsg(playerid, "[SERVER] ÚÈET NEEXISTUJE POUZIJ /register *heslo*");
+	if (!udb_Exists(PlayerName(playerid))) 
+		return SystemMsg(playerid, "[SERVER] Data pro dany nickname nenalezena --> /register *heslo*");
 
-	if (strlen(params) == 0) return SystemMsg(playerid, "[SERVER] POUIJTE /login *heslo*");
+	if (strlen(params) == 0) 
+		return SystemMsg(playerid, "[SERVER] Je treba se prihlasit --> /login *heslo*");
 
 	if (udb_CheckLogin(PlayerName(playerid), params))
 	{
-
-		GivePlayerMoney(playerid, dUserINT(PlayerName(playerid)).("money") - GetPlayerMoney(playerid)); //[SERVER] U jsi pøihláen
-		lvl[playerid] = dUserINT(PlayerName(playerid)).("adminlvl");
-		iPlayerRole[playerid] = dUserINT(PlayerName(playerid)).("tym");
-		joint[playerid] = dUserINT(PlayerName(playerid)).("joint");
-		zapik[playerid] = dUserINT(PlayerName(playerid)).("zapik");
-		SetPlayerColor(playerid, bezova);
-		//SetPlayerSkin(playerid) = dUserINT(PlayerName(playerid)).("skin");
+		LoadPlayerData(playerid)
 		gPlayerAuth[playerid] = true;
 
-		return SystemMsg(playerid, "[SERVER] PØIHLÁENO - NAÈTENY PRACHY A SKIN.");
+		return SystemMsg(playerid, "[SERVER] Hrac prihlasen, pokracujte pomoci Spawn.");
 	}
-	return SystemMsg(playerid, "[SERVER] PØIHLÁENÍ NEÚSPÌNÉ - OPAKUJTE /login *heslo*");
+	return SystemMsg(playerid, "[SERVER] Prihlaseni se nezdarilo --> /login *heslo*");
 }
 
 
@@ -1249,13 +1256,18 @@ public OnGameModeInit()
 
 	SetGameModeText(GAMEMODE_NAME);
 
-	SetTimer("Weapon_Anti_Cheat", 30000, 1);
-	//SetTimer("bomb",60000,1);
-	SetTimer("radarCH", 300, 1);
+	//
+	// Start various timers.
+	//
+
+	SetTimer("AntiCheatWeapon", 30000, 1);
+	SetTimer("OnRadarCheckpoint", 300, 1);
+
 	SetTimer("Machine", 1000, 1);
-	SetTimer("ulozeni", 200000, 1);
-	SetTimer("ScoreUpdate", 1000, true);
-	SetTimer("Vyplata", 300000, 1);
+
+	SetTimer("BatchSavePlayerData", 200000, 1);
+	SetTimer("UpdatePlayerScore", 1000, 1);
+	SetTimer("SendPlayerSalary", 300000, 1);
 
 	//------------------------
 	//CreatePickup(1274, 1,2029.54, 1320.78, 10.82);
@@ -1380,12 +1392,12 @@ public OnPlayerRequestSpawn(playerid)
 		if (udb_Exists(PlayerName(playerid)))
 		{
 			GameTextForPlayer(playerid, "~w~Prihlas se!", 5000, 5);
-			SendClientMessage(playerid, COLOR_SVZEL, "Nejsi přihlášen --> /login heslo");
+			SendClientMessage(playerid, COLOR_SVZEL, "Nejsi prihlasen --> /login heslo");
 		}
 		else
 		{
 			GameTextForPlayer(playerid, "~r~Registruj se!", 5000, 5);
-			SendClientMessage(playerid, COLOR_SVZEL, "Nejsi registrován --> /register heslo");
+			SendClientMessage(playerid, COLOR_SVZEL, "Nejsi registrovan --> /register heslo");
 		}
 
 		return 0;
@@ -1397,7 +1409,7 @@ public OnPlayerRequestSpawn(playerid)
 public OnPlayerConnect(playerid)
 {
 	new playerName[MAX_PLAYER_NAME];
-	new stringToPrint[68];
+	new stringToPrint[128];
 
 	// Reset the auth status for a new player.
 	gPlayerAuth[playerid] = false;
@@ -1410,13 +1422,14 @@ public OnPlayerConnect(playerid)
 	TextDrawShowForPlayer(playerid, gClockText);
 
 	// Send a welcome text to the connecting new player.
-	SendClientMessage(playerid, GREEN, "Cus, vítej v modu CrazyRaceLife2! :) /cmd /help /rules");
+	SendClientMessage(playerid, GREEN, "Cus, vitej v modu CrazyRaceLife2! :) /cmd /help /rules");
 
 	SendDeathMessage(playerid, INVALID_PLAYER_ID, 200);
 
 	// Fetch player's name and print it out to outhers online.
 	GetPlayerName(playerid, playerName, sizeof(playerName));
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Hráč %s se právě připojil ke hře!", playerName);
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s se prave pripojil ke hre!", playerName);
+
 	SendClientMessageToAll(COLOR_SEDA, stringToPrint);
 
 	return false;
@@ -1425,6 +1438,7 @@ public OnPlayerConnect(playerid)
 public OnPlayerDisconnect(playerid, reason)
 {
 	Object_OnPlayerDisconnect(playerid, reason);
+
 	TextDrawHideForPlayer(playerid, KPH[playerid]);
 
 	new string[90], Jmeno[30];
@@ -1474,6 +1488,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 {
 	new text[256];
 	SendDeathMessage(killerid, playerid, reason);
+
+	TextDrawHideForPlayer(playerid, KPH[playerid]);
 
 	if (gPaintball[playerid][E_PAINTBALL_INGAME])
 	{
@@ -2847,103 +2863,6 @@ IsPlayerInInvalidNosVehicle(playerid, vehicleid) //TOE K NITRU HAHA
 	return false;
 }
 
-public AntiJetPack()//antijetpack :)--------------------_)
-{
-	new wang[MAX_PLAYER_NAME], string[256];
-	for (new i = 0; i <= GetMaxPlayers(); i++)
-	{
-		if (IsPlayerConnected(i) && !IsPlayerAdmin(i))
-		{
-			if (GetPlayerSpecialAction(i) == SPECIAL_ACTION_USEJETPACK)
-			{
-				GetPlayerName(i, wang, MAX_PLAYER_NAME);
-				format(string, sizeof(string), "[ ! ] Hráè %s byl vyhozen za poruení pravidel. [Jet Pack]", wang);
-				SendClientMessageToAll(COLOR_CERVENA, string);
-				PlayerPlaySound(i, 1056, 0, 0, 0);
-				Kick(i);
-			}
-		}
-	}
-	return 1;
-}
-
-public Weapon_Anti_Cheat()
-{
-	for (new i = 0; i <= GetMaxPlayers(); i++)
-	{
-		if (!IsPlayerAdmin(i))
-		{
-			new WeData[13][2];
-			GetPlayerWeaponData(i, 7, WeData[7][0], WeData[7][1]);
-			if (WeData[7][0] == 38 || WeData[7][0] == 37 || WeData[7][0] == 36)
-			{
-				new wang[MAX_PLAYERS], string[256];
-				GetPlayerName(i, wang, MAX_PLAYER_NAME);
-				format(string, sizeof(string), "Hráè %s byl vyhozen za weapon cheat", wang);
-				SendClientMessageToAll(COLOR_CERVENA, string);
-				Kick(i);
-			}
-		}
-	}
-	return 1;
-}
-
-public radarCH()
-{
-	for (new i = 0; i < MAX_PLAYERS; i++)
-	{
-		if (IsPlayerInAnyVehicle(i) && IsPlayerConnected(i))
-		{
-			new string[128], Float:value_r, Float:distance_r, Float:x_r, Float:y_r, Float:z_r;
-			GetPlayerPos(i, x_r, y_r, z_r);
-			distance_r = floatsqroot(floatpower(floatabs(floatsub(x_r, PlayerPos[i][X_r])), 2) + floatpower(floatabs(floatsub(y_r, PlayerPos[i][Y_r])), 2) + floatpower(floatabs(floatsub(z_r, PlayerPos[i][Z_r])), 2));
-			value_r = floatround(distance_r * 11000);
-			if (floatround(value_r / 1400) > 65)
-			{
-				format(string, 128, "~r~~h~%d", floatround(value_r / 1400));
-			}
-			else
-			{
-				format(string, 128, "~g~~h~%d", floatround(value_r / 1400));
-			}
-			TextDrawSetString(KPHR[i], string);
-			PlayerPos[i][X_r] = x_r;
-			PlayerPos[i][Y_r] = y_r;
-			PlayerPos[i][Z_r] = z_r;
-			if (IsPlayerInSphere(i, 2048.4158, 1173.2195, 10.6719, 15) ||
-					IsPlayerInSphere(i, 2066.5464, 1623.2606, 10.6719, 15) ||
-					IsPlayerInSphere(i, 2347.6807, 2413.1965, 10.6719, 15) ||
-					IsPlayerInSphere(i, 2507.3359, 1880.9712, 10.6719, 15) ||
-					IsPlayerInSphere(i, 2260.2791, 1373.3129, 10.6719, 15) ||
-					IsPlayerInSphere(i, 2427.2900, 1257.8555, 10.7901, 15) nebo
-					IsPlayerInSphere(i, 2210.5552, 973.2725, 10.6719, 15) ||
-					IsPlayerInSphere(i, 1536.0039, 1133.1715, 10.6719, 15) ||
-					IsPlayerInSphere(i, 1007.3343, 1540.1764, 10.6719, 15) ||
-					IsPlayerInSphere(i, 1448.2607, 2589.8904, 10.6719, 15) ||
-					IsPlayerInSphere(i, 1691.7292, 2173.2539, 10.6719, 15))
-			{
-				if (Radarovany[i] == 0 && floatround(value_r / 1400) > 65)
-				{
-					Radarovany[i] = 1;
-					GivePlayerMoney(i, -500);
-					PlayerPlaySound(i, 1147, 0, 0, 0);
-					SCM(i, COLOR_BILA, " ");
-					format(string, 128, "[ Radar ] Jel jsi pøíli velkou rychlostí ( %d Km/h ). Pokuta: -500 ", floatround(value_r / 1400));
-					SCM(i, COLOR_CERVENA, string);
-					SetTimerEx("radarEX", 5000, 0, "i", i);
-					return 1;
-				}
-			}
-		}
-	}
-	return 1;
-}
-//-----------------|
-public radarEX(playerid)
-{
-	Radarovany[playerid] = 0;
-}
-
 public Machine()
 {
 	new i, ip[256], string[256];
@@ -2962,36 +2881,6 @@ public Machine()
 		}
 	}
 	return 1;
-}
-
-public ulozeni(playerid)
-{
-	for (new i = 0; i < GetMaxPlayers(); i++)
-	{
-		if (IsPlayerConnected(i))
-		{
-			SCM(i, COLOR_ORANZCERV, "[ i ][DATA] Pøipravuje se uloení vìcí na úèet...");
-			//-------
-			if (gPlayerAuth[playerid])
-			{
-				dUserSetINT(PlayerName(playerid)).("banka", bank[playerid]);
-				dUserSetINT(PlayerName(playerid)).("money", GetPlayerMoney(playerid));
-				dUserSetINT(PlayerName(i)).("adminlvl", lvl[playerid]);
-				dUserSetINT(PlayerName(i)).("joint", joint[playerid]);
-
-				SCM(i, COLOR_CERVENA, "[ i ][DATA] Uloeno ! "); //hláka
-			}
-		}
-	}
-	return 1;
-}
-
-public ScoreUpdate()
-{
-	for (new i; i <= GetMaxPlayers(); i++)
-	{
-		SetPlayerScore(i, GetPlayerMoney(i));
-	}
 }
 
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
@@ -3060,126 +2949,6 @@ IsVehicleRcTram(vehicleid)
 			return 0;
 	}
 	return 0;
-}
-
-
-public Vyplata() // pubic vyplata
-{
-	new string[256], tmp[256]; //definice stringu pro zpravu a tmp pro game text
-	for (new i = 0; i < MAX_PLAYERS; i++) // zjisti kolik hracu je na serveru
-	{
-		//Vyplata cislo 1
-		if (IsPlayerConnected(i) && iPlayerRole[i] == 1)
-		{
-			new vyplata = 5 + random(20);
-			GivePlayerMoney(i, vyplata);
-			format(string, sizeof(string), "Výplata povolání: %d | Nemysli si ze lamam budeme davat tolik penìz ! ", vyplata);
-			SendClientMessage(i, COLOR_ORANZCERV, string);
-			format(tmp, sizeof(tmp), "~y~V~g~yplata ~n~~y~ %d", vyplata);
-			GameTextForPlayer(i, tmp, 5000, 1);
-		}
-		//Vyplata cislo 2
-		if (IsPlayerConnected(i) && iPlayerRole[i] == 2)
-		{
-			new vyplata2 = 1500 + random(2000);
-			GivePlayerMoney(i, vyplata2);
-			format(string, sizeof(string), "Výplata povolání: %d | Uijte peníze pro co chcete xD ", vyplata2);
-			SendClientMessage(i, COLOR_ORANZCERV, string);
-			format(tmp, sizeof(tmp), "~y~V~g~yplata ~n~~y~ %d", vyplata2);
-			GameTextForPlayer(i, tmp, 5000, 1);
-		}
-		//Vyplata cislo 3
-		if (IsPlayerConnected(i) && iPlayerRole[i] == 3)
-		{
-			new vyplata3 = 1000 + random(600);
-			GivePlayerMoney(i, vyplata3);
-			format(string, sizeof(string), "Výplata povolání: %d | Pro pány fízle pár papírù z kasy :)", vyplata3);
-			SendClientMessage(i, COLOR_ORANZCERV, string);
-			format(tmp, sizeof(tmp), "~y~V~g~yplata ~n~~y~ %d ", vyplata3);
-			GameTextForPlayer(i, tmp, 5000, 1);
-		}
-		//Vyplata cislo 4
-		if (IsPlayerConnected(i) && iPlayerRole[i] == 4)
-		{
-			new vyplata4 = 1000 + random(600);
-			GivePlayerMoney(i, vyplata4);
-			format(string, sizeof(string), "Výplata povolání: %d | Prachy z benzinky :D", vyplata4);
-			SendClientMessage(i, COLOR_ORANZCERV, string);
-			format(tmp, sizeof(tmp), "~y~V~g~yplata ~n~~y~ %d", vyplata4);
-			GameTextForPlayer(i, tmp, 5000, 1);
-		}
-		//Vyplata cislo 5
-		if (IsPlayerConnected(i) && iPlayerRole[i] == 5)
-		{
-			new vyplata5 = 1200 + random(1000);
-			GivePlayerMoney(i, vyplata5);
-			format(string, sizeof(string), "Výplata povolání: %d | Výdìlek z dragù :D", vyplata5);
-			SendClientMessage(i, COLOR_ORANZCERV, string);
-			format(tmp, sizeof(tmp), "~y~V~g~yplata ~n~~y~ %d ", vyplata5);
-			GameTextForPlayer(i, tmp, 5000, 1);
-		}
-		//Vyplata cislo 6
-		if (IsPlayerConnected(i) && iPlayerRole[i] == 6)
-		{
-			new vyplata6 = 120 + random(100);
-			GivePlayerMoney(i, vyplata6);
-			format(string, sizeof(string), "Výplata povolání: %d | Podpora mìsta a peníze s popelnic xD ", vyplata6);
-			SendClientMessage(i, COLOR_ORANZCERV, string);
-			format(tmp, sizeof(tmp), "~y~V~g~yplata ~n~~y~ %d ", vyplata6);
-			GameTextForPlayer(i, tmp, 5000, 1);
-		}
-		//Vyplata cislo 7
-		if (IsPlayerConnected(i) && iPlayerRole[i] == 7)
-		{
-			new vyplata7 = 190 + random(200);
-			GivePlayerMoney(i, vyplata7);
-			format(string, sizeof(string), "Výplata povolání: %d | PizzaPodpora a výplaty xD ", vyplata7);
-			SendClientMessage(i, COLOR_ORANZCERV, string);
-			format(tmp, sizeof(tmp), "~y~V~g~yplata ~n~~y~ %d ", vyplata7);
-			GameTextForPlayer(i, tmp, 5000, 1);
-		}
-		//Vyplata cislo 8 hackri
-		if (IsPlayerConnected(i) && iPlayerRole[i] == 8)
-		{
-			new vyplata8 = 500 + random(300);
-			GivePlayerMoney(i, vyplata8);
-			format(string, sizeof(string), "Výplata povolání: %d | Vykradené banky xD ", vyplata8);
-			SendClientMessage(i, COLOR_ORANZCERV, string);
-			format(tmp, sizeof(tmp), "~y~V~g~yplata ~n~~y~ %d ", vyplata8);
-			GameTextForPlayer(i, tmp, 5000, 1);
-		}
-		//Vyplata cislo 9 technik
-		if (IsPlayerConnected(i) && iPlayerRole[i] == 9)
-		{
-			new vyplata9 = 300 + random(299);
-			GivePlayerMoney(i, vyplata9);
-			format(string, sizeof(string), "Výplata povolání: %d | Vyplata z autoservisù ", vyplata9);
-			SendClientMessage(i, COLOR_ORANZCERV, string);
-			format(tmp, sizeof(tmp), "~y~V~g~yplata ~n~~y~ %d ", vyplata9);
-			GameTextForPlayer(i, tmp, 5000, 1);
-		}
-		//Vyplata cislo 10 pyrotechnik
-		if (IsPlayerConnected(i) && iPlayerRole[i] == 10)
-		{
-			new vyplata10 = 800 + random(210);
-			GivePlayerMoney(i, vyplata10);
-			format(string, sizeof(string), "Výplata povolání: %d | Vyplata od ministerstva pyrotechniky :D", vyplata10);
-			SendClientMessage(i, COLOR_ORANZCERV, string);
-			format(tmp, sizeof(tmp), "~y~V~g~yplata ~n~~y~ %d ", vyplata10);
-			GameTextForPlayer(i, tmp, 5000, 1);
-		}
-		//Vyplata cislo 0 nezamnestnany
-		if (IsPlayerConnected(i) && iPlayerRole[i] == 0)
-		{
-			new vyplata0 = 100 + random(150);
-			GivePlayerMoney(i, vyplata0);
-			format(string, sizeof(string), "Výplata povolání: %d | Pár dorbkù z mìstké kasy :) A nemysli si e nebude pracovat !", vyplata0);
-			SendClientMessage(i, COLOR_ORANZCERV, string);
-			format(tmp, sizeof(tmp), "~y~V~g~yplata ~n~~y~ %d ", vyplata0);
-			GameTextForPlayer(i, tmp, 5000, 1);
-		}
-	}
-	return 1;
 }
 
 stock TestPrint(print[])

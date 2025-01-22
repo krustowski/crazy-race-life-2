@@ -1,3 +1,6 @@
+// The very game clock's text.
+new Text:gClockText;
+
 public DrawClockText()
 {
 	new hour, minute, second, stringToPrint[256];

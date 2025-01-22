@@ -1,3 +1,11 @@
+enum E_PAINTBALL
+{
+	E_PAINTBALL_INGAME,
+	E_PAINTBALL_SCORE
+}
+
+new gPaintball[MAX_PLAYERS][E_PAINTBALL];
+
 public StartPaintball()
 {
 	for (new i = 0; i < MAX_PLAYERS; i++)
@@ -29,10 +37,12 @@ public GetPaintballScoreboard()
 
 		if (IsPlayerConnected(i) && gPaintball[i][E_PAINTBALL_INGAME]) 
 		{
-			new playerName[MAX_PLAYER_NAME];
-			GetPlayerName(i, playerName, sizeof(playerName));
+			new playerName[MAX_PLAYER_NAME], stringToPrint[128];
 
-			SendClientMessage(i, COLOR_SEDA, "%2d (%20s): %3d bodů\n", i, playerName, gPaintball[i][E_PAINTBALL_SCORE]);
+			GetPlayerName(i, playerName, sizeof(playerName));
+			format(stringToPrint, sizeof(stringToPrint), "%2d (%20s): %3d bodů\n", i, playerName, gPaintball[i][E_PAINTBALL_SCORE]);
+
+			SendClientMessage(i, COLOR_SEDA, stringToPrint);
 		}
 	}
 

@@ -1369,39 +1369,36 @@ dcmd_cmd(playerid, params[])
 dcmd_elevator(playerid, params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 3)
-			return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
 
 	new adminName[MAX_PLAYER_NAME], stringToPrint[128];
 
-	switch (params)
+	if (!strcmp(params, "up"))
 	{
-		case "up":
-			{
-				MoveObject(gAdminElevator, 2303.207, 1174.944, 80.285, 3.0, 0.0, 0.0, 142.812);
-				GetPlayerName(playerid, adminName, sizeof(adminName));
+		MoveObject(gAdminElevator, 2303.207, 1174.944, 80.285, 3.0, 0.0, 0.0, 142.812);
+		GetPlayerName(playerid, adminName, sizeof(adminName));
 
-				format(stringToPrint, sizeof(stringToPrint), "[ AV ] Admin %s rozjel vytah nahoru!", adminName);
-				SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
-			}
-		case "stop":
-			{
-				StopObject(gAdminElevator);
+		format(stringToPrint, sizeof(stringToPrint), "[ AV ] Admin %s rozjel vytah nahoru!", adminName);
+		SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
+	}
+	else if (!strcmp(params, "stop"))
+	{
+		StopObject(gAdminElevator);
 
-				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Výtah se zasekl! Kontaktujte technika!");
-				SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
-			}
-		case "down":
-			{
-				MoveObject(gAdminElevator, 2303.207, 1174.944, 11.260, 3.0, 0.0, 0.0, 0.0);
-				GetPlayerName(playerid, adminName, sizeof(adminName));
+		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Výtah se zasekl! Kontaktujte technika!");
+		SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
+	}
+	else if (!strcmp(params, "down"))
+	{
+		MoveObject(gAdminElevator, 2303.207, 1174.944, 11.260, 3.0, 0.0, 0.0, 0.0);
+		GetPlayerName(playerid, adminName, sizeof(adminName));
 
-				format(stringToPrint, sizeof(stringToPrint), "[ AV ] Admin %s poslal vytah dolu", adminName);
-				SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
-			}
-		default:
-			{
-				SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /elevator [up/down/stop]");
-			}
+		format(stringToPrint, sizeof(stringToPrint), "[ AV ] Admin %s poslal vytah dolu", adminName);
+		SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
+	}
+	else
+	{
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /elevator [up/down/stop]");
 	}
 
 	return 1;
@@ -1409,36 +1406,33 @@ dcmd_elevator(playerid, params[])
 
 dcmd_paintball(playerid, params[])
 {
-	switch (params)
+	if (!strcmp(params, "join"))
 	{
-		case "join":
-			{
-				SendClientMessageToAll(COLOR_ZLUTA, "[ ! ] Paintball zacne za 45 sekund! Pripojte se pomoci /paintball join");
-				SetPlayerPos(playerid, -1365.1, -2307.0, 39.1);
+		SendClientMessageToAll(COLOR_ZLUTA, "[ ! ] Paintball zacne za 45 sekund! Pripojte se pomoci /paintball join");
+		SetPlayerPos(playerid, -1365.1, -2307.0, 39.1);
 
-				SetTimer("StartPaintball", 45000, 0);
+		SetTimer("StartPaintball", 45000, 0);
 
-				gPaintball[playerid][E_PAINTBALL_INGAME] = 1;
-			}
-		case "exit":
-			{
-				new playerName[MAX_PLAYER_NAME], stringToPrint[128];
+		gPaintball[playerid][E_PAINTBALL_INGAME] = 1;
+	}
+	else if (!strcmp(params, "exit"))
+	{
+		new playerName[MAX_PLAYER_NAME], stringToPrint[128];
 
-				GetPlayerName(playerid, playerName, sizeof(playerName));
+		GetPlayerName(playerid, playerName, sizeof(playerName));
 
-				if (gPaintball[playerid][E_PAINTBALL_INGAME])
-				{
-					format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s opousti paintball (/paintball exit)!", playerName);
-					SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
+		if (gPaintball[playerid][E_PAINTBALL_INGAME])
+		{
+			format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s opousti paintball (/paintball exit)!", playerName);
+			SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
 
-					SetPlayerHealth(playerid, 0.0);
-					gPaintball[playerid][E_PAINTBALL_INGAME] = 0;
-				}
-			}
-		default:
-			{
-				SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /paintball [join/exit]")
-			}
+			SetPlayerHealth(playerid, 0.0);
+			gPaintball[playerid][E_PAINTBALL_INGAME] = 0;
+		}
+	}
+	else
+	{
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /paintball [join/exit]");
 	}
 
 	return 1;
@@ -1447,7 +1441,7 @@ dcmd_paintball(playerid, params[])
 dcmd_zbrane(playerid, params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 3)
-			return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
 
 	if (!strlen(params) || !IsNumeric(params)) 
 		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /zbrane [playerID]!");
@@ -1471,7 +1465,7 @@ dcmd_reset(playerid, params[])
 {
 #pragma unused params
 	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 4)
-			return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
 
 	new stringToPrint[128];
 
@@ -1479,23 +1473,23 @@ dcmd_reset(playerid, params[])
 	SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
 
 	SetTimer("StartServerReset", 60000, true);
-	
+
 	return 1;
 }
 
 dcmd_locate(playerid, params[])
 {
 #pragma unused params
-		new stringToPrint[256], interior = GetPlayerInterior(playerid), Float:X, Float:Y, Float:Z, Float:Angle;
+	new stringToPrint[256], interior = GetPlayerInterior(playerid), Float:X, Float:Y, Float:Z, Float:Angle;
 
-		GetPlayerPos(playerid, X, Y, Z);
-		GetPlayerFacingAngle(playerid, Angle);
+	GetPlayerPos(playerid, X, Y, Z);
+	GetPlayerFacingAngle(playerid, Angle);
 
-		format(stringToPrint, sizeof(stringToPrint), "[ i ] Nachazite se se v interieru No. %d na souradnicich: X[%.1f], Y[%.1f], Z[%.1f], Rotace[%.1f].", interior, X, Y, Z, Angle);
-		SendClientMessage(playerid, COLOR_SVZEL, stringToPrint);
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Nachazite se se v interieru No. %d na souradnicich: X[%.1f], Y[%.1f], Z[%.1f], Rotace[%.1f].", interior, X, Y, Z, Angle);
+	SendClientMessage(playerid, COLOR_SVZEL, stringToPrint);
 
-		return 1;
-	}
+	return 1;
+}
 
 dcmd_wanted(playerid, params[]) 
 {
@@ -1628,7 +1622,7 @@ dcmd_dwarp(playerid, params[])
 
 	if (IsPlayerInVehicle(playerid, vehicleId) && playerState == PLAYER_STATE_DRIVER) 
 	{
-		SetVehiclePos(typauta, 2601.22, 1196.54, 10.48);
+		SetVehiclePos(vehicleId, 2601.22, 1196.54, 10.48);
 	}
 	else
 	{
@@ -2133,27 +2127,21 @@ public OnPlayerCommandText(playerid, cmdtext[])
 
 	//----------------------------------------
 	//----------------------------------------
-	if (strcmp(cmdtext, "/mp3", true) == 0)
-	{
-		SCM(playerid, GREEN, "[ i ] [ MP3 ] zapnuto.");
-		PlayerPlaySound(playerid, 1185, 0, 0, 1);
-		PlayerPlaySound(playerid, 1084, 0, 0, 0);
-		SCM(playerid, GREEN, "[ i ] [ MP3 ] prehrano :).");
-		return 1;
-	}
-	if (strcmp(cmdtext, "/mp3s", true) == 0)
-	{
-		SCM(playerid, COLOR_CERVENA, "[ i ] [ MP3 ] vypnuto");
-		PlayerPlaySound(playerid, 1186, 0, 0, 0);
-		return 1;
-	}
-	//----------------------------------------
-	//---------------------------------------------
-	//---------------------------------------------
+	/*if (strcmp(cmdtext, "/mp3", true) == 0)
+	  {
+	  SCM(playerid, GREEN, "[ i ] [ MP3 ] zapnuto.");
+	  PlayerPlaySound(playerid, 1185, 0, 0, 1);
+	  PlayerPlaySound(playerid, 1084, 0, 0, 0);
+	  SCM(playerid, GREEN, "[ i ] [ MP3 ] prehrano :).");
+	  return 1;
+	  }
+	  if (strcmp(cmdtext, "/mp3s", true) == 0)
+	  {
+	  SCM(playerid, COLOR_CERVENA, "[ i ] [ MP3 ] vypnuto");
+	  PlayerPlaySound(playerid, 1186, 0, 0, 0);
+	  return 1;
+	  }*/
 
-	//----------------------------------------
-	//----------------------------------------
-	//----------------------------------------
 	/*if (strcmp(cmdtext, "/buypapir", true) == 0)
 	  {
 	  if (papirek[playerid] == 0)

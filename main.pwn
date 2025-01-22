@@ -1572,6 +1572,87 @@ dcmd_hide(playerid, params[])
 	return 1;
 }
 
+dcmd_rules(playerid, params[])
+{
+#pragma unused params
+	SendClientMessage(playerid, COLOR_ORANZCERV, "[ PRAVIDLA SERVER/MODU: ]");
+	SendClientMessage(playerid, COLOR_ORANZCERV, "[ JE ZAKAZANY CARKILL,HELKILL, BIKEKILL, JETPACK, CHEATY ! ]");
+	SendClientMessage(playerid, COLOR_ORANZCERV, "[ NA HRACE KTERI BUDOU IGNOROVAT TYTO PRAVIDLA CEKA /KICK POZDEJI /BAN ! ]");
+	SendClientMessage(playerid, COLOR_ORANZCERV, "[ V MODU JE ZABUDOVAN ANTI-JETPACK I ANTI-CHEAT !]");
+	SendClientMessage(playerid, COLOR_ORANZCERV, "[ VSECHNA PRAVIDLA VYHRAZENA ! ]");
+
+	return 1;
+}
+
+dcmd_kill(playerid, params[])
+{
+#pragma unused params
+	new playerName[MAX_PLAYER_NAME], stringToPrint[256];
+
+	GetPlayerName(playerid, playerName, sizeof(playerName));
+
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrace %s uz to nebavilo a spachal sebevrazdu (/kill)!", playerName);
+	SendClientMessageToAll(COLOR_HNEDA, stringToPrint);
+
+	SetPlayerHealth(playerid, 0);
+
+	return 1;
+}
+
+dcmd_fix(playerid, params[])
+{
+#pragma unused params
+	//if(GetPlayerVehicleID(playerid) == gAdminAuto && !IsPlayerAdmin(playerid)) return SCM(playerid, COLOR_CERVENA, "Nelze opravit");
+
+	if (!IsPlayerInAnyVehicle(playerid)) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nejsi v aute!");
+
+	SendClientMessage(playerid, COLOR_ZLUTA, "[ i ] Opravil sis auto!");
+	SetVehicleHealth(GetPlayerVehicleID(playerid), 1000.0);
+
+	//RepairVehicle(GetPlayerVedicleID(playerid));
+	return 1;
+}
+
+
+dcmd_dwarp(playerid, params[])
+{
+#pragma unused params
+	new playerState = GetPlayerState(playerid), senderName[MAX_PLAYER_NAME], stringToPrint[256], vehicleId = GetPlayerVehicleID(playerid);
+
+	SetPlayerInterior(playerid, 0);
+	GetPlayerName(playerid, senderName, sizeof(senderName));
+
+	format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s hodil warp na drag [ /dwarp ]", senderName);
+	SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
+
+	if (IsPlayerInVehicle(playerid, vehicleId) && playerState == PLAYER_STATE_DRIVER) 
+	{
+		SetVehiclePos(typauta, 2601.22, 1196.54, 10.48);
+	}
+	else
+	{
+		SetPlayerPos(playerid, 2601.22, 1196.54, 10.48);
+	}
+
+	return 1;
+}
+
+dcmd_soska(playerid, params[])
+{
+#pragma unused params
+	SendClientMessage(playerid, COLOR_SVZEL, "[ ------------ SOSKY ------------ ]");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ Sosky se nachazeji v LS a okoli ]");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ Sosek je zatim celkem 5         ]");
+	SendClientMessage(playerid, COLOR_SVZEL, "");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ ----------- ODMENA ------------ ]");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ $10 000 000 na ruku             ]");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ Prihlednuti k ziskani admin-lvl ]");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ TAK HLEDEJTE! :) :D             ]");
+
+	return 1;
+}
+
 //
 //
 //
@@ -2004,6 +2085,8 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	dcmd(cmd, 3, cmdtext);            //all
 	dcmd(dance, 5, cmdtext);	  //all
 	dcmd(djoin, 5, cmdtext);          //all
+	dcmd(dwarp, 5, cmdtext); 	  //all
+	dcmd(fix, 3, cmdtext); 		  //all
 	dcmd(flip, 4, cmdtext);           //all
 	dcmd(givecash, 8, cmdtext);       //all
 	dcmd(help, 4, cmdtext);           //all
@@ -2015,7 +2098,9 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	dcmd(odpocet, 7, cmdtext);        //all
 	dcmd(paintball, 9, cmdtext);	  //all
 	dcmd(register, 8, cmdtext);       //all
+	dcmd(rules, 5, cmdtext); 	  //all
 	dcmd(skydive, 8, cmdtext);        //all
+	dcmd(soska, 5, cmdtext); 	  //all
 	dcmd(stav, 4, cmdtext);           //all
 	dcmd(text, 4, cmdtext);           //all
 	dcmd(ucet, 4, cmdtext);           //all
@@ -2063,85 +2148,11 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		return 1;
 	}
 	//----------------------------------------
-	if (strcmp(cmdtext, "/rules", true) == 0)
-	{
-		SCM(playerid, COLOR_ORANZCERV, "[ PRAVIDLA SERVER/MODU: ]");
-		SCM(playerid, COLOR_ORANZCERV, "[ JE ZAKAZANY CARKILL,HELKILL, BIKEKILL, JETPACK, CHEATY ! ]");
-		SCM(playerid, COLOR_ORANZCERV, "[ NA HRACE KTERI BUDOU IGNOROVAT TYTO PRAVIDLA CEKA /KICK POZDEJI /BAN ! ]");
-		SCM(playerid, COLOR_ORANZCERV, "[ V MODU JE ZABUDOVAN ANTI-JETPACK I ANTI-CHEAT !]");
-		SCM(playerid, COLOR_ORANZCERV, "[ VSECHNA PRAVIDLA VYHRAZENA ! ]");
-		return 1;
-	}
-	//----------------------------------------
-	//----------------------------------------
-	if (strcmp(cmdtext, "/kill", true) == 0)
-	{
-		new playerName[MAX_PLAYER_NAME], stringToPrint[256];
-		GetPlayerName(playerid, playerName, sizeof(playerName));
-
-		format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrace %s uz to nebavilo a spachal sebevrazdu (/kill)!", playerName);
-		SendClientMessageToAll(COLOR_CERVENA, stringToPrint);
-
-		SetPlayerHealth(playerid, 0);
-
-		return 1;
-	}
-
-	//----------------------------------------
-	if (strcmp(cmdtext, "/opr", true) == 0)
-	{
-		//if(GetPlayerVehicleID(playerid) == gAdminAuto && !IsPlayerAdmin(playerid)) return SCM(playerid, COLOR_CERVENA, "Nelze opravit");
-		if (!IsPlayerInAnyVehicle(playerid)) return SCM(playerid, COLOR_CERVENA, "[ ! ]Nejsi v autì !");
-		{
-			SCM(playerid, COLOR_ZLUTA, "[ i ] Opravil sis auto");
-			SetVehicleHealth(GetPlayerVehicleID(playerid), 1000.0);
-			//RepairVehicle(GetPlayerVedicleID(playerid));
-		}
-		return 1;
-	}
 	//---------------------------------------------
 	//---------------------------------------------
 
 	//----------------------------------------
 	//----------------------------------------
-	if (strcmp(cmdtext, "/dwarp", true) == 0)
-	{
-		new string[256];
-		new sendername[MAX_PLAYER_NAME];
-		new typauta = GetPlayerVehicleID(playerid);
-		new State = GetPlayerState(playerid);
-		SetPlayerInterior(playerid, 0);
-		GetPlayerName(playerid, sendername, sizeof(sendername));
-		format(string, sizeof(string), "Hrac %s hodil warp na drag [ /dwarp ]", sendername);
-		SendClientMessageToAll(COLOR_ZLUTA, string);
-		if (State != PLAYER_STATE_DRIVER)
-		{
-			SetPlayerPos(playerid, 2601.22, 1196.54, 10.48);
-		}
-		if (IsPlayerInVehicle(playerid, typauta) == 1)
-		{
-			SetVehiclePos(typauta, 2601.22, 1196.54, 10.48);
-		}
-		else
-		{
-			SetPlayerPos(playerid, 2601.22, 1196.54, 10.48);
-		}
-		return 1;
-	}
-
-	//----------------------------------------
-	if (strcmp("/soska", cmdtext, true) == 0)
-	{
-		SendClientMessage(playerid, COLOR_SVZEL, "[ ----- SOSKY ----- ]");
-		SendClientMessage(playerid, COLOR_SVZEL, "[ Sosky se nachazeji v LS a okoli ]");
-		SendClientMessage(playerid, COLOR_SVZEL, "[ Sosek je zatim celkem 5 ]");
-		SendClientMessage(playerid, COLOR_SVZEL, "[ ----- ODMENA ------ ]");
-		SendClientMessage(playerid, COLOR_SVZEL, "[ $10 000 000 na ruku ]");
-		SendClientMessage(playerid, COLOR_SVZEL, "[ Pozitivnejsi prihlizeni k ziskani admin-lvl ]");
-		SendClientMessage(playerid, COLOR_SVZEL, "[ TAK HLEDEJTE! :) :D ]");
-
-		return 1;
-	}
 	//----------------------------------------
 	/*if (strcmp(cmdtext, "/buypapir", true) == 0)
 	  {

@@ -1046,109 +1046,165 @@ dcmd_lvl(playerid, params[])
 //----------------------------------------
 dcmd_goto(playerid, params[])
 {
-	if (!IsPlayerAdmin(playerid) && lvl[playerid] < 2) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-	else if (!strlen(params) || !IsNumeric(params)) return SCM(playerid, MODRA, "[ i ]Pouití /goto [ID]! ");
-	new ZadaneID = strval(params), Float:a, Float:b, Float:c;
-	if (!IsPlayerConnected(ZadaneID)) return SCM(playerid, COLOR_CERVENA, "[ ! ]Hráè [ID] není na serveru");
-	else if (ZadaneID == playerid) return SCM(playerid, COLOR_CERVENA, "[ ! ]Neni ti divne teleportovat sám sebe? :D");
+	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 2) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
 
-	GetPlayerPos(ZadaneID, a, b, c);
-	new typauta = GetPlayerVehicleID(playerid);
-	new State = GetPlayerState(playerid);
+	if (!sizeof(params) || !IsNumeric(params[0])) 
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /goto [ID]!");
+
+	new targetId = strval(params[0]), Float:x, Float:y, Float:z;
+
+	if (!IsPlayerConnected(targetId)) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+
+	if (targetId == playerid)
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Neni mozne teleportovat se k sobe samemu!");
+
+	// Fetch the coordinates of the targetId player.
+	GetPlayerPos(targetId, x, y, z);
+
+	new playerState = GetPlayerState(playerid), vehicleId = GetPlayerVehicleID(playerid);
+
+	// Ensure the player is outside.
 	SetPlayerInterior(playerid, 0);
 
-	if (State != PLAYER_STATE_DRIVER)
+	switch (playerState) 
 	{
-		SetPlayerPos(playerid, a, b, c);
-	}
-	if (IsPlayerInVehicle(playerid, typauta) == 1)
-	{
-		SetVehiclePos(typauta, a, b, c);
-	}
-	else
-	{
-		SetPlayerPos(playerid, a, b, c);
+		case PLAYER_STATE_DRIVER:
+			{
+				SetVehiclePos(vehicleId, x, y, z);
+			}
+		default:
+			{
+				SetPlayerPos(playerid, x, y, z);
+			}
 	}
 
 	return 1;
 }
-//----------------------------------------
+
 dcmd_givecash(playerid, params[])
 {
-	new ZadaneID = strval(params), pozice = chrfind(' ', params), poslane_penize = strval(params[pozice]), Text[256];
-	if (!IsPlayerConnected(ZadaneID)) return SCM(playerid, COLOR_CERVENA, "[ ! ]Hráè [ ID ] není pøítomen na serveru");
-	else if (!strlen(params) || !IsNumeric(params)) return SCM(playerid, MODRA, "[ i ]Pouití /givecash [ID] [CASTKA] !");
-	if (GetPlayerMoney(playerid) <= poslane_penize) return SCM(playerid, COLOR_CERVENA, "[ ! ]Nemá dost penìz na poslání");
-	{
-		GivePlayerMoney(playerid, -poslane_penize);
+	if (!sizeof(params) || !IsNumeric(params[0]) || !IsNumeric(params[1]))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /givecash [ID] [castka]");
 
-		format(Text, 256, "[ i ] Hráè %s [ID: %d] ti poslal %d  !", PlayerName(playerid), ZadaneID, poslane_penize);
-		SendClientMessageToAll(COLOR_SEDA, Text);
+	new targetId = strval(params[0]), targetAmount = strval(params[1]);
 
-		GivePlayerMoney(ZadaneID, poslane_penize);
-	}
+	if (targetId == playerid)
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Takovy financni prevod je bezpredmetny!");
+
+	if (targetAmount > GetPlayerMoney(playerid) || targetAmount < 0)
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Neplatna castka!");
+
+	if (!IsPlayerConnected(targetId))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+
+	new playerName[MAX_PLAYER_NAME], stringToPrint[128], targetName[MAX_PLAYER_NAME];
+
+	// Fetch players' names.
+	GetPlayerName(playerid, playerName, sizeof(playerName));
+	GetPlayerName(targetId, targetName, sizeof(targetName));
+
+	// Send an informative statement to the receiving player.
+	format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s [ID: %d] ti poslal castku %d €!", playerName, playerid, targetAmount);
+	SendClientMessage(targetId, COLOR_SVZEL, stringToPrint);
+
+	// Transfer money.
+	GivePlayerMoney(targetId, targetAmount);
+	GivePlayerMoney(playerid, -targetAmount);
+
+	// Send an informative statement to the sending player.
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Castka %s € uspesne zaslana hraci %s [ID: %d]!");
+	SendClientMessage(playerid, COLOR_SVZEL, stringToPrint);
+
 	return 1;
 }
-//----------------------------------------
+
 dcmd_nitro(playerid, params[])
 {
-	if (!IsPlayerAdmin(playerid) && lvl[playerid] < 3) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-	else if (!strlen(params) || !IsNumeric(params)) return SCM(playerid, COLOR_SEDA, "[ i ]Pouití /nitro [ID]!");
-	new ZadaneID = strval(params), State = GetPlayerState(ZadaneID),  vehicleid = GetPlayerVehicleID(ZadaneID);
-	if (!IsPlayerConnected(ZadaneID)) return SCM(playerid, COLOR_CERVENA, "[ ! ]Hráè [ID] není na serveru");
+	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 3) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
 
-	else if (IsPlayerInAnyVehicle(ZadaneID)) return SCM(playerid, COLOR_CERVENA, "[ ! ] Zadane ID se nenachazi v autì ! ");
-	if (!IsPlayerInAnyVehicle(ZadaneID)) return SCM(playerid, COLOR_CERVENA, "[ ! ] Zadane ID neni v autì !");
-	else if (State != PLAYER_STATE_DRIVER) return SCM(playerid, COLOR_CERVENA, "[ ! ]Zadané ID musí øídit auto");
+	if (!sizeof(params) || !IsNumeric(params[0]))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /nitro [ID]");
 
-	if (!IsPlayerInInvalidNosVehicle(playerid, GetPlayerVehicleID(playerid))) return SCM(playerid, COLOR_CERVENA, "[ ! ]Do auta Zadaneho ID nejde nainstalovat nitro ! :P");
-	{
-		AddVehicleComponent(vehicleid, 1010);
-		SCM(playerid, COLOR_SEDA, "[ i ] Nitro nainstalováno do auta Zadaného ID !");
-		SCM(ZadaneID, COLOR_SEDA, "[ i ] Admin %s ti nainstaloval do auta nitro !", PlayerName(playerid));
-	}
+	new targetId = strval(params[0]);
+
+	if (!IsPlayerConnected(targetId))
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+
+	new targetPlayerState = GetPlayerState(targetId), targetVehicleId = GetPlayerVehicleID(targetId);
+
+	if (!IsPlayerInVehicle(targetId))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Hrac se nenachazi ve vozidle!");
+
+	if (targetPlayerState != PLAYER_STATE_DRIVER)
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Hrac je sice v aute, ale neni ridicem!");
+
+	if (!IsPlayerInValidNosVehicle(targetId, targetVehicleId)) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Do auta hrace nejde nainstalovat nitro !");
+
+	new adminName[MAX_PLAYER_NAME], stringToPrint[128];
+
+	GetPlayerName(playerid, adminName, sizeof(adminName));
+
+	// Add the NoS component to such vehicleId.
+	AddVehicleComponent(targetVehicleId, 1010);
+
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s ti do auta nainstaloval nitro!", adminName);
+
+	SendClientMessage(playerid, COLOR_SEDA, "[ i ] Nitro nainstalováno do auta hrace s danym ID!");
+	SendClientMessage(targetId, COLOR_SVZEL, stringToPrint);
+
 	return 1;
 }
-//----------------------------------------
+
 dcmd_admincol(playerid, params[])
 {
-	if (!strlen(params) || !IsNumeric(params)) return SCM(playerid, COLOR_CERVENA, "[ ! ] Pouzití: /admincol [1-5]");
-	new barva = strval(params);
+	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 1) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
 
-	if (!IsPlayerAdmin(playerid) && lvl[playerid] < 1) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
+	if (!sizeof(params) || !IsNumeric(params[0])) 
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouzití: /admincol [1-5]");
 
-	if (barva < 1 || barva > 5) return SCM(playerid, COLOR_CERVENA, "[ ! ]Barvy pouze 1-5");
-	switch (barva)
+	new adminColToSet = strval(params[0]);
+
+	switch (adminColToSet)
 	{
 		case 1:
 			{
 				SetPlayerColor(playerid, COLOR_SVZEL);
-				SCM(playerid, COLOR_SVZEL, "[ i ] Barva nicku Svìtle zelená");
+				SendClientMessage(playerid, COLOR_SVZEL, "[ ! ] Barva nicku nastavena na svetle zelenou!");
 			}
 		case 2:
 			{
 				SetPlayerColor(playerid, MODRA);
-				SCM(playerid, MODRA, "[ i ] Barva nicku Modrá");
+				SendClientMessage(playerid, MODRA, "[ i ] Barva nicku nastavena na modrou!");
 			}
 		case 3:
 			{
 				SetPlayerColor(playerid, COLOR_CERVENA);
-				SCM(playerid, COLOR_CERVENA, "[ i ] Barva nicku Èervená");
+				SendClientMessage(playerid, COLOR_CERVENA, "[ i ] Barva nicku nastavena na cervenou!");
 			}
 		case 4:
 			{
 				SetPlayerColor(playerid, COLOR_ORANZOVA);
-				SCM(playerid, COLOR_ORANZOVA, "[ i ] Barva nicku Ozanová");
+				SendClientMessage(playerid, COLOR_ORANZOVA, "[ i ] Barva nicku nastavena na oranzovou!");
 			}
 		case 5:
 			{
 				SetPlayerColor(playerid, COLOR_BILA);
-				SCM(playerid, COLOR_BILA, "[ i ] Barva nicku Bílá");
+				SendClientMessage(playerid, COLOR_BILA, "[ i ] Barva nicku nastavena na bilou!");
+			}
+		default:
+			{
+				return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Barvy pouze 1-5!");
 			}
 	}
+
 	return 1;
 }
-//----------------------------------------
+
 dcmd_ucet(playerid, params[])
 {
 #pragma unused params
@@ -2871,29 +2927,30 @@ GetPlayerDistanceToPointEx(playerid, Float:x, Float:y, Float:z)
 	return floatround(tmpdis);
 }
 
-IsPlayerInInvalidNosVehicle(playerid, vehicleid) //TOE K NITRU HAHA
+stock bool:IsPlayerInValidNosVehicle(playerid, vehicleid)
 {
-#define MAX_INVALID_NOS_VEHICLES 31
+#define MAX_VALID_NOS_VEHICLES 31
 
-	new InvalidNosVehicles[MAX_INVALID_NOS_VEHICLES] =
+	new ValidNosVehicles[MAX_VALID_NOS_VEHICLES] =
 	{
 		581, 523, 462, 521, 463, 522, 461, 448, 468, 586,
 		509, 481, 510, 472, 473, 493, 595, 484, 430, 453,
 		452, 446, 454, 590, 569, 537, 538, 570, 449, 522, 520
 	};
 
-	vehicleid = GetPlayerVehicleID(playerid);
+	new vehicleIdCheck = GetPlayerVehicleID(playerid);
 
-	if (IsPlayerInVehicle(playerid, vehicleid))
+	// Return when the target player changed vehicles meanwhile, or has exited the target vehicle.
+	if (vehicleid != vehicleIdCheck || !IsPlayerInVehicle(playerid, vehicleid))
+		return false;
+
+	// Loop over permitted NoS vehicles.
+	for (new i = 0; i < MAX_VALID_NOS_VEHICLES; i++)
 	{
-		for (new i = 0; i < MAX_INVALID_NOS_VEHICLES; i++)
-		{
-			if (GetVehicleModel(vehicleid) == InvalidNosVehicles[i])
-			{
-				return true;
-			}
-		}
+		if (GetVehicleModel(vehicleid) == ValidNosVehicles[i])
+			return true;
 	}
+
 	return false;
 }
 

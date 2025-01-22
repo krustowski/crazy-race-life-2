@@ -145,10 +145,21 @@ EnableStuntBonusForAll(0);  		//vypne stunt bonusy aspon mylsim:)
 
 //---------------------[ INCLUDY DEFINICE PARAGMY ]---------------------------//
 
-//-----------------------[FORWARDS NEWS ENUMS ]------------------------------//
-forward Reklama();
+forward ShowAdvert();
+
+forward StartPaintball();
+forward GetPaintballScoreboard();
+forward EndPaintball();
+
+forward DrawClockText();
+
+//
+//
+//
+
 forward AntiJetPack();
 forward Weapon_Anti_Cheat();
+
 forward Machine();
 forward radarCH();
 forward radarEX(playerid);
@@ -156,9 +167,22 @@ forward ulozeni(playerid);
 forward ScoreUpdate();
 forward drag();
 forward Vyplata(playerid);
-forward THodiny();
 
 forward RESET();
+
+//
+//
+//
+
+new const GAMEMODE_NAME[] = "CrazyRaceLife2";
+new const VEHICLE_PLATE[] = "-CRL2-";
+
+// The very game clock's text.
+new Text:gClockText;
+
+//
+//
+//
 
 enum SPS
 {
@@ -173,7 +197,6 @@ new Text:KPH[MAX_PLAYERS];
 new Text:KPHR[MAX_PLAYERS];
 new Radarovany[MAX_PLAYERS];
 new bank[MAX_PLAYERS];
-new Text:Hodiny;
 new dlistek[MAX_PLAYERS];
 new lvl[MAX_PLAYERS];
 new iPlayerRole[MAX_PLAYERS];
@@ -213,16 +236,23 @@ new papirek[MAX_PLAYERS];
 new zapik[MAX_PLAYERS];
 new joint[MAX_PLAYERS];
 
-//paintball ------------------
-new skore[MAX_PLAYERS];
-new hrajepaint[MAX_PLAYERS];
+//
+// Paintball
+//
 
-new vytez = 999;
-new vytezskore = 0;
+enum E_PAINTBALL
+{
+	E_PAINTBALL_INGAME,
+	E_PAINTBALL_SCORE
+}
 
-forward konecpaint();
-forward startpaint();
-//paintball ------------------
+new gPaintball[MAX_PLAYERS][E_PAINTBALL];
+
+#include "paintball.pwn"
+
+//
+//
+//
 
 enum ACCOUNT
 {
@@ -233,7 +263,9 @@ static Hrac[MAX_PLAYERS][ACCOUNT];
 
 //----------------------------------------------------|
 new AdminAuto;
-new PLAYERLIST_authed[MAX_PLAYERS];
+//new gPlayerAuth[MAX_PLAYERS];
+
+new gPlayerAuth[MAX_PLAYERS];
 
 /*new VehicleName[][] = {
   "Landstalker",
@@ -566,7 +598,7 @@ dcmd_unlock(playerid, params[])
 dcmd_register(playerid, params[])
 {
 
-	if (PLAYERLIST_authed[playerid])
+	if (gPlayerAuth[playerid])
 		return SystemMsg(playerid, "[SERVER] REGISTRACE OK - /login *heslo*");
 	if (udb_Exists(PlayerName(playerid)))
 		return SystemMsg(playerid, "[SERVER] ÚÈET U TADY MÁ - POUIJ /login *heslo*.");
@@ -580,7 +612,7 @@ dcmd_register(playerid, params[])
 
 dcmd_login(playerid, params[])
 {
-	if (PLAYERLIST_authed[playerid]) return SystemMsg(playerid, "[SERVER] U jsi pøihláen.");
+	if (gPlayerAuth[playerid]) return SystemMsg(playerid, "[SERVER] U jsi pøihláen.");
 
 	if (!udb_Exists(PlayerName(playerid))) return SystemMsg(playerid, "[SERVER] ÚÈET NEEXISTUJE POUZIJ /register *heslo*");
 
@@ -596,7 +628,7 @@ dcmd_login(playerid, params[])
 		zapik[playerid] = dUserINT(PlayerName(playerid)).("zapik");
 		SetPlayerColor(playerid, bezova);
 		//SetPlayerSkin(playerid) = dUserINT(PlayerName(playerid)).("skin");
-		PLAYERLIST_authed[playerid] = true;
+		gPlayerAuth[playerid] = true;
 
 		return SystemMsg(playerid, "[SERVER] PØIHLÁENO - NAÈTENY PRACHY A SKIN.");
 	}
@@ -1212,10 +1244,10 @@ main()
 
 public OnGameModeInit()
 {
+	// YSI object contructor.
 	Object_Object();
-	// nepouzivat v pripade FS// // // /
 
-	SetGameModeText("CRLive 1.30i "); //nazev GM
+	SetGameModeText(GAMEMODE_NAME);
 
 	SetTimer("Weapon_Anti_Cheat", 30000, 1);
 	//SetTimer("bomb",60000,1);
@@ -1224,6 +1256,7 @@ public OnGameModeInit()
 	SetTimer("ulozeni", 200000, 1);
 	SetTimer("ScoreUpdate", 1000, true);
 	SetTimer("Vyplata", 300000, 1);
+
 	//------------------------
 	//CreatePickup(1274, 1,2029.54, 1320.78, 10.82);
 	//	CreatePickup(362, 1,2017.58,1338.44,10.82);
@@ -1280,8 +1313,7 @@ public OnGameModeInit()
 
 	// Include objects and vehicles
 	#include "objects.pwn"
-	initVehicles();
-
+	#include "vehicles.pwn"
 
 	//------------------------
 	if (!dini_Exists(statistika))
@@ -1297,20 +1329,24 @@ public OnGameModeInit()
 	AddPlayerClass(169, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
 	//------------------------
 
-	//-------------------------
-	Hodiny = TextDrawCreate(547.0, 24.0, "nacitani");
-	TextDrawLetterSize(Hodiny, 0.6, 1.8);
-	TextDrawFont(Hodiny, 3);
-	TextDrawSetOutline(Hodiny, 1);
-	//------------
-	SetTimer("THodiny", 60000, 1);
-	//*******************************************
-	SetTimer("Reklama", 1000 * 60 * 2, true); //1OOO milisekund * 60 = 1 minuta * 2 = 2 minuty :) xD
+	//
+	// Clock initialization.
+	//
+
+	gClockText = TextDrawCreate(547.0, 24.0, "nacitani");
+
+	TextDrawLetterSize(gClockText, 0.6, 1.8);
+	TextDrawFont(gClockText, 3);
+	TextDrawSetOutline(gClockText, 1);
+
+	SetTimer("DrawClockText", 60000, 1);
+
+	SetTimer("ShowAdvert", 1000 * 60 * 2, true); //1OOO milisekund * 60 = 1 minuta * 2 = 2 minuty :) xD
 
 	//----SPZ--AUTA
 	for (new i = 0; i < MAX_VEHICLES; i++)
 	{
-		SetVehicleNumberPlate(i, "CRL MOD");
+		SetVehicleNumberPlate(i, VEHICLE_PLATE);
 	}
 	return 1;
 }
@@ -1320,9 +1356,11 @@ public OnGameModeInit()
 public OnGameModeExit()
 {
 	print("\n +-----------------------------+");
-	print("   | Mode CRLive is Shuting DOwn |");
+	printf("   | Mode %s is Shuting Down |", GAMEMODE_NAME);
 	print(" +-----------------------------+ \n");
-	KillTimer(SetTimer("Reklama", 1000 * 60 * 2, true));
+
+	KillTimer(SetTimer("ShowAdvert", 1000 * 60 * 2, true));
+
 	return 1;
 }
 
@@ -1331,41 +1369,56 @@ public OnPlayerRequestClass(playerid, classid)
 	SetPlayerPos(playerid, 1966.1, 1936.1, 127.5);
 	SetPlayerCameraPos(playerid, 1871.3, 1933.6, 127.5);
 	SetPlayerCameraLookAt(playerid, 1966.1, 1936.1, 127.5);
+
 	return 1;
 }
 
 public OnPlayerRequestSpawn(playerid)
 {
-	if (!PLAYERLIST_authed[playerid])
+	if (!gPlayerAuth[playerid])
 	{
 		if (udb_Exists(PlayerName(playerid)))
 		{
 			GameTextForPlayer(playerid, "~w~Prihlas se!", 5000, 5);
-			SCM(playerid, COLOR_SVZEL, "Nejsi prihlaseny, napi /login heslo");
+			SendClientMessage(playerid, COLOR_SVZEL, "Nejsi přihlášen --> /login heslo");
 		}
 		else
 		{
 			GameTextForPlayer(playerid, "~r~Registruj se!", 5000, 5);
-			SCM(playerid, COLOR_SVZEL, "Nejsi registrovany, napis /register heslo");
+			SendClientMessage(playerid, COLOR_SVZEL, "Nejsi registrován --> /register heslo");
 		}
+
 		return 0;
 	}
+
 	return 1;
 }
 
 public OnPlayerConnect(playerid)
 {
-	new pName[MAX_PLAYER_NAME];
-	new string[68];
-	skore[playerid] = 0;
-	hrajepaint[playerid] = 0;
-	TextDrawShowForPlayer(playerid, Hodiny);
-	SCM(playerid, GREEN, "Cus, vítej v mode CRLive ;) /cmd /acmd /help /rules");
-	PLAYERLIST_authed[playerid] = false;
+	new playerName[MAX_PLAYER_NAME];
+	new stringToPrint[68];
+
+	// Reset the auth status for a new player.
+	gPlayerAuth[playerid] = false;
+
+	// Reset the paintball states.
+	gPaintball[playerid][E_PAINTBALL_INGAME] = 0;
+	gPaintball[playerid][E_PAINTBALL_SCORE] = 0;
+
+	// Show the game clock.
+	TextDrawShowForPlayer(playerid, gClockText);
+
+	// Send a welcome text to the connecting new player.
+	SendClientMessage(playerid, GREEN, "Cus, vítej v modu CrazyRaceLife2! :) /cmd /help /rules");
+
 	SendDeathMessage(playerid, INVALID_PLAYER_ID, 200);
-	GetPlayerName(playerid, pName, sizeof(pName));
-	format(string, sizeof(string), "[ i ] Èus xD! %s doel na server za námi xD", pName); // co to ma napsat
-	SendClientMessageToAll(COLOR_SEDA, string); // oznameni :D
+
+	// Fetch player's name and print it out to outhers online.
+	GetPlayerName(playerid, playerName, sizeof(playerName));
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Hráč %s se právě připojil ke hře!", playerName);
+	SendClientMessageToAll(COLOR_SEDA, stringToPrint);
+
 	return false;
 }
 
@@ -1373,10 +1426,10 @@ public OnPlayerDisconnect(playerid, reason)
 {
 	Object_OnPlayerDisconnect(playerid, reason);
 	TextDrawHideForPlayer(playerid, KPH[playerid]);
+
 	new string[90], Jmeno[30];
 
-
-	if (PLAYERLIST_authed[playerid])
+	if (gPlayerAuth[playerid])
 	{
 		dUserSetINT(PlayerName(playerid)).("money", GetPlayerMoney(playerid)); //co se ulozi do %s.dudb.sav
 		dUserSetINT(PlayerName(playerid)).("banka", bank[playerid]); //to co nahore akorat jina vec
@@ -1387,9 +1440,12 @@ public OnPlayerDisconnect(playerid, reason)
 		//dUserSetINT(playerName(playerid)).
 		dUserSetINT(PlayerName(playerid)).("skin", GetPlayerSkin(playerid));
 	}
-	PLAYERLIST_authed[playerid] = false;
+
+	gPlayerAuth[playerid] = false;
+
 	SendDeathMessage(playerid, INVALID_PLAYER_ID, 201);
 	GetPlayerName(playerid, Jmeno, 30);
+
 	switch (reason)
 	{
 		case 0: format(string, sizeof(string), "[ i ] %s odpojen [spadla hra]", Jmeno); //spadnuti hry - oznameni v konzoli
@@ -1404,11 +1460,13 @@ public OnPlayerDisconnect(playerid, reason)
 
 public OnPlayerSpawn(playerid)
 {
-	if (hrajepaint[playerid] == 1)
+	// Set the player back to the paintball area if is set in game.
+	if (gPaintball[playerid][E_PAINTBALL_INGAME])
 	{
 		SetPlayerPos(playerid, -1365.1, -2307.0, 39.1);
-		GivePlayerWeapon(playerid, 29, 999);//zbran
+		GivePlayerWeapon(playerid, 29, 999);
 	}
+
 	return 1;
 }
 
@@ -1416,23 +1474,29 @@ public OnPlayerDeath(playerid, killerid, reason)
 {
 	new text[256];
 	SendDeathMessage(killerid, playerid, reason);
-	if (hrajepaint[playerid] == 1)
+
+	if (gPaintball[playerid][E_PAINTBALL_INGAME])
 	{
-		skore[killerid] ++;
-		if (skore[killerid] > vytezskore)
+		gPaintball[killerid][E_PAINTBALL_SCORE]++;
+
+		GetPaintballScoreboard();
+
+		/*if (gPaintball[killerid] > vytezgPaintball)
 		{
 			new killer[MAX_PLAYER_NAME];
+
 			vytez = killerid;
-			vytezskore = skore[killerid];
+			vytezgPaintball = gPaintball[killerid];
 			GetPlayerName(killerid, killer, sizeof(killer));
 			for (new i = 0; i < MAX_PLAYERS; i++)
 			{
-				format(text, sizeof(text), "[ i ] %s je ve vedení ! [ Score: %d ].", killer, vytezskore); //text kdo je ve vedeni podle skore :)
+				format(text, sizeof(text), "[ i ] %s je ve vedení ! [ Score: %d ].", killer, vytezgPaintball); //text kdo je ve vedeni podle gPaintball :)
 				SendClientMessage(playerid, COLOR_BILA, text);
 			}
-		}
+		}*/
 		return 1;
 	}
+
 	new killerstate = GetPlayerState(killerid); //zjisti kde sedi hrac
 	if (IsPlayerInAnyVehicle(killerid) && (!IsPlayerInAnyVehicle(playerid)) && (killerstate == PLAYER_STATE_DRIVER) && (reason != WEAPON_VEHICLE))
 	{
@@ -1694,8 +1758,9 @@ public OnPlayerCommandText(playerid, cmdtext[])
 			{
 				SendClientMessage(i, COLOR_ZLUTA, "Paintball zaène za 10 sekund vyberte si své zaèáteèní pozice.");
 				SetPlayerPos(playerid, -1365.1, -2307.0, 39.1);
-				SetTimer("startpaint", 10000, 0);
-				hrajepaint[i] = 1;
+				SetTimer("StartPaintball", 10000, 0);
+
+				gPaintball[i][E_PAINTBALL_INGAME] = 1;
 			}
 		}
 		return 1;
@@ -1704,12 +1769,13 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	if (strcmp("/paintexit", cmdtext, true, 10) == 0)
 	{
 		new string[256];
-		if (hrajepaint[playerid])
+		if (gPaintball[playerid][E_PAINTBALL_INGAME])
 		{
 			format(string, 256, "[ ! ] %s opousti paintball, /paintexit", playerid);
 			SendClientMessageToAll(COLOR_ZLUTA, string);
 			SetPlayerHealth(playerid, 0.0);
-			hrajepaint[playerid] = 0;
+
+			gPaintball[playerid][E_PAINTBALL_INGAME] = 0;
 		}
 	}
 	//----------------------------------------
@@ -2737,40 +2803,6 @@ public OnPlayerExitedMenu(playerid)
 	return 1;
 }
 
-public Reklama()
-{
-	new text_reklamy = random(5);//vygeneruje nahodu z 5
-
-	switch (text_reklamy)
-	{
-		case 0://kdyz nahoda = 0
-			{
-				SendClientMessageToAll(COLOR_SVZEL, " [TIP] Pro pomoc a dalsi info napiste /help :)");
-			}
-
-		case 1://kdyz nahoda = 1
-			{
-				SendClientMessageToAll(COLOR_SVZEL, " [TIP] Pro sebevrazdu napis /kill xD");
-			}
-
-		case 2://kdyz nahoda = 2............
-			{
-				SendClientMessageToAll(COLOR_SVZEL, " [TIP] Po mapì v LS jsou skrytì balíèky(malá zelená soka) více informací ... /soska ");
-			}
-
-		case 3: //kdyz 4?
-			{
-				SendClientMessageToAll(COLOR_SVZEL, " [INFO] Sponzori: http://athostik.xf.cz | http://kyrspa.wz.cz | http://stunt-server.7x.cz | hosted.czfree-ra.net");
-			}
-		case 4:
-			{
-				SendClientMessageToAll(COLOR_SVZEL, " [TIP] Zahrej si s kamaradi paintball v paintball arene ! /paintball, /paintexit ");
-			}
-	}//uzavreni switch
-
-	return true;
-}
-
 IsPlayerInSphere(playerid, Float:x, Float:y, Float:z, radius)
 {
 	if (GetPlayerDistanceToPointEx(playerid, x, y, z) < radius)
@@ -2813,7 +2845,7 @@ IsPlayerInInvalidNosVehicle(playerid, vehicleid) //TOE K NITRU HAHA
 		}
 	}
 	return false;
-}//konec
+}
 
 public AntiJetPack()//antijetpack :)--------------------_)
 {
@@ -2940,7 +2972,7 @@ public ulozeni(playerid)
 		{
 			SCM(i, COLOR_ORANZCERV, "[ i ][DATA] Pøipravuje se uloení vìcí na úèet...");
 			//-------
-			if (PLAYERLIST_authed[playerid])
+			if (gPlayerAuth[playerid])
 			{
 				dUserSetINT(PlayerName(playerid)).("banka", bank[playerid]);
 				dUserSetINT(PlayerName(playerid)).("money", GetPlayerMoney(playerid));
@@ -3150,27 +3182,6 @@ public Vyplata() // pubic vyplata
 	return 1;
 }
 
-public THodiny()
-{
-	new hodina, minuta, s, string[256];
-	gettime(hodina, minuta, s);
-	if (minuta <= 9)
-	{
-		format(string, 25, "%d:0%d", hodina, minuta);
-	}
-	else
-	{
-		format(string, 25, "%d:%d", hodina, minuta);
-	}
-	for (new i = 0; i < MAX_PLAYERS; i++)
-	{
-		TextDrawHideForPlayer(i, Hodiny);
-		TextDrawSetString(Hodiny, string);
-		TextDrawShowForPlayer(i, Hodiny);
-	}
-	return 1;
-}
-
 stock TestPrint(print[])
 {
 #if BUG_SYSTEM
@@ -3184,32 +3195,6 @@ public RESET()
 {
 	SendRconCommand("gmx");
 	return 1;
-}
-
-public startpaint()
-{
-	vytez = 999;
-	vytezskore = 0;
-	for (new i = 0; i < MAX_PLAYERS; i++)
-	{
-		if (IsPlayerConnected(i))
-		{
-			ResetPlayerWeapons(i);
-			GivePlayerWeapon(i, 29, 999);
-			TogglePlayerControllable(i, 1);
-			SendClientMessage(i, COLOR_ZLUTA, "[ ! ] Paintball zaèal, 4 minuty do konce.");
-			PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);//xD
-			SetTimer("konecpaint", 240000, 0);
-		}
-	}
-	return 1;
-}
-
-public konecpaint()
-{
-
-	return 1;
-
 }
 
 /*

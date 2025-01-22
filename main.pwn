@@ -637,8 +637,8 @@ dcmd_login(playerid, params[])
 
 	if (udb_CheckLogin(PlayerName(playerid), params))
 	{
-		LoadPlayerData(playerid);
 		gPlayerAuth[playerid] = true;
+		LoadPlayerData(playerid);
 
 		return SystemMsg(playerid, "[SERVER] Hrac prihlasen, pokracujte pomoci Spawn.");
 	}
@@ -1423,9 +1423,9 @@ public OnGameModeInit()
 	//
 
 	SetTimer("AntiCheatWeapon", 30000, 1);
-	SetTimer("OnRadarCheckpoint", 300, 1);
+	SetTimer("AntiFlood", 1000, 1);
 
-	SetTimer("Machine", 1000, 1);
+	SetTimer("OnRadarCheckpoint", 300, 1);
 
 	SetTimer("BatchSavePlayerData", 200000, 1);
 	SetTimer("UpdatePlayerScore", 1000, 1);

@@ -44,12 +44,12 @@ public LoadPlayerData(playerid)
 {
 	if (IsPlayerConnected(playerid) && gPlayerAuth[playerid])
 	{
-		SendClientMessage(playerid, COLOR_ORANZCERV, "[ i ][DATA] Nacitam ulozena uzivatelska data...")
+		SendClientMessage(playerid, COLOR_ORANZCERV, "[ i ][DATA] Nacitam ulozena uzivatelska data...");
 
-		GivePlayerMoney(playerid, dUserINT(PlayerName(playerid)).("cash");
-		gPlayerData[playerid][E_PLAYER_DATA_BANK] = dUserINT(PlayerName(playerid)).("bank")
-		gPlayerData[playerid][E_PLAYER_DATA_HEALTH] = dUserINT(PlayerName(playerid)).("health")
-		gPlayerData[playerid][E_PLAYER_DATA_VEST] = dUserINT(PlayerName(playerid)).("vest")
+		GivePlayerMoney(playerid, dUserINT(PlayerName(playerid)).("cash"));
+		gPlayerData[playerid][E_PLAYER_DATA_BANK] = dUserINT(PlayerName(playerid)).("bank");
+		gPlayerData[playerid][E_PLAYER_DATA_HEALTH] = dUserINT(PlayerName(playerid)).("health");
+		gPlayerData[playerid][E_PLAYER_DATA_VEST] = dUserINT(PlayerName(playerid)).("vest");
 		gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] = dUserINT(PlayerName(playerid)).("adminlvl");
 		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = dUserINT(PlayerName(playerid)).("team");
 		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = dUserINT(PlayerName(playerid)).("class");
@@ -58,10 +58,14 @@ public LoadPlayerData(playerid)
 		//zapik[playerid] = dUserINT(PlayerName(playerid)).("zapik");
 
 		SetPlayerColor(playerid, bezova);
-		SetPlayerSkin(playerid) = dUserINT(PlayerName(playerid)).("class");
+		SetPlayerSkin(playerid, dUserINT(PlayerName(playerid)).("class"));
 
-		SendClientMessage(playerid, COLOR_ORANZCERV, "[ i ][DATA] Data uspesne nactena!")
+		SendClientMessage(playerid, COLOR_ORANZCERV, "[ i ][DATA] Data uspesne nactena!");
+
+		return 0;
 	}
+
+	return 1;
 }
 
 public SavePlayerData(playerid)

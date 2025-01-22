@@ -155,8 +155,9 @@ forward ShowAdvert();
 // Anticheating.
 //
 
-forward AntiJetPack();
 forward AntiCheatWeapon();
+forward AntiFlood();
+forward AntiJetPack();
 
 #include "anticheat.pwn"
 
@@ -183,6 +184,7 @@ forward EndPaintball();
 //
 
 forward BatchSavePlayerData();
+forward LoadPlayerData(playerid);
 forward SavePlayerData(playerid);
 forward SendPlayerSalary();
 forward UpdatePlayerScore();
@@ -202,7 +204,6 @@ forward OffRadarCheckpoint(playerid);
 //
 //
 
-forward Machine();
 forward drag();
 forward RESET();
 
@@ -217,12 +218,12 @@ new const VEHICLE_PLATE[] = "-CRL2-";
 //
 //
 
-new bank[MAX_PLAYERS];
 new dlistek[MAX_PLAYERS];
 new lvl[MAX_PLAYERS];
 new iPlayerRole[MAX_PLAYERS];
 
 new vytah;
+
 new lamer;
 new Menu:menulamer;
 new borec;
@@ -634,11 +635,12 @@ dcmd_login(playerid, params[])
 
 	if (udb_CheckLogin(PlayerName(playerid), params))
 	{
-		LoadPlayerData(playerid)
+		LoadPlayerData(playerid);
 		gPlayerAuth[playerid] = true;
 
 		return SystemMsg(playerid, "[SERVER] Hrac prihlasen, pokracujte pomoci Spawn.");
 	}
+
 	return SystemMsg(playerid, "[SERVER] Prihlaseni se nezdarilo --> /login *heslo*");
 }
 
@@ -646,27 +648,41 @@ dcmd_login(playerid, params[])
 dcmd_smazat(playerid, params[])
 {
 #pragma unused params
-	if (!IsPlayerAdmin(playerid) && lvl[playerid] < 1) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
+	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 1) 
+		return SendClientMessage(playerid, COLOR_SEDA, "[ ! ] Nedostatecny Admin level!");
 
-	for (new c = 0; c < 45; c++) SendClientMessageToAll(COLOR_BILA, " ");
-	new string[200];
-	if (IsPlayerAdmin(hrac))
-		format(string, sizeof(string), "[ i ] Admin %s promazal chat.", PlayerName(playerid));
-	SendClientMessageToAll(MODRA, string);
+	for (new c = 0; c < 45; c++) 
+		SendClientMessageToAll(COLOR_BILA, " ");
+
+	new adminName[MAX_PLAYER_NAME], stringToPrint[256];
+
+	GetPlayerName(playerid, adminName, sizeof(adminName));
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s promazal(a) chat.", adminName);
+
+	SendClientMessageToAll(MODRA, stringToPrint);
+
 	return 1;
 }
 
 
 dcmd_text(playerid, params[])
 {
-	new pos;
-	new zadane_id = strval(params), tvujtext = strval(params[pos]);
-	if (!strlen(params) || !IsNumeric(params) || !strlen(params[pos])) return SCM(playerid,  0xFF0000AA, "pouziti /text id [text]");
-	if (!IsPlayerConnected(zadane_id)) return SCM(playerid,  0xFF0000AA, "Tento hrac [ID] neni na serveru.");
+	if (!sizeof(params) || !IsNumeric(params[0]) || sizeof(params) < 2 || strlen(params[1]) == 0) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Pouziti /text [ID] [text]");
 
-	new	string[256];
-	format(string, 256, "%s rika hraci %s, ze: %s", PlayerName(playerid), PlayerName(zadane_id), tvujtext);
-	SendClientMessageToAll(0xFF0000AA, string);
+	new targetId = strval(params[0]), targetText = strval(params[1]);
+
+	if (!IsPlayerConnected(targetId)) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Tento hrac [ID] neni na serveru.");
+
+	new playerName[MAX_PLAYER_NAME], stringToPrint[256], targetName[MAX_PLAYER_NAME];
+
+	GetPlayerName(playerid, playerName, sizeof(playerName));
+	GetPlayerName(targetId, targetName, sizeof(targetName));
+
+	format(stringToPrint, sizeof(stringToPrint), "Hrac %s rika hraci %s, ze: %s", playerName, targetName, targetText);
+
+	SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
 
 	return 1;
 }
@@ -735,239 +751,235 @@ dcmd_afk(playerid, params[])
 
 dcmd_ulozit(playerid, params[])
 {
-	if (IsPlayerInSphere(playerid, 1519.4808, 1053.7301, 10.8203, 15) == 1)
+	if (!sizeof(params) || !IsNumeric(params[0])) 
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /ulozit [castka]");
+
+	new amount = strval(params[0]);
+
+	if (amount > GetPlayerMoney(playerid))
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Neplatna castka!");
+
+	if (IsPlayerInSphere(playerid, 1519.4808, 1053.7301, 10.8203, 15) ||
+		IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) || 
+		IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15))
 	{
-		if (!strlen(params)) return SendClientMessage(playerid, COLOR_ZLUTA, "[NAPI]: /ulozit [Èástka]");
-		new castka2 = strval(params);
-		if (castka2 > GetPlayerMoney(playerid)) return SendClientMessage(playerid, COLOR_CERVENA, "patná èástka!");
-		if (castka2 <= GetPlayerMoney(playerid))
-		{
-			bank[playerid] += castka2;
-			GivePlayerMoney(playerid, -castka2);
-			new string[256];
-			format(string, sizeof(string), "Uloil jsi: %d, zùstatek na úètu: %d.", castka2, bank[playerid]);
-			SendClientMessage(playerid, COLOR_ZLUTA, string);
-		}
+		gPlayerData[playerid][E_PLAYER_DATA_BANK] += amount;
+		GivePlayerMoney(playerid, -amount);
+
+		new stringToPrint[256];
+
+		format(stringToPrint, sizeof(stringToPrint), "[ i ] Ulozil jsi castku: %d €! Zustatek na uctu: %d €!", amount, gPlayerData[playerid][E_PLAYER_DATA_BANK]);
+		SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
 	}
-	else if (IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) == 1)
-	{
-		if (!strlen(params)) return SendClientMessage(playerid, COLOR_ZLUTA, "[NAPI]: /ulozit [Èástka]");
-		new castka2 = strval(params);
-		if (castka2 > GetPlayerMoney(playerid)) return SendClientMessage(playerid, COLOR_CERVENA, "patná èástka!");
-		if (castka2 <= GetPlayerMoney(playerid))
-		{
-			bank[playerid] += castka2;
-			GivePlayerMoney(playerid, -castka2);
-			new string[256];
-			format(string, sizeof(string), "Uloil jsi: %d, zùstatek na úètu: %d.", castka2, bank[playerid]);
-			SendClientMessage(playerid, COLOR_ZLUTA, string);
-		}
-	}
-	if (IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15) == 1)
-	{
-		if (!strlen(params)) return SendClientMessage(playerid, COLOR_ZLUTA, "[NAPI]: /ulozit [Èástka]");
-		new castka2 = strval(params);
-		if (castka2 > GetPlayerMoney(playerid)) return SendClientMessage(playerid, COLOR_CERVENA, "patná èástka!");
-		if (castka2 <= GetPlayerMoney(playerid))
-		{
-			bank[playerid] += castka2;
-			GivePlayerMoney(playerid, -castka2);
-			new string[256];
-			format(string, sizeof(string), "Uloil jsi: %d, zùstatek na úètu: %d.", castka2, bank[playerid]);
-			SendClientMessage(playerid, COLOR_ZLUTA, string);
-		}
-	}
+
 	return 1;
 }
 
 dcmd_vybrat(playerid, params[])
 {
-	if (IsPlayerInSphere(playerid, 1519.4808, 1053.7301, 10.8203, 15) == 1) //PREPSAT --------------------------------------------------
+	if (!sizeof(params) || !IsNumeric(params[0]))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /vybrat [castka]");
+
+	new amount = strval(params[0]);
+
+	if (amount > gPlayerData[playerid][E_PLAYER_DATA_BANK])
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Neplatna castka!");
+
+	if (IsPlayerInSphere(playerid, 1519.4808, 1053.7301, 10.8203, 15) ||
+			IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) ||
+			IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15))
 	{
-		if (!strlen(params)) return SendClientMessage(playerid, COLOR_ZLUTA, "[NAPI]: /vybrat [Èástka]");
-		new castka2 = strval(params);
-		if (castka2 > bank[playerid]) return SendClientMessage(playerid, COLOR_CERVENA, "patná èástka!");
-		if (castka2 <= bank[playerid])
-		{
-			bank[playerid] -= castka2;
-			GivePlayerMoney(playerid, castka2);
-			new string[256];
-			format(string, sizeof(string), "Vybral jsi: %d, zùstatek na úètu: %d.", castka2, bank[playerid]);
-			SendClientMessage(playerid, COLOR_ZLUTA, string);
-		}
+		gPlayerData[playerid][E_PLAYER_DATA_BANK] -= amount;
+		GivePlayerMoney(playerid, amount);
+
+		new stringToPrint[256];
+
+		format(stringToPrint, sizeof(stringToPrint), "[ i ] Vybral jsi castku: %d €! Zustatek na uctu: %d €!", amount, gPlayerData[playerid][E_PLAYER_DATA_BANK]);
+		SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
 	}
-	if (IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) == 1)
-	{
-		if (!strlen(params)) return SendClientMessage(playerid, COLOR_ZLUTA, "[NAPI]: /vybrat [Èástka]");
-		new castka2 = strval(params);
-		if (castka2 > bank[playerid]) return SendClientMessage(playerid, COLOR_CERVENA, "patná èástka!");
-		if (castka2 <= bank[playerid])
-		{
-			bank[playerid] -= castka2;
-			GivePlayerMoney(playerid, castka2);
-			new string[256];
-			format(string, sizeof(string), "Vybral jsi: %d, zùstatek na úètu: %d.", castka2, bank[playerid]);
-			SendClientMessage(playerid, COLOR_ZLUTA, string);
-		}
-	}
-	if (IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15) == 1)
-	{
-		if (!strlen(params)) return SendClientMessage(playerid, COLOR_ZLUTA, "[NAPI]: /vybrat [Èástka]");
-		new castka2 = strval(params);
-		if (castka2 > bank[playerid]) return SendClientMessage(playerid, COLOR_CERVENA, "patná èástka!");
-		if (castka2 <= bank[playerid])
-		{
-			bank[playerid] -= castka2;
-			GivePlayerMoney(playerid, castka2);
-			new string[256];
-			format(string, sizeof(string), "Vybral jsi: %d, zùstatek na úètu: %d.", castka2, bank[playerid]);
-			SendClientMessage(playerid, COLOR_ZLUTA, string);
-		}
-	}
+
 	return 1;
 }
 
 dcmd_stav(playerid, params[])
 {
 #pragma unused params
-	if (IsPlayerInSphere(playerid, 1519.4808, 1053.7301, 10.8203, 15) == 1)
+	if (IsPlayerInSphere(playerid, 1519.4808, 1053.7301, 10.8203, 15) ||
+		IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) ||
+		IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15))
 	{
-		new string[256];
-		format(string, sizeof(string), "Zùstatek na vaem úètu èiní: %d.", bank[playerid]);
-		SendClientMessage(playerid, COLOR_ZLUTA, string);
+		new stringToPrint[256];
+
+		format(stringToPrint, sizeof(stringToPrint), "[ i ] Bezny zustatek na bankovnim uctu: %d €!", gPlayerData[playerid][E_PLAYER_DATA_BANK]);
+		SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
 	}
-	else if (IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) == 1)
-	{
-		new string[256];
-		format(string, sizeof(string), "Zùstatek na vaem úètu èiní: %d.", bank[playerid]);
-		SendClientMessage(playerid, COLOR_ZLUTA, string);
-	}
-	else if (IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15) == 1)
-	{
-		new string[256];
-		format(string, sizeof(string), "Zùstatek na vaem úètu èiní: %d.", bank[playerid]);
-		SendClientMessage(playerid, COLOR_ZLUTA, string);
-	}
+
 	return 1;
 }
-//----------------------------------------
+
 dcmd_ccmd(playerid, params[])
 {
 #pragma unused params
-	if (!IsPlayerAdmin(playerid) && lvl[playerid] < 1) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-	{
-		SCM(playerid, COLOR_ZELZLUT, "[ i ][CAM] KAMERY: /cam1 (pyramida dole), /cam2 (banka atd) /camoff");
-	}
+	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 1) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
+	
+	SendClientMessage(playerid, COLOR_ZELZLUT, "[ i ][CAM] KAMERY: /cam1 (pyramida dole), /cam2 (banka atd), /camoff");
+
 	return 1;
 }
-//----------------------------------------
 
 dcmd_acmd(playerid, params[])
 {
 #pragma unused params
-	if (!IsPlayerAdmin(playerid) && lvl[playerid] < 1) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-	{
-		SCM(playerid, COLOR_ZELZLUT, "[ i ] /smazat /prachy /ccmd /acmd /vup /vdown /kick /ban /lvl /hp ");
-		SCM(playerid, COLOR_ZELZLUT, "[ i ] /fakechat /admincol /get /goto ");
-	}
+	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 1) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
+
+	SendClientMessage(playerid, COLOR_ZELZLUT, "[ i ] /smazat /prachy /ccmd /acmd /vup /vdown /kick /ban /lvl /hp ");
+	SendClientMessage(playerid, COLOR_ZELZLUT, "[ i ] /fakechat /admincol /get /goto ");
+
 	return 1;
 }
-//----------------------------------------
+
 dcmd_help(playerid, params[])
 {
 #pragma unused params
-	SCM(playerid, COLOR_ORANZCERV, "[ NAPOVEDA/POMOC: ]"); //napisou se nasledujici zpravy(jen pro nej)
-	SCM(playerid, COLOR_ORANZCERV, "[ Prikazy : /cmd || Pravidla /rules ]");
-	SCM(playerid, COLOR_ORANZCERV, "[ Made by kRySpiN[CzE & kompry  ]");
+	SendClientMessage(playerid, COLOR_ORANZCERV, "[ NAPOVEDA/POMOC: ]");
+	SendClientMessage(playerid, COLOR_ORANZCERV, "[ Prikazy : /cmd || Pravidla /rules ]");
+	SendClientMessage(playerid, COLOR_ORANZCERV, "[ Made by krusty & kompry  ]");
+
 	return 1;
 }
-//----------------------------------------
-//----------------------------------------
-dcmd_skydrive(playerid, params[])
+
+dcmd_skydive(playerid, params[])
 {
 #pragma unused params
+	// Give such user a parachute.
 	GivePlayerWeapon(playerid, 46, 1);
+
+	// Set their position high above the LV pyramide.
 	SetPlayerPos(playerid, 2247.61, 1260.14, 1313.40);
-	SCM(playerid, MODRA, "[ i ]Uaaaaaaaaah xD.. uij si skok xD");
+
+	SendClientMessage(playerid, COLOR_CYAN, "[ i ] Skocil jsi z letadla! Uzij si skydive!");
+
 	return 1;
 }
-//----------------------------------------
+
 dcmd_odpocet(playerid, params[])
 {
 #pragma unused params
-	new string[256], odpocet ;
+	new countdown, stringToPrint[256];
 
 	GameTextForPlayer(playerid, "~n~~n~~n~~n~~n~~n~text", 2000, 4);
-	format(string, sizeof(string), "~n~~n~~n~~n~~n~~n~%d", odpocet);
-	GameTextForPlayer(playerid, string, 2000, 3);
+
+	format(stringToPrint, sizeof(stringToPrint), "~n~~n~~n~~n~~n~~n~%d", countdown);
+
+	GameTextForPlayer(playerid, stringToPrint, 2000, 3);
+
 	return 1;
 }
-//----------------------------------------t
+
 dcmd_fakechat(playerid, params[])
 {
-	if (!IsPlayerAdmin(playerid) && lvl[playerid] < 4) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-	new tmp[256], tmp2[256], Index;
-	tmp = strtok(params, Index), tmp2 = strtok(params, Index);
-	if (!strlen(tmp) || !strlen(tmp2)) return SendClientMessage(playerid, COLOR_CERVENA, "Pouziti: /fakechat [playerid] [text]");
+	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 4) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
 
-	new hracc = strval(tmp);
-	if (IsPlayerConnected(hracc)) return	SendClientMessage(playerid, COLOR_CERVENA, "Hrac se zadanym id neni pripojen.");
-	{
-		SendPlayerMessageToAll(hracc, params[strlen(tmp) + 1]);
-		SendClientMessage(playerid, COLOR_BILA, "Falesna zprava byla uspesne odeslana");
-	}
+	if (!sizeof(params) || sizeof(params) < 2 || !IsNumeric(params[0]))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /fakechat [playerID] [text]");
+
+	new targetId = strval(params[0]), targetText[256] = params[1:];
+
+	if (!IsPlayerConnected(targetId)) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac se zadanym id neni pripojen.");
+
+	SendPlayerMessageToAll(targetId, targetText);
+
+	SendClientMessage(playerid, COLOR_BILA, "[ i ] Falesna zprava byla uspesne odeslana!");
+
 	return 1;
 }
-//----------------------------------------
+
 dcmd_ban(playerid, params[])
 {
-	if (!IsPlayerAdmin(playerid) && lvl[playerid] < 4) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-	else if (!strlen(params) || !IsNumeric(params)) return SCM(playerid, MODRA, "[ i ]Pouití /ban [ID]");
-	new banovany = strval(params), Text[256];
-	if (!IsPlayerConnected(banovany)) return SCM(playerid, COLOR_CERVENA, "[ ! ]Hráè [ID] není na serveru");
-	format(Text, 256, "[ i ] Admin %s [ID: %d] zabanoval %s[ID: %d] !!! ", PlayerName(playerid), playerid, PlayerName(banovany), banovany);
-	SendClientMessageToAll(MODRA, Text);
-	Ban(banovany);
+	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 4) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
+
+	if (!sizeof(params) || !IsNumeric(params[0])) 
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /ban [ID]");
+
+	new adminName[MAX_PLAYER_NAME], playerIdToBan = strval(params[0]), playerName[MAX_PLAYER_NAME], stringToPrint[256];
+
+	if (!IsPlayerConnected(playerIdToBan))
+	       	return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac s danym ID neni na serveru!");
+
+	// Get participated nicknames.
+	GetPlayerName(playerid, adminName, sizeof(adminName));
+	GetPlayerName(playerIdToBan, playerName, sizeof(playerName));
+
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s [ID: %d] zabanoval hrace %s [ID: %d] !!!", adminName, playerid, playerName, playerIdToBan);
+	SendClientMessageToAll(COLOR_CYAN, stringToPrint);
+
+	Ban(playerIdToBan);
+
 	return 1;
 }
 //----------------------------------------
 dcmd_admins(playerid, params[])
 #pragma unused params
 {
-	new Kdopak = 0;
-	new i;
-	new string[180];
+	SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Administratori online:");
 
-	for (i = 0; i < GetMaxPlayers(); i++) if (IsPlayerConnected(i)) if (lvl[i] > 0 || IsPlayerAdmin(i)) Kdopak++;
-	SCM(playerid, COLOR_SVZEL, "[ ! ]Administrátoøi on-line :");
-	if (Kdopak == 0) return SendClientMessage(playerid, COLOR_CERVENA, "[ i ]Na serveru není ádný Admin ");
-	else
+	new adminCount;
+
+	for (new i = 0; i < GetMaxPlayers(); i++) 
 	{
-		for (i = 0; i < GetMaxPlayers(); i++)
+		// IsPlayerAdmin(i) == RCON admin
+		if (IsPlayerConnected(i) && (gPlayerData[i][E_PLAYER_DATA_ADMIN_LVL] > 0 || IsPlayerAdmin(i)))
 		{
-			if (!IsPlayerConnected(i)) continue;
+			adminCount++;
 
-			if (lvl[i] > 0 && !IsPlayerAdmin(i))      format(string, 180, "[ %s [ ID: %d ] LVL: [ %d ]", PlayerName(i), i, lvl[i]);
-			else if (lvl[i] == 0 && IsPlayerAdmin(i)) format(string, 180, "[ %s [ ID: %d ] [ RCON ]]", PlayerName(i), i);
-			else if (lvl[i] > 0 && IsPlayerAdmin(i))  format(string, 180, "[ %s [ ID: %d ] LVL [ %d ] + [ RCON ]]", PlayerName(i), i, lvl[i]);
-			SendClientMessage(playerid, COLOR_ZELZLUT, string);
+			new adminName[MAX_PLAYER_NAME], stringToPrint[128];
+
+			// Omit RCON admin(s) in the output for now...
+			if (gPlayerData[i][E_PLAYER_DATA_ADMIN_LVL] > 0) 
+			{
+				GetPlayerName(i, adminName, sizeof(adminName));
+				format(stringToPrint, sizeof(stringToPrint), "[ %s [ID: %2d] LVL: %d]", adminName, i, gPlayerData[i][E_PLAYER_DATA_ADMIN_LVL]);
+				SendClientMessage(playerid, COLOR_SVZEL, stringToPrint);
+			}
 		}
 	}
+
+	if (!adminCount) 
+	{
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Zadny admin neni pritomen na serveru!");
+		return 0;
+	}
+	
 	return 1;
 }
 
 //----------------------------------------
 dcmd_kick(playerid, params[])
 {
-	printf("BS || /kick");
-	if (!IsPlayerAdmin(playerid) && lvl[playerid] < 3) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-	else if (!strlen(params) || !IsNumeric(params)) return SCM(playerid, MODRA, "[ i ]Pouití /kick [ID]");
-	new kickly = strval(params), Text[256];
-	if (!IsPlayerConnected(kickly)) return SCM(playerid, COLOR_CERVENA, "[ ! ]Hráè [ID] není na serveru");
+	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 3) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
 
-	format(Text, 256, "[ i ] Admin %s vyhodil %s !!! ", PlayerName(playerid), PlayerName(kickly));
-	SendClientMessageToAll(COLOR_CERVENA, Text);
-	Kick(kickly);
+	if (!sizeof(params) || !IsNumeric(params[0])) 
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /kick [ID]");
+
+	new adminName[MAX_PLAYER_NAME], playerIdToKick = strval(params[0]), playerName[MAX_PLAYER_NAME], stringToPrint[128];
+
+	if (!IsPlayerConnected(playerIdToKick)) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+
+	GetPlayerName(playerid, adminName, sizeof(adminName));
+	GetPlayerName(playerIdToKick, playerName, sizeof(playerName));
+
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s vyhodil(a) hrace %s ze serveru !!! ", adminName, playerName);
+
+	SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
+	Kick(playerIdToKick);
+
 	return 1;
 }
 //----------------------------------------
@@ -994,27 +1006,42 @@ return 1;
 
 dcmd_lvl(playerid, params[])
 {
-	TestPrint("dcmd_lvl(playerid, params[])");
+	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 4) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
 
-	if (!IsPlayerAdmin(playerid) && lvl[playerid] < 4) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-	new ZadaneID = strval(params), pozice = chrfind(' ', params);
-	if (!IsPlayerConnected(ZadaneID)) return SCM(playerid, COLOR_CERVENA, "[ ! ]Hráè [ ID ] není pøítomen na serveru");
+	if (!sizeof(params) || sizeof(params) < 2 || !IsNumeric(params[0]) || !IsNumeric(params[1])) 
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /lvl [playerID] [adminLvl]");
 
-	else if (lvl[ZadaneID] == 4) return SCM(playerid, COLOR_CERVENA, "[ ! ] Nemùe mìnit level adminùm 4+.");
-	else if (!params[0]nebo!(pozice = chrfind(' ', params) + 1)nebo!params[pozice]) return SCM(playerid, COLOR_SEDA, "[ ! ] Pouití: /lvl [ ID ] [ LEVEL ]");
-	new nastaveny_level = strval(params[pozice]);
-	if (ZadaneID == playerid) return SCM(playerid, COLOR_CERVENA, "[ ! ] Nemùe mìnit level sám sobì!");
-	else if (nastaveny_level > 4 nebo nastaveny_level < 0) return SCM(playerid, COLOR_SEDA, "[ ! ] LvLy Pouze 0-4.");
-	else if (nastaveny_level == lvl[ZadaneID]) return SCM(playerid, COLOR_CERVENA, "[ ! ] Tento hráè ji tento lvl má, zadaj jiný");
-	new Text[256];
+	new targetId = strval(params[0]), targetLvl = strval(params[1]);
 
-	format(Text, 256, "[ i ] Admin %s nastavil hráèi %s [ ID: %d ] Admin-Level [ %d ][ i ]", PlayerName(playerid), PlayerName(ZadaneID), ZadaneID, nastaveny_level);
-	SendClientMessageToAll(COLOR_SEDA, Text);
+	if (!IsPlayerConnected(targetId)) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
 
-	lvl[ZadaneID] = nastaveny_level;
-	dUserSetINT(PlayerName(ZadaneID)).("adminlvl", lvl[ZadaneID]);
+	if (gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] <= gPlayerData[targetId][E_PLAYER_DATA_ADMIN_LVL])
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nemuzes menit level adminum stejneho nebo vyssiho levelu nez mas sam!");
 
-	return true;
+	if (targetId == playerid) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nemuzes menit level sam sobe!");
+
+	if (targetLvl < 0 || targetLvl > 4)
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Rozsah levelu je pouze 0-4!");
+
+	if (targetLvl == gPlayerData[targetId][E_PLAYER_DATA_ADMIN_LVL])
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Dany hrac jiz vlastni dany admin level!")
+
+	new adminName[MAX_PLAYER_NAME], playerName[MAX_PLAYER_NAME], stringToPrint[128];
+
+	GetPlayerName(playerid, adminName, sizeof(adminName));
+	GetPlayerName(targetId, playerName, sizeof(playerName));
+
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s nastavil hraci %s [ ID: %d ] Admin-Level %d!", adminName, playerName, targetId, targetLvl);
+
+	gPlayerData[targetId][E_PLAYER_DATA_ADMIN_LVL] = targetLvl;
+	SavePlayerData(targetId);
+
+	SendClientMessageToAll(COLOR_SEDA, stringToPrint);
+
+	return 1;
 }
 //----------------------------------------
 dcmd_goto(playerid, params[])
@@ -1127,7 +1154,7 @@ dcmd_ucet(playerid, params[])
 #pragma unused params
 	new string[256], string2[256], string3[265];
 	format(string,  sizeof(string), "[ INFO ] [ VYPIS HERNIHO UCTU ] ***");
-	format(string2, sizeof(string2), "[ INFO ] [ Penize | %d ], [ Banka | %d ], [ WL | %d, ], [ Skin | %d ], [ Tym | %d ]", GetPlayerMoney(playerid), bank[playerid], GetPlayerWantedLevel(playerid), GetPlayerSkin(playerid), iPlayerRole[playerid]);
+	format(string2, sizeof(string2), "[ INFO ] [ Penize | %d ], [ Banka | %d ], [ WL | %d, ], [ Skin | %d ], [ Tym | %d ]", GetPlayerMoney(playerid), gPlayerData[playerid], GetPlayerWantedLevel(playerid), GetPlayerSkin(playerid), iPlayerRole[playerid]);
 	format(string3, sizeof(string3), "[ INFO ] [ AdminLVL | %d ], [ Joint | %dks ], [ Zapik | %d ], [ Marihuana | %dg ], [ Tabak | %dks ]", lvl[playerid], joint[playerid], zapik[playerid], marihuana[playerid], tabak[playerid]);
 	SCM(playerid, COLOR_SEDA, string);
 	SCM(playerid, COLOR_SEDA, string2);
@@ -1324,8 +1351,8 @@ public OnGameModeInit()
 	navrchuadmin = CreatePickup(1318, 1, 1007.30, -1160.62, 50.95);
 
 	// Include objects and vehicles
-	#include "objects.pwn"
-	#include "vehicles.pwn"
+#include "objects.pwn"
+#include "vehicles.pwn"
 
 	//------------------------
 	if (!dini_Exists(statistika))
@@ -1439,37 +1466,44 @@ public OnPlayerDisconnect(playerid, reason)
 {
 	Object_OnPlayerDisconnect(playerid, reason);
 
+	// Hide the vehicle velocity game text.
 	TextDrawHideForPlayer(playerid, KPH[playerid]);
 
-	new string[90], Jmeno[30];
-
-	if (gPlayerAuth[playerid])
-	{
-		dUserSetINT(PlayerName(playerid)).("money", GetPlayerMoney(playerid)); //co se ulozi do %s.dudb.sav
-		dUserSetINT(PlayerName(playerid)).("banka", bank[playerid]); //to co nahore akorat jina vec
-		dUserSetINT(PlayerName(playerid)).("adminlvl", lvl[playerid]);
-		dUserSetINT(PlayerName(playerid)).("tym", iPlayerRole[playerid]);
-		dUserSetINT(PlayerName(playerid)).("joint", iPlayerRole[playerid]);
-		dUserSetINT(PlayerName(playerid)).("zapik", iPlayerRole[playerid]);
-		//dUserSetINT(playerName(playerid)).
-		dUserSetINT(PlayerName(playerid)).("skin", GetPlayerSkin(playerid));
-	}
-
+	// Save player's data and set such player to unauthorized.
+	SavePlayerData(playerid);
 	gPlayerAuth[playerid] = false;
 
 	SendDeathMessage(playerid, INVALID_PLAYER_ID, 201);
-	GetPlayerName(playerid, Jmeno, 30);
 
+	new playerName[MAX_PLAYER_NAME], stringToPrint[128];
+
+	// Fetch player's name to print a statement for other online players.
+	GetPlayerName(playerid, playerName, sizeof(playerName));
+
+	// Prepare the statement for others.
 	switch (reason)
 	{
-		case 0: format(string, sizeof(string), "[ i ] %s odpojen [spadla hra]", Jmeno); //spadnuti hry - oznameni v konzoli
-		case 1: format(string, sizeof(string), "[ i ] %s odpojen [odesel]", Jmeno); //odchod :D - oznameni v konzoli
-		case 2: format(string, sizeof(string), "[ i ] %s odpojen [kick/ban]", Jmeno); // vynuceeny odchod adminem - /kick, /ban
+		case 0: 
+			{
+				format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s odpojen(a) [spadla hra].", playerName);
+			}
+		case 1: 
+			{
+				format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s odpojen(a) [odchod].", playerName); 
+			}
+		case 2: 
+			{
+				format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s odpojen(a) [kick/ban].", playerName);
+			}
+		default: 
+			{
+				format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s odpojen(a) [neznamy duvod].", playerName);
+			}
 	}
 
-	SendClientMessageToAll(COLOR_SEDA, string); // napise to vsem do konzole
+	SendClientMessageToAll(COLOR_SEDA, stringToPrint);
 
-	return false;
+	return 0;
 }
 
 public OnPlayerSpawn(playerid)
@@ -1498,18 +1532,18 @@ public OnPlayerDeath(playerid, killerid, reason)
 		GetPaintballScoreboard();
 
 		/*if (gPaintball[killerid] > vytezgPaintball)
-		{
-			new killer[MAX_PLAYER_NAME];
+		  {
+		  new killer[MAX_PLAYER_NAME];
 
-			vytez = killerid;
-			vytezgPaintball = gPaintball[killerid];
-			GetPlayerName(killerid, killer, sizeof(killer));
-			for (new i = 0; i < MAX_PLAYERS; i++)
-			{
-				format(text, sizeof(text), "[ i ] %s je ve vedení ! [ Score: %d ].", killer, vytezgPaintball); //text kdo je ve vedeni podle gPaintball :)
-				SendClientMessage(playerid, COLOR_BILA, text);
-			}
-		}*/
+		  vytez = killerid;
+		  vytezgPaintball = gPaintball[killerid];
+		  GetPlayerName(killerid, killer, sizeof(killer));
+		  for (new i = 0; i < MAX_PLAYERS; i++)
+		  {
+		  format(text, sizeof(text), "[ i ] %s je ve vedení ! [ Score: %d ].", killer, vytezgPaintball); //text kdo je ve vedeni podle gPaintball :)
+		  SendClientMessage(playerid, COLOR_BILA, text);
+		  }
+		  }*/
 		return 1;
 	}
 
@@ -2861,26 +2895,6 @@ IsPlayerInInvalidNosVehicle(playerid, vehicleid) //TOE K NITRU HAHA
 		}
 	}
 	return false;
-}
-
-public Machine()
-{
-	new i, ip[256], string[256];
-	for (i = 0; i < MAX_PLAYERS; i++)
-	{
-		if (IsPlayerConnected(i))
-		{
-			if (GetPlayerPing(i) == 0)
-			{
-				GetPlayerIp(i, ip, 128);
-				PlayerPlaySound(i, 1056, 0, 0, 0);
-				format(string, 256, "IP: %s se pokouela floodovat server.\r\n", ip);
-				Ban(i);
-				print(string);
-			}
-		}
-	}
-	return 1;
 }
 
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)

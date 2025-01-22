@@ -26,9 +26,26 @@ enum E_PLAYER_TEAM
 	E_PLAYER_TEAM_PYRO,
 }
 
+enum E_PLAYER_HULO
+{
+	E_PLAYER_HULO_ZAZA,
+	E_PLAYER_HULO_TOBACCO,
+	E_PLAYER_HULO_PAPER,
+	E_PLAYER_HULO_LIGHTER,
+	E_PLAYER_HULO_JOINT
+}
+
 new gPlayerAuth[MAX_PLAYERS];
 new gPlayerData[MAX_PLAYERS][E_PLAYER_DATA];
 
+new gPlayerHulo[MAX_PLAYERS][E_PLAYER_HULO];
+
+new gTeamPickup[E_PLAYER_TEAM];
+new gTeamMenu[E_PLAYER_TEAM];
+
+//
+//
+//
 
 public BatchSavePlayerData()
 {
@@ -44,7 +61,7 @@ public LoadPlayerData(playerid)
 {
 	if (IsPlayerConnected(playerid) && gPlayerAuth[playerid])
 	{
-		SendClientMessage(playerid, COLOR_ORANZCERV, "[ i ][DATA] Nacitam ulozena uzivatelska data...");
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ i ][DATA] Nacitam ulozena uzivatelska data...");
 
 		GivePlayerMoney(playerid, dUserINT(PlayerName(playerid)).("cash"));
 		gPlayerData[playerid][E_PLAYER_DATA_BANK] = dUserINT(PlayerName(playerid)).("bank");
@@ -60,7 +77,7 @@ public LoadPlayerData(playerid)
 		SetPlayerColor(playerid, bezova);
 		SetPlayerSkin(playerid, dUserINT(PlayerName(playerid)).("class"));
 
-		SendClientMessage(playerid, COLOR_ORANZCERV, "[ i ][DATA] Data uspesne nactena!");
+		SendClientMessage(playerid, GREEN, "[ i ][DATA] Data uspesne nactena!");
 
 		return 0;
 	}
@@ -72,7 +89,7 @@ public SavePlayerData(playerid)
 {
 	if (IsPlayerConnected(playerid) && gPlayerAuth[playerid])
 	{
-		SendClientMessage(playerid, COLOR_ORANZCERV, "[ i ][DATA] Pripravuje se ulozeni uzivatelskych dat...");
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ i ][DATA] Pripravuje se ulozeni uzivatelskych dat...");
 
 		dUserSetINT(PlayerName(playerid)).("cash", GetPlayerMoney(playerid));
 		dUserSetINT(PlayerName(playerid)).("bank", gPlayerData[playerid][E_PLAYER_DATA_BANK]);
@@ -82,7 +99,7 @@ public SavePlayerData(playerid)
 		dUserSetINT(PlayerName(playerid)).("team", gPlayerData[playerid][E_PLAYER_DATA_TEAM]);
 		dUserSetINT(PlayerName(playerid)).("class", gPlayerData[playerid][E_PLAYER_DATA_CLASS]);
 
-		SendClientMessage(playerid, COLOR_CERVENA, "[ i ][DATA] Data uspesne ulozena! ");
+		SendClientMessage(playerid, GREEN, "[ i ][DATA] Data uspesne ulozena! ");
 	}
 
 	return 1;

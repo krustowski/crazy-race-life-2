@@ -220,50 +220,62 @@ forward OffRadarCheckpoint(playerid);
 // Global static objects.
 //
 
+new gAdminAuto;
 new gAdminElevator;
 
 //
 // Global static team objects.
 //
 
+new love;
+
 new lamer;
 new Menu:menulamer;
+
 new borec;
-new love;
 new Menu:menuborec;
+
 new Menu:menupolisi;
 new polisilv;
 new polisils;
+
 new benzinak;
 new Menu:benzinakmenu;
+
 new dragster;
 new Menu:dragstermenu;
+
 new tulak;
 new Menu:menutulak;
+
 new pizzaboy;
 new Menu:menupizza;
+
 new technik;
 new Menu:menutechnik;
+
 new pyrotechnik;
 new Menu:menupyrotechnik;
+
+new hackeri;
+new Menu:hackerimenu;
+
 new interiertulaci;
 new tulacizpatky;
 new pytelpenez;
 new duledvera;
 new navrchuadmin;
 new picktunel;
-new hackeri;
-new Menu:hackerimenu;
 
 //
 //
 //
 
-new marihuana[MAX_PLAYERS];
-new tabak[MAX_PLAYERS];
-new papirek[MAX_PLAYERS];
-new zapik[MAX_PLAYERS];
-new joint[MAX_PLAYERS];
+/*new marihuana[MAX_PLAYERS];
+  new tabak[MAX_PLAYERS];
+  new papirek[MAX_PLAYERS];
+  new zapik[MAX_PLAYERS];
+  new joint[MAX_PLAYERS];*/
 
 //
 //
@@ -923,7 +935,7 @@ dcmd_ban(playerid, params[])
 
 	return 1;
 }
-//----------------------------------------
+
 dcmd_admins(playerid, params[])
 #pragma unused params
 {
@@ -1044,7 +1056,7 @@ dcmd_lvl(playerid, params[])
 
 	return 1;
 }
-//----------------------------------------
+
 dcmd_goto(playerid, params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 2) 
@@ -1259,7 +1271,6 @@ dcmd_ucet(playerid, params[])
 	return 1;
 }
 
-//----------------------------------------
 dcmd_flip(playerid, params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 1) 
@@ -1285,9 +1296,7 @@ dcmd_flip(playerid, params[])
 
 	return 1;
 }
-//----------------------------------------
 
-//----------------------------------------
 dcmd_djoin(playerid, params[])
 {
 	if (!sizeof(params) || !IsNumeric(params[0]))
@@ -2008,10 +2017,10 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 1) 
 			return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostateèný Admin level!");
 
-			SetPlayerHealth(playerid, 100.0);
-			SetPlayerArmour(playerid, 100.0);
+		SetPlayerHealth(playerid, 100.0);
+		SetPlayerArmour(playerid, 100.0);
 
-			SendClientMessage(playerid, COLOR_SEDA, "[ ! ] Zdravi: 100.0, Vesta: 100.0");
+		SendClientMessage(playerid, COLOR_SEDA, "[ ! ] Zdravi: 100.0, Vesta: 100.0");
 
 		return 1;
 	}
@@ -2476,11 +2485,11 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 2) 
 			return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostateèný Admin level!");
 
-			GivePlayerWeapon(playerid, 28, 400);
-			GivePlayerWeapon(playerid, 26, 400);
-			GivePlayerWeapon(playerid, 31, 400);
-			GivePlayerWeapon(playerid, 46, 1);
-			GivePlayerWeapon(playerid, 43, 1);
+		GivePlayerWeapon(playerid, 28, 400);
+		GivePlayerWeapon(playerid, 26, 400);
+		GivePlayerWeapon(playerid, 31, 400);
+		GivePlayerWeapon(playerid, 46, 1);
+		GivePlayerWeapon(playerid, 43, 1);
 
 		return 1;
 	}
@@ -2685,219 +2694,123 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 public OnPlayerSelectedMenuRow(playerid, row)
 {
-	new string[256];
-	new Menu:Current = GetPlayerMenu(playerid);
-	if (Current == menulamer)
-	{
-		switch (row)
-		{
-			case 0:
-				{
-					new pname[MAX_PLAYER_NAME];
-					GetPlayerName(playerid, pname, MAX_PLAYER_NAME);
-					format(string, sizeof(string), "[!] Hrac %s se pripojil k LAMAM", pname); //UVIDI VSICHNI
-					GivePlayerWeapon(playerid, 5, 1); //PRIDA HRACOVI ZBRAN ID,NABOJU
-					SendClientMessageToAll(COLOR_ZLUTA, string);
-					printf(string); //
-					ResetPlayerWeapons(playerid); //restartuj hracovi zbrane-MUETE VYMAZAT
-					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_LAME; //promenna na povolani cislo 1
-					SetPlayerSkin(playerid, 200); // hracUV skin
-					SetPlayerColor(playerid, COLOR_ZLUTA); //hracovo barva
-									       //SetPlayerPos(playerid,,-2024.5919,145.2734,28.8359); //(,-2024.5919,145.2734,28.8359) teleportuje pri prihlaseni zamestnani
-				}
-		}
-	}
-	//----------------------------------
-	if (Current == menuborec)
-	{
-		switch (row)
-		{
-			case 0:
-				{
-					new pname[MAX_PLAYER_NAME];
-					GetPlayerName(playerid, pname, MAX_PLAYER_NAME);
-					format(string, sizeof(string), "[!] Hrac %s se pripojil k BORCÙM", pname); //UVIDI VSICHNI
-					GivePlayerWeapon(playerid, 32, 1000); //PRIDA HRACOVI ZBRAN ID,NABOJU
-					SendClientMessageToAll(COLOR_ZLUTA, string);
-					printf(string); //vytiskne to do logu
-					SetPlayerSkin(playerid, 29);
-					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_ADMINZ; //promenna na povolani cislo 2
-					SetPlayerColor(playerid, COLOR_SVZEL); //hracovo barva
-									       //SetPlayerPos(playerid,,-2024.5919,145.2734,28.8359); //(,-2024.5919,145.2734,28.8359) teleportuje pri prihlaseni zamestnani
-				}
-		}
-	}
-	//---------------------------------
-	if (Current == menupolisi)
-	{
-		switch (row)
-		{
-			case 0:
-				{
-					new pname[MAX_PLAYER_NAME];
-					GetPlayerName(playerid, pname, MAX_PLAYER_NAME);
-					format(string, sizeof(string), "[!] Hrac %s se pripojil k POLISUM", pname); //UVIDI VSICHNI
-					GivePlayerWeapon(playerid, 32, 111); //PRIDA HRACOVI ZBRAN ID,NABOJU
-					GivePlayerWeapon(playerid, 31, 100);
-					GivePlayerWeapon(playerid, 30, 100);
-					SendClientMessageToAll(COLOR_ZLUTA, string);
-					printf(string); //vytiskne to do logu
-					SetPlayerSkin(playerid, 285);
-					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_POLICE; //promenna na povolani cislo 3
-					SetPlayerColor(playerid, MODRA); //hracovo barva
-				}
-		}
-	}
-	//---------------------------------
+	new Menu:currentMenu = GetPlayerMenu(playerid), playerName[MAX_PLAYER_NAME], stringToPrint[256];
 
-	if (Current == benzinakmenu)
+	GetPlayerName(playerid, playerName, sizeof(playerName));
+
+	if (row == 1)
 	{
-		switch (row)
-		{
-			case 0:
-				{
-					new pname[MAX_PLAYER_NAME];
-					GetPlayerName(playerid, pname, MAX_PLAYER_NAME);
-					format(string, sizeof(string), "[!] Hrac %s se pripojil k BENZINAKÙM", pname); //UVIDI VSICHNI
-					GivePlayerWeapon(playerid, 32, 1); //PRIDA HRACOVI ZBRAN ID,NABOJU
-					SendClientMessageToAll(COLOR_ZLUTA, string);
-					printf(string); //vytiskne to do logu
-					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_GASMAN; //promenna na povolani cislo 4
-					SetPlayerColor(playerid, COLOR_CERVENA); //hracovo barva
-					SetPlayerSkin(playerid, 50);
-					//SetPlayerPos(playerid,,-2024.5919,145.2734,28.8359); //(,-2024.5919,145.2734,28.8359) teleportuje pri prihlaseni zamestnani
-				}
-		}
+		ResetPlayerWeapons(playerid);
+		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_NONE;
+
+		return 1;
 	}
 
-	//---------------------------------
-	if (Current == dragstermenu)
+	switch (currentMenu)
 	{
-		switch (row)
-		{
-			case 0:
-				{
-					new pname[MAX_PLAYER_NAME];
-					GetPlayerName(playerid, pname, MAX_PLAYER_NAME);
-					format(string, sizeof(string), "[!] Hrac %s se pripojil k týmu DRaGsTeRù !!", pname); //UVIDI VSICHNI
-					GivePlayerWeapon(playerid, 31, 1000);
-					GivePlayerWeapon(playerid, 30, 100);
-					GivePlayerWeapon(playerid, 5, 1);
-					SendClientMessageToAll(COLOR_ZLUTA, string);
-					printf(string); //tisk
-					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_DRAGSTER; //promenna na povolani cislo 5
-					SetPlayerSkin(playerid, 107);
-					SetPlayerColor(playerid, COLOR_ORANZOVA);
-				}
-		}
-	}
-	//---------------------------------
-	if (Current == menutulak)
-	{
-		switch (row)
-		{
-			case 0:
-				{
-					new pname[MAX_PLAYER_NAME];
-					GetPlayerName(playerid, pname, MAX_PLAYER_NAME);
-					format(string, sizeof(string), "[!] Hrac %s se pripojil k TULAKOM", pname); //UVIDI VSICHNI
-					GivePlayerWeapon(playerid, 32, 1); //PRIDA HRACOVI ZBRAN ID,NABOJU
-					GivePlayerWeapon(playerid, 4, 1);
-					SetPlayerSkin(playerid, 230) || SetPlayerSkin(playerid, 137);
-					SendClientMessageToAll(COLOR_ZLUTA, string);
-					printf(string); //vytiskne to do logu
-					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_GARBAGE; //promenna na povolani cislo 6
-					SetPlayerColor(playerid, COLOR_SVZEL); //hracovo barva
-									       //SetPlayerPos(playerid,,-2024.5919,145.2734,28.8359); //(,-2024.5919,145.2734,28.8359) teleportuje pri prihlaseni zamestnani
-				}
-		}
-	}
-	//---------------------------------
-	if (Current == menupizza)
-	{
-		switch (row)
-		{
-			case 0:
-				{
-					new pname[MAX_PLAYER_NAME];
-					GetPlayerName(playerid, pname, MAX_PLAYER_NAME);
-					format(string, sizeof(string), "[!] Hrac %s se pripojil k PIZZABOYs", pname); //UVIDI VSICHNI
-					GivePlayerWeapon(playerid, 24, 111); //PRIDA HRACOVI ZBRAN ID,NABOJU
-					GivePlayerWeapon(playerid, 4, 1);
-					SendClientMessageToAll(COLOR_ZLUTA, string);
-					printf(string); //vytiskne to do logu
-					SetPlayerSkin(playerid, 250);
-					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_PIZZABOY; //promenna na povolani cislo 7
-					SetPlayerColor(playerid, COLOR_ZELZLUT); //hracovo barva
-										 //SetPlayerPos(playerid,,-2024.5919,145.2734,28.8359); //(,-2024.5919,145.2734,28.8359) teleportuje pri prihlaseni zamestnani
-				}
-		}
-	}
-	//---------------------------------
-	if (Current == hackerimenu)
-	{
-		switch (row)
-		{
-			case 0:
-				{
-					new pname[MAX_PLAYER_NAME];
-					GetPlayerName(playerid, pname, MAX_PLAYER_NAME);
-					format(string, sizeof(string), "[!] Hrac %s se pripojil k HACKRÙM", pname); //UVIDI VSICHNI
-					GivePlayerWeapon(playerid, 4, 100);
-					GivePlayerWeapon(playerid, 24, 200);
-					SetPlayerSkin(playerid, 170);
-					SendClientMessageToAll(COLOR_ZLUTA, string);
-					printf(string); //vytiskne to do logu
-					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_HACKER; //promenna na povolani cislo 8
-					SetPlayerColor(playerid, COLOR_BILA); //hracovo barva
-									      //SetPlayerPos(playerid,,-2024.5919,145.2734,28.8359); //(,-2024.5919,145.2734,28.8359) teleportuje pri prihlaseni zamestnani
-				}
-		}
-	}
-	//---------------------------------
-	if (Current == menutechnik)
-	{
-		switch (row)
-		{
-			case 0:
-				{
-					new pname[MAX_PLAYER_NAME];
-					GetPlayerName(playerid, pname, MAX_PLAYER_NAME);
-					format(string, sizeof(string), "[!] Hrac %s se pripojil k TECHNIKOM", pname); //UVIDI VSICHNI
-					GivePlayerWeapon(playerid, 4, 100);
-					GivePlayerWeapon(playerid, 24, 200);
-					SetPlayerSkin(playerid, 50);
-					SendClientMessageToAll(COLOR_ZLUTA, string);
-					printf(string); //vytiskne to do logu
-					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_CAR_REPAIR; //promenna na povolani cislo 9
-					SetPlayerColor(playerid, COLOR_SEDA); //hracovo barva
-									      //SetPlayerPos(playerid,,-2024.5919,145.2734,28.8359); //(,-2024.5919,145.2734,28.8359) teleportuje pri prihlaseni zamestnani
-				}
-		}
-	}
-	//---------------------------------
-	if (Current == menupyrotechnik)
-	{
-		switch (row)
-		{
-			case 0:
+		case gTeamMenu[E_PLAYER_TEAM_LAME]:
+			{
+				GivePlayerWeapon(playerid, 5, 1);
+				SetPlayerColor(playerid, COLOR_ZLUTA);
+				SetPlayerSkin(playerid, 200);
 
-				{
-					new pname[MAX_PLAYER_NAME];
-					GetPlayerName(playerid, pname, MAX_PLAYER_NAME);
-					format(string, sizeof(string), "[!] Hrac %s se pripojil k PYROTECHNIKOM", pname); //UVIDI VSICHNI
-					GivePlayerWeapon(playerid, 4, 100);
-					GivePlayerWeapon(playerid, 24, 200);
-					SetPlayerSkin(playerid, 230);
-					SendClientMessageToAll(COLOR_ZLUTA, string);
-					printf(string); //vytiskne to do logu
-					gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_PYRO; //promenna na povolani cislo 10
-					SetPlayerColor(playerid, COLOR_SEDA); //hracovo barva
-									      //SetPlayerPos(playerid,,-2024.5919,145.2734,28.8359); //(,-2024.5919,145.2734,28.8359) teleportuje pri prihlaseni zamestnani
-				}
-		}
+				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_LAME;
+				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Lamek!", playerName);
+			}
+		case gTeamMenu[E_PLAYER_TEAM_ADMINZ]:
+			{
+				GivePlayerWeapon(playerid, 32, 1000);
+				SetPlayerColor(playerid, COLOR_SVZEL);
+				SetPlayerSkin(playerid, 29);
+
+				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_ADMINZ;
+				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Admin borcu!", playerName);
+			}
+		case gTeamMenu[E_PLAYER_TEAM_POLICE]:
+			{
+				GivePlayerWeapon(playerid, 30, 100);
+				GivePlayerWeapon(playerid, 31, 100);
+				GivePlayerWeapon(playerid, 32, 111);
+				SetPlayerColor(playerid, MODRA);
+				SetPlayerSkin(playerid, 285);
+
+				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_POLICE;
+				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Policajtu!", playerName);
+			}
+		case gTeamMenu[E_PLAYER_TEAM_GASMAN]:
+			{
+				GivePlayerWeapon(playerid, 32, 1);
+				SetPlayerColor(playerid, COLOR_CERVENA);
+				SetPlayerSkin(playerid, 50);
+
+				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_GASMAN;
+				format(stringToPrint, sizeof(stringToPrint), " [ ! ] Hrac %s se pripojil k tymu Pumparu/Benzinaku!", playerName);
+			}
+		case gTeamMenu[E_PLAYER_TEAM_DRAGSTER]:
+			{
+				GivePlayerWeapon(playerid, 5, 1);
+				GivePlayerWeapon(playerid, 30, 100);
+				GivePlayerWeapon(playerid, 31, 1000);
+				SetPlayerColor(playerid, COLOR_ORANZOVA);
+				SetPlayerSkin(playerid, 107);
+
+				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_DRAGSTER;
+				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu DRaGsTeRù!", playerName);
+			}
+		case gTeamMenu[E_PLAYER_TEAM_GARBAGE]:
+			{
+				GivePlayerWeapon(playerid, 4, 1);
+				GivePlayerWeapon(playerid, 32, 1);
+				SetPlayerColor(playerid, COLOR_SVZEL);
+				SetPlayerSkin(playerid, 230); // alternatively ID 137
+
+				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_GARBAGE; 
+				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Tulaku!", playerName);
+			}
+		case gTeamMenu[E_PLAYER_TEAM_PIZZABOY]:
+			{
+				GivePlayerWeapon(playerid, 4, 1);
+				GivePlayerWeapon(playerid, 24, 111);
+				SetPlayerColor(playerid, COLOR_ZELZLUT);
+				SetPlayerSkin(playerid, 250);
+
+				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_PIZZABOY;
+				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Pizzaboyz!", playerName); 
+			}
+		case gTeamMenu[E_PLAYER_TEAM_HACKER]:
+			{
+				GivePlayerWeapon(playerid, 4, 100);
+				GivePlayerWeapon(playerid, 24, 100);
+				SetPlayerColor(playerid, COLOR_BILA);
+				SetPlayerSkin(playerid, 170);
+
+				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_HACKER;
+				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Hackeru!", playerName); 
+			}
+		case gTeamMenu[E_PLAYER_TEAM_CAR_REPAIR]:
+			{
+				GivePlayerWeapon(playerid, 4, 100);
+				GivePlayerWeapon(playerid, 24, 100);
+				SetPlayerColor(playerid, COLOR_SEDA);
+				SetPlayerSkin(playerid, 50);
+
+				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_CAR_REPAIR;
+				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Automechaniku!", playerName);
+			}
+		case gTeamMenu[E_PLAYER_TEAM_PYRO]:
+			{
+				GivePlayerWeapon(playerid, 4, 100);
+				GivePlayerWeapon(playerid, 24, 100);
+				SetPlayerColor(playerid, COLOR_SEDA);
+				SetPlayerSkin(playerid, 230);
+
+				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_PYRO;
+				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Pyrotechniku!", playerName);
+			}
 	}
-	//---------------------------------
+
+	SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
+
 	return 1;
 }
 

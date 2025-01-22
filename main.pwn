@@ -497,7 +497,7 @@ new AdminAuto;
 new VehStats[200];
 */
 
-chrfind(n, h[], s = 0)
+stock chrfind(n, h[], s = 0)
 {
 	new l = strlen(h);
 	while (s < l)
@@ -727,7 +727,6 @@ stock PlayerName(playerid)
 	GetPlayerName(playerid, name, 255);
 	return name;
 }
-//--//
 
 dcmd_afk(playerid, params[])
 {
@@ -1530,6 +1529,9 @@ public OnPlayerConnect(playerid)
 	gPaintball[playerid][E_PAINTBALL_INGAME] = 0;
 	gPaintball[playerid][E_PAINTBALL_SCORE] = 0;
 
+	// Draw mapicons for the user.
+#include "mapicons.pwn"
+
 	// Show the game clock.
 	TextDrawShowForPlayer(playerid, gClockText);
 
@@ -1919,10 +1921,12 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	if (strcmp(cmdtext, "/locate", true) == 0)
 	{
 		new formatovany_text[256], Int = GetPlayerInterior(playerid), Float:X, Float:Y, Float:Z, Float:Uhel;
+
 		GetPlayerPos(playerid, X, Y, Z);
 		GetPlayerFacingAngle(playerid, Uhel);
 		format(formatovany_text, 256, "[ i ] Nacházíte se v interiéru %d na souøadnicích X[%.1f], Y[%.1f], Z[%.1f], Rotace[%.1f].", Int, X, Y, Z, Uhel);
-		SCM(playerid, MODRA, formatovany_text);
+		SendClientMessage(playerid, COLOR_SVZEL, formatovany_text);
+
 		return true;
 	}
 	//----------------------------------------

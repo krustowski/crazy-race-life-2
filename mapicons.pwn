@@ -67,11 +67,13 @@ enum E_MAPICON_ID
 }
 
 // The very global spawn point in LV.
-SetPlayerMapIcon(playerid, 0, 1966.1, 1936.1, 127.5, E_MAPICON_ID_ENEMY_ATTACK, 0, MAPICON_LOCAL);
+SetPlayerMapIcon(playerid, 0, 2247.61, 1260.14, 1313.40, E_MAPICON_ID_ENEMY_ATTACK, 0, MAPICON_LOCAL);
 
 // ATMs.
 SetPlayerMapIcon(playerid, 1, 1519.4808, 1053.7301, 10.8203, E_MAPICON_ID_ROBBERY, 0, MAPICON_LOCAL);
 SetPlayerMapIcon(playerid, 2, 1481.1512, 2158.1211, 11.0234, E_MAPICON_ID_ROBBERY, 0, MAPICON_LOCAL);
 SetPlayerMapIcon(playerid, 3, 2074.4917, 2295.2041, 10.8203, E_MAPICON_ID_ROBBERY, 0, MAPICON_LOCAL);
 
+// Oznaceni zavodist + stanovist tymu Dragsteru.
 SetPlayerMapIcon(playerid, 10, 2620.14, 1195.76, 10.81, E_MAPICON_ID_RACE_TOURNAMENT, 0, MAPICON_LOCAL);
+

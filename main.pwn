@@ -146,6 +146,8 @@ EnableStuntBonusForAll(0);  		//vypne stunt bonusy aspon mylsim:)
 new const GAMEMODE_NAME[] = "CrazyRaceLife2";
 new const VEHICLE_PLATE[] = "-CRL-2-";
 
+forward SplitIntoTwo(input[], token1[], token2[], tokenSize);
+
 //
 // Advertisement.
 //
@@ -227,142 +229,99 @@ new gAdminElevator;
 // Global static team objects.
 //
 
-new love;
+new gAdminRoomHealth;
 
-new lamer;
-new Menu:menulamer;
+new gHackerzInteriorEntrance;
+new gHackerzInteriorExit;
+new gHackerzMoneyBag;
 
-new borec;
-new Menu:menuborec;
+new gAdminDoorDown;
+new gAdminDoorUp;
 
-new Menu:menupolisi;
-new polisilv;
-new polisils;
-
-new benzinak;
-new Menu:benzinakmenu;
-
-new dragster;
-new Menu:dragstermenu;
-
-new tulak;
-new Menu:menutulak;
-
-new pizzaboy;
-new Menu:menupizza;
-
-new technik;
-new Menu:menutechnik;
-
-new pyrotechnik;
-new Menu:menupyrotechnik;
-
-new hackeri;
-new Menu:hackerimenu;
-
-new interiertulaci;
-new tulacizpatky;
-new pytelpenez;
-new duledvera;
-new navrchuadmin;
 new picktunel;
 
 //
 //
 //
 
-/*new marihuana[MAX_PLAYERS];
-  new tabak[MAX_PLAYERS];
-  new papirek[MAX_PLAYERS];
-  new zapik[MAX_PLAYERS];
-  new joint[MAX_PLAYERS];*/
+new gTeamPickupLame, gTeamPickupAdminz, gTeamPickupPolice, gTeamPickupGasman, gTeamPickupDragster, gTeamPickupGarbage, gTeamPickupHacker, gTeamPickupPizzaboy, gTeamPickupCarRepair, gTeamPickupPyro;
 
 //
 //
 //
 
-enum ACCOUNT
-{
-	AFK
-}
-
-static Hrac[MAX_PLAYERS][ACCOUNT];
-
-new AdminAuto;
-
-
-/*new VehicleName[][] = {
-  "Landstalker",
-  "Bravura",
-  "Buffalo",
-  "Linerunner",
-  "Pereniel",
-  "Sentinel",
-  "Dumper",
-  "Firetruck",
-  "Trashmaster",
-  "Stretch",
-  "Manana",
-  "Infernus",
-  "Voodoo",
-  "Pony",
-  "Mule",
-  "Cheetah",
-  "Ambulance",
-  "Leviathan",
-  "Moonbeam",
-  "Esperanto",
-  "Taxi",
-  "Washington",
-  "Bobcat",
-  "Mr Whoopee",
-  "BF Injection",
-  "Hunter",
-  "Premier",
-  "Enforcer",
-  "Securicar",
-  "Banshee",
-  "Predator",
-  "Bus",
-  "Rhino",
-  "Barracks",
-  "Hotknife",
-  "Trailer",
-  "Previon",
-  "Coach",
-  "Cabbie",
-  "Stallion",
-  "Rumpo",
-  "RC Bandit",
-  "Romero",
-  "Packer",
-  "Monster Truck",
-  "Admiral",
-  "Squalo",
-  "Seasparrow",
-  "Pizzaboy",
-  "Tram",
-  "Trailer",
-  "Turismo",
-  "Speeder",
-  "Reefer",
-  "Tropic",
-  "Flatbed",
-  "Yankee",
-  "Caddy",
-  "Solair",
-  "Berkley's RC Van",
-  "Skimmer",
-  "PCJ-600",
-  "Faggio",
-  "Freeway",
-  "RC Baron",
-  "RC Raider",
-  "Glendale",
-  "Oceanic",
-  "Sanchez",
-  "Sparrow",
-"Patriot",
+new gVehicleName[][] = {
+	"Landstalker",
+	"Bravura",
+	"Buffalo",
+	"Linerunner",
+	"Pereniel",
+	"Sentinel",
+	"Dumper",
+	"Firetruck",
+	"Trashmaster",
+	"Stretch",
+	"Manana",
+	"Infernus",
+	"Voodoo",
+	"Pony",
+	"Mule",
+	"Cheetah",
+	"Ambulance",
+	"Leviathan",
+	"Moonbeam",
+	"Esperanto",
+	"Taxi",
+	"Washington",
+	"Bobcat",
+	"Mr Whoopee",
+	"BF Injection",
+	"Hunter",
+	"Premier",
+	"Enforcer",
+	"Securicar",
+	"Banshee",
+	"Predator",
+	"Bus",
+	"Rhino",
+	"Barracks",
+	"Hotknife",
+	"Trailer",
+	"Previon",
+	"Coach",
+	"Cabbie",
+	"Stallion",
+	"Rumpo",
+	"RC Bandit",
+	"Romero",
+	"Packer",
+	"Monster Truck",
+	"Admiral",
+	"Squalo",
+	"Seasparrow",
+	"Pizzaboy",
+	"Tram",
+	"Trailer",
+	"Turismo",
+	"Speeder",
+	"Reefer",
+	"Tropic",
+	"Flatbed",
+	"Yankee",
+	"Caddy",
+	"Solair",
+	"Berkley's RC Van",
+	"Skimmer",
+	"PCJ-600",
+	"Faggio",
+	"Freeway",
+	"RC Baron",
+	"RC Raider",
+	"Glendale",
+	"Oceanic",
+	"Sanchez",
+	"Sparrow",
+	"Patriot",
 	"Quad",
 	"Coastguard",
 	"Dinghy",
@@ -504,10 +463,9 @@ new AdminAuto;
 	"Boxville",
 	"Farm Plow",
 	"Utility Trailer"
-	};
+};
 
 new VehStats[200];
-*/
 
 stock chrfind(n, h[], s = 0)
 {
@@ -544,93 +502,98 @@ stock KickAll()
 
 stock SystemMsg(playerid, msg[])
 {
-	if ((IsPlayerConnected(playerid)) && (strlen(msg) > 0))
+	if (IsPlayerConnected(playerid) && strlen(msg) > 0)
 	{
-		SCM(playerid, COLOR_SVZEL, msg);
+		SendClientMessage(playerid, COLOR_SVZEL, msg);
 	}
+
 	return 1;
 }
 
-//-----------------[FORWARDS NEWS ENUMS ]------------------------------------//
+stock IsNumeric(input[])
+{
+	for (new i = 0, j = strlen(input); i < j; i++) 
+	{
+		if (input[i] > '9' || input[i] < '0') 
+			return 0;
+	}
 
-//-----------------------------------------------------------------------------//
-// DCMD  |  DCMD  |  DCMD  |  DCMD  |  DCMD  |  DCMD  |  DCMD  |  DCMD  | DCMD //
-//-----------------------------------------------------------------------------//
+	return 1;
+}
+
+//
+//  DCMDs
+//
 
 dcmd_lock(playerid, params[])
 {
 #pragma unused params
-	if (IsPlayerInAnyVehicle(playerid))
+	if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 	{
-		new State = GetPlayerState(playerid);
-		if (State != PLAYER_STATE_DRIVER)
-		{
-			SCM(playerid, COLOR_CERVENA, "[ ! ] Neøídí tedkon auto");
-			return 1;
-		}
-		new i;
-		for (i = 0; i < MAX_PLAYERS; i++)
-		{
-			if (i != playerid)
-			{
-				SetVehicleParamsForPlayer(GetPlayerVehicleID(playerid), i, 0, 1);
-			}
-		}
-		SCM(playerid, 0xFFFF00AA, "[ i ] Vozidlo zamèeno :)");
-		new Float:pX, Float:pY, Float:pZ;
-		GetPlayerPos(playerid, pX, pY, pZ);
-		PlayerPlaySound(playerid, 1056, pX, pY, pZ);
+		SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nejsi v aute, nebo nejsi ridicem!");
+		return 1;
 	}
-	else
+
+	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
-		SCM(playerid, COLOR_CERVENA, "[ ! ] Nejsi ve aute");
+		if (i != playerid)
+		{
+			SetVehicleParamsForPlayer(GetPlayerVehicleID(playerid), i, 0, 1);
+		}
 	}
-	return 1;//nejak takto :-)
+
+	SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Vozidlo zamceno! :)");
+
+	new Float:pX, Float:pY, Float:pZ;
+	GetPlayerPos(playerid, pX, pY, pZ);
+
+	PlayerPlaySound(playerid, 1056, pX, pY, pZ);
+
+	return 1;
 }
 
 dcmd_unlock(playerid, params[])
 {
 #pragma unused params
-	if (IsPlayerInAnyVehicle(playerid))
+	if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 	{
-		new State = GetPlayerState(playerid);
-		if (State != PLAYER_STATE_DRIVER)
-		{
-			SCM(playerid, COLOR_CERVENA, "[ ! ] Neøídí tedkon auto");
-			return 1;
-		}
-		new i;
-		for (i = 0; i < MAX_PLAYERS; i++)
-		{
-			if (i != playerid)
-			{
-				SetVehicleParamsForPlayer(GetPlayerVehicleID(playerid), i, 0, 0);
-			}
-		}
-		SCM(playerid, 0xFFFF00AA, "[ i ] Vozidlo odemceno");
-		new Float:pX, Float:pY, Float:pZ;
-		GetPlayerPos(playerid, pX, pY, pZ);
-		PlayerPlaySound(playerid, 1056, pX, pY, pZ);
+		SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nejsi v aute, nebo nejsi ridicem!");
+		return 1;
 	}
-	else
+
+	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
-		SCM(playerid, COLOR_CERVENA, "[ ! ] Nejsi v aute");
+		if (i != playerid)
+		{
+			SetVehicleParamsForPlayer(GetPlayerVehicleID(playerid), i, 0, 0);
+		}
 	}
+
+	SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Vozidlo odemceno! :)");
+
+	new Float:pX, Float:pY, Float:pZ;
+	GetPlayerPos(playerid, pX, pY, pZ);
+
+	PlayerPlaySound(playerid, 1056, pX, pY, pZ);
+
 	return 1;
 }
 
 dcmd_register(playerid, params[])
 {
+	new playerName[MAX_PLAYER_NAME];
+	GetPlayerName(playerid, playerName, sizeof(playerName));
+
 	if (gPlayerAuth[playerid])
 		return SystemMsg(playerid, "[SERVER] Registrace herniho uctu probehla uspesne! --> /login *heslo*");
 
-	if (udb_Exists(PlayerName(playerid)))
+	if (udb_Exists(playerName))
 		return SystemMsg(playerid, "[SERVER] Neni treba se znovu registrovat --> /login *heslo*.");
 
 	if (strlen(params) == 0)
 		return SystemMsg(playerid, "[SERVER] Registrace je povinna --> /register *heslo*");
 
-	if (udb_Create(PlayerName(playerid), params))
+	if (udb_Create(playerName, params))
 		return SystemMsg(playerid, "[SERVER] Herni ucet uspesne vytvoren --> /login *heslo*.");
 
 	return 1;
@@ -638,16 +601,19 @@ dcmd_register(playerid, params[])
 
 dcmd_login(playerid, params[])
 {
+	new playerName[MAX_PLAYER_NAME];
+	GetPlayerName(playerid, playerName, sizeof(playerName));
+
 	if (gPlayerAuth[playerid]) 
 		return SystemMsg(playerid, "[SERVER] Uz jsi prihlasen.");
 
-	if (!udb_Exists(PlayerName(playerid))) 
+	if (!udb_Exists(playerName)) 
 		return SystemMsg(playerid, "[SERVER] Data pro dany nickname nenalezena --> /register *heslo*");
 
 	if (strlen(params) == 0) 
 		return SystemMsg(playerid, "[SERVER] Je treba se prihlasit --> /login *heslo*");
 
-	if (udb_CheckLogin(PlayerName(playerid), params))
+	if (udb_CheckLogin(playerName, params))
 	{
 		gPlayerAuth[playerid] = true;
 		LoadPlayerData(playerid);
@@ -663,153 +629,131 @@ dcmd_smazat(playerid, params[])
 {
 #pragma unused params
 	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 1) 
-		return SendClientMessage(playerid, COLOR_SEDA, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
 
 	for (new c = 0; c < 45; c++) 
-		SendClientMessageToAll(COLOR_BILA, " ");
+		SendClientMessageToAll(COLOR_NEVIDITEL, " ");
 
 	new adminName[MAX_PLAYER_NAME], stringToPrint[256];
 
 	GetPlayerName(playerid, adminName, sizeof(adminName));
 	format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s promazal(a) chat.", adminName);
 
-	SendClientMessageToAll(MODRA, stringToPrint);
+	SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
 
 	return 1;
 }
 
-
 dcmd_text(playerid, params[])
 {
-	if (!sizeof(params) || !IsNumeric(params[0]) || sizeof(params) < 2 || strlen(params[1]) == 0) 
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Pouziti /text [ID] [text]");
+	new token1[32], token2[32];
+	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
-	new targetId = strval(params[0]), targetText = strval(params[1]);
+	if (!strlen(params) || count != 2)
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti /text [ID] [text]");
+
+	new targetId = strval(token1);
 
 	if (!IsPlayerConnected(targetId)) 
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Tento hrac [ID] neni na serveru.");
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
 
 	new playerName[MAX_PLAYER_NAME], stringToPrint[256], targetName[MAX_PLAYER_NAME];
 
 	GetPlayerName(playerid, playerName, sizeof(playerName));
 	GetPlayerName(targetId, targetName, sizeof(targetName));
 
-	format(stringToPrint, sizeof(stringToPrint), "Hrac %s rika hraci %s, ze: %s", playerName, targetName, targetText);
+	format(stringToPrint, sizeof(stringToPrint), "Hrac %s rika hraci %s, ze: %s", playerName, targetName, token2);
 
 	SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
 
 	return 1;
 }
 
-/*dcmd_/(playerid,params[])
-  {
-  new pos;
-  new tvujtext = strval(params);
-  if (!strlen(params) || !strlen(params[pos])) return SCM(playerid,  0xFF0000AA, "pouziti // [text]");
-  if (!IsPlayerAdmin(playerid)) return SCM(playerid, COLOR_CERVENA, "[ ! ]Nejsi admin ");
-
-  new	string[256];
-  format(string, 256, "[ AdminChat ]%s : %s", PlayerName(playerid), tvujtext);
-  SendMessageToAdmins(COLOR_SVZEL, string);
-
-  return 1;
-  } */
-
-//-----------------------------------------------------------------------------
-/*stock SystemMsg(playerid,msg[])
-  {
-  if ((IsPlayerConnected(playerid))&&(strlen(msg)>0))
-  {
-  SCM(playerid,COLOR_SYSTEM,msg);
-  }
-  return 1;
-  }
- */
-//---------------------------------------------------
-IsNumeric(string[])
-{
-	for (new i = 0, j = strlen(string); i < j; i++) if (string[i] > '9' || string[i] < '0') return 0;
-	return 1;
-}
-//---------------------------------------------------
-
-stock PlayerName(playerid)
-{
-	new name[255];
-	GetPlayerName(playerid, name, 255);
-	return name;
-}
-
 dcmd_afk(playerid, params[])
 {
 #pragma unused params
+	new playerName[MAX_PLAYER_NAME], stringToPrint[256];
 
-	new str[256];
-	if (Hrac[playerid][AFK] == 0)
+	GetPlayerName(playerid, playerName, sizeof(playerName));
+
+	if (!gPlayerData[playerid][E_PLAYER_DATA_AFK])
 	{
-		format(str, 256, "[ i ] %s (ID: %d) na chvili odesel od PC !", PlayerName(playerid), playerid);
-		SendClientMessageToAll(MODRA, str);
+		format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s (ID: %d) na chvili odesel od PC (/afk)!", playerName, playerid);
+		SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
+
+		// Lock the player's animations.
 		TogglePlayerControllable(playerid, false);
-		Hrac[playerid][AFK] = 1;
+
+		gPlayerData[playerid][E_PLAYER_DATA_AFK] = 1;
 	}
 	else
 	{
-		format(str, 256, "[ ! ] %s (ID: %d) se vratil :)", PlayerName(playerid), playerid);
-		SendClientMessageToAll(COLOR_SVZEL, str);
+		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s (ID: %d) se vratil do hry (/afk)!", playerName, playerid);
+		SendClientMessageToAll(COLOR_SVZEL, stringToPrint);
+
+		// Re-enable player's animations.
 		TogglePlayerControllable(playerid, true);
-		Hrac[playerid][AFK] = 0;
+
+		gPlayerData[playerid][E_PLAYER_DATA_AFK] = 0;
 	}
+
 	return true;
 }
 
 dcmd_ulozit(playerid, params[])
 {
-	if (!sizeof(params) || !IsNumeric(params[0])) 
+	if (!strlen(params) || !IsNumeric(params)) 
 		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /ulozit [castka]");
 
-	new amount = strval(params[0]);
+	new amount = strval(params);
 
 	if (amount > GetPlayerMoney(playerid))
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Neplatna castka!");
 
-	if (IsPlayerInSphere(playerid, 1519.4808, 1053.7301, 10.8203, 15) ||
-			IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) || 
-			IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15))
+	if (!IsPlayerInSphere(playerid, 1519.4808, 1053.7301, 10.8203, 15) &&
+			!IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) &&
+			!IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15))
 	{
-		gPlayerData[playerid][E_PLAYER_DATA_BANK] += amount;
-		GivePlayerMoney(playerid, -amount);
-
-		new stringToPrint[256];
-
-		format(stringToPrint, sizeof(stringToPrint), "[ i ] Ulozil jsi castku: %d €! Zustatek na uctu: %d €!", amount, gPlayerData[playerid][E_PLAYER_DATA_BANK]);
-		SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+		SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nejsi v dosahu bankomatu!");
+		return 1;
 	}
+
+	gPlayerData[playerid][E_PLAYER_DATA_BANK] += amount;
+	GivePlayerMoney(playerid, -amount);
+
+	new stringToPrint[256];
+
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Ulozil jsi castku: $%d! Zustatek na uctu: $%d!", amount, gPlayerData[playerid][E_PLAYER_DATA_BANK]);
+	SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
 
 	return 1;
 }
 
 dcmd_vybrat(playerid, params[])
 {
-	if (!sizeof(params) || !IsNumeric(params[0]))
+	if (!strlen(params) || !IsNumeric(params))
 		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /vybrat [castka]");
 
-	new amount = strval(params[0]);
+	new amount = strval(params);
 
 	if (amount > gPlayerData[playerid][E_PLAYER_DATA_BANK])
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Neplatna castka!");
 
-	if (IsPlayerInSphere(playerid, 1519.4808, 1053.7301, 10.8203, 15) ||
-			IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) ||
-			IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15))
+	if (!IsPlayerInSphere(playerid, 1519.4808, 1053.7301, 10.8203, 15) &&
+			!IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) &&
+			!IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15))
 	{
-		gPlayerData[playerid][E_PLAYER_DATA_BANK] -= amount;
-		GivePlayerMoney(playerid, amount);
-
-		new stringToPrint[256];
-
-		format(stringToPrint, sizeof(stringToPrint), "[ i ] Vybral jsi castku: %d €! Zustatek na uctu: %d €!", amount, gPlayerData[playerid][E_PLAYER_DATA_BANK]);
-		SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+		SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nejsi v dosahu bankomatu!");
+		return 1;
 	}
+
+	gPlayerData[playerid][E_PLAYER_DATA_BANK] -= amount;
+	GivePlayerMoney(playerid, amount);
+
+	new stringToPrint[256];
+
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Vybral jsi castku: $%d! Zustatek na uctu: $%d!", amount, gPlayerData[playerid][E_PLAYER_DATA_BANK]);
+	SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
 
 	return 1;
 }
@@ -817,15 +761,18 @@ dcmd_vybrat(playerid, params[])
 dcmd_stav(playerid, params[])
 {
 #pragma unused params
-	if (IsPlayerInSphere(playerid, 1519.4808, 1053.7301, 10.8203, 15) ||
-			IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) ||
-			IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15))
+	if (!IsPlayerInSphere(playerid, 1519.4808, 1053.7301, 10.8203, 15) &&
+			!IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) &&
+			!IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15))
 	{
-		new stringToPrint[256];
-
-		format(stringToPrint, sizeof(stringToPrint), "[ i ] Bezny zustatek na bankovnim uctu: %d €!", gPlayerData[playerid][E_PLAYER_DATA_BANK]);
-		SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+		SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nejsi v dosahu bankomatu!");
+		return 1;
 	}
+
+	new stringToPrint[256];
+
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Bezny zustatek na bankovnim uctu: $%d!", gPlayerData[playerid][E_PLAYER_DATA_BANK]);
+	SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
 
 	return 1;
 }
@@ -856,9 +803,9 @@ dcmd_acmd(playerid, params[])
 dcmd_help(playerid, params[])
 {
 #pragma unused params
-	SendClientMessage(playerid, COLOR_ORANZCERV, "[ NAPOVEDA/POMOC: ]");
-	SendClientMessage(playerid, COLOR_ORANZCERV, "[ Prikazy : /cmd || Pravidla /rules ]");
-	SendClientMessage(playerid, COLOR_ORANZCERV, "[ Made by krusty & kompry  ]");
+	SendClientMessage(playerid, COLOR_ZLUTA, "[ NAPOVEDA/POMOC: ]");
+	SendClientMessage(playerid, COLOR_ZLUTA, "[ Prikazy : /cmd || Pravidla /rules ]");
+	SendClientMessage(playerid, COLOR_ZLUTA, "[ Made by krusty & kompry  ]");
 
 	return 1;
 }
@@ -879,14 +826,15 @@ dcmd_skydive(playerid, params[])
 
 dcmd_odpocet(playerid, params[])
 {
-#pragma unused params
-	new countdown, stringToPrint[256];
+	if (!strlen(params) || !IsNumeric(params))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti /odpocet [sekundy]");
 
-	GameTextForPlayer(playerid, "~n~~n~~n~~n~~n~~n~text", 2000, 4);
+	//new stringToPrint[256];
 
-	format(stringToPrint, sizeof(stringToPrint), "~n~~n~~n~~n~~n~~n~%d", countdown);
+	GameTextForPlayer(playerid, "~n~~n~~n~~n~~n~~n~odpocet", strval(params) * 1000, 4);
 
-	GameTextForPlayer(playerid, stringToPrint, 2000, 3);
+	//format(stringToPrint, sizeof(stringToPrint), "~n~~n~~n~~n~~n~~n~%d", strval(params));
+	//GameTextForPlayer(playerid, stringToPrint, 2000, 3);
 
 	return 1;
 }
@@ -939,7 +887,7 @@ dcmd_ban(playerid, params[])
 dcmd_admins(playerid, params[])
 #pragma unused params
 {
-	SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Administratori online:");
+	SendClientMessage(playerid, COLOR_ZLUTA, "[ i ] Administratori online:");
 
 	new adminCount;
 
@@ -995,34 +943,13 @@ dcmd_kick(playerid, params[])
 
 	return 1;
 }
-//----------------------------------------
-/*dcmd_lvl(playerid, params[])
-  {
-  if(!IsPlayerAdmin(playerid) && lvl[playerid] < 3) return SCM(playerid, COLOR_SEDA, "[ ! ] Nedostateèný Admin-level");
-//else if(!strlen(params) || !IsNumeric(params)) return SCM(playerid, MODRA, "[ i ]Pouití /lvl [ID] [LEVEL] ! tLAMO xD";
-new pos;
-if(!params[0] || !(pos=chrfind(' ',params)+1) || !params[pos])
-return SCM(playerid, COLOR_SEDA, "Pouití: /lvl [ID] [LEVEL]");
-
-new lvlovany = strval(params), level = strval(params[pos]);
-if(!IsPlayerConnected(lvlovany)) return SCM(playerid, COLOR_CERVENA, "[ ! ]Hráè [ID] není na serveru");
-else if(level < 1 || level > 3) return SCM(playerid, COLOR_CERVENA, "[ ! ] Level pouze 1-3");
-
-new string[150];
-format(string, 150, "[ i ] Admin %s [ID:%d] dal hráèi %s[ID:%d] %d level", PlayerName(playerid), playerid,PlayerName(lvlovany),lvlovany, level);
-
-lvl[lvlovany] = level;
-
-return 1;
-}*/
-//----------------------------------------
 
 dcmd_lvl(playerid, params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 4) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
 
-	if (!sizeof(params) || sizeof(params) < 2 || !IsNumeric(params[0]) || !IsNumeric(params[1])) 
+	if (!strlen(params) || sizeof(params) < 2 || !IsNumeric(params[0]) || !IsNumeric(params[1])) 
 		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /lvl [playerID] [adminLvl]");
 
 	new targetId = strval(params[0]), targetLvl = strval(params[1]);
@@ -1175,10 +1102,10 @@ dcmd_nitro(playerid, params[])
 	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 3) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
 
-	if (!sizeof(params) || !IsNumeric(params[0]))
+	if (!strlen(params) || !IsNumeric(params))
 		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /nitro [ID]");
 
-	new targetId = strval(params[0]);
+	new targetId = strval(params);
 
 	if (!IsPlayerConnected(targetId))
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
@@ -1261,8 +1188,8 @@ dcmd_ucet(playerid, params[])
 	new lineToPrint1[256], lineToPrint2[256], lineToPrint3[265];
 
 	format(lineToPrint1, sizeof(lineToPrint1), "[ INFO ] [ VYPIS HERNIHO UCTU ] ***");
-	format(lineToPrint2, sizeof(lineToPrint2), "[ INFO ] [ Penize | %d € ], [ Banka | %d € ], [ Wanted level | %d ], [ Skin | %d ], [ Tym | %d ]", GetPlayerMoney(playerid), gPlayerData[playerid][E_PLAYER_DATA_BANK], GetPlayerWantedLevel(playerid), GetPlayerSkin(playerid), gPlayerData[playerid][E_PLAYER_DATA_TEAM]);
-	format(lineToPrint3, sizeof(lineToPrint3), "[ INFO ] [ Admin level | %d ], [ Joint | %d ks ], [ Zapik | %d ks ], [ Marihuana | %d g ], [ Tabak | %d ks ]", gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL], joint[playerid], zapik[playerid], marihuana[playerid], tabak[playerid]);
+	format(lineToPrint2, sizeof(lineToPrint2), "[ INFO ] [ Penize | $%d ], [ Banka | $%d ], [ Wanted level | %d ], [ Skin | %d ], [ Tym | %d ]", GetPlayerMoney(playerid), gPlayerData[playerid][E_PLAYER_DATA_BANK], GetPlayerWantedLevel(playerid), GetPlayerSkin(playerid), gPlayerData[playerid][E_PLAYER_DATA_TEAM]);
+	format(lineToPrint3, sizeof(lineToPrint3), "[ INFO ] [ Admin level | %d ], [ Joint | %d ks ], [ Zapik | %d ks ], [ Marihuana | %d g ], [ Tabak | %d ks ]", gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL], gPlayerHulo[playerid][E_PLAYER_HULO_JOINT], gPlayerHulo[playerid][E_PLAYER_HULO_LIGHTER], gPlayerHulo[playerid][E_PLAYER_HULO_ZAZA], gPlayerHulo[playerid][E_PLAYER_HULO_TOBACCO]);
 
 	SendClientMessage(playerid, COLOR_SEDA, lineToPrint1);
 	SendClientMessage(playerid, COLOR_SEDA, lineToPrint2);
@@ -1413,9 +1340,9 @@ stock SendMessageToAdmins(colorId, const messageString[])
 main()
 {
 	print("\n--------------------------------"); //vypis do console a log serveru
-	print("    [ *** CrAzY RaCe Life *** ]     ");
-	print("  [ StUnTs, RaCeS aNd DrIvIng ! ]  ");
-	print(" [ Made by krusty and kompry ] ");
+	print(" [ ***** CrAzY RaCe Life ***** ]     ");
+	print(" [ StUnTs, RaCeS aNd DrIvIng ! ]  ");
+	print(" [ Made by krusty and kompry!  ] ");
 	print("----------------------------------\n");
 }
 
@@ -1442,6 +1369,56 @@ public OnGameModeInit()
 	//
 	// Create pickups, static objects and static vehicles.
 	//
+
+	gTeamPickupLame = CreatePickup(1239, 1, 2252.11, 1285.30, 19.17);
+	gTeamMenu[E_PLAYER_TEAM_LAME] = CreateMenu("Lamerz", 1, 150.0, 100.0, 250.0, 150.0);
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_LAME], 0, "Lamka");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_LAME], 1, "Opustit tym");
+
+	gTeamPickupAdminz = CreatePickup(1239, 1, 2304.43, 1151.95, 85.94);
+	gTeamMenu[E_PLAYER_TEAM_ADMINZ] = CreateMenu("Adminz", 1, 150.0, 100.0, 250.0, 150.0);
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_ADMINZ], 0, "Admin borec");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_ADMINZ], 1, "Opustit tym");
+
+	gTeamPickupPolice = CreatePickup(1239, 1, 2171.22, 1397.11, 11.06);
+	gTeamMenu[E_PLAYER_TEAM_POLICE] = CreateMenu("Police LV", 1, 150.0, 100.0, 250.0, 150.0);
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_POLICE], 0, "Policajt");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_POLICE], 1, "Opustit tym");
+
+	gTeamPickupGasman = CreatePickup(1239, 1, 2637.36, 1127.04, 11.18);
+	gTeamMenu[E_PLAYER_TEAM_GASMAN] = CreateMenu("Benzina", 1, 150.0, 100.0, 250.0, 150.0);
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_GASMAN], 0, "Benzinak");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_GASMAN], 1, "Opustit tym");
+
+	gTeamPickupDragster = CreatePickup(1239, 1, 2620.14, 1195.76, 10.81);
+	gTeamMenu[E_PLAYER_TEAM_DRAGSTER] = CreateMenu("Dragsterz", 1, 150.0, 100.0, 250.0, 150.0);
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_DRAGSTER], 0, "DRaGsTeR");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_DRAGSTER], 1, "Opustit tym");
+
+	gTeamPickupGarbage = CreatePickup(1581, 1, 2892.8, -2127.9, 3.2);
+	gTeamMenu[E_PLAYER_TEAM_GARBAGE] = CreateMenu("Garbage men", 1, 150.0, 100.0, 250.0, 150.0);
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_GARBAGE], 0, "Tulak");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_GARBAGE], 1, "Opustit tym");
+
+	gTeamPickupPizzaboy = CreatePickup(1581, 1, 2101.70, -1810.05, 13.55);
+	gTeamMenu[E_PLAYER_TEAM_PIZZABOY] = CreateMenu("Pizzaboyz", 1, 150.0, 100.0, 250.0, 150.0);
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PIZZABOY], 0, "Pizza boy");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PIZZABOY], 1, "Opustit tym");
+
+	gTeamPickupHacker = CreatePickup(1581, 1, 2838.10, -2130.26, 0.19);
+	gTeamMenu[E_PLAYER_TEAM_HACKER] = CreateMenu("Hackerz",  1, 150.0, 100.0, 250.0, 150.0);
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_HACKER], 0, "Hacker");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_HACKER], 1, "Opustit tym");
+
+	//gTeamPickup[E_PLAYER_TEAM_CAR_REPAIR] = CreatePickup(1581,1, );
+	gTeamMenu[E_PLAYER_TEAM_CAR_REPAIR] = CreateMenu("Servicemen", 1, 150.0, 100.0, 250.0, 150.0);
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_CAR_REPAIR], 0, "Technik");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_CAR_REPAIR], 1, "Opustit tym");
+
+	//gTeamPickup[E_PLAYER_TEAM_PYRO] = CreatePickup(1581,1, );
+	gTeamMenu[E_PLAYER_TEAM_PYRO] = CreateMenu("Pyroz", 1, 150.0, 100.0, 250.0, 150.0);
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PYRO], 0, "Pyrotechnik");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PYRO], 1, "Opustit tym");
 
 #include "pickups.pwn"
 #include "objects.pwn"
@@ -1509,7 +1486,10 @@ public OnPlayerRequestSpawn(playerid)
 {
 	if (!gPlayerAuth[playerid])
 	{
-		if (udb_Exists(PlayerName(playerid)))
+		new playerName[MAX_PLAYER_NAME];
+		GetPlayerName(playerid, playerName, sizeof(playerName));
+
+		if (udb_Exists(playerName))
 		{
 			GameTextForPlayer(playerid, "~w~Prihlas se!", 5000, 5);
 			SendClientMessage(playerid, COLOR_SVZEL, "Nejsi prihlasen --> /login heslo");
@@ -1929,27 +1909,31 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	//----------------------------------------
 	if (strcmp(cmdtext, "/locate", true) == 0)
 	{
-		new formatovany_text[256], Int = GetPlayerInterior(playerid), Float:X, Float:Y, Float:Z, Float:Uhel;
+		new stringToPrint[256], interior = GetPlayerInterior(playerid), Float:X, Float:Y, Float:Z, Float:Angle;
 
 		GetPlayerPos(playerid, X, Y, Z);
-		GetPlayerFacingAngle(playerid, Uhel);
-		format(formatovany_text, 256, "[ i ] Nacházíte se v interiéru %d na souøadnicích X[%.1f], Y[%.1f], Z[%.1f], Rotace[%.1f].", Int, X, Y, Z, Uhel);
-		SendClientMessage(playerid, COLOR_SVZEL, formatovany_text);
+		GetPlayerFacingAngle(playerid, Angle);
 
-		return true;
+		format(stringToPrint, sizeof(stringToPrint), "[ i ] Nachazite se se v interieru No. %d na souradnicich X[%.1f], Y[%.1f], Z[%.1f], Rotace[%.1f].", interior, X, Y, Z, Angle);
+		SendClientMessage(playerid, COLOR_SVZEL, stringToPrint);
+
+		return 1;
 	}
 	//----------------------------------------
 	if (strcmp(cmdtext, "/wanted", true) == 0)
 	{
 		if (gPlayerData[playerid][E_PLAYER_DATA_TEAM] == E_PLAYER_TEAM_POLICE || IsPlayerAdmin(playerid) || gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] > 1)
 		{
-			new string[256];
+			new playerName[MAX_PLAYER_NAME], stringToPrint[256];
+
 			for (new i = 0; i <= GetMaxPlayers(); i++)
 			{
 				if (GetPlayerWantedLevel(i) > 0)
 				{
-					format(string, sizeof(string), "%s [ WANTED ] - %d", PlayerName(i), GetPlayerWantedLevel(i));
-					SendClientMessage(playerid, COLOR_BILA, string);
+					GetPlayerName(i, playerName, sizeof(playerName));
+
+					format(stringToPrint, sizeof(stringToPrint), "%s [ WANTED ] - %d", playerName, GetPlayerWantedLevel(i));
+					SendClientMessage(playerid, COLOR_BILA, stringToPrint);
 				}
 			}
 		}
@@ -1989,17 +1973,21 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	//----------------------------------------
 	if (strcmp(cmdtext, "/kill", true) == 0)
 	{
-		new formatovany_text[256];
-		format(formatovany_text, sizeof(formatovany_text), "[ i ] Hráèe %s u to nebavilo a spáchal sebevradu!", PlayerName(playerid));
-		SendClientMessageToAll(COLOR_CERVENA, formatovany_text);
+		new playerName[MAX_PLAYER_NAME], stringToPrint[256];
+		GetPlayerName(playerid, playerName, sizeof(playerName));
+
+		format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrace %s uz to nebavilo a spachal sebevrazdu (/kill)!", playerName);
+		SendClientMessageToAll(COLOR_CERVENA, stringToPrint);
+
 		SetPlayerHealth(playerid, 0);
+
 		return 1;
 	}
 
 	//----------------------------------------
 	if (strcmp(cmdtext, "/opr", true) == 0)
 	{
-		//if(GetPlayerVehicleID(playerid) == AdminAuto && !IsPlayerAdmin(playerid)) return SCM(playerid, COLOR_CERVENA, "Nelze opravit");
+		//if(GetPlayerVehicleID(playerid) == gAdminAuto && !IsPlayerAdmin(playerid)) return SCM(playerid, COLOR_CERVENA, "Nelze opravit");
 		if (!IsPlayerInAnyVehicle(playerid)) return SCM(playerid, COLOR_CERVENA, "[ ! ]Nejsi v autì !");
 		{
 			SCM(playerid, COLOR_ZLUTA, "[ i ] Opravil sis auto");
@@ -2090,411 +2078,413 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	//----------------------------------------
 	if (strcmp("/soska", cmdtext, true) == 0)
 	{
-		SCM(playerid, COLOR_SVZEL, "[ ----- SOKY ----- ]");
-		SCM(playerid, COLOR_SVZEL, "[ Soky se nacházejí v a v okolí LS ]");
-		SCM(playerid, COLOR_SVZEL, "[ Soek je zatim celkem 5 ]");
-		SCM(playerid, COLOR_SVZEL, "[ ----- ODMÌNA ------ ]");
-		SCM(playerid, COLOR_SVZEL, "[ 10 000 000 na ruku ]");
-		SCM(playerid, COLOR_SVZEL, "[ Pozitivnìjí pøihlíení k dostání admin-lvl ]");
-		SCM(playerid, COLOR_SVZEL, "[ TAK HLEDEJTE :) :P:D ]");
+		SendClientMessage(playerid, COLOR_SVZEL, "[ ----- SOSKY ----- ]");
+		SendClientMessage(playerid, COLOR_SVZEL, "[ Sosky se nachazeji v LS a okoli ]");
+		SendClientMessage(playerid, COLOR_SVZEL, "[ Sosek je zatim celkem 5 ]");
+		SendClientMessage(playerid, COLOR_SVZEL, "[ ----- ODMENA ------ ]");
+		SendClientMessage(playerid, COLOR_SVZEL, "[ $10 000 000 na ruku ]");
+		SendClientMessage(playerid, COLOR_SVZEL, "[ Pozitivnejsi prihlizeni k ziskani admin-lvl ]");
+		SendClientMessage(playerid, COLOR_SVZEL, "[ TAK HLEDEJTE! :) :D ]");
+
 		return 1;
 	}
 	//----------------------------------------
-	if (strcmp(cmdtext, "/buypapir", true) == 0)
+	/*if (strcmp(cmdtext, "/buypapir", true) == 0)
+	  {
+	  if (papirek[playerid] == 0)
+	  {
+	  SendClientMessage(playerid, COLOR_LEMON, "Koupil sis papirek 1/5");
+	  papirek[playerid] = 1;
+	  }
+	  else
+	  {
+	  if (papirek[playerid] == 1)
+	  {
+	  SendClientMessage(playerid, COLOR_LEMON, "Koupil sis papirek 2/5");
+	  papirek[playerid] = 2;
+	  }
+	  else
+	  {
+	  if (papirek[playerid] == 2)
+	  {
+	  SendClientMessage(playerid, COLOR_LEMON, "Koupil sis papirek 3/5");
+	  papirek[playerid] = 3;
+	  }
+	  else
+	  {
+	  if (papirek[playerid] == 3)
+	  {
+	  SendClientMessage(playerid, COLOR_LEMON, "Koupil sis papirek 4/5");
+	  papirek[playerid] = 4;
+	  }
+	  else
+	  {
+	  if (papirek[playerid] == 4)
+	  {
+	  SendClientMessage(playerid, COLOR_LEMON, "Koupil sis papirek 5/5");
+	  papirek[playerid] = 5;
+	  }
+	  else
+	  {
+	  SendClientMessage(playerid, COLOR_LEMON, "[ ! ]U má max 5 papírkù");
+	  }
+	  }
+	  }
+	  }
+	  }
+	  return 1;
+	  }
+
+	  if (strcmp(cmdtext, "/hulit", true) == 0)
+	  {
+	  if (joint[playerid] == 0)
+	  {
+	  SendClientMessage(playerid, COLOR_LEMON, "[ ! ]Nemá adného jointa /ubalit ");
+	  }
+	  else
+	  {
+	  if (joint[playerid] == 1)
+	  {
+	  SendClientMessage(playerid, COLOR_LEMON, "Zùstal ti 0/5 jointù");
+	  SetPlayerHealth(playerid, 100.0);
+	  joint[playerid] = 0;
+	  }
+	  else
+	  {
+	  if (joint[playerid] == 2)
+	  {
+	  SendClientMessage(playerid, COLOR_LEMON, "Zùstal ti 1/5 jointù");
+	  SetPlayerHealth(playerid, 100.0);
+	  joint[playerid] = 1;
+	  }
+	  else
+	  {
+	  if (joint[playerid] == 3)
 	{
-		if (papirek[playerid] == 0)
-		{
-			SendClientMessage(playerid, COLOR_LEMON, "Koupil sis papirek 1/5");
-			papirek[playerid] = 1;
-		}
-		else
-		{
-			if (papirek[playerid] == 1)
-			{
-				SendClientMessage(playerid, COLOR_LEMON, "Koupil sis papirek 2/5");
-				papirek[playerid] = 2;
-			}
-			else
-			{
-				if (papirek[playerid] == 2)
-				{
-					SendClientMessage(playerid, COLOR_LEMON, "Koupil sis papirek 3/5");
-					papirek[playerid] = 3;
-				}
-				else
-				{
-					if (papirek[playerid] == 3)
-					{
-						SendClientMessage(playerid, COLOR_LEMON, "Koupil sis papirek 4/5");
-						papirek[playerid] = 4;
-					}
-					else
-					{
-						if (papirek[playerid] == 4)
-						{
-							SendClientMessage(playerid, COLOR_LEMON, "Koupil sis papirek 5/5");
-							papirek[playerid] = 5;
-						}
-						else
-						{
-							SendClientMessage(playerid, COLOR_LEMON, "[ ! ]U má max 5 papírkù");
-						}
-					}
-				}
-			}
-		}
-		return 1;
+		SendClientMessage(playerid, COLOR_LEMON, "Zùstal ti 2/5 jointù");
+		SetPlayerHealth(playerid, 100.0);
+		joint[playerid] = 2;
 	}
+	  else
+	  {
+		  if (joint[playerid] == 4)
+		  {
+			  SendClientMessage(playerid, COLOR_LEMON, "Zùstal ti 3/5 jointù");
+			  SetPlayerHealth(playerid, 100.0);
+			  joint[playerid] = 3;
+		  }
+		  else
+		  {
+			  if (joint[playerid] == 5)
+			  {
+				  SendClientMessage(playerid, COLOR_LEMON, "Zùstal ti 4/5 jointù");
+				  SetPlayerHealth(playerid, 100.0);
+				  joint[playerid] = 4;
+			  }
+		  }
+	  }
+}
+}
+}
+return 1;
+}
 
-	if (strcmp(cmdtext, "/hulit", true) == 0)
+if (strcmp(cmdtext, "/ubalit", true) == 0)
+{
+	if (joint[playerid] == 5)
 	{
-		if (joint[playerid] == 0)
-		{
-			SendClientMessage(playerid, COLOR_LEMON, "[ ! ]Nemá adného jointa /ubalit ");
-		}
-		else
-		{
-			if (joint[playerid] == 1)
-			{
-				SendClientMessage(playerid, COLOR_LEMON, "Zùstal ti 0/5 jointù");
-				SetPlayerHealth(playerid, 100.0);
-				joint[playerid] = 0;
-			}
-			else
-			{
-				if (joint[playerid] == 2)
-				{
-					SendClientMessage(playerid, COLOR_LEMON, "Zùstal ti 1/5 jointù");
-					SetPlayerHealth(playerid, 100.0);
-					joint[playerid] = 1;
-				}
-				else
-				{
-					if (joint[playerid] == 3)
-					{
-						SendClientMessage(playerid, COLOR_LEMON, "Zùstal ti 2/5 jointù");
-						SetPlayerHealth(playerid, 100.0);
-						joint[playerid] = 2;
-					}
-					else
-					{
-						if (joint[playerid] == 4)
-						{
-							SendClientMessage(playerid, COLOR_LEMON, "Zùstal ti 3/5 jointù");
-							SetPlayerHealth(playerid, 100.0);
-							joint[playerid] = 3;
-						}
-						else
-						{
-							if (joint[playerid] == 5)
-							{
-								SendClientMessage(playerid, COLOR_LEMON, "Zùstal ti 4/5 jointù");
-								SetPlayerHealth(playerid, 100.0);
-								joint[playerid] = 4;
-							}
-						}
-					}
-				}
-			}
-		}
-		return 1;
+		SendClientMessage(playerid, COLOR_LEMON, "[ i ]U má 5 jointu vic nemue /hulit");
 	}
-
-	if (strcmp(cmdtext, "/ubalit", true) == 0)
-	{
-		if (joint[playerid] == 5)
-		{
-			SendClientMessage(playerid, COLOR_LEMON, "[ i ]U má 5 jointu vic nemue /hulit");
-		}
-		else
-		{
-			if (zapik[playerid] == 0)
-			{
-				SendClientMessage(playerid, COLOR_LEMON, "[ ! ]Nemá zapík /zapik");
-			}
-			else
-			{
-				if (marihuana[playerid] == 0)
-				{
-					SendClientMessage(playerid, COLOR_LEMON, "[ ! ]Nemá marihuanu /otrhat");
-				}
-				else
-				{
-					if (tabak[playerid] == 0)
-					{
-						SendClientMessage(playerid, COLOR_LEMON, "[ ! ]Nemá tabak /tabak ");
-					}
-					else
-					{
-						if (papirek[playerid] == 0)
-						{
-							SendClientMessage(playerid, COLOR_LEMON, "[ ! ]Nemá Papírky /buypapir ");
-						}
-						else
-						{
-							joint[playerid] = 1;
-							SendClientMessage(playerid, COLOR_LEMON, "[ i ]Ubalil sis jointa 1/5 /hulit");
-
-							if (marihuana[playerid] == 1)
-							{
-								marihuana[playerid] = 0;
-							}
-							else
-							{
-								if (tabak[playerid] == 1)
-								{
-									tabak[playerid] = 0;
-								}
-								else
-								{
-									if (papirek[playerid] == 1)
-									{
-										papirek[playerid] = 0;
-									}
-									else
-									{
-										joint[playerid] = 2;
-										SendClientMessage(playerid, COLOR_LEMON, "[ i ]Ubalil sis jointa 2/5 /hulit");
-										if (marihuana[playerid] == 2)
-										{
-											marihuana[playerid] = 1;
-										}
-										else
-										{
-											if (tabak[playerid] == 2)
-											{
-												tabak[playerid] = 1;
-											}
-											else
-											{
-												if (papirek[playerid] == 2)
-												{
-													papirek[playerid] = 1;
-												}
-												else
-												{
-													joint[playerid] = 3;
-													SendClientMessage(playerid, COLOR_LEMON, "[ i ]Ubalil sis jointa 3/5 /hulit");
-													if (marihuana[playerid] == 3)
-													{
-														marihuana[playerid] = 2;
-													}
-													else
-													{
-														if (tabak[playerid] == 3)
-														{
-															tabak[playerid] = 2;
-														}
-														else
-														{
-															if (papirek[playerid] == 3)
-															{
-																papirek[playerid] = 2;
-															}
-															else
-															{
-																joint[playerid] = 4;
-																SendClientMessage(playerid, COLOR_LEMON, "[ i ]Ubalil sis jointa 4/5 /hulit");
-																if (marihuana[playerid] == 4)
-																{
-																	marihuana[playerid] = 3;
-																}
-																else
-																{
-																	if (tabak[playerid] == 4)
-																	{
-																		tabak[playerid] = 3;
-																	}
-																	else
-																	{
-																		joint[playerid] = 5;
-																		SendClientMessage(playerid, COLOR_LEMON, "[ i ]Ubalil sis jointa 5/5 /hulit");
-																		if (papirek[playerid] == 4)
-																		{
-																			papirek[playerid] = 3;
-																		}
-																		else
-																		{
-																			if (marihuana[playerid] == 5)
-																			{
-																				marihuana[playerid] = 4;
-																			}
-																			else
-																			{
-																				if (tabak[playerid] == 5)
-																				{
-																					tabak[playerid] = 4;
-																				}
-																				else
-																				{
-																					if (papirek[playerid] == 5)
-																					{
-																						papirek[playerid] = 4;
-																					}
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		return 1;
-	}
-
-	if (strcmp(cmdtext, "/zapik", true) == 0)
+	else
 	{
 		if (zapik[playerid] == 0)
 		{
-			SendClientMessage(playerid, COLOR_LEMON, "[ i ]Koupil sis zapik! /otrhat /hulit /buypapir /tabak /ubalit");
-			zapik[playerid] = 1;
-		}
-		else
-		{
-			SendClientMessage(playerid, COLOR_LEMON, "[ ! ]U má zapik! /otrhat /hulit /buypapir /tabak /ubalit");
-		}
-		return 1;
-	}
-
-	if (strcmp(cmdtext, "/sklenik", true) == 0)
-	{
-		SetPlayerPos(playerid, 2360.5535, 72.3878, 27.6625);
-		return 1;
-	}
-
-	if (strcmp(cmdtext, "/otrhat", true) == 0)
-	{
-		if (IsPlayerInSphere(playerid, 2360.5535, 72.3878, 27.6625, 101) == 0)
-		{
-			SendClientMessage(playerid, COLOR_LEMON, "[ ! ]Nejsi we skleníku :P");
+			SendClientMessage(playerid, COLOR_LEMON, "[ ! ]Nemá zapík /zapik");
 		}
 		else
 		{
 			if (marihuana[playerid] == 0)
 			{
-				SendClientMessage(playerid, COLOR_LEMON, "[ i ]Natrhal sis marihuanu 1/5 /ubalit");
-				marihuana[playerid] = 1;
+				SendClientMessage(playerid, COLOR_LEMON, "[ ! ]Nemá marihuanu /otrhat");
 			}
 			else
 			{
-				if (marihuana[playerid] == 1)
+				if (tabak[playerid] == 0)
 				{
-					SendClientMessage(playerid, COLOR_LEMON, "[ i ]Natrhal sis marihuanu 2/5 /ubalit");
-					marihuana[playerid] = 2;
+					SendClientMessage(playerid, COLOR_LEMON, "[ ! ]Nemá tabak /tabak ");
 				}
 				else
 				{
-					if (marihuana[playerid] == 2)
+					if (papirek[playerid] == 0)
 					{
-						SendClientMessage(playerid, COLOR_LEMON, "[ i ]Natrhal sis marihuanu 3/5 /ubalit");
-						marihuana[playerid] = 3;
+						SendClientMessage(playerid, COLOR_LEMON, "[ ! ]Nemá Papírky /buypapir ");
 					}
 					else
 					{
-						if (marihuana[playerid] == 3)
+						joint[playerid] = 1;
+						SendClientMessage(playerid, COLOR_LEMON, "[ i ]Ubalil sis jointa 1/5 /hulit");
+
+						if (marihuana[playerid] == 1)
 						{
-							SendClientMessage(playerid, COLOR_LEMON, "[ i ]Natrhal sis marihuanu 4/5 /ubalit");
-							marihuana[playerid] = 4;
+							marihuana[playerid] = 0;
 						}
 						else
 						{
-							if (marihuana[playerid] == 4)
+							if (tabak[playerid] == 1)
 							{
-								SendClientMessage(playerid, COLOR_LEMON, "[ i ]Natrhal sis marihuanu 5/5 /ubalit");
-								marihuana[playerid] = 5;
+								tabak[playerid] = 0;
 							}
 							else
 							{
-								SendClientMessage(playerid, COLOR_LEMON, "[ i ]Vic Marihuany uz neuneses! /ubalit");
+								if (papirek[playerid] == 1)
+								{
+									papirek[playerid] = 0;
+								}
+								else
+								{
+									joint[playerid] = 2;
+									SendClientMessage(playerid, COLOR_LEMON, "[ i ]Ubalil sis jointa 2/5 /hulit");
+									if (marihuana[playerid] == 2)
+									{
+										marihuana[playerid] = 1;
+									}
+									else
+									{
+										if (tabak[playerid] == 2)
+										{
+											tabak[playerid] = 1;
+										}
+										else
+										{
+											if (papirek[playerid] == 2)
+											{
+												papirek[playerid] = 1;
+											}
+											else
+											{
+												joint[playerid] = 3;
+												SendClientMessage(playerid, COLOR_LEMON, "[ i ]Ubalil sis jointa 3/5 /hulit");
+												if (marihuana[playerid] == 3)
+												{
+													marihuana[playerid] = 2;
+												}
+												else
+												{
+													if (tabak[playerid] == 3)
+													{
+														tabak[playerid] = 2;
+													}
+													else
+													{
+														if (papirek[playerid] == 3)
+														{
+															papirek[playerid] = 2;
+														}
+														else
+														{
+															joint[playerid] = 4;
+															SendClientMessage(playerid, COLOR_LEMON, "[ i ]Ubalil sis jointa 4/5 /hulit");
+															if (marihuana[playerid] == 4)
+															{
+																marihuana[playerid] = 3;
+															}
+															else
+															{
+																if (tabak[playerid] == 4)
+																{
+																	tabak[playerid] = 3;
+																}
+																else
+																{
+																	joint[playerid] = 5;
+																	SendClientMessage(playerid, COLOR_LEMON, "[ i ]Ubalil sis jointa 5/5 /hulit");
+																	if (papirek[playerid] == 4)
+																	{
+																		papirek[playerid] = 3;
+																	}
+																	else
+																	{
+																		if (marihuana[playerid] == 5)
+																		{
+																			marihuana[playerid] = 4;
+																		}
+																		else
+																		{
+																			if (tabak[playerid] == 5)
+																			{
+																				tabak[playerid] = 4;
+																			}
+																			else
+																			{
+																				if (papirek[playerid] == 5)
+																				{
+																					papirek[playerid] = 4;
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
 							}
 						}
 					}
 				}
 			}
 		}
-		return 1;
 	}
+	return 1;
+}
 
-	if (strcmp(cmdtext, "/tabak", true) == 0)
+if (strcmp(cmdtext, "/zapik", true) == 0)
+{
+	if (zapik[playerid] == 0)
 	{
-		if (tabak[playerid] == 0)
+		SendClientMessage(playerid, COLOR_LEMON, "[ i ]Koupil sis zapik! /otrhat /hulit /buypapir /tabak /ubalit");
+		zapik[playerid] = 1;
+	}
+	else
+	{
+		SendClientMessage(playerid, COLOR_LEMON, "[ ! ]U má zapik! /otrhat /hulit /buypapir /tabak /ubalit");
+	}
+	return 1;
+}
+
+if (strcmp(cmdtext, "/sklenik", true) == 0)
+{
+	SetPlayerPos(playerid, 2360.5535, 72.3878, 27.6625);
+	return 1;
+}
+
+if (strcmp(cmdtext, "/otrhat", true) == 0)
+{
+	if (IsPlayerInSphere(playerid, 2360.5535, 72.3878, 27.6625, 101) == 0)
+	{
+		SendClientMessage(playerid, COLOR_LEMON, "[ ! ]Nejsi we skleníku :P");
+	}
+	else
+	{
+		if (marihuana[playerid] == 0)
 		{
-			SendClientMessage(playerid, COLOR_LEMON, "[ i ]Koupil sis tabak 1/5 /ubalit");
-			tabak[playerid] = 1;
+			SendClientMessage(playerid, COLOR_LEMON, "[ i ]Natrhal sis marihuanu 1/5 /ubalit");
+			marihuana[playerid] = 1;
 		}
 		else
 		{
-			if (tabak[playerid] == 1)
+			if (marihuana[playerid] == 1)
 			{
-				SendClientMessage(playerid, COLOR_LEMON, "[ i ]Koupil sis tabak 2/5 /ubalit");
-				tabak[playerid] = 2;
+				SendClientMessage(playerid, COLOR_LEMON, "[ i ]Natrhal sis marihuanu 2/5 /ubalit");
+				marihuana[playerid] = 2;
 			}
 			else
 			{
-				if (tabak[playerid] == 2)
+				if (marihuana[playerid] == 2)
 				{
-					SendClientMessage(playerid, COLOR_LEMON, "[ i ]Koupil sis tabak 3/5 /ubalit");
-					tabak[playerid] = 3;
+					SendClientMessage(playerid, COLOR_LEMON, "[ i ]Natrhal sis marihuanu 3/5 /ubalit");
+					marihuana[playerid] = 3;
 				}
 				else
 				{
-					if (tabak[playerid] == 3)
+					if (marihuana[playerid] == 3)
 					{
-						SendClientMessage(playerid, COLOR_LEMON, "[ i ]Koupil sis tabak 4/5 /ubalit ");
-						tabak[playerid] = 4;
+						SendClientMessage(playerid, COLOR_LEMON, "[ i ]Natrhal sis marihuanu 4/5 /ubalit");
+						marihuana[playerid] = 4;
 					}
 					else
 					{
-						if (tabak[playerid] == 4)
+						if (marihuana[playerid] == 4)
 						{
-							SendClientMessage(playerid, COLOR_LEMON, "[ i ]Koupil sis tabak 5/5 /ubalit");
-							tabak[playerid] = 5;
+							SendClientMessage(playerid, COLOR_LEMON, "[ i ]Natrhal sis marihuanu 5/5 /ubalit");
+							marihuana[playerid] = 5;
 						}
 						else
 						{
-							SendClientMessage(playerid, COLOR_LEMON, "[ ! ]U má 5 ks tabákù /ubalit");
+							SendClientMessage(playerid, COLOR_LEMON, "[ i ]Vic Marihuany uz neuneses! /ubalit");
 						}
 					}
 				}
 			}
 		}
-		return 1;
 	}
-	//----------------------------------------
-	if (strcmp("/balicek", cmdtext, true) == 0)
+	return 1;
+}
+
+if (strcmp(cmdtext, "/tabak", true) == 0)
+{
+	if (tabak[playerid] == 0)
 	{
-		GivePlayerWeapon(playerid, 32, 20);
-
-		GivePlayerWeapon(playerid, 46, 1);
-		return 1;
+		SendClientMessage(playerid, COLOR_LEMON, "[ i ]Koupil sis tabak 1/5 /ubalit");
+		tabak[playerid] = 1;
 	}
-	//----------------------------------------
-	if (strcmp(cmdtext, "/vybava", true) == 0)
+	else
 	{
-		if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 2) 
-			return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostateèný Admin level!");
-
-		GivePlayerWeapon(playerid, 28, 400);
-		GivePlayerWeapon(playerid, 26, 400);
-		GivePlayerWeapon(playerid, 31, 400);
-		GivePlayerWeapon(playerid, 46, 1);
-		GivePlayerWeapon(playerid, 43, 1);
-
-		return 1;
+		if (tabak[playerid] == 1)
+		{
+			SendClientMessage(playerid, COLOR_LEMON, "[ i ]Koupil sis tabak 2/5 /ubalit");
+			tabak[playerid] = 2;
+		}
+		else
+		{
+			if (tabak[playerid] == 2)
+			{
+				SendClientMessage(playerid, COLOR_LEMON, "[ i ]Koupil sis tabak 3/5 /ubalit");
+				tabak[playerid] = 3;
+			}
+			else
+			{
+				if (tabak[playerid] == 3)
+				{
+					SendClientMessage(playerid, COLOR_LEMON, "[ i ]Koupil sis tabak 4/5 /ubalit ");
+					tabak[playerid] = 4;
+				}
+				else
+				{
+					if (tabak[playerid] == 4)
+					{
+						SendClientMessage(playerid, COLOR_LEMON, "[ i ]Koupil sis tabak 5/5 /ubalit");
+						tabak[playerid] = 5;
+					}
+					else
+					{
+						SendClientMessage(playerid, COLOR_LEMON, "[ ! ]U má 5 ks tabákù /ubalit");
+					}
+				}
+			}
+		}
 	}
+	return 1;
+}*/
 
-	return InvalidCommand(playerid);
+//----------------------------------------
+if (strcmp("/balicek", cmdtext, true) == 0)
+{
+	GivePlayerWeapon(playerid, 32, 20);
+
+	GivePlayerWeapon(playerid, 46, 1);
+	return 1;
+}
+//----------------------------------------
+if (strcmp(cmdtext, "/vybava", true) == 0)
+{
+	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 2) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostateèný Admin level!");
+
+	GivePlayerWeapon(playerid, 28, 400);
+	GivePlayerWeapon(playerid, 26, 400);
+	GivePlayerWeapon(playerid, 31, 400);
+	GivePlayerWeapon(playerid, 46, 1);
+	GivePlayerWeapon(playerid, 43, 1);
+
+	return 1;
+}
+
+return InvalidCommand(playerid);
 }
 
 InvalidCommand(playerid)
@@ -2503,10 +2493,10 @@ InvalidCommand(playerid)
 	return 1;
 }
 
-public OnPlayerInfoChange(playerid)
-{
-	return 1;
-}
+/*public OnPlayerInfoChange(playerid)
+  {
+  return 1;
+  }*/
 
 public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 {
@@ -2564,7 +2554,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			TextDrawHideForPlayer(playerid, KPHR[playerid]);
 		}
 	}
-	if (newstate == PLAYER_STATE_DRIVER && GetPlayerVehicleID(playerid) == AdminAuto)
+	if (newstate == PLAYER_STATE_DRIVER && GetPlayerVehicleID(playerid) == gAdminAuto)
 	{
 		if (!IsPlayerAdmin(playerid))
 		{
@@ -2618,77 +2608,77 @@ public OnPlayerObjectMoved(playerid, objectid)
 
 public OnPlayerPickUpPickup(playerid, pickupid)
 {
-	if (pickupid == lamer)
+	if (pickupid == gTeamPickup[E_PLAYER_TEAM_LAME])
 	{
-		ShowMenuForPlayer(menulamer, playerid);
+		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_LAME], playerid);
 	}
-	else if (pickupid == borec)
+	else if (pickupid == gTeamPickup[E_PLAYER_TEAM_ADMINZ])
 	{
-		ShowMenuForPlayer(menuborec, playerid);
+		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_ADMINZ], playerid);
 	}
-	else if (pickupid == love)
+	else if (pickupid == gTeamPickup[E_PLAYER_TEAM_POLICE])
 	{
-		SetPlayerHealth(hrac, 100.0);
+		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_POLICE], playerid);
 	}
-	else if (pickupid == polisils)
+	else if (pickupid == gTeamPickup[E_PLAYER_TEAM_GASMAN])
 	{
-		ShowMenuForPlayer(menupolisi, playerid);
+		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_GASMAN], playerid);
 	}
-	else if (pickupid == polisilv)
+	else if (pickupid == gTeamPickup[E_PLAYER_TEAM_DRAGSTER])
 	{
-		ShowMenuForPlayer(menupolisi, playerid);
+		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_DRAGSTER], playerid);
 	}
-	else if (pickupid == benzinak)
+	else if (pickupid == gTeamPickup[E_PLAYER_TEAM_GARBAGE])
 	{
-		ShowMenuForPlayer(benzinakmenu, playerid);
+		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_GARBAGE], playerid);
 	}
-	else if (pickupid == dragster)
+	else if (pickupid == gTeamPickup[E_PLAYER_TEAM_PIZZABOY])
 	{
-		ShowMenuForPlayer(dragstermenu, playerid);
+		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_PIZZABOY], playerid);
 	}
-	else if (pickupid == tulak)
+	else if (pickupid == gTeamPickup[E_PLAYER_TEAM_HACKER])
 	{
-		ShowMenuForPlayer(menutulak, playerid);
+		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_HACKER], playerid);
 	}
-	else if (pickupid == pizzaboy)
+	else if (pickupid == gTeamPickup[E_PLAYER_TEAM_CAR_REPAIR])
 	{
-		ShowMenuForPlayer(menupizza, playerid);
+		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_CAR_REPAIR], playerid);
 	}
-	else if (pickupid == interiertulaci)
+	else if (pickupid == gTeamPickup[E_PLAYER_TEAM_PYRO])
+	{
+		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_PYRO], playerid);
+	}
+
+	//
+	//
+	//
+
+	else if (pickupid == gAdminRoomHealth)
+	{
+		SetPlayerHealth(playerid, 100.0);
+	}
+	else if (pickupid == gHackerzInteriorEntrance)
 	{
 		SetPlayerPos(playerid, 2845.28, -2125.33, 0.19);
 	}
-	else if (pickupid == tulacizpatky)
+	else if (pickupid == gHackerzInteriorExit)
 	{
 		SetPlayerPos(playerid, 2881.27, -2123.99, 4.32);
 	}
-	else if (pickupid == pytelpenez)
+	else if (pickupid == gHackerzMoneyBag)
 	{
 		GivePlayerMoney(playerid, 10000);
-		DestroyPickup(pytelpenez);
+		DestroyPickup(gHackerzMoneyBag);
 	}
-	else if (pickupid == duledvera)
+	else if (pickupid == gAdminDoorDown)
 	{
 		SetPlayerPos(playerid, 1007.98, -1164.11, 50.95);
 	}
-	else if (pickupid == navrchuadmin)
+	else if (pickupid == gAdminDoorUp)
 	{
 		SetPlayerPos(playerid, 981.84, -1158.15, 23.86);
 	}
-	else if (pickupid == hackeri)
-	{
-		ShowMenuForPlayer(hackerimenu, playerid);
-	}
-	else if (pickupid == technik)
-	{
-		ShowMenuForPlayer(menutechnik, playerid);
-	}
-	else if (pickupid == pyrotechnik)
-	{
-		ShowMenuForPlayer(menupyrotechnik, playerid);
-	}
 
-	//---------------------
 	return 1;
 }
 
@@ -2706,107 +2696,104 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		return 1;
 	}
 
-	switch (currentMenu)
+	if (currentMenu == gTeamMenu[E_PLAYER_TEAM_LAME])
 	{
-		case gTeamMenu[E_PLAYER_TEAM_LAME]:
-			{
-				GivePlayerWeapon(playerid, 5, 1);
-				SetPlayerColor(playerid, COLOR_ZLUTA);
-				SetPlayerSkin(playerid, 200);
+		GivePlayerWeapon(playerid, 5, 1);
+		SetPlayerColor(playerid, COLOR_ZLUTA);
+		SetPlayerSkin(playerid, 200);
 
-				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_LAME;
-				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Lamek!", playerName);
-			}
-		case gTeamMenu[E_PLAYER_TEAM_ADMINZ]:
-			{
-				GivePlayerWeapon(playerid, 32, 1000);
-				SetPlayerColor(playerid, COLOR_SVZEL);
-				SetPlayerSkin(playerid, 29);
+		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_LAME;
+		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Lamek!", playerName);
+	}
+	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_ADMINZ])
+	{
+		GivePlayerWeapon(playerid, 32, 1000);
+		SetPlayerColor(playerid, COLOR_SVZEL);
+		SetPlayerSkin(playerid, 29);
 
-				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_ADMINZ;
-				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Admin borcu!", playerName);
-			}
-		case gTeamMenu[E_PLAYER_TEAM_POLICE]:
-			{
-				GivePlayerWeapon(playerid, 30, 100);
-				GivePlayerWeapon(playerid, 31, 100);
-				GivePlayerWeapon(playerid, 32, 111);
-				SetPlayerColor(playerid, MODRA);
-				SetPlayerSkin(playerid, 285);
+		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_ADMINZ;
+		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Admin borcu!", playerName);
+	}
+	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_POLICE])
+	{
+		GivePlayerWeapon(playerid, 30, 100);
+		GivePlayerWeapon(playerid, 31, 100);
+		GivePlayerWeapon(playerid, 32, 111);
+		SetPlayerColor(playerid, MODRA);
+		SetPlayerSkin(playerid, 285);
 
-				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_POLICE;
-				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Policajtu!", playerName);
-			}
-		case gTeamMenu[E_PLAYER_TEAM_GASMAN]:
-			{
-				GivePlayerWeapon(playerid, 32, 1);
-				SetPlayerColor(playerid, COLOR_CERVENA);
-				SetPlayerSkin(playerid, 50);
+		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_POLICE;
+		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Policajtu!", playerName);
+	}
+	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_GASMAN])
+	{
+		GivePlayerWeapon(playerid, 32, 1);
+		SetPlayerColor(playerid, COLOR_CERVENA);
+		SetPlayerSkin(playerid, 50);
 
-				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_GASMAN;
-				format(stringToPrint, sizeof(stringToPrint), " [ ! ] Hrac %s se pripojil k tymu Pumparu/Benzinaku!", playerName);
-			}
-		case gTeamMenu[E_PLAYER_TEAM_DRAGSTER]:
-			{
-				GivePlayerWeapon(playerid, 5, 1);
-				GivePlayerWeapon(playerid, 30, 100);
-				GivePlayerWeapon(playerid, 31, 1000);
-				SetPlayerColor(playerid, COLOR_ORANZOVA);
-				SetPlayerSkin(playerid, 107);
+		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_GASMAN;
+		format(stringToPrint, sizeof(stringToPrint), " [ ! ] Hrac %s se pripojil k tymu Pumparu/Benzinaku!", playerName);
+	}
+	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_DRAGSTER])
+	{
+		GivePlayerWeapon(playerid, 5, 1);
+		GivePlayerWeapon(playerid, 30, 100);
+		GivePlayerWeapon(playerid, 31, 1000);
+		SetPlayerColor(playerid, COLOR_ORANZOVA);
+		SetPlayerSkin(playerid, 107);
 
-				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_DRAGSTER;
-				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu DRaGsTeRù!", playerName);
-			}
-		case gTeamMenu[E_PLAYER_TEAM_GARBAGE]:
-			{
-				GivePlayerWeapon(playerid, 4, 1);
-				GivePlayerWeapon(playerid, 32, 1);
-				SetPlayerColor(playerid, COLOR_SVZEL);
-				SetPlayerSkin(playerid, 230); // alternatively ID 137
+		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_DRAGSTER;
+		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu DRaGsTeRù!", playerName);
+	}
+	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_GARBAGE])
+	{
+		GivePlayerWeapon(playerid, 4, 1);
+		GivePlayerWeapon(playerid, 32, 1);
+		SetPlayerColor(playerid, COLOR_SVZEL);
+		SetPlayerSkin(playerid, 230); // alternatively ID 137
 
-				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_GARBAGE; 
-				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Tulaku!", playerName);
-			}
-		case gTeamMenu[E_PLAYER_TEAM_PIZZABOY]:
-			{
-				GivePlayerWeapon(playerid, 4, 1);
-				GivePlayerWeapon(playerid, 24, 111);
-				SetPlayerColor(playerid, COLOR_ZELZLUT);
-				SetPlayerSkin(playerid, 250);
+		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_GARBAGE; 
+		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Tulaku!", playerName);
+	}
+	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_PIZZABOY])
+	{
+		GivePlayerWeapon(playerid, 4, 1);
+		GivePlayerWeapon(playerid, 24, 111);
+		SetPlayerColor(playerid, COLOR_ZELZLUT);
+		SetPlayerSkin(playerid, 250);
 
-				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_PIZZABOY;
-				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Pizzaboyz!", playerName); 
-			}
-		case gTeamMenu[E_PLAYER_TEAM_HACKER]:
-			{
-				GivePlayerWeapon(playerid, 4, 100);
-				GivePlayerWeapon(playerid, 24, 100);
-				SetPlayerColor(playerid, COLOR_BILA);
-				SetPlayerSkin(playerid, 170);
+		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_PIZZABOY;
+		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Pizzaboyz!", playerName); 
+	}
+	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_HACKER])
+	{
+		GivePlayerWeapon(playerid, 4, 100);
+		GivePlayerWeapon(playerid, 24, 100);
+		SetPlayerColor(playerid, COLOR_BILA);
+		SetPlayerSkin(playerid, 170);
 
-				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_HACKER;
-				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Hackeru!", playerName); 
-			}
-		case gTeamMenu[E_PLAYER_TEAM_CAR_REPAIR]:
-			{
-				GivePlayerWeapon(playerid, 4, 100);
-				GivePlayerWeapon(playerid, 24, 100);
-				SetPlayerColor(playerid, COLOR_SEDA);
-				SetPlayerSkin(playerid, 50);
+		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_HACKER;
+		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Hackeru!", playerName); 
+	}
+	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_CAR_REPAIR])
+	{
+		GivePlayerWeapon(playerid, 4, 100);
+		GivePlayerWeapon(playerid, 24, 100);
+		SetPlayerColor(playerid, COLOR_SEDA);
+		SetPlayerSkin(playerid, 50);
 
-				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_CAR_REPAIR;
-				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Automechaniku!", playerName);
-			}
-		case gTeamMenu[E_PLAYER_TEAM_PYRO]:
-			{
-				GivePlayerWeapon(playerid, 4, 100);
-				GivePlayerWeapon(playerid, 24, 100);
-				SetPlayerColor(playerid, COLOR_SEDA);
-				SetPlayerSkin(playerid, 230);
+		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_CAR_REPAIR;
+		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Automechaniku!", playerName);
+	}
+	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_PYRO])
+	{
+		GivePlayerWeapon(playerid, 4, 100);
+		GivePlayerWeapon(playerid, 24, 100);
+		SetPlayerColor(playerid, COLOR_SEDA);
+		SetPlayerSkin(playerid, 230);
 
-				gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_PYRO;
-				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Pyrotechniku!", playerName);
-			}
+		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_PYRO;
+		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Pyrotechniku!", playerName);
 	}
 
 	SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
@@ -2930,6 +2917,23 @@ IsVehicleRcTram(vehicleid)
 			return 0;
 	}
 	return 0;
+}
+
+public SplitIntoTwo(input[], token1[], token2[], tokenSize)
+{
+	new spacePos = strfind(input, " ");
+	if (spacePos == -1)
+	{
+		strmid(token1, input, 0, strlen(input), tokenSize);
+		token2[0] = '\0';
+		return 1;
+	}
+
+	strmid(token1, input, 0, spacePos, tokenSize);
+
+	strmid(token2, input, spacePos + 1, strlen(input), tokenSize);
+
+	return 2;
 }
 
 stock TestPrint(print[])

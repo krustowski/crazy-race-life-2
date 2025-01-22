@@ -40,7 +40,7 @@ new gPlayerData[MAX_PLAYERS][E_PLAYER_DATA];
 
 new gPlayerHulo[MAX_PLAYERS][E_PLAYER_HULO];
 
-new gTeamPickup[E_PLAYER_TEAM];
+new PICKUP:gTeamPickup[E_PLAYER_TEAM];
 new gTeamMenu[E_PLAYER_TEAM];
 
 //
@@ -63,19 +63,22 @@ public LoadPlayerData(playerid)
 	{
 		SendClientMessage(playerid, COLOR_ZLUTA, "[ i ][DATA] Nacitam ulozena uzivatelska data...");
 
-		GivePlayerMoney(playerid, dUserINT(PlayerName(playerid)).("cash"));
-		gPlayerData[playerid][E_PLAYER_DATA_BANK] = dUserINT(PlayerName(playerid)).("bank");
-		gPlayerData[playerid][E_PLAYER_DATA_HEALTH] = dUserINT(PlayerName(playerid)).("health");
-		gPlayerData[playerid][E_PLAYER_DATA_VEST] = dUserINT(PlayerName(playerid)).("vest");
-		gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] = dUserINT(PlayerName(playerid)).("adminlvl");
-		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = dUserINT(PlayerName(playerid)).("team");
-		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = dUserINT(PlayerName(playerid)).("class");
+		new playerName[MAX_PLAYER_NAME];
+		GetPlayerName(playerid, playerName, sizeof(playerName));
+
+		GivePlayerMoney(playerid, dUserINT(playerName).("cash"));
+		gPlayerData[playerid][E_PLAYER_DATA_BANK] = dUserINT(playerName).("bank");
+		gPlayerData[playerid][E_PLAYER_DATA_HEALTH] = dUserINT(playerName).("health");
+		gPlayerData[playerid][E_PLAYER_DATA_VEST] = dUserINT(playerName).("vest");
+		gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] = dUserINT(playerName).("adminlvl");
+		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = dUserINT(playerName).("team");
+		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = dUserINT(playerName).("class");
 
 		//joint[playerid] = dUserINT(PlayerName(playerid)).("joint");
 		//zapik[playerid] = dUserINT(PlayerName(playerid)).("zapik");
 
 		SetPlayerColor(playerid, bezova);
-		SetPlayerSkin(playerid, dUserINT(PlayerName(playerid)).("class"));
+		SetPlayerSkin(playerid, dUserINT(playerName).("class"));
 
 		SendClientMessage(playerid, GREEN, "[ i ][DATA] Data uspesne nactena!");
 
@@ -91,13 +94,16 @@ public SavePlayerData(playerid)
 	{
 		SendClientMessage(playerid, COLOR_ZLUTA, "[ i ][DATA] Pripravuje se ulozeni uzivatelskych dat...");
 
-		dUserSetINT(PlayerName(playerid)).("cash", GetPlayerMoney(playerid));
-		dUserSetINT(PlayerName(playerid)).("bank", gPlayerData[playerid][E_PLAYER_DATA_BANK]);
-		dUserSetINT(PlayerName(playerid)).("health", gPlayerData[playerid][E_PLAYER_DATA_HEALTH]);
-		dUserSetINT(PlayerName(playerid)).("vest", gPlayerData[playerid][E_PLAYER_DATA_VEST]);
-		dUserSetINT(PlayerName(playerid)).("adminlvl", gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL]);
-		dUserSetINT(PlayerName(playerid)).("team", gPlayerData[playerid][E_PLAYER_DATA_TEAM]);
-		dUserSetINT(PlayerName(playerid)).("class", gPlayerData[playerid][E_PLAYER_DATA_CLASS]);
+		new playerName[MAX_PLAYER_NAME];
+		GetPlayerName(playerid, playerName, sizeof(playerName));
+
+		dUserSetINT(playerName).("cash", GetPlayerMoney(playerid));
+		dUserSetINT(playerName).("bank", gPlayerData[playerid][E_PLAYER_DATA_BANK]);
+		dUserSetINT(playerName).("health", gPlayerData[playerid][E_PLAYER_DATA_HEALTH]);
+		dUserSetINT(playerName).("vest", gPlayerData[playerid][E_PLAYER_DATA_VEST]);
+		dUserSetINT(playerName).("adminlvl", gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL]);
+		dUserSetINT(playerName).("team", gPlayerData[playerid][E_PLAYER_DATA_TEAM]);
+		dUserSetINT(playerName).("class", gPlayerData[playerid][E_PLAYER_DATA_CLASS]);
 
 		SendClientMessage(playerid, GREEN, "[ i ][DATA] Data uspesne ulozena! ");
 	}

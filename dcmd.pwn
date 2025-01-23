@@ -721,29 +721,41 @@ dcmd_djoin(playerid, params[])
 	if (!strlen(params) || !IsNumeric(params))
 		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /djoin [ID zavodu]");
 
-	new dragRaceId = strval(params), stringToPrint[128];
+	new raceId = strval(params), stringToPrint[128];
 
 	if (!IsPlayerInAnyVehicle(playerid))
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Pro prihlaseni do dragu je treba byt v aute!");
 
 	// Check if already joined such race.
-	if (gDragRace[playerid][dragRaceId])
+	if (gPlayerRace[playerid][raceId])
 		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Do daneho zavodu jsi jiz prihlasen!");
 
-	switch (dragRaceId)
+	switch (raceId)
 	{
 		case E_RACE_ID_LV_PYRAMID:
 			{
-				gDragRace[playerid][dragRaceId] = true;	
+				gPlayerRace[playerid][raceId] = true;	
 				GivePlayerMoney(playerid, -300);
 
 				SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Uspesne prihlasen do daneho zavodu (prihlaska $300)!");
 
-				SetRaceForUser(playerid, dragRaceId);
+				SetRaceForUser(playerid, raceId);
+			}
+		case E_RACE_ID_STUNT_LV_1:
+			{
+				new raceCost = 1000;
+
+				gPlayerRace[playerid][raceId] = true;	
+				GivePlayerMoney(playerid, -raceCost);
+
+				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Uspesne prihlasen do zavodu '%s' (prihlaska $%d)", gRaceNames[raceId], raceCost);
+				SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+
+				SetRaceForUser(playerid, raceId);
 			}
 		default:
 			{
-				format(stringToPrint, sizeof(stringToPrint), "[ i ] Drag zavod s danym ID neni pripraven!");
+				format(stringToPrint, sizeof(stringToPrint), "[ i ] Zavod s danym ID neni pripraven!");
 				return SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
 			}
 	}

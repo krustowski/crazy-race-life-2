@@ -20,60 +20,99 @@ enum E_RACE_COORD
 	E_RACE_COORD_Z
 }
 
-enum E_CHECKPOINT
+/*enum E_CHECKPOINT
 {
-	coords[E_RACE_COORD]
+	E_CHECKPOINT_COORDS[E_RACE_COORD]
 }
 
 enum E_RACE
 {
-	name[MAX_RACE_NAME],
-	checkpoints[E_CHECKPOINT]
-}
+	E_RACE_NAME[MAX_RACE_NAME],
+	E_RACE_CHECKPOINTS[MAX_RACE_CP]
+}*/
 
 enum E_RACE_ID
 {
 	E_RACE_ID_NONE,
 	E_RACE_ID_LV_PYRAMID,
-	E_RACE_STUNT_LV_1
+	E_RACE_ID_STUNT_LV_1
 }
 
-// gRaceProps is an array that holds references to all races defined.
-new E_RACE:gRaceProps[E_RACE_ID];
+// gPlayerRace hold a reference to the state of a player's registration to such race. Thus if registered, a value for such RACE_ID should return true (1).
+new gPlayerRace[MAX_PLAYERS][E_RACE_ID];
 
-new gDragRace[MAX_PLAYERS][E_RACE_ID];
-
-// Common multidimension array to store all coordinates for any given race/stunt.
-/*new gDragRaceProps[E_RACE_ID][MAX_RACE_CP][E_RACE_COORD] = 
+// gRaceNames is an array to hold all race names referenced via E_RACE_ID.
+new const gRaceNames[E_RACE_ID][] = 
 {
+	// E_RACE_ID_NONE
+	"Blank Race (stub)",
+	// E_RACE_ID_LV_PYRAMID
+	"Las Venturas Pyramid Race",
+	// E_RACE_STUNT_LV_1
+	"Las Venturas Stunt Race No. 1"
+};
+
+// gRaceCoords is an array to hold all checkpoint coordinates for every race defined via E_RACE_ID.
+new const Float:gRaceCoords[E_RACE_ID][][E_RACE_COORD] = 
+{
+	// E_RACE_ID_NONE
+	{
+		{0.0, 0.0, 0.0},
+		{0.0, 0.0, 0.0},
+		{0.0, 0.0, 0.0},
+		{0.0, 0.0, 0.0},
+		{0.0, 0.0, 0.0},
+		{0.0, 0.0, 0.0}
+	},
+	// E_RACE_ID_LV_PYRAMID
+	{
+		{0.0, 0.0, 0.0},
+		{0.0, 0.0, 0.0},
+		{0.0, 0.0, 0.0},
+		{0.0, 0.0, 0.0},
+		{0.0, 0.0, 0.0},
+		{0.0, 0.0, 0.0}
+	},
+	// E_RACE_ID_STUNT_LV_1
 	{
 		{2605.1, 1193.9, 10.4},
-		{2002.7, 1209.4, 17.6}
+		{2002.7, 1209.4, 17.6},
+		{1971.5, 1248.1, 17.6},
+		{1874.3, 1247.6, 17.6},
+		{1897.2, 1138.4, 17.6},
+		{1869.7, 935.8, 10.2}
 	}
-};*/
+};
 
-public StartDragRace()
+//
+//
+//
+
+public StartRace()
 {
 	return 1;
 }
 
 
-public SetRaceForUser(playerid, dragRaceId)
+public SetRaceForUser(playerid, raceId)
 {
 	if (!IsPlayerConnected(playerid))
 		return 0;
 
-	switch (dragRaceId)
+	// 0 references E_RACE_ID_NONE, so nothing is to be prepared for the player.
+	if (raceId == 0)
+		return 0;
+
+	switch (raceId)
 	{
-		case E_RACE_STUNT_LV_1:
+		case E_RACE_ID_STUNT_LV_1:
 			{
-				/*for (new i = 0; i <= sizeof(gDragRaceProps[dragRaceId]); i++)
-				{}*/
+				new stringToPrint[128];
 
-				/*new coords[MAX_RACE_CP][E_RACE_COORD] = gDragRaceProps[E_RACE_STUNT_LV_1];
+				format(stringToPrint, sizeof(stringToPrint), "[ ! ] race coords: X: %.2f, Y: %.2f, Z: %.2f", gRaceCoords[raceId][0][E_RACE_COORD_X], gRaceCoords[raceId][0][E_RACE_COORD_Y], gRaceCoords[raceId][0][E_RACE_COORD_Z]);
+				SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
 
-				// Set the starting point.
-				SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_NORMAL, coords[0][E_RACE_COORD_X], coords[0][E_RACE_COORD_Y], coords[0][E_RACE_COORD_Z], coords[1][E_RACE_COORD_X], coords[1][E_RACE_COORD_Y], coords[1][E_RACE_COORD_Z], 10.0);*/
+				SetPlayerRaceCheckpoint(playerid, CP_TYPE_AIR_NORMAL, gRaceCoords[raceId][0][E_RACE_COORD_X], gRaceCoords[raceId][0][E_RACE_COORD_Y], gRaceCoords[raceId][0][E_RACE_COORD_Z]);
 			}
 	}
 

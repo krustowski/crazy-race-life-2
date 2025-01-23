@@ -117,13 +117,13 @@ forward DrawClockText();
 #include "clock.pwn"
 
 //
-// Drag race.
+// Race subsystem.
 //
 
-forward SetRaceForUser(playerid, dragRaceId);
-forward StartDragRace();
+forward SetRaceForUser(playerid, raceId);
+forward StartRace();
 
-#include "drag.pwn"
+#include "race.pwn"
 //
 // Paintball minigame.
 //
@@ -245,7 +245,7 @@ public OnGameModeInit()
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_ADMINZ], 0, "Admin borec");
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_ADMINZ], 0, "Opustit tym");
 
-	gTeamPickup[E_PLAYER_TEAM_POLICE] = CreatePickup(1239, 1, 2171.22, 1397.11, 11.06);
+	gTeamPickup[E_PLAYER_TEAM_POLICE] = CreatePickup(1239, 1, 229.4, 167.4, 1003.0);
 	gTeamMenu[E_PLAYER_TEAM_POLICE] = CreateMenu("Police LV", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_POLICE], 0, "Policajt");
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_POLICE], 0, "Opustit tym");

@@ -977,12 +977,12 @@ dcmd_reset(playerid, params[])
 dcmd_locate(playerid, params[])
 {
 #pragma unused params
-	new stringToPrint[256], interior = GetPlayerInterior(playerid), Float:X, Float:Y, Float:Z, Float:Angle;
+	new stringToPrint[256], interiorNo = GetPlayerInterior(playerid), Float:X, Float:Y, Float:Z, Float:Angle;
 
 	GetPlayerPos(playerid, X, Y, Z);
 	GetPlayerFacingAngle(playerid, Angle);
 
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Nachazite se se v interieru No. %d na souradnicich: X[%.1f], Y[%.1f], Z[%.1f], Rotace[%.1f].", interior, X, Y, Z, Angle);
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Nachazite se se v interieru No. %d na souradnicich: X[%.2f], Y[%.2f], Z[%.2f], Rotace[%.2f].", interiorNo, X, Y, Z, Angle);
 	SendClientMessage(playerid, COLOR_SVZEL, stringToPrint);
 
 	return 1;
@@ -1120,11 +1120,11 @@ dcmd_dwarp(playerid, params[])
 
 	if (IsPlayerInVehicle(playerid, vehicleId) && playerState == PLAYER_STATE_DRIVER) 
 	{
-		SetVehiclePos(vehicleId, 2601.22, 1196.54, 10.48);
+		SetVehiclePos(vehicleId, 2635.67, 1171.51, 10.37);
 	}
 	else
 	{
-		SetPlayerPos(playerid, 2601.22, 1196.54, 10.48);
+		SetPlayerPos(playerid, 2635.67, 1171.51, 10.37);
 	}
 
 	return 1;

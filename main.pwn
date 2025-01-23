@@ -120,6 +120,7 @@ forward DrawClockText();
 // Race subsystem.
 //
 
+forward CheckRaceCheckpoint(playerid);
 forward SetRaceForUser(playerid, raceId);
 forward StartRace();
 
@@ -1124,6 +1125,8 @@ public OnPlayerLeaveCheckpoint(playerid)
 
 public OnPlayerEnterRaceCheckpoint(playerid)
 {
+	CheckRaceCheckpoint(playerid);
+
 	return 1;
 }
 

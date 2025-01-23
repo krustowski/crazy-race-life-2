@@ -1,3 +1,11 @@
+#define RC_BANDIT   	441
+#define RC_BARON    	464
+#define RC_GOBLIN  	501
+#define RC_RAIDER  	465
+#define D_TRAM     	449
+#define RC_TANK    	564
+#define RC_CAM      	594
+
 AddStaticVehicle(522, 2040.105, 1341.658, 10.332, 259.0, -1, -1);
 AddStaticVehicle(522, 2040.151, 1344.618, 10.332, 259.0, -1, -1);
 AddStaticVehicle(522, 2040.051, 1346.566, 10.332, 259.0, -1, -1);

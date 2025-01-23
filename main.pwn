@@ -1,90 +1,30 @@
-/*==========================================================================================================================================||
-  ||==========================================================================================================================================||
-  ||                                                                                                                                          ||
-  ||      CCCCCCCCCCCCCCCCC   RRRRRRRRRRRRRRRRRR   LLLL                                                                                       ||
-  ||      CCCCCCCCCCCCCCCCC   RRRRRRRRRRRRRRRRRR   LLLL                    IIII                                                               ||
-  ||      CCCC                RRRR          RRRR   LLLL                    IIII                                                               ||
-  ||      CCCC                RRRR          RRRR   LLLL                                                                                       ||
-  ||      CCCC                RRRR          RRRR   LLLL                                                                                       ||
-  ||      CCCC                RRRR          RRRR   LLLL                                                                                       ||
-  ||      CCCC                RRRR          RRRR   LLLL                    IIII      VVVV                   VVVV        EEEEEEEEEEEEEE        ||
-  ||      CCCC                RRRRRRRRRRRRRRRRRR   LLLL                    IIII      VVVV                  VVVV        EEEEEEEEEEEEEEE        ||
-  ||      CCCC                RRRRRRRRRRRRRRRRRR   LLLL                IIIIIIII       VVVV                VVVV        EEEE        EEEE        ||
-  ||      CCCC                RRRR RRRR            LLLL                IIIIIIII        VVVV              VVVV        EEEE         EEEE        ||
-  ||      CCCC                RRRR  RRRR           LLLL                    IIII         VVVV            VVVV        EEEEEEEEEEEEEEEEEE        ||
-  ||      CCCC                RRRR   RRRR          LLLL                    IIII          VVVV          VVVV        EEEEEEEEEEEEEEEEEEE        ||
-  ||      CCCC                RRRR    RRRR         LLLL                    IIII           VVVV        VVVV        EEEE                        ||
-  ||      CCCC                RRRR     RRRR        LLLL                    IIII            VVVV      VVVV        EEEE                         ||
-  ||      CCCC                RRRR      RRRR       LLLL                    IIII             VVVV    VVVV        EEEE                          ||
-  ||      CCCC                RRRR       RRRR      LLLL                    IIII              VVVV  VVVV         EEEE                          ||
-  ||      CCCCCCCCCCCCCCCCCC  RRRR        RRRR     LLLLLLLLLLLLLLLLLL   IIIIIIIIII            VVVVVVVV          EEEEEEEEEEEEEEEEEEEEE         ||
-  ||      CCCCCCCCCCCCCCCCCC  RRRR         RRRR    LLLLLLLLLLLLLLLLLL   IIIIIIIIII             VVVVVV            EEEEEEEEEEEEEEEEEEEE         ||
-  ||                                                                                                                                          ||
-  ||                                                                                                                                          ||
-  ||                           ** CRLive ** by kRySpiNCzE ©* copy kRySpiNCzE & kompry 2008-2010 ©**                                           ||
-  ||==========================================================================================================================================||
-  ||==========================================================================================================================================||
-  ||==========================================================================================================================================||
+/*****************************************************************************************************************************************
+ *   
+ *    .d8888b.                                    8888888b.                            888      d8b  .d888          .d8888b.  
+ *    d88P  Y88b                                   888   Y88b                           888      Y8P d88P"          d88P  Y88b 
+ *    888    888                                   888    888                           888          888                   888 
+ *    888        888d888 8888b.  88888888 888  888 888   d88P  8888b.   .d8888b .d88b.  888      888 888888 .d88b.       .d88P 
+ *    888        888P"      "88b    d88P  888  888 8888888P"      "88b d88P"   d8P  Y8b 888      888 888   d8P  Y8b  .od888P"  
+ *    888    888 888    .d888888   d88P   888  888 888 T88b   .d888888 888     88888888 888      888 888   88888888 d88P"      
+ *    Y88b  d88P 888    888  888  d88P    Y88b 888 888  T88b  888  888 Y88b.   Y8b.     888      888 888   Y8b.     888"       
+ *     "Y8888P"  888    "Y888888 88888888  "Y88888 888   T88b "Y888888  "Y8888P "Y8888  88888888 888 888    "Y8888  888888888  
+ *                                             888                                                                             
+ *                                        Y8b d88P                                                                             
+ *                                         "Y88P"                                                                              
 
-  [ MODE CRLive ]
+ [ *** GameMode CRL2 *** ] 
 
-  <<  Zákaz íøení módu bez vìdomí autorù < ©copyright kRySpiN[CzE & kompry > !  >>
+ [ Created: 	Jan 2025 (Extends legacy GameMode CRL (2008-2010)) ]
+ [ Credits: 	krusty, kompry, DRaGsTeR ]
+ [ Language: 	CZ, EN ]
+ [ Version: 	0.1.Z ]
 
-  [ Autor : _Dk]kRySpiN[CzE  [ pawno ]  &&  kompry [ MTA ] ]
-  [ Thanks : Pawno.cz > Uèíme se pawno kadý den , RLM]DRaGsTeR[CzE © - special thanks ]
-  [ Website : http://kyrspa.wz.cz [ kRySpiNCzE ]	[ Create Mode : From 15.11.2008 ]
-  [ Game Mode : Crazy & Race Live (No RealLive Style) ]
-  [ Mode Language : Czech ]
-  [ Version: 1.30i ]
-  [ Cars: 17 ]
-  [ Jobs: 8 ] !
-  [ Adminscript: YES [ inside ] ]
-  [ -- ]
+ *****************************************************************************************************************************************/
 
-  -------------------------------
+//
+//  Generic includes.
+//
 
-
-  [ Commands ]
-
-  [ Commands for player ]
-
-  [ /register /login /cmd /help /rules /balicek /kill /afk /vybrat /ulozit /stav ]
-  [ /smazat /lock /unlock /nitro || /nos /mp3 /mp3s /zel /opr /alist /dwarp /drag ]
-  [ /skydrive /otrhat /sklenik /tabak /hulit /ubalit /buypapir  ]
-
-  --------------------------------
-
-  [ AdminScript ]
-
-  [ /prachy /ccmd /cam1 /cam2 /cam3 /camoff /acmd /vup /vdown /ban /kick /lvl /flip /vybava /hp /vstop ]
-
-  --------------------------------
-
-  [ Povolani ] [ gPlayerData[playerid][E_PLAYER_DATA_TEAM] ]
-
-  [ 0 ] Nezamìstnaný
-  [ 1 ] Lamy [ LV ]
-  [ 2 ] Admin - borci [ LV ]
-  [ 3 ] Polii [ LV - )LS( ] - LS este neni
-  [ 4 ] Benzinák [ LV ]
-  [ 5 ] Dragster [ LV ]
-  [ 6 ] Tulaci [ LS ]
-[ 7 ] Pizzaboy [ LS ]
-[ 8 ] Hackri [ LS ]
-[ 9 ] Technik [ ? ] - neni pripravuju ..
-[ 10 ] Pyrotechnik [ ? ]
-[ ? ] ? [ ? ]
-[ -- ]
-
--------------------------------- >[ 0-vyp | 1-zap xD ]<
-ShowNameTags(1); 					//meno 1-zapnute 0-vypnute
-ShowPlayerMarkers(1); 				//zobrazenie na mape 1-zapnute 0-vypnute
-UsePlayerPedAnims(); 				//zrychli na sprintovanie hraca  singl...
-AllowInteriorWeapons(1); 			//zbrane v interieru
-EnableStuntBonusForAll(0);  		//vypne stunt bonusy aspon mylsim:)
-
-//-----------------------[ DEKLERAÈNÍ ÈÁST MÓDU]------------------------------//
-//---------------------[ INCLUDY DEFINICE PARAGMY ]---------------------------*/
 #include <a_samp>
 #include <core>
 #include <float>
@@ -92,15 +32,30 @@ EnableStuntBonusForAll(0);  		//vypne stunt bonusy aspon mylsim:)
 /*#include <a_objects>*/
 #include <y_objects>
 #include <string>
-#include <dutils>		//kregistraci
-#include <dudb>			//k registraci
 
-#define Text_Under_Minimap "~g~CrAzY ~r~& ~r~RaCe ~b~LiVe"
+//
+//  Registration
+//
+
+#include <dutils>		
+#include <dudb>	
+
+#define MINIMAP_TEXT "~g~CrAzY ~r~& ~r~RaCe ~b~Life2"
 #define dcmd(%1,%2,%3) if ((strcmp((%3)[1], #%1, true, (%2)) == 0) && ((((%3)[(%2) + 1] == 0) && (dcmd_%1(playerid, "")))||(((%3)[(%2) + 1] == 32) && (dcmd_%1(playerid, (%3)[(%2) + 2]))))) return 1
 
 #pragma tabsize 0
 
 #define STATS_FILE 	"stats.cfg"
+
+#define BUG_SYSTEM 	true
+
+#define SOUND_MUSIC10
+#define SOUND_OFF
+
+//
+//  Common colour definitions.
+//
+
 #define GREEN           0x21DD00FF
 #define ORANGE          0xF97804FF
 #define RED             0xE60000FF
@@ -126,19 +81,6 @@ EnableStuntBonusForAll(0);  		//vypne stunt bonusy aspon mylsim:)
 #define COLOR_NEVIDITEL 0x4682B400
 #define COLOR_SVZEL     0x29FF06AA
 #define bezova          0xFFF8DC
-
-#define BUG_SYSTEM 	true
-
-#define SOUND_MUSIC10
-#define SOUND_OFF
-
-#define RC_BANDIT   	441
-#define RC_BARON    	464
-#define RC_GOBLIN  	501
-#define RC_RAIDER  	465
-#define D_TRAM     	449
-#define RC_TANK    	564
-#define RC_CAM      	594
 
 new const GAMEMODE_NAME[] = "CrazyRaceLife2";
 new const VEHICLE_PLATE[] = "-CRL-2-";
@@ -643,7 +585,6 @@ dcmd_admins(playerid, params[])
 	return 1;
 }
 
-//----------------------------------------
 dcmd_kick(playerid, params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 3) 
@@ -1371,29 +1312,24 @@ dcmd_soska(playerid, params[])
 	return 1;
 }
 
-//---------------------------------[ DCMD ]-----------------------------------///
-//-----------------------[ KONEC DEKLEREÈNÍ ÈÁSTÍ ]---------------------------///
+/*************************************************************************************
+ *
+ *       ______                       ____                  __    _ ____    ___ 
+ *      / ____/________ _____  __  __/ __ \____ _________  / /   (_) __/__ |__ \
+ *     / /   / ___/ __ `/_  / / / / / /_/ / __ `/ ___/ _ \/ /   / / /_/ _ \__/ /
+ *    / /___/ /  / /_/ / / /_/ /_/ / _, _/ /_/ / /__/  __/ /___/ / __/  __/ __/ 
+ *    \____/_/   \__,_/ /___/\__, /_/ |_|\__,_/\___/\___/_____/_/_/  \___/____/ 
+ *                          /____/                                              
 
-/////////////////////////////////////////////////////////////////////////////////
-/*///////////////////////////////////////////////////////////////////////////////
-  /     CCCCCCCCC   RRRRRRRRR     LL             II                               /
-  /     CC          RR     RR     LL                                              /
-  /     CC          RR     RR     LL             II    VV      VV     EEEEEEEE    /
-  /     CC          RRRRRRRRR     LL           IIII     VV    VV     EE     EE    /
-  /     CC          RR    RR      LL             II      VV  VV     EEEEEEEEEE    /
-  /     CC          RR     RR     LL             II       VVVV     EE             /
-  /     CCCCCCCCC   RR      RR    LLLLLLLLL   IIIIIIII     VV       EEEEEEEEEE    /
-  /                                                                               /
-  / C&RLIVE BY ** kRySpiNCzE & kompry * COPY kRySpiNCzE & kompry 2008 - 2010  */
-/////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////
+ [ *** GameMode CRL2 *** Credits: krusty, kompry, DRaGsTeR *** Jan 2025 *** ]
+
+ *************************************************************************************/
 
 main()
 {
-	print("\n-------------------------------");
-	print(" [ ***** CrAzY RaCe Life ***** ]");
-	print(" [ StUnTs, RaCeS aNd DrIvIng ! ]");
-	print(" [ Made by krusty and kompry!  ]");
+	print("\n---------------------------------");
+	printf(" [ ******** %s ********  ]", GAMEMODE_NAME);
+	print(" [ Credits: krusty, kompry, DRaGsTeR ]");
 	print("----------------------------------\n");
 }
 
@@ -1403,6 +1339,12 @@ public OnGameModeInit()
 	Object_Object();
 
 	SetGameModeText(GAMEMODE_NAME);
+
+	ShowNameTags(1);
+	ShowPlayerMarkers(1); 
+	UsePlayerPedAnims(1);
+	AllowInteriorWeapons(0);
+	EnableStuntBonusForAll(1);  
 
 	//
 	// Start various timers.

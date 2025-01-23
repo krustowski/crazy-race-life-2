@@ -119,72 +119,72 @@ public SendPlayerSalary()
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if (!IsPlayerConnected(i)) 
-		{
 			continue;
-		}
 
 		switch (gPlayerData[i][E_PLAYER_DATA_TEAM]) 
 		{
 			case E_PLAYER_TEAM_NONE:
 				{
 					teamSalary = 100 + random(150);
-					format(stringToPrint, sizeof(stringToPrint), "Podpora v nezamestnanosti: %d € | Par drobku z mestske kasy :) A nemysli si ze nebudes pracovat!", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "Podpora v nezamestnanosti: $%d | Par drobku z mestske kasy :) A nemysli si ze nebudes pracovat!", teamSalary);
 				}
 			case E_PLAYER_TEAM_LAME:
 				{
 					teamSalary = 5 + random(20);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: %d € | Nemysli si ze lamam budeme davat tolik penez!", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Nemysli si ze lamam budeme davat tolik penez!", teamSalary);
 				}
 			case E_PLAYER_TEAM_ADMINZ:
 				{
 					teamSalary = 1500 + random(2000);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: %d € | Uzijte peníze pro co chcete! :D", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Uzijte peníze pro co chcete! :D", teamSalary);
 				}
 			case E_PLAYER_TEAM_POLICE:
 				{
 					teamSalary = 1000 + random(600);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: %d € | Pro pany fizle par papiru z mestske kasy! :)", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Pro pany fizle par papiru z mestske kasy! :)", teamSalary);
 				}
 			case E_PLAYER_TEAM_GASMAN:
 				{
 					teamSalary = 1000 + random(600);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: %d € | Provize z benzinky! :D", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Provize z benzinky! :D", teamSalary);
 				}
 			case E_PLAYER_TEAM_DRAGSTER:
 				{
 					teamSalary = 1200 + random(1000);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: %d € | Provize z dragu! :D", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Provize z dragu! :D", teamSalary);
 				}
 			case E_PLAYER_TEAM_GARBAGE:
 				{
 					teamSalary = 120 + random(100);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: %d € | Podpora mesta a penize z popelnic! :D", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Podpora mesta a penize z popelnic! :D", teamSalary);
 				}
 			case E_PLAYER_TEAM_PIZZABOY:
 				{
 					teamSalary = 190 + random(200);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: %d € | Pizza provize a spropitne! :D", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Pizza provize a spropitne! :D", teamSalary);
 				}
 			case E_PLAYER_TEAM_HACKER:
 				{
 					teamSalary = 1500 + random(800);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: %d € | Vypalne a provize z prodeje ukradenych dat! :D", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Vypalne a provize z prodeje ukradenych dat! :D", teamSalary);
 				}
 			case E_PLAYER_TEAM_CAR_REPAIR:
 				{
 					teamSalary = 300 + random(299);
-					format(stringToPrint, sizeof(stringToPrint), "Výplata povolani: %d € | Vyplata z autoservisu!", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "Výplata povolani: $%d | Vyplata z autoservisu!", teamSalary);
 				}
 			case E_PLAYER_TEAM_PYRO:
 				{
 					teamSalary = 800 + random(210);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: %d € | Vyplata od ministerstva pyrotechniky! :D", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Vyplata od ministerstva pyrotechniky! :D", teamSalary);
 				}
 		}
 
 		SendClientMessage(i, COLOR_ORANZCERV, stringToPrint);
+
 		format(gameText, sizeof(gameText), "~y~V~g~yplata ~n~~y~ %d ", teamSalary);
 		GameTextForPlayer(i, gameText, 5000, 1);
+
 		GivePlayerMoney(i, teamSalary);
 	}
 
@@ -199,5 +199,4 @@ public UpdatePlayerScore()
 		SetPlayerScore(i, GetPlayerMoney(i));
 	}
 }
-
 

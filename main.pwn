@@ -211,12 +211,6 @@ forward OffRadarCheckpoint(playerid);
 #include "radar.pwn"
 
 //
-//
-//
-
-//forward RESET();
-
-//
 // Global static objects.
 //
 
@@ -514,7 +508,9 @@ stock IsNumeric(input[])
 }
 
 //
-//  DCMDs
+//
+//  [ DCMDs ]
+//
 //
 
 dcmd_lock(playerid, params[])
@@ -689,7 +685,7 @@ dcmd_afk(playerid, params[])
 		gPlayerData[playerid][E_PLAYER_DATA_AFK] = 0;
 	}
 
-	return true;
+	return 1;
 }
 
 dcmd_ulozit(playerid, params[])
@@ -786,8 +782,9 @@ dcmd_acmd(playerid, params[])
 	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 1) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
 
-	SendClientMessage(playerid, COLOR_ZELZLUT, "[ i ] /smazat /prachy /ccmd /acmd /vup /vdown /kick /ban /lvl /hp ");
-	SendClientMessage(playerid, COLOR_ZELZLUT, "[ i ] /fakechat /admincol /get /goto ");
+	SendClientMessage(playerid, COLOR_ZELZLUT, "[ -- ADMIN CMD SET -- ]");
+	SendClientMessage(playerid, COLOR_ZELZLUT, "[ /acmd /admincol /ban /cam /ccmd /elevator /fakechat /get /goto ]");
+	SendClientMessage(playerid, COLOR_ZELZLUT, "[ /kick /lvl /nitro /reset /smazat /zbrane ");
 
 	return 1;
 }
@@ -795,9 +792,10 @@ dcmd_acmd(playerid, params[])
 dcmd_help(playerid, params[])
 {
 #pragma unused params
-	SendClientMessage(playerid, COLOR_ZLUTA, "[ NAPOVEDA/POMOC: ]");
-	SendClientMessage(playerid, COLOR_ZLUTA, "[ Prikazy : /cmd || Pravidla /rules ]");
-	SendClientMessage(playerid, COLOR_ZLUTA, "[ Made by krusty & kompry  ]");
+	SendClientMessage(playerid, COLOR_ZLUTA, "[ -- NAPOVEDA/POMOC -- ]");
+	SendClientMessage(playerid, COLOR_ZLUTA, "[ Prikazy:  /cmd       ]");
+	SendClientMessage(playerid, COLOR_ZLUTA, "[ Pravidla: /rules     ]");
+	SendClientMessage(playerid, COLOR_ZLUTA, "[ Made by krusty & kompry ]");
 
 	return 1;
 }
@@ -1352,10 +1350,11 @@ dcmd_lay(playerid, params[])
 dcmd_cmd(playerid, params[])
 {
 #pragma unused params
-	SendClientMessage(playerid, COLOR_SVZEL, "[ PRIKAZY: ]");
-	SendClientMessage(playerid, COLOR_SVZEL, "[ /cmd /rules /help /balicek /kill /afk  /lock /unlock ]");
-	SendClientMessage(playerid, COLOR_SVZEL, "[ /register /login /mp3 /mp3s /djoin(jeste neni hotovo) /dwarp /skydrive ]");
-	SendClientMessage(playerid, COLOR_SVZEL, "[ /admins /paintball /locate /wanted ]");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ -- ZAKLADNI CMD SET -- ]");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ /admins /afk /cmd /dance /djoin /dwarp /fix /givecash ]");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ /help /hide /lay /locate /lock /login /paintball /register ]");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ /rules /skydive /soska /stav /text /ucet /ulozit /unlock ]");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ /vybrat /wanted ]");
 
 	return 1;
 }
@@ -1379,7 +1378,7 @@ dcmd_elevator(playerid, params[])
 	{
 		StopObject(gAdminElevator);
 
-		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Výtah se zasekl! Kontaktujte technika!");
+		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Vytah se zasekl! Kontaktujte technika!");
 		SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
 	}
 	else if (!strcmp(params, "down"))
@@ -1557,17 +1556,18 @@ dcmd_hide(playerid, params[])
 		SendClientMessage(playerid, COLOR_SVZEL, "[ HIDE ] Nyni jsi na opet viditelny na herni mape!");
 	}
 
+	gPlayerData[playerid][E_PLAYER_DATA_HIDE] = !gPlayerData[playerid][E_PLAYER_DATA_HIDE];
+
 	return 1;
 }
 
 dcmd_rules(playerid, params[])
 {
 #pragma unused params
-	SendClientMessage(playerid, COLOR_ORANZCERV, "[ PRAVIDLA SERVER/MODU: ]");
+	SendClientMessage(playerid, COLOR_ORANZCERV, "[ -- PRAVIDLA SERVER/MODU -- ]");
 	SendClientMessage(playerid, COLOR_ORANZCERV, "[ JE ZAKAZANY CARKILL,HELKILL, BIKEKILL, JETPACK, CHEATY ! ]");
 	SendClientMessage(playerid, COLOR_ORANZCERV, "[ NA HRACE KTERI BUDOU IGNOROVAT TYTO PRAVIDLA CEKA /KICK POZDEJI /BAN ! ]");
 	SendClientMessage(playerid, COLOR_ORANZCERV, "[ V MODU JE ZABUDOVAN ANTI-JETPACK I ANTI-CHEAT !]");
-	SendClientMessage(playerid, COLOR_ORANZCERV, "[ VSECHNA PRAVIDLA VYHRAZENA ! ]");
 
 	return 1;
 }
@@ -1845,8 +1845,7 @@ public OnPlayerRequestSpawn(playerid)
 
 public OnPlayerConnect(playerid)
 {
-	new playerName[MAX_PLAYER_NAME];
-	new stringToPrint[128];
+	new playerName[MAX_PLAYER_NAME], stringToPrint[128];
 
 	// Reset the auth status for a new player.
 	gPlayerAuth[playerid] = false;
@@ -2975,19 +2974,6 @@ public StartServerReset()
 
 	return 1;
 }
-
-/*
-   public stavA()
-   {
-#define vehicleid vehicleid
-new Stav[1000][2];
-if(IsPlayerInAnyVehicle(playerid))
-{
-GetVehicleHealth(vehicleid, Stav[0]);
-SendClientMessage(playerid, MODRA3, "[ i ][ VEH ]Stav Auta: %d ! ", Stav[0]);
-}
-return 1;
-}*/
 
 /*-----------------------------------------------------------------------------/
   /------------------------------------------------------------------------------/

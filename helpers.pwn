@@ -1,3 +1,11 @@
+#define RC_BANDIT   	441
+#define RC_BARON    	464
+#define RC_GOBLIN  	501
+#define RC_RAIDER  	465
+#define D_TRAM     	449
+#define RC_TANK    	564
+#define RC_CAM      	594
+
 stock chrfind(n, h[], s = 0)
 {
 	new l = strlen(h);

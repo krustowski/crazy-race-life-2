@@ -77,3 +77,5 @@ SetPlayerMapIcon(playerid, 3, 2074.4917, 2295.2041, 10.8203, E_MAPICON_ID_ROBBER
 // Oznaceni zavodist + stanovist tymu Dragsteru.
 SetPlayerMapIcon(playerid, 10, 2620.14, 1195.76, 10.81, E_MAPICON_ID_RACE_TOURNAMENT, 0, MAPICON_LOCAL);
 
+// Housing.
+SetPlayerMapIcon(playerid, 20, 1442.6, -637.3, 95.1, E_MAPICON_ID_PROPERTY_NOT_FOR_SALE, 0, MAPICON_LOCAL);

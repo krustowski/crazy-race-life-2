@@ -210,6 +210,8 @@ forward OffRadarCheckpoint(playerid);
 
 #include "radar.pwn"
 
+#include "helpers.pwn"
+
 //
 // Global static objects.
 //
@@ -230,282 +232,8 @@ new gHackerzMoneyBag;
 new gAdminDoorDown;
 new gAdminDoorUp;
 
+// ????
 new picktunel;
-
-//
-//
-//
-
-new gVehicleName[][] = {
-	"Landstalker",
-	"Bravura",
-	"Buffalo",
-	"Linerunner",
-	"Pereniel",
-	"Sentinel",
-	"Dumper",
-	"Firetruck",
-	"Trashmaster",
-	"Stretch",
-	"Manana",
-	"Infernus",
-	"Voodoo",
-	"Pony",
-	"Mule",
-	"Cheetah",
-	"Ambulance",
-	"Leviathan",
-	"Moonbeam",
-	"Esperanto",
-	"Taxi",
-	"Washington",
-	"Bobcat",
-	"Mr Whoopee",
-	"BF Injection",
-	"Hunter",
-	"Premier",
-	"Enforcer",
-	"Securicar",
-	"Banshee",
-	"Predator",
-	"Bus",
-	"Rhino",
-	"Barracks",
-	"Hotknife",
-	"Trailer",
-	"Previon",
-	"Coach",
-	"Cabbie",
-	"Stallion",
-	"Rumpo",
-	"RC Bandit",
-	"Romero",
-	"Packer",
-	"Monster Truck",
-	"Admiral",
-	"Squalo",
-	"Seasparrow",
-	"Pizzaboy",
-	"Tram",
-	"Trailer",
-	"Turismo",
-	"Speeder",
-	"Reefer",
-	"Tropic",
-	"Flatbed",
-	"Yankee",
-	"Caddy",
-	"Solair",
-	"Berkley's RC Van",
-	"Skimmer",
-	"PCJ-600",
-	"Faggio",
-	"Freeway",
-	"RC Baron",
-	"RC Raider",
-	"Glendale",
-	"Oceanic",
-	"Sanchez",
-	"Sparrow",
-	"Patriot",
-	"Quad",
-	"Coastguard",
-	"Dinghy",
-	"Hermes",
-	"Sabre",
-	"Rustler",
-	"ZR-350",
-	"Walton",
-	"Regina",
-	"Comet",
-	"BMX",
-	"Burrito",
-	"Camper",
-	"Marquis",
-	"Baggage",
-	"Dozer",
-	"Maverick",
-	"News Chopper",
-	"Rancher",
-	"FBI Rancher",
-	"Virgo",
-	"Greenwood",
-	"Jetmax",
-	"Hotring",
-	"Sandking",
-	"Blista Compact",
-	"Police Maverick",
-	"Boxville",
-	"Benson",
-	"Mesa",
-	"RC Goblin",
-	"Hotring Racer",
-	"Hotring Racer",
-	"Bloodring Banger",
-	"Rancher",
-	"Super GT",
-	"Elegant",
-	"Journey",
-	"Bike",
-	"Mountain Bike",
-	"Beagle",
-	"Cropdust",
-	"Stunt",
-	"Tanker",
-	"RoadTrain",
-	"Nebula",
-	"Majestic",
-	"Buccaneer",
-	"Shamal",
-	"Hydra",
-	"FCR-900",
-	"NRG-500",
-	"HPV1000",
-	"Cement Truck",
-	"Tow Truck",
-	"Fortune",
-	"Cadrona",
-	"FBI Truck",
-	"Willard",
-	"Forklift",
-	"Tractor",
-	"Combine",
-	"Feltzer",
-	"Remington",
-	"Slamvan",
-	"Blade",
-	"Freight",
-	"Streak",
-	"Vortex",
-	"Vincent",
-	"Bullet",
-	"Clover",
-	"Sadler",
-	"Firetruck",
-	"Hustler",
-	"Intruder",
-	"Primo",
-	"Cargobob",
-	"Tampa",
-	"Sunrise",
-	"Merit",
-	"Utility",
-	"Nevada",
-	"Yosemite",
-	"Windsor",
-	"Monster Truck",
-	"Monster Truck",
-	"Uranus",
-	"Jester",
-	"Sultan",
-	"Stratum",
-	"Elegy",
-	"Raindance",
-	"RC Tiger",
-	"Flash",
-	"Tahoma",
-	"Savanna",
-	"Bandito",
-	"Freight",
-	"Trailer",
-	"Kart",
-	"Mower",
-	"Duneride",
-	"Sweeper",
-	"Broadway",
-	"Tornado",
-	"AT-400",
-	"DFT-30",
-	"Huntley",
-	"Stafford",
-	"BF-400",
-	"Newsvan",
-	"Tug",
-	"Trailer",
-	"Emperor",
-	"Wayfarer",
-	"Euros",
-	"Hotdog",
-	"Club",
-	"Trailer",
-	"Trailer",
-	"Andromada",
-	"Dodo",
-	"RC Cam",
-	"Launch",
-	"Police Car (LSPD)",
-	"Police Car (SFPD)",
-	"Police Car (LVPD)",
-	"Police Ranger",
-	"Picador",
-	"S.W.A.T. Van",
-	"Alpha",
-	"Phoenix",
-	"Glendale",
-	"Sadler",
-	"Luggage Trailer",
-	"Luggage Trailer",
-	"Stair Trailer",
-	"Boxville",
-	"Farm Plow",
-	"Utility Trailer"
-};
-
-new VehStats[200];
-
-stock chrfind(n, h[], s = 0)
-{
-	new l = strlen(h);
-	while (s < l)
-	{
-		if (h[s] == n) return s;
-		s++;
-	}
-	return -1;
-}
-
-stock BanAll()
-{
-	for (new i; i < MAX_PLAYERS; i++)
-	{
-		if (IsPlayerConnected(i))
-		{
-			Ban(i);
-		}
-	}
-}
-
-stock KickAll()
-{
-	for (new i; i < MAX_PLAYERS; i++)
-	{
-		if (IsPlayerConnected(i))
-		{
-			Kick(i);
-		}
-	}
-}
-
-stock SystemMsg(playerid, msg[])
-{
-	if (IsPlayerConnected(playerid) && strlen(msg) > 0)
-	{
-		SendClientMessage(playerid, COLOR_SVZEL, msg);
-	}
-
-	return 1;
-}
-
-stock IsNumeric(input[])
-{
-	for (new i = 0, j = strlen(input); i < j; i++) 
-	{
-		if (input[i] > '9' || input[i] < '0') 
-			return 0;
-	}
-
-	return 1;
-}
 
 //
 //
@@ -1248,6 +976,8 @@ dcmd_djoin(playerid, params[])
 				GivePlayerMoney(playerid, -300);
 
 				SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Uspesne prihlasen do daneho zavodu (prihlaska $300)!");
+
+				SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_NORMAL, 2605.1, 1193.9, 10.4, 2043.9, 1193.2, 10.2, 3.0);
 			}
 		default:
 			{
@@ -1632,28 +1362,11 @@ dcmd_soska(playerid, params[])
 	SendClientMessage(playerid, COLOR_SVZEL, "[ ------------ SOSKY ------------ ]");
 	SendClientMessage(playerid, COLOR_SVZEL, "[ Sosky se nachazeji v LS a okoli ]");
 	SendClientMessage(playerid, COLOR_SVZEL, "[ Sosek je zatim celkem 5         ]");
-	SendClientMessage(playerid, COLOR_SVZEL, "");
+	SendClientMessage(playerid, COLOR_SVZEL, "[                                 ]");
 	SendClientMessage(playerid, COLOR_SVZEL, "[ ----------- ODMENA ------------ ]");
 	SendClientMessage(playerid, COLOR_SVZEL, "[ $10 000 000 na ruku             ]");
 	SendClientMessage(playerid, COLOR_SVZEL, "[ Prihlednuti k ziskani admin-lvl ]");
 	SendClientMessage(playerid, COLOR_SVZEL, "[ TAK HLEDEJTE! :) :D             ]");
-
-	return 1;
-}
-
-//
-//
-//
-
-stock SendMessageToAdmins(colorId, const messageString[])
-{
-	for (new i = 0; i <= MAX_PLAYERS; i++)
-	{
-		if (IsPlayerConnected(i) && (IsPlayerAdmin(i) || gPlayerData[i][E_PLAYER_DATA_ADMIN_LVL] >= 3))
-		{
-			SendClientMessage(i, colorId, messageString);
-		}
-	}
 
 	return 1;
 }
@@ -1677,10 +1390,10 @@ stock SendMessageToAdmins(colorId, const messageString[])
 
 main()
 {
-	print("\n--------------------------------"); //vypis do console a log serveru
-	print(" [ ***** CrAzY RaCe Life ***** ]     ");
-	print(" [ StUnTs, RaCeS aNd DrIvIng ! ]  ");
-	print(" [ Made by krusty and kompry!  ] ");
+	print("\n-------------------------------");
+	print(" [ ***** CrAzY RaCe Life ***** ]");
+	print(" [ StUnTs, RaCeS aNd DrIvIng ! ]");
+	print(" [ Made by krusty and kompry!  ]");
 	print("----------------------------------\n");
 }
 
@@ -1711,52 +1424,52 @@ public OnGameModeInit()
 	gTeamPickup[E_PLAYER_TEAM_LAME] = CreatePickup(1239, 1, 2252.11, 1285.30, 19.17);
 	gTeamMenu[E_PLAYER_TEAM_LAME] = CreateMenu("Lamerz", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_LAME], 0, "Lamka");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_LAME], 1, "Opustit tym");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_LAME], 0, "Opustit tym");
 
 	gTeamPickup[E_PLAYER_TEAM_ADMINZ] = CreatePickup(1239, 1, 2304.43, 1151.95, 85.94);
 	gTeamMenu[E_PLAYER_TEAM_ADMINZ] = CreateMenu("Adminz", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_ADMINZ], 0, "Admin borec");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_ADMINZ], 1, "Opustit tym");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_ADMINZ], 0, "Opustit tym");
 
 	gTeamPickup[E_PLAYER_TEAM_POLICE] = CreatePickup(1239, 1, 2171.22, 1397.11, 11.06);
 	gTeamMenu[E_PLAYER_TEAM_POLICE] = CreateMenu("Police LV", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_POLICE], 0, "Policajt");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_POLICE], 1, "Opustit tym");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_POLICE], 0, "Opustit tym");
 
 	gTeamPickup[E_PLAYER_TEAM_GASMAN] = CreatePickup(1239, 1, 2637.36, 1127.04, 11.18);
 	gTeamMenu[E_PLAYER_TEAM_GASMAN] = CreateMenu("Benzina", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_GASMAN], 0, "Benzinak");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_GASMAN], 1, "Opustit tym");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_GASMAN], 0, "Opustit tym");
 
 	gTeamPickup[E_PLAYER_TEAM_DRAGSTER] = CreatePickup(1239, 1, 2620.14, 1195.76, 10.81);
 	gTeamMenu[E_PLAYER_TEAM_DRAGSTER] = CreateMenu("Dragsterz", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_DRAGSTER], 0, "DRaGsTeR");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_DRAGSTER], 1, "Opustit tym");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_DRAGSTER], 0, "Opustit tym");
 
 	gTeamPickup[E_PLAYER_TEAM_GARBAGE] = CreatePickup(1581, 1, 2892.8, -2127.9, 3.2);
 	gTeamMenu[E_PLAYER_TEAM_GARBAGE] = CreateMenu("Garbage men", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_GARBAGE], 0, "Tulak");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_GARBAGE], 1, "Opustit tym");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_GARBAGE], 0, "Opustit tym");
 
 	gTeamPickup[E_PLAYER_TEAM_PIZZABOY] = CreatePickup(1581, 1, 2101.70, -1810.05, 13.55);
 	gTeamMenu[E_PLAYER_TEAM_PIZZABOY] = CreateMenu("Pizzaboyz", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PIZZABOY], 0, "Pizza boy");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PIZZABOY], 1, "Opustit tym");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PIZZABOY], 0, "Opustit tym");
 
 	gTeamPickup[E_PLAYER_TEAM_HACKER] = CreatePickup(1581, 1, 2838.10, -2130.26, 0.19);
 	gTeamMenu[E_PLAYER_TEAM_HACKER] = CreateMenu("Hackerz",  1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_HACKER], 0, "Hacker");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_HACKER], 1, "Opustit tym");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_HACKER], 0, "Opustit tym");
 
 	//gTeamPickup[E_PLAYER_TEAM_CAR_REPAIR] = CreatePickup(1581,1, );
 	gTeamMenu[E_PLAYER_TEAM_CAR_REPAIR] = CreateMenu("Servicemen", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_CAR_REPAIR], 0, "Technik");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_CAR_REPAIR], 1, "Opustit tym");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_CAR_REPAIR], 0, "Opustit tym");
 
 	//gTeamPickup[E_PLAYER_TEAM_PYRO] = CreatePickup(1581,1, );
 	gTeamMenu[E_PLAYER_TEAM_PYRO] = CreateMenu("Pyroz", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PYRO], 0, "Pyrotechnik");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PYRO], 1, "Opustit tym");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PYRO], 0, "Opustit tym");
 
 #include "pickups.pwn"
 #include "objects.pwn"
@@ -2511,13 +2224,6 @@ if (strcmp(cmdtext, "/tabak", true) == 0)
 	return 1;
 }*/
 
-stock InvalidCommand(playerid)
-{
-	SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Tento prikaz neexistuje! /cmd /help /rules");
-
-	return 1;
-}
-
 public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 {
 	return 1;
@@ -2829,51 +2535,6 @@ public OnPlayerExitedMenu(playerid)
 	return 1;
 }
 
-IsPlayerInSphere(playerid, Float:x, Float:y, Float:z, radius)
-{
-	if (GetPlayerDistanceToPointEx(playerid, x, y, z) < radius)
-	{
-		return 1;
-	}
-	return 0;
-}
-
-GetPlayerDistanceToPointEx(playerid, Float:x, Float:y, Float:z)
-{
-	new Float:x1, Float:y1, Float:z1;
-	new Float:tmpdis;
-	GetPlayerPos(playerid, x1, y1, z1);
-	tmpdis = floatsqroot(floatpower(floatabs(floatsub(x, x1)), 2) + floatpower(floatabs(floatsub(y, y1)), 2) + floatpower(floatabs(floatsub(z, z1)), 2));
-	return floatround(tmpdis);
-}
-
-stock bool:IsPlayerInValidNosVehicle(playerid, vehicleid)
-{
-#define MAX_VALID_NOS_VEHICLES 31
-
-	new ValidNosVehicles[MAX_VALID_NOS_VEHICLES] =
-	{
-		581, 523, 462, 521, 463, 522, 461, 448, 468, 586,
-		509, 481, 510, 472, 473, 493, 595, 484, 430, 453,
-		452, 446, 454, 590, 569, 537, 538, 570, 449, 522, 520
-	};
-
-	new vehicleIdCheck = GetPlayerVehicleID(playerid);
-
-	// Return when the target player changed vehicles meanwhile, or has exited the target vehicle.
-	if (vehicleid != vehicleIdCheck || !IsPlayerInVehicle(playerid, vehicleid))
-		return false;
-
-	// Loop over permitted NoS vehicles.
-	for (new i = 0; i < MAX_VALID_NOS_VEHICLES; i++)
-	{
-		if (GetVehicleModel(vehicleid) == ValidNosVehicles[i])
-			return true;
-	}
-
-	return false;
-}
-
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
 	if (newkeys == KEY_SECONDARY_ATTACK)
@@ -2902,77 +2563,6 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 			}
 		}
 	}
-}
-
-GetVehicleWithinDistance(playerid, Float:x1, Float:y1, Float:z1, Float:dist, &veh)
-{
-	for (new i = 1; i < MAX_VEHICLES; i++)
-	{
-		if (GetVehicleModel(i) > 0)
-		{
-			if (GetPlayerVehicleID(playerid) != i)
-			{
-				new Float:x, Float:y, Float:z;
-				new Float:x2, Float:y2, Float:z2;
-				GetVehiclePos(i, x, y, z);
-				x2 = x1 - x;
-				y2 = y1 - y;
-				z2 = z1 - z;
-				new Float:vDist = (x2 * x2 + y2 * y2 + z2 * z2);
-				if (vDist < dist)
-				{
-					veh = i;
-					dist = vDist;
-				}
-			}
-		}
-	}
-}
-
-IsVehicleRcTram(vehicleid)
-{
-	new model = GetVehicleModel(vehicleid);
-	switch (model)
-	{
-		case D_TRAM, RC_GOBLIN, RC_BARON, RC_BANDIT, RC_RAIDER, RC_TANK:
-			return 1;
-		default:
-			return 0;
-	}
-	return 0;
-}
-
-public SplitIntoTwo(input[], token1[], token2[], tokenSize)
-{
-	new spacePos = strfind(input, " ");
-	if (spacePos == -1)
-	{
-		strmid(token1, input, 0, strlen(input), tokenSize);
-		token2[0] = '\0';
-		return 1;
-	}
-
-	strmid(token1, input, 0, spacePos, tokenSize);
-
-	strmid(token2, input, spacePos + 1, strlen(input), tokenSize);
-
-	return 2;
-}
-
-stock TestPrint(print[])
-{
-#if BUG_SYSTEM
-	printf(" BS | %s ", print);
-#else
-#pragma unused print
-#endif
-}
-
-public StartServerReset()
-{
-	SendRconCommand("gmx");
-
-	return 1;
 }
 
 /*-----------------------------------------------------------------------------/

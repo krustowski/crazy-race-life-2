@@ -36,6 +36,12 @@ enum E_RACE_ID
 // gPlayerRace hold a reference to the state of a player's registration to such race. Thus if registered, a value for such RACE_ID should return true (1).
 new gPlayerRace[MAX_PLAYERS][E_RACE_ID];
 
+new gPlayerRaceTime[MAX_PLAYERS];
+
+new Timer:gPlayerRaceTimer[MAX_PLAYERS];
+
+new Text:gRaceInfoText[MAX_PLAYERS];
+
 //
 //  Race props.
 //
@@ -174,10 +180,15 @@ public SetPlayerRaceState(playerid, raceId)
 
 public ResetPlayerRaceState(playerid, raceId, finishedSuccessfully)
 {
-	DisablePlayerRaceCheckpoint(playerid);
-
 	if (!CheckPlayerRaceState(playerid))
 		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Nejsi prihlasen v zadnem zavode.");
+
+	DisablePlayerRaceCheckpoint(playerid);
+	TextDrawHideForPlayer(playerid, gRaceInfoText[playerid]);
+	KillTimer(gPlayerRaceTimer[playerid]);
+
+	gPlayerRaceTimer[playerid] = 0;
+	gPlayerRaceTime[playerid] = 0;
 
 	if (finishedSuccessfully)
 	{
@@ -214,7 +225,7 @@ public CheckPlayerRaceState(playerid)
 		if (gPlayerRace[playerid][i])
 		{
 			// The player is racing at the moment!
-			return 1;
+			return i;
 		}
 	}
 
@@ -222,8 +233,29 @@ public CheckPlayerRaceState(playerid)
 	return 0;
 }
 
+public UpdateRaceInfoText(playerid)
+{
+	new stringToPrint[128];
+
+	gPlayerRaceTime[playerid] += 1000;
+
+	format(stringToPrint, sizeof(stringToPrint), "~g~Race_ID:_%2d~n~~r~Cas:~b~%4d~y~:~b~%2d", CheckPlayerRaceState(playerid), floatround(floatround(gPlayerRaceTime[playerid] / 1000) / 60), floatround(gPlayerRaceTime[playerid] / 1000) % 60);
+
+	// Redraw the player's current velocity.
+	TextDrawSetString(gRaceInfoText[playerid], stringToPrint);
+	//TextDrawShowForPlayer(playerid, gRaceInfoText[playerid]);
+
+	return 1;
+}
+
 public CheckRaceCheckpoint(playerid)
 {
+	if (!gPlayerRaceTimer[playerid])
+	{
+		gPlayerRaceTimer[playerid] = SetTimerEx("UpdateRaceInfoText", 1 * SECOND_MS, 1, "i", playerid);
+		TextDrawShowForPlayer(playerid, gRaceInfoText[playerid]);
+	}
+
 	//SendClientMessage(playerid, COLOR_ZLUTA, "[ i ] Jsi v zavodnim checkpointu!");
 	DisablePlayerRaceCheckpoint(playerid);
 

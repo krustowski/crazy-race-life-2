@@ -176,8 +176,7 @@ new gAdminElevator;
 //  Texts.
 //
 
-new gGameModeText;
-new gRaceInfoText;
+new Text:gGameModeText;
 
 //
 //  Global static team objects.
@@ -336,12 +335,6 @@ public OnGameModeInit()
 	TextDrawFont(gGameModeText, 3);
 	TextDrawSetOutline(gGameModeText, 1);
 
-	gRaceInfoText = TextDrawCreate(580.0, 400.0, "");
-
-	TextDrawLetterSize(gRaceInfoText, 0.5, 1.5);
-	TextDrawFont(gRaceInfoText, 3);
-	TextDrawSetOutline(gRaceInfoText, 1);
-
 	gClockText = TextDrawCreate(547.0, 24.0, "nacitani");
 
 	TextDrawLetterSize(gClockText, 0.6, 1.8);
@@ -408,6 +401,12 @@ public OnPlayerConnect(playerid)
 
 	// Draw mapicons for the user.
 #include "mapicons.pwn"
+
+	gRaceInfoText[playerid] = TextDrawCreate(530.0, 400.0, "");
+
+	TextDrawLetterSize(gRaceInfoText[playerid], 0.5, 1.5);
+	TextDrawFont(gRaceInfoText[playerid], 3);
+	TextDrawSetOutline(gRaceInfoText[playerid], 1);
 
 	// Show the game clock.
 	TextDrawShowForPlayer(playerid, gClockText);

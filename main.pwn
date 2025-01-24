@@ -44,7 +44,6 @@
 //  Basic definitions.
 //
 
-#define MINIMAP_TEXT "~g~CrAzY ~r~& ~r~RaCe ~b~Life2"
 #define dcmd(%1,%2,%3) if ((strcmp((%3)[1], #%1, true, (%2)) == 0) && ((((%3)[(%2) + 1] == 0) && (dcmd_%1(playerid, "")))||(((%3)[(%2) + 1] == 32) && (dcmd_%1(playerid, (%3)[(%2) + 2]))))) return 1
 
 #pragma tabsize 0
@@ -88,6 +87,8 @@
 
 new const GAMEMODE_NAME[] = "CrazyRaceLife2";
 new const GAMEMODE_CREDITS[] = "krusty, kompry, DRaGsTeR";
+
+new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 
 new const VEHICLE_PLATE[] = "-CRL-2-";
 
@@ -168,6 +169,8 @@ forward OffRadarCheckpoint(playerid);
 
 new gAdminAuto;
 new gAdminElevator;
+
+new gGameModeText;
 
 //
 // Global static team objects.
@@ -306,6 +309,12 @@ public OnGameModeInit()
 	AddPlayerClass(45, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
 	AddPlayerClass(169, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
 
+	gGameModeText = TextDrawCreate(20.0, 425.0, MINIMAP_TEXT);
+
+	TextDrawLetterSize(gGameModeText, 0.5, 1.5);
+	TextDrawFont(gGameModeText, 3);
+	TextDrawSetOutline(gGameModeText, 1);
+
 	//
 	// Clock initialization.
 	//
@@ -389,6 +398,7 @@ public OnPlayerConnect(playerid)
 
 	// Show the game clock.
 	TextDrawShowForPlayer(playerid, gClockText);
+	TextDrawShowForPlayer(playerid, gGameModeText);
 
 	// Send a welcome text to the connecting new player.
 	SendClientMessage(playerid, GREEN, "Cus, vitej v modu CrazyRaceLife2! :) /cmd /help /rules");
@@ -1069,25 +1079,27 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 
 	if (newstate == PLAYER_STATE_DRIVER || newstate == PLAYER_STATE_PASSENGER)
 	{
-		KPH[playerid] = TextDrawCreate(256, 426, "Rychlost:");
-		TextDrawAlignment(KPH[playerid], 0);
-		TextDrawBackgroundColor(KPH[playerid], 0x000000ff);
-		TextDrawFont(KPH[playerid], 1);
-		TextDrawLetterSize(KPH[playerid], 0.7, 1.8);
-		TextDrawColor(KPH[playerid], 0xff0000cc);
-		TextDrawSetOutline(KPH[playerid], 1);
-		TextDrawSetProportional(KPH[playerid], 1);
-		TextDrawSetShadow(KPH[playerid], 1);
+		KPH[playerid] = TextDrawCreate(256, 425, "Rychlost:");
 
-		KPHR[playerid] = TextDrawCreate(370, 426, "0");
+		TextDrawAlignment(KPH[playerid], 0);
+		//TextDrawBackgroundColor(KPH[playerid], 0x000000ff);
+		TextDrawFont(KPH[playerid], 3);
+		TextDrawLetterSize(KPH[playerid], 0.5, 1.5);
+		//TextDrawColor(KPH[playerid], 0xff0000cc);
+		TextDrawSetOutline(KPH[playerid], 1);
+		//TextDrawSetProportional(KPH[playerid], 1);
+		//TextDrawSetShadow(KPH[playerid], 1);
+
+		KPHR[playerid] = TextDrawCreate(350, 425, "0");
+
 		TextDrawAlignment(KPHR[playerid], 0);
-		TextDrawBackgroundColor(KPHR[playerid], 0x000000ff);
+		//TextDrawBackgroundColor(KPHR[playerid], 0x000000ff);
 		TextDrawFont(KPHR[playerid], 3);
-		TextDrawLetterSize(KPHR[playerid], 0.7, 1.8);
-		TextDrawColor(KPHR[playerid], 0x00ff00cc);
+		TextDrawLetterSize(KPHR[playerid], 0.5, 1.5);
+		//TextDrawColor(KPHR[playerid], 0x00ff00cc);
 		TextDrawSetOutline(KPHR[playerid], 1);
-		TextDrawSetProportional(KPHR[playerid], 1);
-		TextDrawSetShadow(KPHR[playerid], 1);
+		//TextDrawSetProportional(KPHR[playerid], 1);
+		//TextDrawSetShadow(KPHR[playerid], 1);
 
 		TextDrawShowForPlayer(playerid, KPHR[playerid]);
 		TextDrawShowForPlayer(playerid, KPH[playerid]);

@@ -102,13 +102,10 @@ public SavePlayerData(playerid)
 
 		dUserSetINT(playerName).("cash", GetPlayerMoney(playerid));
 		dUserSetINT(playerName).("bank", gPlayerData[playerid][E_PLAYER_DATA_BANK]);
-		//dUserSetINT(playerName).("health", gPlayerData[playerid][E_PLAYER_DATA_HEALTH]);
 		dUserSetINT(playerName).("health", GetPlayerHealth(playerid));
-		//dUserSetINT(playerName).("armour", gPlayerData[playerid][E_PLAYER_DATA_ARMOUR]);
 		dUserSetINT(playerName).("armour", GetPlayerArmour(playerid));
 		dUserSetINT(playerName).("adminlvl", gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL]);
 		dUserSetINT(playerName).("team", gPlayerData[playerid][E_PLAYER_DATA_TEAM]);
-		//dUserSetINT(playerName).("class", gPlayerData[playerid][E_PLAYER_DATA_CLASS]);
 		dUserSetINT(playerName).("class", GetPlayerSkin(playerid));
 
 		SendClientMessage(playerid, GREEN, "[ i ][DATA] Data uspesne ulozena! ");
@@ -188,7 +185,7 @@ public SendPlayerSalary()
 		SendClientMessage(i, COLOR_ORANZCERV, stringToPrint);
 
 		format(gameText, sizeof(gameText), "~y~V~g~yplata~n~~y~$~g~%d", teamSalary);
-		GameTextForPlayer(i, gameText, 5000, 1);
+		GameTextForPlayer(i, gameText, 4000, 1);
 
 		GivePlayerMoney(i, teamSalary);
 	}

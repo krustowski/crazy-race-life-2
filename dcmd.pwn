@@ -736,13 +736,13 @@ dcmd_race(playerid, params[])
 	}
 	else if (!strcmp(token1, "list"))
 	{
-		SendClientMessage(playerid, COLOR_ZLUTA, "[ i ] Seznam dostupnych zavodu:");
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ i ] Seznam dostupnych zavodu (prihlaska / odmena):");
 
 		for (new i = 1; i < sizeof(gRaceNames); i++)
 		{
-			new stringToPrint[128];
+			new stringToPrint[256];
 
-			format(stringToPrint, sizeof(stringToPrint), "ID: %2d: %s", i, gRaceNames[i]);
+			format(stringToPrint, sizeof(stringToPrint), "ID: %2d: %s ($%d / $%d)", i, gRaceNames[i], gRaceFeePrize[i][E_RACE_FEE_FEE], gRaceFeePrize[i][E_RACE_FEE_PRIZE]);
 			SendClientMessage(playerid, COLOR_SEDA, stringToPrint);
 		}
 	}

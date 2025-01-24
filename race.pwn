@@ -139,7 +139,7 @@ public SetPlayerRace(playerid, raceId)
 
 public SetPlayerRaceState(playerid, raceId)
 {
-	new stringToPrint[128];
+	new stringToPrint[256];
 
 	if (!IsPlayerInAnyVehicle(playerid))
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Pro prihlaseni do zavodu je treba byt v aute!");
@@ -183,11 +183,12 @@ public ResetPlayerRaceState(playerid, raceId, finishedSuccessfully)
 	{
 		SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Dokoncil jsi zavod!");
 
-		new playerName[MAX_PLAYER_NAME], stringToPrint[128];
+		new playerName[MAX_PLAYER_NAME], stringToPrint[256];
 
 		GetPlayerName(playerid, playerName, sizeof(playerName));
-		format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s prave uspesne dokoncil zavod '%s'!", playerName, gRaceNames[raceId]);
+		GivePlayerMoney(playerid, gRaceFeePrize[raceId][E_RACE_FEE_PRIZE]);
 
+		format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s prave uspesne dokoncil zavod '%s' a obdrzel vyhru $%d!", playerName, gRaceNames[raceId], gRaceFeePrize[raceId][E_RACE_FEE_PRIZE]);
 		SendClientMessageToAll(COLOR_SVZEL, stringToPrint);
 	}
 

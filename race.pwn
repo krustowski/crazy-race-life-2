@@ -30,7 +30,8 @@ enum E_RACE_ID
 {
 	E_RACE_ID_NONE,
 	E_RACE_ID_LV_PYRAMID,
-	E_RACE_ID_STUNT_LV_1
+	E_RACE_ID_STUNT_LV_1,
+	E_RACE_ID_CIRCUIT_SF_WANG
 }
 
 // gPlayerRace hold a reference to the state of a player's registration to such race. Thus if registered, a value for such RACE_ID should return true (1).
@@ -54,7 +55,9 @@ new const gRaceNames[E_RACE_ID][] =
 	// E_RACE_ID_LV_PYRAMID
 	"Las Venturas Pyramid Race",
 	// E_RACE_ID_STUNT_LV_1
-	"Las Venturas Stunt Race No. 1"
+	"Las Venturas Stunt Race No. 1",
+	// E_RACE_ID_CIRCUIT_SF_WANG
+	"San Fierro WangCars Circuit"
 };
 
 new const gRaceFeePrize[E_RACE_ID][E_RACE_FEE] =
@@ -64,6 +67,8 @@ new const gRaceFeePrize[E_RACE_ID][E_RACE_FEE] =
 	// E_RACE_ID_LV_PYRAMID
 	{300, 5000},
 	// E_RACE_ID_STUNT_LV_1
+	{1500, 20000},
+	// E_RACE_ID_CIRCUIT_SF_WANG
 	{1500, 20000}
 };
 
@@ -235,11 +240,17 @@ public CheckPlayerRaceState(playerid)
 
 public UpdateRaceInfoText(playerid)
 {
-	new stringToPrint[128];
+	new cpCount, raceId = CheckPlayerRaceState(playerid), stringToPrint[128];
+
+	switch (raceId)
+	{
+		case E_RACE_ID_STUNT_LV_1:
+			cpCount = sizeof(gRaceCoordsLVStuntNo1);
+	}
 
 	gPlayerRaceTime[playerid] += 1000;
 
-	format(stringToPrint, sizeof(stringToPrint), "~g~Race_ID:_%2d~n~~r~Cas:~b~%4d~y~:~b~%2d", CheckPlayerRaceState(playerid), floatround(floatround(gPlayerRaceTime[playerid] / 1000) / 60), floatround(gPlayerRaceTime[playerid] / 1000) % 60);
+	format(stringToPrint, sizeof(stringToPrint), "~w~Zavod:_________~g~%3d~n~~w~Checkpoint:_~r~%2d~y~/~r~%2d~n~~w~Cas:_______~b~%4d~y~:~b~%2d", raceId, gPlayerRace[playerid][raceId]-1, cpCount, floatround(floatround(gPlayerRaceTime[playerid] / 1000) / 60), floatround(gPlayerRaceTime[playerid] / 1000) % 60);
 
 	// Redraw the player's current velocity.
 	TextDrawSetString(gRaceInfoText[playerid], stringToPrint);

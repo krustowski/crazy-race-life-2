@@ -402,7 +402,7 @@ public OnPlayerConnect(playerid)
 	// Draw mapicons for the user.
 #include "mapicons.pwn"
 
-	gRaceInfoText[playerid] = TextDrawCreate(530.0, 400.0, "");
+	gRaceInfoText[playerid] = TextDrawCreate(460.0, 400.0, "");
 
 	TextDrawLetterSize(gRaceInfoText[playerid], 0.5, 1.5);
 	TextDrawFont(gRaceInfoText[playerid], 3);

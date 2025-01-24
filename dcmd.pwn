@@ -716,48 +716,35 @@ dcmd_flip(playerid, params[])
 	return 1;
 }
 
-dcmd_djoin(playerid, params[])
+dcmd_race(playerid, params[])
 {
-	if (!strlen(params) || !IsNumeric(params))
-		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /djoin [ID zavodu]");
+	new token1[32], token2[32];
+	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
-	new raceId = strval(params), stringToPrint[128];
+	if (!strlen(params) || (strcmp(token1, "join") && strcmp(token1, "exit") && strcmp(token1, "list")) || (!strcmp(token1, "join") && !IsNumeric(token2)))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /race [join/exit/list] [ID zavodu]");
 
-	if (!IsPlayerInAnyVehicle(playerid))
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Pro prihlaseni do dragu je treba byt v aute!");
-
-	// Check if already joined such race.
-	if (gPlayerRace[playerid][raceId])
-		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Do daneho zavodu jsi jiz prihlasen!");
-
-	switch (raceId)
+	if (!strcmp(token1, "join"))
 	{
-		case E_RACE_ID_LV_PYRAMID:
-			{
-				gPlayerRace[playerid][raceId] = true;	
-				GivePlayerMoney(playerid, -300);
+		new raceId = strval(token2);
 
-				SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Uspesne prihlasen do daneho zavodu (prihlaska $300)!");
+		SetPlayerRaceState(playerid, raceId);
+	}
+	else if (!strcmp(token1, "exit"))
+	{
+		ResetPlayerRaceState(playerid, 0, false);
+	}
+	else if (!strcmp(token1, "list"))
+	{
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ i ] Seznam dostupnych zavodu:");
 
-				SetRaceForUser(playerid, raceId);
-			}
-		case E_RACE_ID_STUNT_LV_1:
-			{
-				new raceCost = 1000;
+		for (new i = 1; i < sizeof(gRaceNames); i++)
+		{
+			new stringToPrint[128];
 
-				gPlayerRace[playerid][raceId] = true;	
-				GivePlayerMoney(playerid, -raceCost);
-
-				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Uspesne prihlasen do zavodu '%s' (prihlaska $%d)", gRaceNames[raceId], raceCost);
-				SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
-
-				SetRaceForUser(playerid, raceId);
-			}
-		default:
-			{
-				format(stringToPrint, sizeof(stringToPrint), "[ i ] Zavod s danym ID neni pripraven!");
-				return SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
-			}
+			format(stringToPrint, sizeof(stringToPrint), "ID: %2d: %s", i, gRaceNames[i]);
+			SendClientMessage(playerid, COLOR_SEDA, stringToPrint);
+		}
 	}
 
 	return 1;

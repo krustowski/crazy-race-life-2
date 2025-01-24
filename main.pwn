@@ -55,6 +55,8 @@
 #define SOUND_MUSIC10
 #define SOUND_OFF
 
+#define SECOND_MS	1000
+
 //
 //  Common colour definitions.
 //
@@ -164,16 +166,21 @@ forward OffRadarCheckpoint(playerid);
 #include "helpers.pwn"
 
 //
-// Global static objects.
+//  Global static objects.
 //
 
 new gAdminAuto;
 new gAdminElevator;
 
+//
+//  Texts.
+//
+
 new gGameModeText;
+new gRaceInfoText;
 
 //
-// Global static team objects.
+//  Global static team objects.
 //
 
 new gAdminRoomHealth;
@@ -226,18 +233,28 @@ public OnGameModeInit()
 	AllowInteriorWeapons(0);
 	EnableStuntBonusForAll(1);  
 
+	// Set the unique Vehlicle Plate for all vehicles possible.
+	for (new i = 0; i < MAX_VEHICLES; i++)
+	{
+		SetVehicleNumberPlate(i, VEHICLE_PLATE);
+	}
+
 	//
 	// Start various timers.
 	//
 
-	SetTimer("AntiCheatWeapon", 30000, 1);
-	SetTimer("AntiFlood", 1000, 1);
+	SetTimer("AntiCheatWeapon", 30 * SECOND_MS, 1);
+	SetTimer("AntiFlood", 1 * SECOND_MS, 1);
 
 	SetTimer("OnRadarCheckpoint", 300, 1);
 
-	SetTimer("BatchSavePlayerData", 200000, 1);
-	SetTimer("UpdatePlayerScore", 1000, 1);
-	SetTimer("SendPlayerSalary", 300000, 1);
+	SetTimer("BatchSavePlayerData", 200 * SECOND_MS, 1);
+	SetTimer("UpdatePlayerScore", 1 * SECOND_MS, 1);
+	SetTimer("SendPlayerSalary", 300 * SECOND_MS, 1);
+
+	SetTimer("DrawClockText", 60 * SECOND_MS, 1);
+
+	SetTimer("ShowAdvert", 120 * SECOND_MS, 1);
 
 	//
 	// Create pickups, static objects and static vehicles.
@@ -309,31 +326,27 @@ public OnGameModeInit()
 	AddPlayerClass(45, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
 	AddPlayerClass(169, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
 
+	//
+	//  DrawTexts initialization.
+	//
+
 	gGameModeText = TextDrawCreate(20.0, 425.0, MINIMAP_TEXT);
 
 	TextDrawLetterSize(gGameModeText, 0.5, 1.5);
 	TextDrawFont(gGameModeText, 3);
 	TextDrawSetOutline(gGameModeText, 1);
 
-	//
-	// Clock initialization.
-	//
+	gRaceInfoText = TextDrawCreate(580.0, 400.0, "");
+
+	TextDrawLetterSize(gRaceInfoText, 0.5, 1.5);
+	TextDrawFont(gRaceInfoText, 3);
+	TextDrawSetOutline(gRaceInfoText, 1);
 
 	gClockText = TextDrawCreate(547.0, 24.0, "nacitani");
 
 	TextDrawLetterSize(gClockText, 0.6, 1.8);
 	TextDrawFont(gClockText, 3);
 	TextDrawSetOutline(gClockText, 1);
-
-	SetTimer("DrawClockText", 60000, 1);
-
-	SetTimer("ShowAdvert", 1000 * 60 * 2, true);
-
-	// Set the unique Vehlicle Plate for all vehicles possible.
-	for (new i = 0; i < MAX_VEHICLES; i++)
-	{
-		SetVehicleNumberPlate(i, VEHICLE_PLATE);
-	}
 
 	return 1;
 }
@@ -612,7 +625,6 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	dcmd(afk, 3, cmdtext);            //all
 	dcmd(cmd, 3, cmdtext);            //all
 	dcmd(dance, 5, cmdtext);	  //all
-	dcmd(djoin, 5, cmdtext);          //all
 	dcmd(dwarp, 5, cmdtext); 	  //all
 	dcmd(fix, 3, cmdtext); 		  //all
 	dcmd(givecash, 8, cmdtext);       //all
@@ -625,6 +637,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	dcmd(login, 5, cmdtext);          //all
 	dcmd(paintball, 9, cmdtext);	  //all
 	dcmd(port, 4, cmdtext); 	  //all
+	dcmd(race, 4, cmdtext);		  //all
 	dcmd(register, 8, cmdtext);       //all
 	dcmd(rules, 5, cmdtext); 	  //all
 	dcmd(skydive, 7, cmdtext);        //all

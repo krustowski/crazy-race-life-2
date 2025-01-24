@@ -20,16 +20,11 @@ enum E_RACE_COORD
 	E_RACE_COORD_Z
 }
 
-/*enum E_CHECKPOINT
-  {
-  E_CHECKPOINT_COORDS[E_RACE_COORD]
-  }
-
-  enum E_RACE
-  {
-  E_RACE_NAME[MAX_RACE_NAME],
-  E_RACE_CHECKPOINTS[MAX_RACE_CP]
-  }*/
+enum E_RACE_FEE
+{
+	E_RACE_FEE_FEE,
+	E_RACE_FEE_PRIZE
+}
 
 enum E_RACE_ID
 {
@@ -41,6 +36,10 @@ enum E_RACE_ID
 // gPlayerRace hold a reference to the state of a player's registration to such race. Thus if registered, a value for such RACE_ID should return true (1).
 new gPlayerRace[MAX_PLAYERS][E_RACE_ID];
 
+//
+//  Race props.
+//
+
 // gRaceNames is an array to hold all race names referenced via E_RACE_ID.
 new const gRaceNames[E_RACE_ID][] = 
 {
@@ -48,42 +47,21 @@ new const gRaceNames[E_RACE_ID][] =
 	"Blank Race (stub)",
 	// E_RACE_ID_LV_PYRAMID
 	"Las Venturas Pyramid Race",
-	// E_RACE_STUNT_LV_1
+	// E_RACE_ID_STUNT_LV_1
 	"Las Venturas Stunt Race No. 1"
 };
 
-// gRaceCoords is an array to hold all checkpoint coordinates for every race defined via E_RACE_ID.
-new const gRaceCoords[E_RACE_ID][][E_RACE_COORD] = 
+new const gRaceFeePrize[E_RACE_ID][E_RACE_FEE] =
 {
 	// E_RACE_ID_NONE
-	{
-		{0.0, 0.0, 0.0},
-		{0.0, 0.0, 0.0},
-		{0.0, 0.0, 0.0},
-		{0.0, 0.0, 0.0},
-		{0.0, 0.0, 0.0},
-		{0.0, 0.0, 0.0}
-	},
+	{0, 0},
 	// E_RACE_ID_LV_PYRAMID
-	{
-		{0.0, 0.0, 0.0},
-		{0.0, 0.0, 0.0},
-		{0.0, 0.0, 0.0},
-		{0.0, 0.0, 0.0},
-		{0.0, 0.0, 0.0},
-		{0.0, 0.0, 0.0}
-	},
+	{0, 0},
 	// E_RACE_ID_STUNT_LV_1
-	{
-		{2605.1, 1193.9, 10.4},
-		{2002.7, 1209.4, 17.6},
-		{1971.5, 1248.1, 17.6},
-		{1874.3, 1247.6, 17.6},
-		{1897.2, 1138.4, 17.6},
-		{1869.7, 935.8, 10.2}
-	}
+	{1500, 15000}
 };
 
+// E_RACE_ID_STUNT_LV_1
 new gRaceCoordsLVStuntNo1[][E_RACE_COORD] =
 {
 	{2605.1, 1193.9, 10.4},
@@ -100,7 +78,7 @@ new gRaceCoordsLVStuntNo1[][E_RACE_COORD] =
 };
 
 //
-//
+//  Race-related functions.
 //
 
 public StartRace()
@@ -108,46 +86,31 @@ public StartRace()
 	return 1;
 }
 
-
-public SetRaceForUser(playerid, raceId)
+public SetPlayerRace(playerid, raceId)
 {
-	if (!IsPlayerConnected(playerid))
+	// Check if player has joined such race.
+	if (!IsPlayerConnected(playerid) || raceId == E_RACE_ID_NONE || !gPlayerRace[playerid][raceId])
 		return 0;
 
-	// 0 references E_RACE_ID_NONE, so nothing is to be prepared for the player.
-	if (raceId == 0)
-		return 0;
+	// Fetch the relative position in such race (position of checkpoints).
+	new lastCPNo, raceCPPosition = gPlayerRace[playerid][raceId] - 1;
+
+	// Prepare the coords to show a race checkpoint.
+	new x0, y0, z0, x1, y1, z1, cpType = CP_TYPE_GROUND_NORMAL;
 
 	switch (raceId)
 	{
 		case E_RACE_ID_STUNT_LV_1:
 			{
-				if (!gPlayerRace[playerid][raceId]) 
-					return 1;
+				lastCPNo = sizeof(gRaceCoordsLVStuntNo1) - 1;
 
-				// Fetch the relative position in such race (position of checkpoints).
-				new raceCPPosition = gPlayerRace[playerid][raceId] - 1;
-
-				new lastCPNo = sizeof(gRaceCoordsLVStuntNo1) - 1;
-
+				// End the race.
 				if (raceCPPosition > lastCPNo)
 				{
-					DisablePlayerRaceCheckpoint(playerid);
-
-					gPlayerRace[playerid][raceId] = 0;
-					SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Dokoncil jsi zavod!");
-
-					new playerName[MAX_PLAYER_NAME], stringToPrint[128];
-
-					GetPlayerName(playerid, playerName, sizeof(playerName));
-					format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s prave uspesne dokoncil zavod '%s'!", playerName, gRaceNames[raceId]);
-
-					SendClientMessageToAll(COLOR_SVZEL, stringToPrint);
+					ResetPlayerRaceState(playerid, raceId, true);
 
 					return 1;
 				}
-
-				new x0, y0, z0, x1, y1, z1, cpType = CP_TYPE_GROUND_NORMAL;
 
 				x0 = gRaceCoordsLVStuntNo1[raceCPPosition][E_RACE_COORD_X];
 				y0 = gRaceCoordsLVStuntNo1[raceCPPosition][E_RACE_COORD_Y];
@@ -161,44 +124,114 @@ public SetRaceForUser(playerid, raceId)
 				} else {
 					cpType = CP_TYPE_GROUND_FINISH;
 				}
-
-				SetPlayerRaceCheckpoint(playerid, cpType, Float:x0, Float:y0, Float:z0, Float:x1, Float:y1, Float:z0, 10.0);
-
-				/*for (new i = 0; i <= sizeof(gRaceCoords[E_RACE_ID_STUNT_LV_1]); i++)
-				{
-
-				}*/
-
-				//new x0 = gRaceCoords[E_RACE_ID_STUNT_LV_1][0][E_RACE_COORD_X], y0 = gRaceCoords[E_RACE_ID_STUNT_LV_1][0][E_RACE_COORD_Y], z0 = gRaceCoords[E_RACE_ID_STUNT_LV_1][0][E_RACE_COORD_Z];
-				//new x1 = gRaceCoords[E_RACE_ID_STUNT_LV_1][1][E_RACE_COORD_X], y1 = gRaceCoords[E_RACE_ID_STUNT_LV_1][1][E_RACE_COORD_Y], z1 = gRaceCoords[E_RACE_ID_STUNT_LV_1][1][E_RACE_COORD_Z];
-
-				//new stringToPrint[128];
-
-				//format(stringToPrint, sizeof(stringToPrint), "[ ! ] Start CP: X: %.2f, Y: %.2f, Z: %.2f", x0, y0, z0);
-				//SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
-
-				//SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_NORMAL, Float:x0, Float:y0, Float:z0, Float:x1, Float:y1, Float:z0, 10.0);
-				//SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_NORMAL, Float:x1, Float:y1, Float:z0, 0.0, 0.0, 0.0, 10.0);
-
-				//SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_NORMAL, 2605.1, 1192.9, 10.4, 2002.7, 1209.4, 17.6, 10.0);
-				//SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_NORMAL, Float:gRaceCoordsLVStunt[0][0], Float:gRaceCoordsLVStunt[0][1], Float:gRaceCoordsLVStunt[0][2], Float:gRaceCoordsLVStunt[1][0], Float:gRaceCoordsLVStunt[1][1], Float:gRaceCoordsLVStunt[1][2], 10.0);
+			}
+		default:
+			{
+				return 0;
 			}
 	}
 
+	// Set the next checkpoint to reach.
+	SetPlayerRaceCheckpoint(playerid, cpType, Float:x0, Float:y0, Float:z0, Float:x1, Float:y1, Float:z0, 10.0);
+
 	return 1;
+}
+
+public SetPlayerRaceState(playerid, raceId)
+{
+	new stringToPrint[128];
+
+	if (!IsPlayerInAnyVehicle(playerid))
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Pro prihlaseni do zavodu je treba byt v aute!");
+
+	// Check if already joined such race.
+	if (gPlayerRace[playerid][raceId])
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Do daneho zavodu jsi jiz prihlasen!");
+
+	if (CheckPlayerRaceState(playerid))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Jiz jsi prihlasen v jinem zavode! Pred prihlasenim je treba predchozi zavod dokoncit!");
+
+	if (raceId == E_RACE_ID_NONE)
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Zavod s danym ID neni pripraven!");
+
+	if (GetPlayerMoney(playerid) < gRaceFeePrize[raceId][E_RACE_FEE_FEE])
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Nemas dostatek hotovosti pro zaplaceni prihlasky do zavodu!");
+
+	//
+	//  Ok, register the player with given raceId.
+	//
+
+	gPlayerRace[playerid][raceId] = 1;
+	GivePlayerMoney(playerid, -gRaceFeePrize[raceId][E_RACE_FEE_FEE]);
+
+	format(stringToPrint, sizeof(stringToPrint), "[ ! ] Uspesne prihlasen do zavodu '%s' (prihlaska $%d). Projed prvnim checkpointem pro spusteni casomiry.", gRaceNames[raceId], gRaceFeePrize[raceId][E_RACE_FEE_FEE]);
+	SendClientMessage(playerid, COLOR_SVZEL, stringToPrint);
+
+	SetPlayerRace(playerid, raceId);
+
+	return 1;
+}
+
+public ResetPlayerRaceState(playerid, raceId, finishedSuccessfully)
+{
+	DisablePlayerRaceCheckpoint(playerid);
+
+	if (!CheckPlayerRaceState(playerid))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Nejsi prihlasen v zadnem zavode.");
+
+	if (finishedSuccessfully)
+	{
+		SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Dokoncil jsi zavod!");
+
+		new playerName[MAX_PLAYER_NAME], stringToPrint[128];
+
+		GetPlayerName(playerid, playerName, sizeof(playerName));
+		format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s prave uspesne dokoncil zavod '%s'!", playerName, gRaceNames[raceId]);
+
+		SendClientMessageToAll(COLOR_SVZEL, stringToPrint);
+	}
+
+	if (!finishedSuccessfully && CheckPlayerRaceState(playerid))
+	{
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Zavod, ve kterem jsi byl prihlasen, byl predcasne ukoncen!");
+	}
+
+	// Reset all race states to be sure not to interfere with others.
+	for (new i = 0; i < sizeof(gRaceNames); i++)
+	{
+		gPlayerRace[playerid][i] = 0;
+	}
+
+	return 1;
+}
+
+// This number should be aither 0, or 1 at max! This means the player must be in just one race at the time!
+public CheckPlayerRaceState(playerid)
+{
+	for (new i = 0; i < sizeof(gRaceNames); i++)
+	{
+		if (gPlayerRace[playerid][i])
+		{
+			// The player is racing at the moment!
+			return 1;
+		}
+	}
+
+	// The player does not seem to be in any race now.
+	return 0;
 }
 
 public CheckRaceCheckpoint(playerid)
 {
 	//SendClientMessage(playerid, COLOR_ZLUTA, "[ i ] Jsi v zavodnim checkpointu!");
 	DisablePlayerRaceCheckpoint(playerid);
-	
-	for (new i = 0; i <= sizeof(gRaceCoords); i++)
+
+	for (new i = 0; i <= sizeof(gRaceNames); i++)
 	{
 		if (gPlayerRace[playerid][i])
 		{
 			gPlayerRace[playerid][i]++;
-			SetRaceForUser(playerid, i);
+			SetPlayerRace(playerid, i);
 			break;
 		}
 	}

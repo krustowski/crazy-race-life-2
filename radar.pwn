@@ -17,11 +17,9 @@ public OnRadarCheckpoint()
 {
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if (!IsPlayerConnected(i) || GetPlayerState(i) != PLAYER_STATE_DRIVER)
+		if (!IsPlayerConnected(i) || !IsPlayerInAnyVehicle(i))
 			continue;
 
-		if (IsPlayerConnected(i) && IsPlayerInAnyVehicle(i))
-		{
 			new stringToPrint[128], Float:value_r, Float:distance_r, Float:x_r, Float:y_r, Float:z_r;
 
 			// Fetch the current player's position.
@@ -59,7 +57,7 @@ public OnRadarCheckpoint()
 					IsPlayerInSphere(i, 1448.2607, 2589.8904, 10.6719, 15) ||
 					IsPlayerInSphere(i, 1691.7292, 2173.2539, 10.6719, 15))
 			{
-				if (gRadarCaught[i] == 0 && floatround(value_r / 1400) > 65)
+				if (gRadarCaught[i] == 0 && floatround(value_r / 1400) > 65 && GetPlayerState(i) == PLAYER_STATE_DRIVER)
 				{
 					gRadarCaught[i] = 1;
 
@@ -73,7 +71,6 @@ public OnRadarCheckpoint()
 					SetTimerEx("OffRadarCheckpoint", 5000, 0, "i", i);
 
 					return 1;
-				}
 			}
 		}
 	}

@@ -137,6 +137,13 @@ public SetRaceForUser(playerid, raceId)
 					gPlayerRace[playerid][raceId] = 0;
 					SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Dokoncil jsi zavod!");
 
+					new playerName[MAX_PLAYER_NAME], stringToPrint[128];
+
+					GetPlayerName(playerid, playerName, sizeof(playerName));
+					format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s prave uspesne dokoncil zavod '%s'!", playerName, gRaceNames[raceId]);
+
+					SendClientMessageToAll(COLOR_SVZEL, stringToPrint);
+
 					return 1;
 				}
 

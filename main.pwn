@@ -40,6 +40,10 @@
 #include <dutils>		
 #include <dudb>	
 
+//
+//  Basic definitions.
+//
+
 #define MINIMAP_TEXT "~g~CrAzY ~r~& ~r~RaCe ~b~Life2"
 #define dcmd(%1,%2,%3) if ((strcmp((%3)[1], #%1, true, (%2)) == 0) && ((((%3)[(%2) + 1] == 0) && (dcmd_%1(playerid, "")))||(((%3)[(%2) + 1] == 32) && (dcmd_%1(playerid, (%3)[(%2) + 2]))))) return 1
 
@@ -446,6 +450,8 @@ public OnPlayerDisconnect(playerid, reason)
 
 public OnPlayerSpawn(playerid)
 {
+	SetPlayerSkin(playerid, gPlayerData[playerid][E_PLAYER_DATA_CLASS]);
+
 	// Set the player back to the paintball area if is set in game.
 	if (gPaintball[playerid][E_PAINTBALL_INGAME])
 	{
@@ -462,8 +468,9 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 	SendDeathMessage(killerid, playerid, reason);
 
-	// Hide the velocite meter on death.
+	// Hide velocity meters.
 	TextDrawHideForPlayer(playerid, KPH[playerid]);
+	TextDrawHideForPlayer(playerid, KPHR[playerid]);
 
 	if (gPaintball[playerid][E_PAINTBALL_INGAME])
 	{
@@ -1053,9 +1060,15 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 
 public OnPlayerStateChange(playerid, newstate, oldstate)
 {
+	// Hide the velocity meter on vehicle exit.
+	if ((oldstate == PLAYER_STATE_DRIVER || oldstate == PLAYER_STATE_PASSENGER) && newstate == PLAYER_STATE_ONFOOT)
+	{
+		TextDrawHideForPlayer(playerid, KPH[playerid]);
+		TextDrawHideForPlayer(playerid, KPHR[playerid]);
+	}
+
 	if (newstate == PLAYER_STATE_DRIVER || newstate == PLAYER_STATE_PASSENGER)
 	{
-		//-------|
 		KPH[playerid] = TextDrawCreate(256, 426, "Rychlost:");
 		TextDrawAlignment(KPH[playerid], 0);
 		TextDrawBackgroundColor(KPH[playerid], 0x000000ff);
@@ -1065,7 +1078,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		TextDrawSetOutline(KPH[playerid], 1);
 		TextDrawSetProportional(KPH[playerid], 1);
 		TextDrawSetShadow(KPH[playerid], 1);
-		//-------|
+
 		KPHR[playerid] = TextDrawCreate(370, 426, "0");
 		TextDrawAlignment(KPHR[playerid], 0);
 		TextDrawBackgroundColor(KPHR[playerid], 0x000000ff);
@@ -1075,26 +1088,11 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		TextDrawSetOutline(KPHR[playerid], 1);
 		TextDrawSetProportional(KPHR[playerid], 1);
 		TextDrawSetShadow(KPHR[playerid], 1);
-		//-------|
+
 		TextDrawShowForPlayer(playerid, KPHR[playerid]);
 		TextDrawShowForPlayer(playerid, KPH[playerid]);
 	}
-	if (oldstate == PLAYER_STATE_DRIVER)
-	{
-		if (newstate == PLAYER_STATE_ONFOOT)
-		{
-			TextDrawHideForPlayer(playerid, KPH[playerid]);
-			TextDrawHideForPlayer(playerid, KPHR[playerid]);
-		}
-	}
-	if (oldstate == PLAYER_STATE_PASSENGER)
-	{
-		if (newstate == PLAYER_STATE_ONFOOT)
-		{
-			TextDrawHideForPlayer(playerid, KPH[playerid]);
-			TextDrawHideForPlayer(playerid, KPHR[playerid]);
-		}
-	}
+
 	if (newstate == PLAYER_STATE_DRIVER && GetPlayerVehicleID(playerid) == gAdminAuto)
 	{
 		if (!IsPlayerAdmin(playerid))

@@ -67,7 +67,7 @@ enum E_MAPICON_ID
 }
 
 // The very global spawn point in LV.
-SetPlayerMapIcon(playerid, 0, 2247.61, 1260.14, 1313.40, E_MAPICON_ID_ENEMY_ATTACK, 0, MAPICON_LOCAL);
+SetPlayerMapIcon(playerid, 0, 2323.73, 1283.18, 97.60, E_MAPICON_ID_ENEMY_ATTACK, 0, MAPICON_LOCAL);
 
 // ATMs.
 SetPlayerMapIcon(playerid, 1, 1519.4808, 1053.7301, 10.8203, E_MAPICON_ID_ROBBERY, 0, MAPICON_LOCAL);
@@ -80,6 +80,7 @@ SetPlayerMapIcon(playerid, 10, 2620.14, 1195.76, 10.81, E_MAPICON_ID_RACE_TOURNA
 // Housing.
 SetPlayerMapIcon(playerid, 20, 1442.6, -637.3, 95.1, E_MAPICON_ID_PROPERTY_NOT_FOR_SALE, 0, MAPICON_LOCAL);
 SetPlayerMapIcon(playerid, 21, 541.0, 2364.8, 31.2, E_MAPICON_ID_PROPERTY_NOT_FOR_SALE, 0, MAPICON_LOCAL);
+SetPlayerMapIcon(playerid, 22, -2657.27, 882.27, 79.34, E_MAPICON_ID_PROPERTY_NOT_FOR_SALE, 0, MAPICON_LOCAL);
 
 // Airports.
 SetPlayerMapIcon(playerid, 30, 414.3, 2528.1, 16.6, E_MAPICON_ID_AIRYARD, 0, MAPICON_LOCAL);
@@ -87,3 +88,5 @@ SetPlayerMapIcon(playerid, 30, 414.3, 2528.1, 16.6, E_MAPICON_ID_AIRYARD, 0, MAP
 // Jobs.
 SetPlayerMapIcon(playerid, 40, 970.7, 2155.0, 10.8, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
 SetPlayerMapIcon(playerid, 41, 2287.1, 2426.7, 10.8, E_MAPICON_ID_POLICE, 0, MAPICON_LOCAL);
+SetPlayerMapIcon(playerid, 42, -91.76, -305.44, 1.42, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
+

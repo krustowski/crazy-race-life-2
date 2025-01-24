@@ -681,7 +681,7 @@ dcmd_ucet(playerid, params[])
 
 	format(lineToPrint1, sizeof(lineToPrint1), "[ INFO ] [ VYPIS HERNIHO UCTU ] ***");
 	format(lineToPrint2, sizeof(lineToPrint2), "[ INFO ] [ Penize | $%d ], [ Banka | $%d ], [ Wanted level | %d ], [ Skin | %d ], [ Tym | %d ]", GetPlayerMoney(playerid), gPlayerData[playerid][E_PLAYER_DATA_BANK], GetPlayerWantedLevel(playerid), GetPlayerSkin(playerid), gPlayerData[playerid][E_PLAYER_DATA_TEAM]);
-	format(lineToPrint3, sizeof(lineToPrint3), "[ INFO ] [ Admin level | %d ], [ Joint | %d ks ], [ Zapik | %d ks ], [ Marihuana | %d g ], [ Tabak | %d ks ]", gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL], gPlayerHulo[playerid][E_PLAYER_HULO_JOINT], gPlayerHulo[playerid][E_PLAYER_HULO_LIGHTER], gPlayerHulo[playerid][E_PLAYER_HULO_ZAZA], gPlayerHulo[playerid][E_PLAYER_HULO_TOBACCO]);
+	format(lineToPrint3, sizeof(lineToPrint3), "[ INFO ] [ Admin level | %d ], [ Joint | %d ks ], [ Zapik | %d ks ], [ Marihuana | %d g ], [ Tabak | %d ks ]", gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL], gPlayerDrugz[playerid][E_PLAYER_DRUGZ_JOINT], gPlayerDrugz[playerid][E_PLAYER_DRUGZ_LIGHTER], gPlayerDrugz[playerid][E_PLAYER_DRUGZ_ZAZA], gPlayerDrugz[playerid][E_PLAYER_DRUGZ_TOBACCO]);
 
 	SendClientMessage(playerid, COLOR_ZLUTA, lineToPrint1);
 	SendClientMessage(playerid, COLOR_SEDA, lineToPrint2);

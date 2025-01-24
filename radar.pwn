@@ -17,6 +17,9 @@ public OnRadarCheckpoint()
 {
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
+		if (!IsPlayerConnected(i) || GetPlayerState(i) != PLAYER_STATE_DRIVER)
+			continue;
+
 		if (IsPlayerConnected(i) && IsPlayerInAnyVehicle(i))
 		{
 			new stringToPrint[128], Float:value_r, Float:distance_r, Float:x_r, Float:y_r, Float:z_r;
@@ -64,7 +67,7 @@ public OnRadarCheckpoint()
 					PlayerPlaySound(i, 1147, 0, 0, 0);
 
 					SendClientMessage(i, COLOR_BILA, " ");
-					format(stringToPrint, 128, "[ Radar ] Jel jsi příliš velkou rychlostí ( %3d km/h ). Pokuta: 500 €", floatround(value_r / 1400));
+					format(stringToPrint, 128, "[ Radar ] Jel jsi prilis vysokou rychlosti ( %3d km/h )! Pokuta: $500", floatround(value_r / 1400));
 					SendClientMessage(i, COLOR_CERVENA, stringToPrint);
 
 					SetTimerEx("OffRadarCheckpoint", 5000, 0, "i", i);

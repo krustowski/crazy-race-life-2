@@ -841,11 +841,11 @@ dcmd_lay(playerid, params[])
 dcmd_cmd(playerid, params[])
 {
 #pragma unused params
-	SendClientMessage(playerid, COLOR_SVZEL, "[ -- ZAKLADNI CMD SET -- ]");
-	SendClientMessage(playerid, COLOR_SVZEL, "[ /admins /afk /cmd /dance /djoin /dwarp /fix /givecash ]");
-	SendClientMessage(playerid, COLOR_SVZEL, "[ /help /hide /lay /locate /lock /login /paintball /register ]");
-	SendClientMessage(playerid, COLOR_SVZEL, "[ /rules /skydive /soska /stav /text /ucet /ulozit /unlock ]");
-	SendClientMessage(playerid, COLOR_SVZEL, "[ /vybrat /wanted ]");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ i ] ZAKLADNI CMD SET");
+	SendClientMessage(playerid, COLOR_ZLUTA, "/admins /afk /cmd /dance /deathmatch /dwarp /fix /givecash");
+	SendClientMessage(playerid, COLOR_ZLUTA, "/help /hide /lay /locate /lock /login /race /register");
+	SendClientMessage(playerid, COLOR_ZLUTA, "/rules /skydive /soska /stav /text /ucet /ulozit /unlock");
+	SendClientMessage(playerid, COLOR_ZLUTA, "/vybrat /wanted");
 
 	return 1;
 }

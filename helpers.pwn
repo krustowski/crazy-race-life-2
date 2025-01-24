@@ -75,7 +75,7 @@ stock SendMessageToAdmins(colorId, const messageString[])
 
 stock InvalidCommand(playerid)
 {
-	SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Tento prikaz neexistuje! /cmd /help /rules");
+	SendClientMessage(playerid, COLOR_SEDA, "[ ! ] Tento prikaz neexistuje! /cmd /help /rules");
 
 	return 1;
 }

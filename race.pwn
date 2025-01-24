@@ -56,9 +56,9 @@ new const gRaceFeePrize[E_RACE_ID][E_RACE_FEE] =
 	// E_RACE_ID_NONE
 	{0, 0},
 	// E_RACE_ID_LV_PYRAMID
-	{0, 0},
+	{300, 5000},
 	// E_RACE_ID_STUNT_LV_1
-	{1500, 15000}
+	{1500, 20000}
 };
 
 // E_RACE_ID_STUNT_LV_1

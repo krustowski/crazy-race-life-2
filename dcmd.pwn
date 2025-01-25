@@ -1029,6 +1029,9 @@ dcmd_port(playerid, params[])
 	SetPlayerPos(playerid, 1958.3783, 1343.1572, 15.3746);
 	SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Portl ses do LV nad schodiste.");
 
+	SetPlayerPos(playerid, -1951.58, 296.77, 41.04);
+	SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Portl ses do SF k WangCars,");
+
 	return 1;
 }
 

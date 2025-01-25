@@ -88,6 +88,49 @@ new gRaceCoordsLVStuntNo1[][E_RACE_COORD] =
 	{2158.6, 1274.4, 17.3}
 };
 
+// E_RACE_ID_CIRCUIT_SF_WANG
+new gRaceCoordsSFCircuitWang[][E_RACE_COORD] = 
+{
+	{-2005.41, 288.46, 33.52},
+	{-2007.04, 110.69, 27.11},
+	{-2006.25, -290.78, 34.88},
+	{-2209.03, -289.74, 34.88},
+	{-2209.73, -189.65, 34.79},
+	{-2254.61, -190.96, 34.74},
+	{-2256.06, -350.24, 50.44},
+	{-2185.70, -515.48, 47.66},
+	{-2224.95, -746.13, 64.05},
+	{-2346.90, -786.03, 93.68},
+	{-2422.64, -608.41, 132.12},
+	{-2628.31, -491.66, 69.57},
+	{-2328.72, -460.53, 79.59},
+	{-2661.18, -401.12, 32.10},
+	{-2806.27, -470.40, 6.74},
+	{-2807.58, -167.50, 6.59},
+	{-2808.82, 35.12, 6.58},
+	{-2640.80, 39.60, 3.75},
+	{-2499.37, 39.95, 26.03},
+	{-2422.13, 40.88, 34.57},
+	{-2417.30, 210.72, 34.57},
+	{-2308.73, 419.44, 34.56},
+	{-2386.68, 593.88, 26.84},
+	{-2386.03, 806.54, 34.60},
+	{-2528.37, 807.28, 49.39},
+	{-2750.92, 810.49, 52.62},
+	{-2823.32, 947.66, 43.46},
+	{-2879.47, 1182.73, 8.25},
+	{-2681.97, 1290.53, 6.60},
+	{-2460.92, 1377.01, 5.59},
+	{-2192.16, 1331.99, 6.60},
+	{-1783.95, 1353.35, 6.60},
+	{-1684.50, 1114.72, 6.61},
+	{-1557.73, 797.32, 6.59},
+	{-1566.18, 495.60, 6.58},
+	{-1739.46, 313.67, 6.60},
+	{-1864.09, 412.28, 16.58},
+	{-2005.41, 288.46, 33.52}
+};
+
 //
 //  Race-related functions.
 //
@@ -132,6 +175,31 @@ public SetPlayerRace(playerid, raceId)
 					x1 = gRaceCoordsLVStuntNo1[raceCPPosition+1][E_RACE_COORD_X];
 					y1 = gRaceCoordsLVStuntNo1[raceCPPosition+1][E_RACE_COORD_Y];
 					z1 = gRaceCoordsLVStuntNo1[raceCPPosition+1][E_RACE_COORD_Z];
+				} else {
+					cpType = CP_TYPE_GROUND_FINISH;
+				}
+			}
+		case E_RACE_ID_CIRCUIT_SF_WANG:
+			{
+				lastCPNo = sizeof(gRaceCoordsSFCircuitWang) - 1;
+
+				// End the race.
+				if (raceCPPosition > lastCPNo)
+				{
+					ResetPlayerRaceState(playerid, raceId, true);
+
+					return 1;
+				}
+
+				x0 = gRaceCoordsSFCircuitWang[raceCPPosition][E_RACE_COORD_X];
+				y0 = gRaceCoordsSFCircuitWang[raceCPPosition][E_RACE_COORD_Y];
+				z0 = gRaceCoordsSFCircuitWang[raceCPPosition][E_RACE_COORD_Z];
+
+				if (raceCPPosition + 1 <= lastCPNo)
+				{
+					x1 = gRaceCoordsSFCircuitWang[raceCPPosition+1][E_RACE_COORD_X];
+					y1 = gRaceCoordsSFCircuitWang[raceCPPosition+1][E_RACE_COORD_Y];
+					z1 = gRaceCoordsSFCircuitWang[raceCPPosition+1][E_RACE_COORD_Z];
 				} else {
 					cpType = CP_TYPE_GROUND_FINISH;
 				}
@@ -246,6 +314,8 @@ public UpdateRaceInfoText(playerid)
 	{
 		case E_RACE_ID_STUNT_LV_1:
 			cpCount = sizeof(gRaceCoordsLVStuntNo1);
+		case E_RACE_ID_CIRCUIT_SF_WANG:
+			cpCount = sizeof(gRaceCoordsSFCircuitWang);
 	}
 
 	gPlayerRaceTime[playerid] += 1000;

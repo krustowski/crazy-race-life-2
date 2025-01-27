@@ -189,13 +189,8 @@ dcmd_ulozit(playerid, params[])
 	if (amount > GetPlayerMoney(playerid))
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Neplatna castka!");
 
-	if (!IsPlayerInSphere(playerid, 1519.4808, 1053.7301, 10.8203, 15) &&
-			!IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) &&
-			!IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15))
-	{
-		SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nejsi v dosahu bankomatu!");
-		return 1;
-	}
+	if (!CheckPlayerBankLocation(playerid))
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nejsi v dosahu bankomatu!");
 
 	gPlayerData[playerid][E_PLAYER_DATA_BANK] += amount;
 	GivePlayerMoney(playerid, -amount);
@@ -218,13 +213,8 @@ dcmd_vybrat(playerid, params[])
 	if (amount > gPlayerData[playerid][E_PLAYER_DATA_BANK])
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Neplatna castka!");
 
-	if (!IsPlayerInSphere(playerid, 1519.4808, 1053.7301, 10.8203, 15) &&
-			!IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) &&
-			!IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15))
-	{
-		SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nejsi v dosahu bankomatu!");
-		return 1;
-	}
+	if (!CheckPlayerBankLocation(playerid))
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nejsi v dosahu bankomatu!");
 
 	gPlayerData[playerid][E_PLAYER_DATA_BANK] -= amount;
 	GivePlayerMoney(playerid, amount);
@@ -240,13 +230,8 @@ dcmd_vybrat(playerid, params[])
 dcmd_stav(playerid, params[])
 {
 #pragma unused params
-	if (!IsPlayerInSphere(playerid, 1519.4808, 1053.7301, 10.8203, 15) &&
-			!IsPlayerInSphere(playerid, 1481.1512, 2158.1211, 11.0234, 15) &&
-			!IsPlayerInSphere(playerid, 2074.4917, 2295.2041, 10.8203, 15))
-	{
-		SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nejsi v dosahu bankomatu!");
-		return 1;
-	}
+	if (!CheckPlayerBankLocation(playerid))
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nejsi v dosahu bankomatu!");
 
 	new stringToPrint[256];
 
@@ -1020,17 +1005,27 @@ dcmd_hp(playerid, params[])
 
 dcmd_port(playerid, params[])
 {
-#pragma unused params
 	if (IsPlayerInAnyVehicle(playerid))
 	{
 		RemovePlayerFromVehicle(playerid);
 	}
 
-	SetPlayerPos(playerid, 1958.3783, 1343.1572, 15.3746);
-	SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Portl ses do LV nad schodiste.");
+	if (!strlen(params) || !IsNumeric(params))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /hp [ID lokace]");
 
-	SetPlayerPos(playerid, -1951.58, 296.77, 41.04);
-	SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Portl ses do SF k WangCars,");
+	switch (strval(params))
+	{
+		case 0:
+			{
+				SetPlayerPos(playerid, 1958.3783, 1343.1572, 15.3746);
+				SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Portl ses do LV nad schodiste.");
+			}
+		case 1:
+			{
+				SetPlayerPos(playerid, -1951.58, 296.77, 41.04);
+				SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Portl ses do SF k WangCars,");
+			}
+	}
 
 	return 1;
 }

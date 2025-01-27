@@ -165,6 +165,10 @@ forward OffRadarCheckpoint(playerid);
 
 #include "helpers.pwn"
 
+forward CheckPlayerBankLocation(playerid);
+
+#include "bank.pwn"
+
 //
 //  Global static objects.
 //

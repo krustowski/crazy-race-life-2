@@ -176,7 +176,7 @@ dcmd_deathmatch(playerid, params[])
 {
 	if (!strcmp(params, "join"))
 	{
-		SendClientMessageToAll(COLOR_ZLUTA, "[ ! ] Paintball zacne za 45 sekund! Pripojte se pomoci /paintball join");
+		SendClientMessageToAll(COLOR_ZLUTA, "[ ! ] Deathmatch zacne za 45 sekund! Pripojte se pomoci /deathmatch join");
 		SetPlayerPos(playerid, -1365.1, -2307.0, 39.1);
 
 		SetTimer("StartPaintball", 45000, 0);
@@ -191,7 +191,7 @@ dcmd_deathmatch(playerid, params[])
 
 		if (gPaintball[playerid][E_PAINTBALL_INGAME])
 		{
-			format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s opousti paintball (/paintball exit)!", playerName);
+			format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s opousti deathmatch (/deathmatch exit)!", playerName);
 			SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
 
 			SetPlayerHealth(playerid, 0.0);
@@ -200,7 +200,7 @@ dcmd_deathmatch(playerid, params[])
 	}
 	else
 	{
-		SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /paintball [join/exit]");
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /deathmatch [join/exit]");
 	}
 
 	return 1;
@@ -1048,7 +1048,7 @@ dcmd_nitro(playerid, params[])
 	if (!IsPlayerConnected(targetId))
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
 
-	if (!IsPlayerInVehicle(targetId))
+	if (!IsPlayerInAnyVehicle(targetId))
 		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Hrac se nenachazi ve vozidle!");
 
 	new targetPlayerState = GetPlayerState(targetId), targetVehicleId = GetPlayerVehicleID(targetId);

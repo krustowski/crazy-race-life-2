@@ -213,8 +213,9 @@ forward AddMapicons(playerid);
 
 main()
 {
-	printf(" [ ********* %s ********* ]", GAMEMODE_NAME);
-	printf(" [ Credits: %s ]", GAMEMODE_CREDITS);
+	PrintAsciiLogoToLogs();
+	printf(" ");
+	printf(" * Starting up...");
 }
 
 public OnGameModeInit()
@@ -281,9 +282,9 @@ public OnGameModeInit()
 
 public OnGameModeExit()
 {
-	print("\n +-----------------------------+");
-	printf(" | Mode %s is Shuting Down |", GAMEMODE_NAME);
-	print(" +-----------------------------+ \n");
+	PrintAsciiLogoToLogs();
+	printf(" ");
+	printf(" * Shutting down...");
 
 	KillTimer(SetTimer("ShowAdvert", 1000 * 60 * 2, true));
 

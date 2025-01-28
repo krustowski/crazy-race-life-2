@@ -419,6 +419,11 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 	SendDeathMessage(killerid, playerid, reason);
 
+	new X, Y, Z;
+
+	GetPlayerPos(playerid, X, Y, Z);
+	AddPlayerDeathPickups(playerid, Float:X, Float:Y, Float:Z);
+
 	ResetPlayerMoney(playerid);
 
 	// Hide velocity meters.
@@ -752,6 +757,21 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	else if (pickupid == gAdminDoorUp)
 	{
 		SetPlayerPos(playerid, 981.84, -1158.15, 23.86);
+	}
+
+	//
+	//  Death pickups.
+	//
+
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i) || gPlayerMoneyPickup[i] == -1)
+			continue;
+
+		DestroyPickup(gPlayerMoneyPickup[i]);
+		GivePlayerMoney(playerid, gPlayerMoneyPickupAmount[i]);
+
+		gPlayerMoneyPickupAmount[i] = 0;
 	}
 
 	return 1;

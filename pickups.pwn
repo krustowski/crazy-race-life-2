@@ -25,9 +25,27 @@ new picktunel;
 new gHeroinPackage;
 new gCocainePackage;
 
+new gPlayerMoneyPickup[MAX_PLAYERS];
+new gPlayerMoneyPickupAmount[MAX_PLAYERS];
+
+new gPlayerWeaponPickup[MAX_PLAYERS];
+
 //
 //
 //
+
+public AddPlayerDeathPickups(playerid, Float:X, Float:Y, Float:Z)
+{
+	if (GetPlayerMoney(playerid) > 0)
+	{
+		gPlayerMoneyPickup[playerid] = CreatePickup(1212, 19, Float:X, Float:Y, Float:Z);
+		gPlayerMoneyPickupAmount[playerid] = GetPlayerMoney(playerid);
+
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ i ] Tve penize zustaly na miste umrti!");
+	}
+
+	return 1;
+}
 
 public InitPickups()
 {
@@ -102,5 +120,4 @@ public InitPickups()
 	gTeamMenu[E_PLAYER_TEAM_PYRO] = CreateMenu("Pyroz", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PYRO], 0, "Pyrotechnik");
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PYRO], 0, "Opustit tym");
-
 }

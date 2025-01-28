@@ -79,7 +79,7 @@ public OnRadarCheckpoint()
 					GivePlayerMoney(i, -RADAR_FEE);
 					PlayerPlaySound(i, 1147, 0, 0, 0);
 
-					format(stringToPrint, 128, "[ Radar ] Jel jsi prilis vysokou rychlosti ( %3d km/h )! Pokuta: $%d", floatround(radarValue / 1400), RADAR_FEE);
+					format(stringToPrint, 128, "[ RADAR ] Jel jsi prilis vysokou rychlosti ( %3d km/h )! Pokuta: $%d", floatround(radarValue / 1400), RADAR_FEE);
 					SendClientMessage(i, COLOR_CERVENA, stringToPrint);
 
 					SetTimerEx("OffRadarCheckpoint", 5000, 0, "i", i);

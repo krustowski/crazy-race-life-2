@@ -12,7 +12,8 @@ public ShowAdvert()
 		"[ TIP ] Pokud jsi uvizl v zavodu, muzes ho opustit pomoci /race exit",
 		"[ TIP ] Po prihlaseni do jakehokoliv zavodu lze hodit warp ke startu pomoci /race warp",
 		"[ TIP ] Po mape se lze volne premistovat pomoci /port [ID lokace], nelze vsak takto cestovat ve vozidle",
-		"[ TIP ] Malo penez? Sezen motorku a delej stunty, ktere jsou kdekoliv finance ohodnoceny!"
+		"[ TIP ] Malo penez? Sezen motorku a delej stunty, ktere jsou kdekoliv finance ohodnoceny!",
+		"[ TIP ] Skoc si skidive pomoci /skidive!"
 	};
 
 	new advertId = random(sizeof(advertList)), stringToPrint[256];

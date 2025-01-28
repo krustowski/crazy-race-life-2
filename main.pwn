@@ -511,6 +511,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 
 	dcmd(admins, 6, cmdtext);         //all
 	dcmd(afk, 3, cmdtext);            //all
+	dcmd(bank, 4, cmdtext);		  //all
 	dcmd(cmd, 3, cmdtext);            //all
 	dcmd(dance, 5, cmdtext);	  //all
 	dcmd(dwarp, 5, cmdtext); 	  //all
@@ -530,12 +531,9 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	dcmd(rules, 5, cmdtext); 	  //all
 	dcmd(skydive, 7, cmdtext);        //all
 	dcmd(soska, 5, cmdtext); 	  //all
-	dcmd(stav, 4, cmdtext);           //all
 	dcmd(text, 4, cmdtext);           //all
 	dcmd(ucet, 4, cmdtext);           //all
-	dcmd(ulozit, 6, cmdtext);         //all
 	dcmd(unlock, 6, cmdtext);         //all
-	dcmd(vybrat, 6, cmdtext);         //all
 	dcmd(wanted, 6, cmdtext);	  //all
 
 	//--------------[ ADMIN COMMANDS ]-------------|

@@ -181,64 +181,60 @@ dcmd_afk(playerid, params[])
 	return 1;
 }
 
-dcmd_ulozit(playerid, params[])
+dcmd_bank(playerid, params[])
 {
-	if (!strlen(params) || !IsNumeric(params)) 
-		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /ulozit [castka]");
+	new token1[32], token2[32];
+	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
-	new amount = strval(params);
-
-	if (amount > GetPlayerMoney(playerid))
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Neplatna castka!");
+	if (!strlen(params) || (strcmp(token1, "vlozit") && strcmp(token1, "vybrat") && strcmp(token1, "stav")) || (!strcmp(token1, "vlozit") && !IsNumeric(token2)) || (!strcmp(token1, "vybrat") && !IsNumeric(token2)))
+	{
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /bank vlozit [castka]");
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /bank vybrat [castka]");
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /bank stav");
+		return 1;
+	}
 
 	if (!CheckPlayerBankLocation(playerid))
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nejsi v dosahu bankomatu!");
 
-	gPlayerData[playerid][E_PLAYER_DATA_BANK] += amount;
-	GivePlayerMoney(playerid, -amount);
 
-	new stringToPrint[256];
+	if (!strcmp(token1, "vlozit"))
+	{
+		new targetAmount = strval(token2);
 
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Ulozil jsi castku: $%d! Zustatek na uctu: $%d!", amount, gPlayerData[playerid][E_PLAYER_DATA_BANK]);
-	SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+		if (targetAmount > GetPlayerMoney(playerid))
+			return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Neplatna castka!");
 
-	return 1;
-}
+		gPlayerData[playerid][E_PLAYER_DATA_BANK] += targetAmount;
+		GivePlayerMoney(playerid, -targetAmount);
 
-dcmd_vybrat(playerid, params[])
-{
-	if (!strlen(params) || !IsNumeric(params))
-		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /vybrat [castka]");
+		new stringToPrint[256];
 
-	new amount = strval(params);
+		format(stringToPrint, sizeof(stringToPrint), "[ i ] Ulozil jsi castku: $%d! Zustatek na uctu: $%d!", targetAmount, gPlayerData[playerid][E_PLAYER_DATA_BANK]);
+		SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+	}
+	else if (!strcmp(token1, "vybrat"))
+	{
+		new targetAmount = strval(token2);
 
-	if (amount > gPlayerData[playerid][E_PLAYER_DATA_BANK])
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Neplatna castka!");
+		if (targetAmount > gPlayerData[playerid][E_PLAYER_DATA_BANK])
+			return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Neplatna castka!");
 
-	if (!CheckPlayerBankLocation(playerid))
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nejsi v dosahu bankomatu!");
+		gPlayerData[playerid][E_PLAYER_DATA_BANK] -= targetAmount;
+		GivePlayerMoney(playerid, targetAmount);
 
-	gPlayerData[playerid][E_PLAYER_DATA_BANK] -= amount;
-	GivePlayerMoney(playerid, amount);
+		new stringToPrint[256];
 
-	new stringToPrint[256];
+		format(stringToPrint, sizeof(stringToPrint), "[ i ] Vybral jsi castku: $%d! Zustatek na uctu: $%d!", targetAmount, gPlayerData[playerid][E_PLAYER_DATA_BANK]);
+		SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+	}
+	else if (!strcmp(token1, "stav"))
+	{
+		new stringToPrint[256];
 
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Vybral jsi castku: $%d! Zustatek na uctu: $%d!", amount, gPlayerData[playerid][E_PLAYER_DATA_BANK]);
-	SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
-
-	return 1;
-}
-
-dcmd_stav(playerid, params[])
-{
-#pragma unused params
-	if (!CheckPlayerBankLocation(playerid))
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nejsi v dosahu bankomatu!");
-
-	new stringToPrint[256];
-
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Bezny zustatek na bankovnim uctu: $%d!", gPlayerData[playerid][E_PLAYER_DATA_BANK]);
-	SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+		format(stringToPrint, sizeof(stringToPrint), "[ i ] Bezny zustatek na bankovnim uctu: $%d!", gPlayerData[playerid][E_PLAYER_DATA_BANK]);
+		SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+	}
 
 	return 1;
 }
@@ -249,7 +245,7 @@ dcmd_ccmd(playerid, params[])
 	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 1) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
 
-	SendClientMessage(playerid, COLOR_ZELZLUT, "[ i ][CAM] KAMERY: /cam1 (pyramida dole), /cam2 (banka atd), /camoff");
+	SendClientMessage(playerid, COLOR_ZELZLUT, "[ CAM ] KAMERY: /cam 1 (pyramida dole), /cam 2 (banka atd), /camoff");
 
 	return 1;
 }
@@ -260,9 +256,9 @@ dcmd_acmd(playerid, params[])
 	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 1) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
 
-	SendClientMessage(playerid, COLOR_ZELZLUT, "[ -- ADMIN CMD SET -- ]");
-	SendClientMessage(playerid, COLOR_ZELZLUT, "[ /acmd /admincol /ban /cam /ccmd /elevator /fakechat /get /goto ]");
-	SendClientMessage(playerid, COLOR_ZELZLUT, "[ /kick /lvl /nitro /reset /smazat /zbrane ");
+	SendClientMessage(playerid, COLOR_ZELZLUT, "[ i ] ADMIN CMD SET");
+	SendClientMessage(playerid, COLOR_ZLUTA, "/acmd /admincol /ban /cam /ccmd /elevator /fakechat /get /goto");
+	SendClientMessage(playerid, COLOR_ZLUTA, "/kick /lvl /nitro /reset /smazat /spectate /zbrane ");
 
 	return 1;
 }
@@ -270,10 +266,10 @@ dcmd_acmd(playerid, params[])
 dcmd_help(playerid, params[])
 {
 #pragma unused params
-	SendClientMessage(playerid, COLOR_ZLUTA, "[ -- NAPOVEDA/POMOC -- ]");
-	SendClientMessage(playerid, COLOR_ZLUTA, "[ Prikazy:  /cmd       ]");
-	SendClientMessage(playerid, COLOR_ZLUTA, "[ Pravidla: /rules     ]");
-	SendClientMessage(playerid, COLOR_ZLUTA, "[ Made by krusty & kompry ]");
+	SendClientMessage(playerid, COLOR_ZELZLUT, "[ i ] NAPOVEDA/POMOC");
+	SendClientMessage(playerid, COLOR_ZLUTA, "* Prikazy:  /cmd");
+	SendClientMessage(playerid, COLOR_ZLUTA, "* Admin prikazy:  /acmd");
+	SendClientMessage(playerid, COLOR_ZLUTA, "* Pravidla: /rules");
 
 	return 1;
 }
@@ -841,10 +837,9 @@ dcmd_cmd(playerid, params[])
 {
 #pragma unused params
 	SendClientMessage(playerid, COLOR_SVZEL, "[ i ] ZAKLADNI CMD SET");
-	SendClientMessage(playerid, COLOR_ZLUTA, "/admins /afk /cmd /dance /deathmatch /dwarp /fix /givecash");
+	SendClientMessage(playerid, COLOR_ZLUTA, "/admins /afk /bank /cmd /dance /deathmatch /dwarp /fix /givecash");
 	SendClientMessage(playerid, COLOR_ZLUTA, "/help /hide /lay /locate /lock /login /race /register");
-	SendClientMessage(playerid, COLOR_ZLUTA, "/rules /skydive /soska /stav /text /ucet /ulozit /unlock");
-	SendClientMessage(playerid, COLOR_ZLUTA, "/vybrat /wanted");
+	SendClientMessage(playerid, COLOR_ZLUTA, "/rules /skydive /soska /text /ucet /unlock / wanted");
 
 	return 1;
 }

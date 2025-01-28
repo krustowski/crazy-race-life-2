@@ -203,3 +203,47 @@ public UpdatePlayerScore()
 	}
 }
 
+public OnPlayerPrivMsg(playerid, receiverid, text[])
+{
+	if (GetPlayerMoney(playerid) < 10) 
+	{
+		SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] K odeslani soukrome zpravy potrebujes alespon $10!");
+		return 0;
+	}
+
+	if (!IsPlayerConnected(receiverid))
+	{
+		SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Prijemce soukrome zpravy neni pritomen na serveru!");
+		return 0;
+	}
+
+	new senderName[MAX_PLAYER_NAME], receiverName[MAX_PLAYER_NAME], stringForReceiver[256], stringForSender[256]; 
+
+	// Get both counterparts' nicknames.
+	GetPlayerName(playerid, senderName, sizeof(senderName)); 
+	GetPlayerName(receiverid, receiverName, sizeof(receiverName)); 
+
+	format(stringForReceiver, sizeof(stringForReceiver), "[PM] od %s (ID: %d): %s", senderName, playerid, text);
+	format(stringForSender, sizeof(stringForSender), "[PM] pro %s (ID: %d): %s", receiverName, receiverid, text);
+
+	SendClientMessage(receiverid, GREEN, stringForReceiver);
+	SendClientMessage(playerid, GREEN, stringForSender);
+
+	// Play direct message tones.
+	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0); 
+	PlayerPlaySound(receiverid, 1057, 0.0, 0.0, 0.0);
+
+	GameTextForPlayer(playerid, "~w~PM ~r~Odeslana~w~.", 3000, 3); 
+	GameTextForPlayer(receiverid, "~w~PM ~r~Prijata~w~.", 3000, 3);
+
+	GivePlayerMoney(playerid, -10); 
+
+	/*if (!IsPlayerAdmin(recieverid) && !IsPlayerAdmin(playerid))
+	  {
+	  SendMessageToAdmins(COLOR_BILA, stringForSender);
+	  SendMessageToAdmins(COLOR_BILA, stringForReceiver);
+	  }*/
+
+	return 1;
+}
+

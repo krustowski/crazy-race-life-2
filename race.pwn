@@ -153,30 +153,32 @@ new gRaceCoordsSFCircuitWang[][E_RACE_COORD] =
 	{-2005.41, 288.46, 33.52}
 };
 
-new gRaceCoordsLSFLSAirport =
+new gRaceCoordsLSFLSAirport[][E_RACE_COORD] =
 {
-	{-1440.25, -287,26, 13,82},
+	{-1440.25, -287.26, 13.82},
 	{-1665.94, -546.80, 11.19},
 	{-1810.79, -580.08, 16.16},
-	{-2809.76, -972.80, 49.10},
-	{-1553,35, -1442,38, 39.98},
-	{-1618.58, 1188,70, 69.51},
-	{-1753.42, -467.45, 76.45},
+	{-1809.76, -972.80, 49.10},
+	{-1553.35, -1442.38, 39.98},
+	{-1618.58, -1188.70, 69.51},
+	{-1725.06, -830.24, 79.17},
 	{-1632.21, -828.92, 93.80},
-	{-1591.80,1 -1152.68, 102.64},
+	{-1591.80, -1152.68, 102.64},
 	{-1406.56, -1415.77, 105.19},
+	// 11
 	{-1130.43, -1336.53, 127.54},
 	{-933.18, -1396.86, 127.35},
 	{-878.21, -1102.05, 97.44},
-	{-603,46, -975.79, 63.84},
+	{-603.46, -975.79, 63.84},
 	{-315.57, -866.21, 46.70},
 	{-108.91, -1009.81, 23.85},
 	{-144.43, -1272.83, 2.62},
 	{-22.91, -1518.86, 1.65},
 	{164.26, -1519.18, 12.25},
 	{291.03, -1493.18, 32.46},
+	// 21
 	{317.53, -1642.43, 32.97},
-	{631,01, -1675.74, 16.18},
+	{631.01, -1675.74, 16.18},
 	{636.30, -1408.25, 13.23},
 	{848.48, -1403.57, 13.21},
 	{1050.65, -1402.20, 13.23},
@@ -185,6 +187,7 @@ new gRaceCoordsLSFLSAirport =
 	{1273.61, -1144.37, 23.48},
 	{1504.86, -1162.56, 23.74},
 	{1845.19, -1181.76, 23.47},
+	// 31
 	{1849.23, -1367.16, 13.23},
 	{1820.55, -1727.58, 13.21},
 	{1688.72, -1730.07, 13.21},
@@ -193,14 +196,23 @@ new gRaceCoordsLSFLSAirport =
 	{1306.41, -1853.97, 13.21},
 	{1059.67, -1850.80, 13.23},
 	{1033.12, -2077.10, 12.76},
-	{1980.10, -2464.86, 6.89},
-	{1521.92, -2433.21, 2.30},
-	{1525.46, -2286.63, -3.15},
-	{1572.14, -2281.28, -3.15},
-	{1582.85, -2264.27, -3.02},
-	{1743.29, -2353.66, -2.79},
-	{1791.65, -2317.99, 13.20},
-	{1638.13, -2319.06, 13.21}
+	{1057.64, -2312.45, 12.64},
+	{1315.26, -2464.73, 7.28},
+	// 41
+	{1504.08, -2457.98, 2.09},
+	{1520.50, -2290.82, -3.36},
+	{1574.24, -2285.73, -3.36},
+	{1580.57, -2255.93, -3.22},
+	{1751.79, -2254.44, -1.39},
+	{1797.36, -2283.21, 8.94},
+	{1694.67, -2319.06, 13.00},
+	{1578.43, -2317.91, 13.00},
+	{1579.59, -2194.64, 12.99},
+	{1771.15, -2169.07, 13.00},
+	// 51
+	{1954.61, -2165.85, 13.00},
+	{1965.29, -2289.74, 13.17},
+	{1889.86, -2411.43, 13.16}
 };
 
 //
@@ -212,78 +224,67 @@ public StartRace()
 	return 1;
 }
 
-public SetPlayerRace(playerid, raceId)
+stock SetPlayerRaceSingle(playerid, raceId, coords[][E_RACE_COORD], len)
 {
-	// Check if player has joined such race.
-	if (!IsPlayerConnected(playerid) || raceId == E_RACE_ID_NONE || !gPlayerRace[playerid][raceId])
-		return 0;
-
 	// Fetch the relative position in such race (position of checkpoints).
 	new lastCPNo, raceCPPosition = gPlayerRace[playerid][raceId] - 1;
 
 	// Prepare the coords to show a race checkpoint.
 	new x0, y0, z0, x1, y1, z1, cpType = CP_TYPE_GROUND_NORMAL;
 
+	lastCPNo = len - 1;
+
+	// End the race.
+	if (raceCPPosition > lastCPNo)
+	{
+		ResetPlayerRaceState(playerid, raceId, true);
+
+		return 1;
+	}
+
+	x0 = coords[raceCPPosition][E_RACE_COORD_X];
+	y0 = coords[raceCPPosition][E_RACE_COORD_Y];
+	z0 = coords[raceCPPosition][E_RACE_COORD_Z];
+
+	if (raceCPPosition + 1 <= lastCPNo)
+	{
+		x1 = coords[raceCPPosition+1][E_RACE_COORD_X];
+		y1 = coords[raceCPPosition+1][E_RACE_COORD_Y];
+		z1 = coords[raceCPPosition+1][E_RACE_COORD_Z];
+	} else {
+		cpType = CP_TYPE_GROUND_FINISH;
+	}
+
+	// Set the next checkpoint to reach.
+	SetPlayerRaceCheckpoint(playerid, cpType, Float:x0, Float:y0, Float:z0, Float:x1, Float:y1, Float:z0, 10.0);
+
+}
+
+public SetPlayerRace(playerid, raceId)
+{
+	// Check if player has joined such race.
+	if (!IsPlayerConnected(playerid) || raceId == E_RACE_ID_NONE || !gPlayerRace[playerid][raceId])
+		return 0;
+
 	switch (raceId)
 	{
 		case E_RACE_ID_STUNT_LV_1:
 			{
-				lastCPNo = sizeof(gRaceCoordsLVStuntNo1) - 1;
-
-				// End the race.
-				if (raceCPPosition > lastCPNo)
-				{
-					ResetPlayerRaceState(playerid, raceId, true);
-
-					return 1;
-				}
-
-				x0 = gRaceCoordsLVStuntNo1[raceCPPosition][E_RACE_COORD_X];
-				y0 = gRaceCoordsLVStuntNo1[raceCPPosition][E_RACE_COORD_Y];
-				z0 = gRaceCoordsLVStuntNo1[raceCPPosition][E_RACE_COORD_Z];
-
-				if (raceCPPosition + 1 <= lastCPNo)
-				{
-					x1 = gRaceCoordsLVStuntNo1[raceCPPosition+1][E_RACE_COORD_X];
-					y1 = gRaceCoordsLVStuntNo1[raceCPPosition+1][E_RACE_COORD_Y];
-					z1 = gRaceCoordsLVStuntNo1[raceCPPosition+1][E_RACE_COORD_Z];
-				} else {
-					cpType = CP_TYPE_GROUND_FINISH;
-				}
+				SetPlayerRaceSingle(playerid, raceId, gRaceCoordsLVStuntNo1, sizeof(gRaceCoordsLVStuntNo1));
 			}
 		case E_RACE_ID_CIRCUIT_SF_WANG:
 			{
-				lastCPNo = sizeof(gRaceCoordsSFCircuitWang) - 1;
-
-				// End the race.
-				if (raceCPPosition > lastCPNo)
-				{
-					ResetPlayerRaceState(playerid, raceId, true);
-
-					return 1;
-				}
-
-				x0 = gRaceCoordsSFCircuitWang[raceCPPosition][E_RACE_COORD_X];
-				y0 = gRaceCoordsSFCircuitWang[raceCPPosition][E_RACE_COORD_Y];
-				z0 = gRaceCoordsSFCircuitWang[raceCPPosition][E_RACE_COORD_Z];
-
-				if (raceCPPosition + 1 <= lastCPNo)
-				{
-					x1 = gRaceCoordsSFCircuitWang[raceCPPosition+1][E_RACE_COORD_X];
-					y1 = gRaceCoordsSFCircuitWang[raceCPPosition+1][E_RACE_COORD_Y];
-					z1 = gRaceCoordsSFCircuitWang[raceCPPosition+1][E_RACE_COORD_Z];
-				} else {
-					cpType = CP_TYPE_GROUND_FINISH;
-				}
+				SetPlayerRaceSingle(playerid, raceId, gRaceCoordsSFCircuitWang, sizeof(gRaceCoordsSFCircuitWang));
+			}
+		case E_RACE_ID_SF_LS_AIRPORT:
+			{
+				SetPlayerRaceSingle(playerid, raceId, gRaceCoordsLSFLSAirport, sizeof(gRaceCoordsLSFLSAirport));
 			}
 		default:
 			{
 				return 0;
 			}
 	}
-
-	// Set the next checkpoint to reach.
-	SetPlayerRaceCheckpoint(playerid, cpType, Float:x0, Float:y0, Float:z0, Float:x1, Float:y1, Float:z0, 10.0);
 
 	return 1;
 }
@@ -388,6 +389,8 @@ public UpdateRaceInfoText(playerid)
 			cpCount = sizeof(gRaceCoordsLVStuntNo1);
 		case E_RACE_ID_CIRCUIT_SF_WANG:
 			cpCount = sizeof(gRaceCoordsSFCircuitWang);
+		case E_RACE_ID_SF_LS_AIRPORT:
+			cpCount = sizeof(gRaceCoordsLSFLSAirport);
 	}
 
 	gPlayerRaceTime[playerid] += 1000;

@@ -8,7 +8,9 @@ public ShowAdvert()
 		"[ INFO ] Hostovano a sponzorovano organizaci vxn.dev",
 		"[ TIP ] Zahrej si deathmatch spolu s kamarady ve specialni arene: /deathmatch [join/exit]",
 		"[ TIP ] Hotovost nevydrzi vecne (umrti, uraz apod), sver sve finance bance!",
-		"[ TIP ] Nevahej a vyuzij pestre nabidky zavodu! Pro vice informaci pouzij /race list"
+		"[ TIP ] Nevahej a vyuzij pestre nabidky zavodu! Pro vice informaci pouzij /race list",
+		"[ TIP ] Pokud jsi uvizl v zavodu, muzes ho opustit pomoci /race exit",
+		"[ TIP ] Po prihlaseni do jakehokoliv zavodu lze hodit warp ke startu pomoci /race warp"
 	};
 
 	new advertId = random(sizeof(advertList)), stringToPrint[256];

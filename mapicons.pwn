@@ -91,4 +91,5 @@ SetPlayerMapIcon(playerid, 30, 414.3, 2528.1, 16.6, E_MAPICON_ID_AIRYARD, 0, MAP
 SetPlayerMapIcon(playerid, 40, 970.7, 2155.0, 10.8, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
 SetPlayerMapIcon(playerid, 41, 2287.1, 2426.7, 10.8, E_MAPICON_ID_POLICE, 0, MAPICON_LOCAL);
 SetPlayerMapIcon(playerid, 42, -91.76, -305.44, 1.42, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
+SetPlayerMapIcon(playerid, 43, -81.32, -1135.79, 0.91, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
 

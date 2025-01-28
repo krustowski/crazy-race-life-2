@@ -1,8 +1,10 @@
+new RADAR_FEE = 500;
+
 enum E_POSITION
 {
-      Float:X_r,
-      Float:Y_r,
-      Float:Z_r
+	Float:E_POSITION_X,
+     	Float:E_POSITION_Y,
+        Float:E_POSITION_Z
 }
 
 // Global variables to track the player's position and state.
@@ -13,6 +15,25 @@ new gRadarCaught[MAX_PLAYERS];
 new Text:KPH[MAX_PLAYERS];
 new Text:KPHR[MAX_PLAYERS];
 
+new Text:gVehicleStatesText[MAX_PLAYERS];
+
+new gRadarPositions[][4] =
+{
+	// LV
+	{2048.4158, 1173.2195, 10.6719, 15},
+	{2066.5464, 1623.2606, 10.6719, 15},
+	{2347.6807, 2413.1965, 10.6719, 15},
+	{2507.3359, 1880.9712, 10.6719, 15},
+	{2260.2791, 1373.3129, 10.6719, 15},
+	{2427.2900, 1257.8555, 10.7901, 15},
+	{2210.5552, 973.2725, 10.6719, 15},
+	{1536.0039, 1133.1715, 10.6719, 15},
+	{1007.3343, 1540.1764, 10.6719, 15},
+	{1448.2607, 2589.8904, 10.6719, 15},
+	{1691.7292, 2173.2539, 10.6719, 15}
+};
+
+
 public OnRadarCheckpoint()
 {
 	for (new i = 0; i < MAX_PLAYERS; i++)
@@ -20,60 +41,55 @@ public OnRadarCheckpoint()
 		if (!IsPlayerConnected(i) || !IsPlayerInAnyVehicle(i))
 			continue;
 
-			new stringToPrint[128], Float:value_r, Float:distance_r, Float:x_r, Float:y_r, Float:z_r;
+		new stringToPrint[256], Float:radarValue, Float:radarDistance, Float:radarX, Float:radarY, Float:radarZ, Float:vehicleHelth;
 
-			// Fetch the current player's position.
-			GetPlayerPos(i, x_r, y_r, z_r);
+		// Fetch the current player's position.
+		GetPlayerPos(i, radarX, radarY, radarZ);
 
-			distance_r = floatsqroot(floatpower(floatabs(floatsub(x_r, gPlayerPosition[i][X_r])), 2) + floatpower(floatabs(floatsub(y_r, gPlayerPosition[i][Y_r])), 2) + floatpower(floatabs(floatsub(z_r, gPlayerPosition[i][Z_r])), 2));
-			value_r = floatround(distance_r * 11000);
+		radarDistance = floatsqroot(floatpower(floatabs(floatsub(radarX, gPlayerPosition[i][E_POSITION_X])), 2) + floatpower(floatabs(floatsub(radarY, gPlayerPosition[i][E_POSITION_Y])), 2) + floatpower(floatabs(floatsub(radarZ, gPlayerPosition[i][E_POSITION_Z])), 2));
+		radarValue = floatround(radarDistance * 11000);
 
-			if (floatround(value_r / 1400) > 65)
+		GetVehicleHealth(GetPlayerVehicleID(i), vehicleHelth);
+
+		if (floatround(radarValue / 1400) > 65)
+		{
+			format(stringToPrint, sizeof(stringToPrint), "~w~Stav:______%3d_%%~n~~w~Rychlost:_~r~~h~%3d", floatround(vehicleHelth / 10), floatround(radarValue / 1400));
+		}
+		else
+		{
+			format(stringToPrint, sizeof(stringToPrint), "~w~Stav:______%3d_%%~n~~w~Rychlost:_~g~~h~%3d", floatround(vehicleHelth / 10), floatround(radarValue / 1400));
+		}
+
+		// Redraw the player's current velocity.
+		TextDrawSetString(gVehicleStatesText[i], stringToPrint);
+
+		gPlayerPosition[i][E_POSITION_X] = radarX;
+		gPlayerPosition[i][E_POSITION_Y] = radarY;
+		gPlayerPosition[i][E_POSITION_Z] = radarZ;
+
+		for (new j = 0; j < sizeof(gRadarPositions); j++)
+		{
+			if (IsPlayerInSphere(i, Float:gRadarPositions[j][0], Float:gRadarPositions[j][1], Float:gRadarPositions[j][2], Float:gRadarPositions[j][3]))
 			{
-				format(stringToPrint, 128, "~r~~h~%d", floatround(value_r / 1400));
-			}
-			else
-			{
-				format(stringToPrint, 128, "~g~~h~%d", floatround(value_r / 1400));
-			}
-
-			// Redraw the player's current velocity.
-			TextDrawSetString(KPHR[i], stringToPrint);
-
-			gPlayerPosition[i][X_r] = x_r;
-			gPlayerPosition[i][Y_r] = y_r;
-			gPlayerPosition[i][Z_r] = z_r;
-
-			// Compare the current position with the radar positions.
-			if (IsPlayerInSphere(i, 2048.4158, 1173.2195, 10.6719, 15) ||
-					IsPlayerInSphere(i, 2066.5464, 1623.2606, 10.6719, 15) ||
-					IsPlayerInSphere(i, 2347.6807, 2413.1965, 10.6719, 15) ||
-					IsPlayerInSphere(i, 2507.3359, 1880.9712, 10.6719, 15) ||
-					IsPlayerInSphere(i, 2260.2791, 1373.3129, 10.6719, 15) ||
-					IsPlayerInSphere(i, 2427.2900, 1257.8555, 10.7901, 15) ||
-					IsPlayerInSphere(i, 2210.5552, 973.2725, 10.6719, 15) ||
-					IsPlayerInSphere(i, 1536.0039, 1133.1715, 10.6719, 15) ||
-					IsPlayerInSphere(i, 1007.3343, 1540.1764, 10.6719, 15) ||
-					IsPlayerInSphere(i, 1448.2607, 2589.8904, 10.6719, 15) ||
-					IsPlayerInSphere(i, 1691.7292, 2173.2539, 10.6719, 15))
-			{
-				if (gRadarCaught[i] == 0 && floatround(value_r / 1400) > 65 && GetPlayerState(i) == PLAYER_STATE_DRIVER)
+				// Compare the current position with the radar positions.
+				if (gRadarCaught[i] == 0 && floatround(radarValue / 1400) > 65 && GetPlayerState(i) == PLAYER_STATE_DRIVER)
 				{
 					gRadarCaught[i] = 1;
 
-					GivePlayerMoney(i, -500);
+					GivePlayerMoney(i, -RADAR_FEE);
 					PlayerPlaySound(i, 1147, 0, 0, 0);
 
-					SendClientMessage(i, COLOR_BILA, " ");
-					format(stringToPrint, 128, "[ Radar ] Jel jsi prilis vysokou rychlosti ( %3d km/h )! Pokuta: $500", floatround(value_r / 1400));
+					format(stringToPrint, 128, "[ Radar ] Jel jsi prilis vysokou rychlosti ( %3d km/h )! Pokuta: $%d", floatround(radarValue / 1400), RADAR_FEE);
 					SendClientMessage(i, COLOR_CERVENA, stringToPrint);
 
 					SetTimerEx("OffRadarCheckpoint", 5000, 0, "i", i);
 
 					return 1;
+				}
 			}
 		}
 	}
+
 	return 1;
 }
 

@@ -389,6 +389,8 @@ public OnPlayerRequestSpawn(playerid)
 		return 0;
 	}
 
+	SpawnPlayer(playerid);
+
 	return 1;
 }
 
@@ -405,6 +407,8 @@ public OnPlayerConnect(playerid)
 
 	// Draw mapicons for the user.
 #include "mapicons.pwn"
+
+	// Text inits.
 
 	gRaceInfoText[playerid] = TextDrawCreate(460.0, 400.0, "");
 
@@ -435,7 +439,8 @@ public OnPlayerDisconnect(playerid, reason)
 	Object_OnPlayerDisconnect(playerid, reason);
 
 	// Hide the vehicle velocity game text.
-	TextDrawHideForPlayer(playerid, KPH[playerid]);
+	//TextDrawHideForPlayer(playerid, KPH[playerid]);
+	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
 	// Save player's data and set such player to unauthorized.
 	SavePlayerData(playerid);
@@ -494,9 +499,12 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 	SendDeathMessage(killerid, playerid, reason);
 
+	ResetPlayerMoney(playerid);
+
 	// Hide velocity meters.
-	TextDrawHideForPlayer(playerid, KPH[playerid]);
-	TextDrawHideForPlayer(playerid, KPHR[playerid]);
+	//TextDrawHideForPlayer(playerid, KPH[playerid]);
+	//TextDrawHideForPlayer(playerid, KPHR[playerid]);
+	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
 	if (gPaintball[playerid][E_PAINTBALL_INGAME])
 	{
@@ -530,8 +538,9 @@ public OnPlayerDeath(playerid, killerid, reason)
 		GetPlayerName(killerid, killerName, MAX_PLAYER_NAME);
 
 		// Hide velocity meters.
-		TextDrawHideForPlayer(playerid, KPH[playerid]);
-		TextDrawHideForPlayer(playerid, KPHR[playerid]);
+		//TextDrawHideForPlayer(playerid, KPH[playerid]);
+		//TextDrawHideForPlayer(playerid, KPHR[playerid]);
+		TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
 		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s [ID: %d] porusil pravidla serveru! [Car kill]", killerName, killerid);
 		SendClientMessageToAll(COLOR_CERVENA, stringToPrint);
@@ -1078,8 +1087,9 @@ public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 public OnPlayerExitVehicle(playerid, vehicleid)
 {
 	// Hide velocity meters.
-	TextDrawHideForPlayer(playerid, KPH[playerid]);
-	TextDrawHideForPlayer(playerid, KPHR[playerid]);
+	//TextDrawHideForPlayer(playerid, KPH[playerid]);
+	//TextDrawHideForPlayer(playerid, KPHR[playerid]);
+	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
 	return 1;
 }
@@ -1089,13 +1099,20 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 	// Hide the velocity meter on vehicle exit.
 	if ((oldstate == PLAYER_STATE_DRIVER || oldstate == PLAYER_STATE_PASSENGER) && newstate == PLAYER_STATE_ONFOOT)
 	{
-		TextDrawHideForPlayer(playerid, KPH[playerid]);
-		TextDrawHideForPlayer(playerid, KPHR[playerid]);
+		//TextDrawHideForPlayer(playerid, KPH[playerid]);
+		//TextDrawHideForPlayer(playerid, KPHR[playerid]);
+		TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 	}
 
 	if (newstate == PLAYER_STATE_DRIVER || newstate == PLAYER_STATE_PASSENGER)
 	{
-		KPH[playerid] = TextDrawCreate(256, 425, "Rychlost:");
+		gVehicleStatesText[playerid] = TextDrawCreate(256, 410, "~w~Stav:______%3d_%%~n~~w~Rychlost:_%3d");
+
+		TextDrawLetterSize(gVehicleStatesText[playerid], 0.5, 1.5);
+		TextDrawFont(gVehicleStatesText[playerid], 3);
+		TextDrawSetOutline(gVehicleStatesText[playerid], 1);
+
+		/*KPH[playerid] = TextDrawCreate(256, 425, "Rychlost:");
 
 		TextDrawAlignment(KPH[playerid], 0);
 		//TextDrawBackgroundColor(KPH[playerid], 0x000000ff);
@@ -1117,15 +1134,16 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		//TextDrawSetProportional(KPHR[playerid], 1);
 		//TextDrawSetShadow(KPHR[playerid], 1);
 
-		TextDrawShowForPlayer(playerid, KPHR[playerid]);
-		TextDrawShowForPlayer(playerid, KPH[playerid]);
+		//TextDrawShowForPlayer(playerid, KPHR[playerid]);
+		//TextDrawShowForPlayer(playerid, KPH[playerid]);*/
+		TextDrawShowForPlayer(playerid, gVehicleStatesText[playerid]);
 	}
 
 	if (newstate == PLAYER_STATE_DRIVER && GetPlayerVehicleID(playerid) == gAdminAuto)
 	{
 		if (!IsPlayerAdmin(playerid))
 		{
-			SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ]Jeliko nejsi admin, bude vozidlo znièeno xD.");
+			SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Vozidlo bude zniceno, protoze nemas opravneni ho ridit!");
 			GameTextForPlayer(playerid, "~r~Toto auto je jen pro ~b~rcon ~g~adminy", 5000, 5);
 			SetVehicleHealth(GetPlayerVehicleID(playerid), 100.0);
 		}

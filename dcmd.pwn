@@ -101,6 +101,8 @@ dcmd_login(playerid, params[])
 	}
 
 	return SystemMsg(playerid, "[SERVER] Prihlaseni se nezdarilo --> /login *heslo*");
+
+	SpawnPlayer(playerid);
 }
 
 
@@ -1011,7 +1013,7 @@ dcmd_port(playerid, params[])
 	}
 
 	if (!strlen(params) || !IsNumeric(params))
-		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /hp [ID lokace]");
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /port [ID lokace]");
 
 	switch (strval(params))
 	{

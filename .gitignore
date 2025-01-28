@@ -4,3 +4,5 @@ gamemodes/*
 samp03svr
 samp-npc
 server.cfg
+plugins/*
+log-core.so

@@ -32,7 +32,8 @@ enum E_RACE_ID
 	E_RACE_ID_LV_PYRAMID,
 	E_RACE_ID_STUNT_LV_1,
 	E_RACE_ID_CIRCUIT_SF_WANG,
-	E_RACE_ID_SF_LS_AIRPORT
+	E_RACE_ID_SF_LS_AIRPORT,
+	E_RACE_ID_LV_MAP_CIRCUIT
 }
 
 // gPlayerRace hold a reference to the state of a player's registration to such race. Thus if registered, a value for such RACE_ID should return true (1).
@@ -59,7 +60,9 @@ new gRaceWarp[E_RACE_ID][E_RACE_COORD] =
 	// E_RACE_ID_CIRCUIT_SF_WANG
 	{-2005.75, 320.07, 34.58},
 	// SF to LS Airport race
-	{-1386.19, -407.38, 14.14}
+	{-1386.19, -407.38, 14.14},
+	// LV map circuit
+	{2046.05, 1009.33, 10.24}
 };
 
 // gRaceNames is an array to hold all race names referenced via E_RACE_ID.
@@ -74,7 +77,9 @@ new const gRaceNames[E_RACE_ID][] =
 	// E_RACE_ID_CIRCUIT_SF_WANG
 	"San Fierro WangCars Circuit",
 	// SF to LS Airport race
-	"San Fierro to Los Santos Airport race"
+	"San Fierro to Los Santos Airport race",
+	// LV map circuit
+	"Las Venturas to Whole Map Circuit"
 };
 
 new const gRaceFeePrize[E_RACE_ID][E_RACE_FEE] =
@@ -84,11 +89,13 @@ new const gRaceFeePrize[E_RACE_ID][E_RACE_FEE] =
 	// E_RACE_ID_LV_PYRAMID
 	{300, 5000},
 	// E_RACE_ID_STUNT_LV_1
-	{1500, 20000},
+	{1500, 25000},
 	// E_RACE_ID_CIRCUIT_SF_WANG
 	{1500, 20000},
 	// SF to LS Airport race
-	{2000, 35000}
+	{2000, 35000},
+	// E_RACE_ID_LV_MAP_CIRCUIT
+	{3500, 45000}
 };
 
 new gRaceCoordsLVPyramid[][E_RACE_COORD] =
@@ -219,6 +226,111 @@ new gRaceCoordsLSFLSAirport[][E_RACE_COORD] =
 	{1889.86, -2411.43, 13.16}
 };
 
+new gRaceCoordsLVMapCircuit[][E_RACE_COORD] =
+{
+	{2046.95, 982.90, 10.21},
+	{2048.64, 842.09, 6.27},
+	{2214.63, 834.22, 6.30},
+	{2500.25, 838.85, 6.30},
+	{2687.55, 978.64, 6.29},
+	{2726.26, 1206.99, 6.29},
+	{2726.26, 1446.08, 6.29},
+	{2727.66, 1822.88, 6.30},
+	{2725.44, 2155.23, 6.31},
+	{2681.64, 2450.49, 6.28},
+	// 11
+	{2491.00, 2612.43, 4.66},
+	{2198.72, 2612.03, 6.33},
+	{1908.17, 2531.06, 6.36},
+	{1587.37, 2472.76, 6.35},
+	{1242.10, 2478.20, 8.03},
+	{961.07, 2586.93, 10.16},
+	{661.18, 2659.26, 27.36},
+	{389.09, 2700.56, 60.27},
+	{113.12, 2713.06, 52.12},
+	{-219.29, 2635.40, 62.42},
+	// 21
+	{-502.10, 2716.77, 65.31},
+	{-831.92, 2727.31, 45.20},
+	{-1247.94, 2677.41, 47.00},
+	{-1440.67, 2723.94, 63.56},
+	{-1769.11, 2715.47, 58.66},
+	{-1972.12, 2613.21, 49.13},
+	{-2382.21, 2671.81, 58.85},
+	{-2764.70, 2501.85, 95.51},
+	{-2689.33, 2114.70, 54.98},
+	{-2688.34, 1456.02, 54.99},
+	// 31
+	{-2625.09, 1138.82, 54.99},
+	{-2217.28, 1055.74, 55.14},
+	{-1889.41, 1051.04, 44.85},
+	{-1899.67, 849.85, 34.58},
+	{-1713.30, 845.33, 24.29},
+	{-1539.91, 839.95, 6.61},
+	{-1565.61, 498.05, 6.58},
+	{-1747.15, 308.38, 6.59},
+	{-1831.84, 386.98, 16.57},
+	{-1895.20, 111.27, 37.69},
+	// 41
+	{-1932.30, -234.41, 38.18},
+	{-2156.96, -334.99, 34.75},
+	{-2583.10, -337.75, 21.52},
+	{-2809.17, -499.68, 6.63},
+	{-2871.45, -866.36, 7.16},
+	{-2916.02, -1187.03, 8.91},
+	{-2929.46, -1695.34, 16.90},
+	{-2784.75, -2012.38, 37.57},
+	{-2540.79, -2218.72, 28.94},
+	{-2449.42, -2542.66, 48.93},
+	// 51
+	{-2035.02, -2659.05, 55.27},
+	{-1719.66, -2665.35, 46.54},
+	{-1276.70, -2896.97, 56.23},
+	{-973.31, -2867.58, 66.50},
+	{-647.90, -2784.31, 50.05},
+	{-185.61, -2872.17, 38.74},
+	{6.84, -2647.05, 39.75},
+	{-288.26, -2197.39, 27.96},
+	{-292.68, -1771.75, 15.14},
+	{-110.23, -1455.49, 12.36},
+	// 61
+	{116.72, -1268.03, 14.77},
+	{495.35, -1137.53, 30.69},
+	{627.63, -1246.94, 17.19},
+	{632.06, -1525.99, 14.54},
+	{632.98, -1742.99, 12.85},
+	{836.37, -1782.85, 13.31},
+	{1039.18, -2062.38, 12.48},
+	{1075.37, -2339.65, 12.01},
+	{1310.95, -2464.58, 7.22},
+	{1334.09, -2583.55, 12.94},
+	// 71
+	{1551.35, -2684.51, 6.85},
+	{2021.18, -2685.05, 10.63},
+	{2175.52, -2523.74, 12.93},
+	{2311.62, -2260.42, 12.92},
+	{2600.69, -2169.42, 12.04},
+	{2829.70, -2096.63, 10.49},
+	{2858.51, -1731.37, 10.44},
+	{2926.18, -1446.60, 10.44},
+	{2891.28, -918.27, 10.44},
+	{2897.26, -526.27, 12.00},
+	// 81
+	{2800.09, -240.79, 11.09},
+	{2877.81, -40.02, 16.99},
+	{2808.87, 76.25, 19.55},
+	{2740.16, 276.19, 19.83},
+	{2475.49, 318.15, 30.81},
+	{2124.84, 319.75, 33.45},
+	{1717.89, 303.15, 19.01},
+	{1741.18, 501.11, 28.57},
+	{1807.99, 829.19, 10.24},
+	{2051.83, 834.95, 6.30},
+	// 91
+	{2070.53, 961.72, 9.88},
+	{2046.41, 999.06, 10.24}
+};
+
 //
 //  Race-related functions.
 //
@@ -280,6 +392,10 @@ public SetPlayerRace(playerid, raceId)
 		case E_RACE_ID_SF_LS_AIRPORT:
 			{
 				SetPlayerRaceSingle(playerid, raceId, gRaceCoordsLSFLSAirport, sizeof(gRaceCoordsLSFLSAirport));
+			}
+		case E_RACE_ID_LV_MAP_CIRCUIT:
+			{
+				SetPlayerRaceSingle(playerid, raceId, gRaceCoordsLVMapCircuit, sizeof(gRaceCoordsLVMapCircuit));
 			}
 		default:
 			{
@@ -419,6 +535,8 @@ public UpdateRaceInfoText(playerid)
 			cpCount = sizeof(gRaceCoordsSFCircuitWang);
 		case E_RACE_ID_SF_LS_AIRPORT:
 			cpCount = sizeof(gRaceCoordsLSFLSAirport);
+		case E_RACE_ID_LV_MAP_CIRCUIT:
+			cpCount = sizeof(gRaceCoordsLVMapCircuit);
 	}
 
 	gPlayerRaceTime[playerid] += 1000;

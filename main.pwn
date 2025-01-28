@@ -32,6 +32,7 @@
 /*#include <a_objects>*/
 #include <y_objects>
 #include <string>
+#include <a_mysql>
 
 //
 //  Registration
@@ -152,6 +153,7 @@ forward SavePlayerData(playerid);
 forward SendPlayerSalary();
 forward UpdatePlayerScore();
 
+#include "mysql.pwn"
 #include "player.pwn"
 
 //
@@ -228,11 +230,7 @@ public OnGameModeInit()
 	AllowInteriorWeapons(0);
 	EnableStuntBonusForAll(1);  
 
-	// Set the unique Vehlicle Plate for all vehicles possible.
-	for (new i = 0; i < MAX_VEHICLES; i++)
-	{
-		SetVehicleNumberPlate(i, VEHICLE_PLATE);
-	}
+	InitDB();
 
 	//
 	// Start various timers.
@@ -271,6 +269,12 @@ public OnGameModeInit()
 	AddPlayerClass(29, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
 	AddPlayerClass(45, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
 	AddPlayerClass(169, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
+
+	// Set the unique Vehlicle Plate for all vehicles possible.
+	for (new i = 0; i < MAX_VEHICLES; i++)
+	{
+		SetVehicleNumberPlate(i, VEHICLE_PLATE);
+	}
 
 	return 1;
 }

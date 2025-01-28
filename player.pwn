@@ -223,8 +223,8 @@ public OnPlayerPrivMsg(playerid, receiverid, text[])
 	GetPlayerName(playerid, senderName, sizeof(senderName)); 
 	GetPlayerName(receiverid, receiverName, sizeof(receiverName)); 
 
-	format(stringForReceiver, sizeof(stringForReceiver), "[PM] od %s (ID: %d): %s", senderName, playerid, text);
-	format(stringForSender, sizeof(stringForSender), "[PM] pro %s (ID: %d): %s", receiverName, receiverid, text);
+	format(stringForReceiver, sizeof(stringForReceiver), "[ PM ] od %s (ID: %d): %s", senderName, playerid, text);
+	format(stringForSender, sizeof(stringForSender), "[ PM ] pro %s (ID: %d): %s", receiverName, receiverid, text);
 
 	SendClientMessage(receiverid, GREEN, stringForReceiver);
 	SendClientMessage(playerid, GREEN, stringForSender);
@@ -233,8 +233,8 @@ public OnPlayerPrivMsg(playerid, receiverid, text[])
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0); 
 	PlayerPlaySound(receiverid, 1057, 0.0, 0.0, 0.0);
 
-	GameTextForPlayer(playerid, "~w~PM ~r~Odeslana~w~.", 3000, 3); 
-	GameTextForPlayer(receiverid, "~w~PM ~r~Prijata~w~.", 3000, 3);
+	GameTextForPlayer(playerid, "~w~PM ~g~Odeslana~w~.", 3000, 3); 
+	GameTextForPlayer(receiverid, "~w~PM ~g~Prijata~w~.", 3000, 3);
 
 	GivePlayerMoney(playerid, -10); 
 

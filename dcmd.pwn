@@ -64,16 +64,16 @@ dcmd_register(playerid, params[])
 	GetPlayerName(playerid, playerName, sizeof(playerName));
 
 	if (gPlayerAuth[playerid])
-		return SystemMsg(playerid, "[SERVER] Registrace herniho uctu probehla uspesne! --> /login *heslo*");
+		return SystemMsg(playerid, "[ AUTH ] Registrace herniho uctu probehla uspesne! --> /login *heslo*");
 
 	if (udb_Exists(playerName))
-		return SystemMsg(playerid, "[SERVER] Neni treba se znovu registrovat --> /login *heslo*.");
+		return SystemMsg(playerid, "[ AUTH ] Neni treba se znovu registrovat --> /login *heslo*.");
 
 	if (strlen(params) == 0)
-		return SystemMsg(playerid, "[SERVER] Registrace je povinna --> /register *heslo*");
+		return SystemMsg(playerid, "[ AUTH ] Registrace je povinna --> /register *heslo*");
 
 	if (udb_Create(playerName, params))
-		return SystemMsg(playerid, "[SERVER] Herni ucet uspesne vytvoren --> /login *heslo*.");
+		return SystemMsg(playerid, "[ AUTH ] Herni ucet uspesne vytvoren --> /login *heslo*.");
 
 	return 1;
 }
@@ -84,25 +84,25 @@ dcmd_login(playerid, params[])
 	GetPlayerName(playerid, playerName, sizeof(playerName));
 
 	if (gPlayerAuth[playerid]) 
-		return SystemMsg(playerid, "[SERVER] Uz jsi prihlasen.");
+		return SystemMsg(playerid, "[ AUTH ] Uz jsi prihlasen.");
 
 	if (!udb_Exists(playerName)) 
-		return SystemMsg(playerid, "[SERVER] Data pro dany nickname nenalezena --> /register *heslo*");
+		return SystemMsg(playerid, "[ AUTH ] Data pro dany nickname nenalezena --> /register *heslo*");
 
 	if (strlen(params) == 0) 
-		return SystemMsg(playerid, "[SERVER] Je treba se prihlasit --> /login *heslo*");
+		return SystemMsg(playerid, "[ AUTH ] Je treba se prihlasit --> /login *heslo*");
 
 	if (udb_CheckLogin(playerName, params))
 	{
 		gPlayerAuth[playerid] = true;
 		LoadPlayerData(playerid);
 
-		return SystemMsg(playerid, "[SERVER] Hrac prihlasen, pokracujte pomoci Spawn.");
+		SpawnPlayer(playerid);
+
+		return SystemMsg(playerid, "[ AUTH ] Prihlaseni uspesne.");
 	}
 
-	return SystemMsg(playerid, "[SERVER] Prihlaseni se nezdarilo --> /login *heslo*");
-
-	SpawnPlayer(playerid);
+	return SystemMsg(playerid, "[ AUTH ] Prihlaseni se nezdarilo --> /login *heslo*");
 }
 
 
@@ -532,6 +532,24 @@ dcmd_get(playerid, params[])
 	return 1;
 }
 
+dcmd_pm(playerid, params[])
+{
+	new token1[32], token2[32];
+	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
+
+	if (!strlen(params) || count != 2 || !IsNumeric(token1))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti /pm [playerID] [text]");
+
+	new targetId = strval(token1);
+
+	if (!IsPlayerConnected(targetId))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+
+	OnPlayerPrivMsg(playerid, targetId, token2);
+
+	return 1;
+}
+
 dcmd_givecash(playerid, params[])
 {
 	new token1[32], token2[32];
@@ -558,7 +576,7 @@ dcmd_givecash(playerid, params[])
 	GetPlayerName(targetId, targetName, sizeof(targetName));
 
 	// Send an informative statement to the receiving player.
-	format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s [ID: %d] ti poslal castku %d €!", playerName, playerid, targetAmount);
+	format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s [ID: %d] ti poslal castku $%d!", playerName, playerid, targetAmount);
 	SendClientMessage(targetId, COLOR_SVZEL, stringToPrint);
 
 	// Transfer money.
@@ -566,7 +584,7 @@ dcmd_givecash(playerid, params[])
 	GivePlayerMoney(playerid, -targetAmount);
 
 	// Send an informative statement to the sending player.
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Castka %s € uspesne zaslana hraci %s [ID: %d]!");
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Castka $%s uspesne zaslana hraci %s [ID: %d]!");
 	SendClientMessage(playerid, COLOR_SVZEL, stringToPrint);
 
 	return 1;
@@ -585,10 +603,10 @@ dcmd_nitro(playerid, params[])
 	if (!IsPlayerConnected(targetId))
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
 
-	new targetPlayerState = GetPlayerState(targetId), targetVehicleId = GetPlayerVehicleID(targetId);
-
 	if (!IsPlayerInVehicle(targetId))
 		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Hrac se nenachazi ve vozidle!");
+
+	new targetPlayerState = GetPlayerState(targetId), targetVehicleId = GetPlayerVehicleID(targetId);
 
 	if (targetPlayerState != PLAYER_STATE_DRIVER)
 		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Hrac je sice v aute, ale neni ridicem!");
@@ -660,15 +678,37 @@ dcmd_admincol(playerid, params[])
 dcmd_ucet(playerid, params[])
 {
 #pragma unused params
-	new lineToPrint1[256], lineToPrint2[256], lineToPrint3[265];
+	new accountPropsText[][] =
+	{
+		"* Penize: hotovost $%d, banka $%d",
+		"* Tym: %d, Skin: %d",
+		"* Admin level: %d, Wanted level: %d"
+	};
 
-	format(lineToPrint1, sizeof(lineToPrint1), "[ INFO ] [ VYPIS HERNIHO UCTU ] ***");
-	format(lineToPrint2, sizeof(lineToPrint2), "[ INFO ] [ Penize | $%d ], [ Banka | $%d ], [ Wanted level | %d ], [ Skin | %d ], [ Tym | %d ]", GetPlayerMoney(playerid), gPlayerData[playerid][E_PLAYER_DATA_BANK], GetPlayerWantedLevel(playerid), GetPlayerSkin(playerid), gPlayerData[playerid][E_PLAYER_DATA_TEAM]);
-	format(lineToPrint3, sizeof(lineToPrint3), "[ INFO ] [ Admin level | %d ], [ Joint | %d ks ], [ Zapik | %d ks ], [ Marihuana | %d g ], [ Tabak | %d ks ]", gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL], gPlayerDrugz[playerid][E_PLAYER_DRUGZ_JOINT], gPlayerDrugz[playerid][E_PLAYER_DRUGZ_LIGHTER], gPlayerDrugz[playerid][E_PLAYER_DRUGZ_ZAZA], gPlayerDrugz[playerid][E_PLAYER_DRUGZ_TOBACCO]);
+	SendClientMessage(playerid, COLOR_SVZEL, "[ ACCOUNT ] Vypis herniho uctu");
 
-	SendClientMessage(playerid, COLOR_ZLUTA, lineToPrint1);
-	SendClientMessage(playerid, COLOR_SEDA, lineToPrint2);
-	SendClientMessage(playerid, COLOR_SEDA, lineToPrint3);
+	for (new i = 0; i < sizeof(accountPropsText); i++)
+	{
+		new stringToPrint[128];
+
+		switch (i)
+		{
+			case 0:
+				{
+					format(stringToPrint, sizeof(stringToPrint), accountPropsText[i], GetPlayerMoney(playerid), gPlayerData[playerid][E_PLAYER_DATA_BANK]);
+				}
+			case 1:
+				{
+					format(stringToPrint, sizeof(stringToPrint), accountPropsText[i], gPlayerData[playerid][E_PLAYER_DATA_TEAM], GetPlayerSkin(playerid));
+				}
+			case 2:
+				{
+					format(stringToPrint, sizeof(stringToPrint), accountPropsText[i], gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL], GetPlayerWantedLevel(playerid));
+				}
+		}
+
+		SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+	}
 
 	return 1;
 }
@@ -882,7 +922,7 @@ dcmd_elevator(playerid, params[])
 	return 1;
 }
 
-dcmd_paintball(playerid, params[])
+dcmd_deathmatch(playerid, params[])
 {
 	if (!strcmp(params, "join"))
 	{
@@ -1127,14 +1167,10 @@ dcmd_dwarp(playerid, params[])
 dcmd_soska(playerid, params[])
 {
 #pragma unused params
-	SendClientMessage(playerid, COLOR_SVZEL, "[ ------------ SOSKY ------------ ]");
-	SendClientMessage(playerid, COLOR_SVZEL, "[ Sosky se nachazeji v LS a okoli ]");
-	SendClientMessage(playerid, COLOR_SVZEL, "[ Sosek je zatim celkem 5         ]");
-	SendClientMessage(playerid, COLOR_SVZEL, "[                                 ]");
-	SendClientMessage(playerid, COLOR_SVZEL, "[ ----------- ODMENA ------------ ]");
-	SendClientMessage(playerid, COLOR_SVZEL, "[ $10 000 000 na ruku             ]");
-	SendClientMessage(playerid, COLOR_SVZEL, "[ Prihlednuti k ziskani admin-lvl ]");
-	SendClientMessage(playerid, COLOR_SVZEL, "[ TAK HLEDEJTE! :) :D             ]");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ INFO ] Sosky");
+	SendClientMessage(playerid, COLOR_ZLUTA, "* Sosky se nachazeji v LS a jeho okoli");
+	SendClientMessage(playerid, COLOR_ZLUTA, "* Sosek je zatim celkem 5");
+	SendClientMessage(playerid, COLOR_ZLUTA, "* Odmenou je $10M v hotovosti a zvyseni moznosti ziskani admin levelu");
 
 	return 1;
 }

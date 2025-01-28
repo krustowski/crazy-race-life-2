@@ -514,6 +514,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	dcmd(bank, 4, cmdtext);		  //all
 	dcmd(cmd, 3, cmdtext);            //all
 	dcmd(dance, 5, cmdtext);	  //all
+	dcmd(deathmatch, 10, cmdtext);	  //all
 	dcmd(dwarp, 5, cmdtext); 	  //all
 	dcmd(fix, 3, cmdtext); 		  //all
 	dcmd(givecash, 8, cmdtext);       //all
@@ -524,7 +525,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	dcmd(locate, 6, cmdtext); 	  //all
 	dcmd(lock, 4, cmdtext);           //all
 	dcmd(login, 5, cmdtext);          //all
-	dcmd(paintball, 9, cmdtext);	  //all
+	dcmd(pm, 2, cmdtext);		  //all
 	dcmd(port, 4, cmdtext); 	  //all
 	dcmd(race, 4, cmdtext);		  //all
 	dcmd(register, 8, cmdtext);       //all

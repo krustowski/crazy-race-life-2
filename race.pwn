@@ -57,7 +57,7 @@ new gRaceWarp[E_RACE_ID][E_RACE_COORD] =
 	// E_RACE_ID_STUNT_LV_1
 	{2635.67, 1171.51, 10.37},
 	// E_RACE_ID_CIRCUIT_SF_WANG
-	{-1951.58, 296.77, 41.04},
+	{-2005.75, 320.07, 34.58},
 	// SF to LS Airport race
 	{-1386.19, -407.38, 14.14}
 };

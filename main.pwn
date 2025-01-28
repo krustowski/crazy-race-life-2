@@ -91,14 +91,13 @@ new const GAMEMODE_NAME[] = "CrazyRaceLife2";
 new const GAMEMODE_CREDITS[] = "krusty, kompry, DRaGsTeR";
 
 new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
-
 new const VEHICLE_PLATE[] = "-CRL-2-";
 
 forward SplitIntoTwo(input[], token1[], token2[], tokenSize);
 forward StartServerReset();
 
 //
-// Advertisement.
+//  Advertisement.
 //
 
 forward ShowAdvert();
@@ -106,7 +105,7 @@ forward ShowAdvert();
 #include "advert.pwn"
 
 //
-// Anticheating.
+//  Anticheating.
 //
 
 forward AntiCheatWeapon();
@@ -116,7 +115,7 @@ forward AntiJetPack();
 #include "anticheat.pwn"
 
 //
-// Clock text (re)drawing.
+//  Clock text (re)drawing.
 //
 
 forward DrawClockText();
@@ -124,7 +123,7 @@ forward DrawClockText();
 #include "clock.pwn"
 
 //
-// Race subsystem.
+//  Racing subsystem.
 //
 
 forward CheckRaceCheckpoint(playerid);
@@ -132,8 +131,9 @@ forward SetRaceForUser(playerid, raceId);
 forward StartRace();
 
 #include "race.pwn"
+
 //
-// Paintball minigame.
+//  Deathmatch minigame.
 //
 
 forward StartPaintball();
@@ -143,7 +143,7 @@ forward EndPaintball();
 #include "paintball.pwn"
 
 //
-// Player data management.
+//  Player data management + team management.
 //
 
 forward BatchSavePlayerData();
@@ -155,7 +155,7 @@ forward UpdatePlayerScore();
 #include "player.pwn"
 
 //
-// Radar + Vehicle velocity.
+//  Radar + Vehicle velocity/props.
 //
 
 forward OnRadarCheckpoint();
@@ -165,41 +165,33 @@ forward OffRadarCheckpoint(playerid);
 
 #include "helpers.pwn"
 
+//
+//  Banking.
+//
+
 forward CheckPlayerBankLocation(playerid);
 
 #include "bank.pwn"
 
 //
-//  Global static objects.
+//  Pickups, Objects, Vehicles, Texts, Mapicons.
 //
 
-new gAdminAuto;
-new gAdminElevator;
+forward InitPickups();
+forward InitObjects();
+forward InitVehicles();
+forward InitTexts();
+forward AddTexts(playerid);
+forward AddMapicons(playerid);
+
+#include "pickups.pwn"
+#include "objects.pwn"
+#include "vehicles.pwn"
+#include "texts.pwn"
+#include "mapicons.pwn"
 
 //
-//  Texts.
-//
-
-new Text:gGameModeText;
-
-//
-//  Global static team objects.
-//
-
-new gAdminRoomHealth;
-
-new gHackerzInteriorEntrance;
-new gHackerzInteriorExit;
-new gHackerzMoneyBag;
-
-new gAdminDoorDown;
-new gAdminDoorUp;
-
-// ????
-new picktunel;
-
-//
-//  DCMDs
+//  DCMDs = command set definitions.
 //
 
 #include "dcmd.pwn"
@@ -260,62 +252,13 @@ public OnGameModeInit()
 	SetTimer("ShowAdvert", 120 * SECOND_MS, 1);
 
 	//
-	// Create pickups, static objects and static vehicles.
+	// Create pickups, static objects and static vehicles + DrawTexts.
 	//
 
-	gTeamPickup[E_PLAYER_TEAM_LAME] = CreatePickup(1239, 1, 2252.11, 1285.30, 19.17);
-	gTeamMenu[E_PLAYER_TEAM_LAME] = CreateMenu("Lamerz", 1, 150.0, 100.0, 250.0, 150.0);
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_LAME], 0, "Lamka");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_LAME], 0, "Opustit tym");
-
-	gTeamPickup[E_PLAYER_TEAM_ADMINZ] = CreatePickup(1239, 1, 2304.43, 1151.95, 85.94);
-	gTeamMenu[E_PLAYER_TEAM_ADMINZ] = CreateMenu("Adminz", 1, 150.0, 100.0, 250.0, 150.0);
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_ADMINZ], 0, "Admin borec");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_ADMINZ], 0, "Opustit tym");
-
-	gTeamPickup[E_PLAYER_TEAM_POLICE] = CreatePickup(1239, 1, 229.4, 167.4, 1003.0);
-	gTeamMenu[E_PLAYER_TEAM_POLICE] = CreateMenu("Police LV", 1, 150.0, 100.0, 250.0, 150.0);
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_POLICE], 0, "Policajt");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_POLICE], 0, "Opustit tym");
-
-	gTeamPickup[E_PLAYER_TEAM_GASMAN] = CreatePickup(1239, 1, 2637.36, 1127.04, 11.18);
-	gTeamMenu[E_PLAYER_TEAM_GASMAN] = CreateMenu("Benzina", 1, 150.0, 100.0, 250.0, 150.0);
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_GASMAN], 0, "Benzinak");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_GASMAN], 0, "Opustit tym");
-
-	gTeamPickup[E_PLAYER_TEAM_DRAGSTER] = CreatePickup(1239, 1, 2620.14, 1195.76, 10.81);
-	gTeamMenu[E_PLAYER_TEAM_DRAGSTER] = CreateMenu("Dragsterz", 1, 150.0, 100.0, 250.0, 150.0);
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_DRAGSTER], 0, "DRaGsTeR");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_DRAGSTER], 0, "Opustit tym");
-
-	gTeamPickup[E_PLAYER_TEAM_GARBAGE] = CreatePickup(1581, 1, 2892.8, -2127.9, 3.2);
-	gTeamMenu[E_PLAYER_TEAM_GARBAGE] = CreateMenu("Garbage men", 1, 150.0, 100.0, 250.0, 150.0);
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_GARBAGE], 0, "Tulak");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_GARBAGE], 0, "Opustit tym");
-
-	gTeamPickup[E_PLAYER_TEAM_PIZZABOY] = CreatePickup(1581, 1, 2101.70, -1810.05, 13.55);
-	gTeamMenu[E_PLAYER_TEAM_PIZZABOY] = CreateMenu("Pizzaboyz", 1, 150.0, 100.0, 250.0, 150.0);
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PIZZABOY], 0, "Pizza boy");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PIZZABOY], 0, "Opustit tym");
-
-	gTeamPickup[E_PLAYER_TEAM_HACKER] = CreatePickup(1581, 1, 2838.10, -2130.26, 0.19);
-	gTeamMenu[E_PLAYER_TEAM_HACKER] = CreateMenu("Hackerz",  1, 150.0, 100.0, 250.0, 150.0);
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_HACKER], 0, "Hacker");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_HACKER], 0, "Opustit tym");
-
-	//gTeamPickup[E_PLAYER_TEAM_CAR_REPAIR] = CreatePickup(1581,1, );
-	gTeamMenu[E_PLAYER_TEAM_CAR_REPAIR] = CreateMenu("Servicemen", 1, 150.0, 100.0, 250.0, 150.0);
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_CAR_REPAIR], 0, "Technik");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_CAR_REPAIR], 0, "Opustit tym");
-
-	//gTeamPickup[E_PLAYER_TEAM_PYRO] = CreatePickup(1581,1, );
-	gTeamMenu[E_PLAYER_TEAM_PYRO] = CreateMenu("Pyroz", 1, 150.0, 100.0, 250.0, 150.0);
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PYRO], 0, "Pyrotechnik");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PYRO], 0, "Opustit tym");
-
-#include "pickups.pwn"
-#include "objects.pwn"
-#include "vehicles.pwn"
+	InitPickups();
+	InitObjects();
+	InitVehicles();
+	InitTexts();
 
 	if (!dini_Exists(STATS_FILE))
 	{
@@ -328,22 +271,6 @@ public OnGameModeInit()
 	AddPlayerClass(29, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
 	AddPlayerClass(45, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
 	AddPlayerClass(169, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
-
-	//
-	//  DrawTexts initialization.
-	//
-
-	gGameModeText = TextDrawCreate(20.0, 425.0, MINIMAP_TEXT);
-
-	TextDrawLetterSize(gGameModeText, 0.5, 1.5);
-	TextDrawFont(gGameModeText, 3);
-	TextDrawSetOutline(gGameModeText, 1);
-
-	gClockText = TextDrawCreate(547.0, 24.0, "nacitani");
-
-	TextDrawLetterSize(gClockText, 0.6, 1.8);
-	TextDrawFont(gClockText, 3);
-	TextDrawSetOutline(gClockText, 1);
 
 	return 1;
 }
@@ -406,30 +333,23 @@ public OnPlayerConnect(playerid)
 	gPaintball[playerid][E_PAINTBALL_SCORE] = 0;
 
 	// Draw mapicons for the user.
-#include "mapicons.pwn"
+	AddMapicons(playerid);
 
 	// Text inits.
-
-	gRaceInfoText[playerid] = TextDrawCreate(460.0, 400.0, "");
-
-	TextDrawLetterSize(gRaceInfoText[playerid], 0.5, 1.5);
-	TextDrawFont(gRaceInfoText[playerid], 3);
-	TextDrawSetOutline(gRaceInfoText[playerid], 1);
-
-	// Show the game clock.
-	TextDrawShowForPlayer(playerid, gClockText);
-	TextDrawShowForPlayer(playerid, gGameModeText);
-
-	// Send a welcome text to the connecting new player.
-	SendClientMessage(playerid, GREEN, "Cus, vitej v modu CrazyRaceLife2! :) /cmd /help /rules");
-
-	SendDeathMessage(playerid, INVALID_PLAYER_ID, 200);
+	AddTexts(playerid);
 
 	// Fetch player's name and print it out to outhers online.
 	GetPlayerName(playerid, playerName, sizeof(playerName));
 	format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s se prave pripojil ke hre!", playerName);
 
 	SendClientMessageToAll(COLOR_SEDA, stringToPrint);
+
+	// Send a welcome text to the connecting new player.
+	SendClientMessage(playerid, COLOR_NEVIDITEL, "");
+	SendClientMessage(playerid, GREEN, "Vitej v modu CrazyRaceLife2! :) /cmd /help /rules");
+	SendClientMessage(playerid, COLOR_NEVIDITEL, "");
+
+	SendDeathMessage(playerid, INVALID_PLAYER_ID, 200);
 
 	return 0;
 }

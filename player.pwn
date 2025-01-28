@@ -63,7 +63,7 @@ public LoadPlayerData(playerid)
 {
 	if (IsPlayerConnected(playerid) && gPlayerAuth[playerid])
 	{
-		SendClientMessage(playerid, COLOR_ZLUTA, "[ i ][DATA] Nacitam ulozena uzivatelska data...");
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ DATA ] Nacitam ulozena uzivatelska data...");
 
 		new playerName[MAX_PLAYER_NAME];
 		GetPlayerName(playerid, playerName, sizeof(playerName));
@@ -84,19 +84,19 @@ public LoadPlayerData(playerid)
 		SetPlayerHealth(playerid, gPlayerData[playerid][E_PLAYER_DATA_HEALTH]);
 		SetPlayerArmour(playerid, gPlayerData[playerid][E_PLAYER_DATA_ARMOUR]);
 
-		SendClientMessage(playerid, GREEN, "[ i ][DATA] Data uspesne nactena!");
+		SendClientMessage(playerid, GREEN, "[ DATA ] Data uspesne nactena!");
 
-		return 0;
+		return 1;
 	}
 
-	return 1;
+	return 0;
 }
 
 public SavePlayerData(playerid)
 {
 	if (IsPlayerConnected(playerid) && gPlayerAuth[playerid])
 	{
-		SendClientMessage(playerid, COLOR_ZLUTA, "[ i ][DATA] Pripravuje se ulozeni uzivatelskych dat...");
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ AUTOSAVE ] Pripravuje se ulozeni uzivatelskych dat...");
 
 		new playerName[MAX_PLAYER_NAME];
 		GetPlayerName(playerid, playerName, sizeof(playerName));
@@ -109,7 +109,7 @@ public SavePlayerData(playerid)
 		dUserSetINT(playerName).("team", gPlayerData[playerid][E_PLAYER_DATA_TEAM]);
 		dUserSetINT(playerName).("class", GetPlayerSkin(playerid));
 
-		SendClientMessage(playerid, GREEN, "[ i ][DATA] Data uspesne ulozena! ");
+		SendClientMessage(playerid, GREEN, "[ AUTOSAVE ] Data uspesne ulozena! ");
 	}
 
 	return 1;
@@ -174,7 +174,7 @@ public SendPlayerSalary()
 			case E_PLAYER_TEAM_CAR_REPAIR:
 				{
 					teamSalary = 300 + random(299);
-					format(stringToPrint, sizeof(stringToPrint), "Výplata povolani: $%d | Vyplata z autoservisu!", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Vyplata z autoservisu!", teamSalary);
 				}
 			case E_PLAYER_TEAM_PYRO:
 				{

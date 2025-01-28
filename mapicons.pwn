@@ -66,31 +66,33 @@ enum E_MAPICON_ID
 	E_MAPICON_ID_PAY_N_SPRAY
 }
 
-// The very global spawn point in LV.
-SetPlayerMapIcon(playerid, 0, 2323.73, 1283.18, 97.60, E_MAPICON_ID_ENEMY_ATTACK, 0, MAPICON_LOCAL);
-
-// ATMs.
-for (new i = 0; i < sizeof(gBankLocation); i++)
+public AddMapicons(playerid)
 {
-	SetPlayerMapIcon(playerid, i+1, Float:gBankLocation[i][0], Float:gBankLocation[i][1], Float:gBankLocation[i][2], E_MAPICON_ID_ROBBERY, 0, MAPICON_LOCAL);
+	// The very global spawn point in LV.
+	SetPlayerMapIcon(playerid, 0, 2323.73, 1283.18, 97.60, E_MAPICON_ID_ENEMY_ATTACK, 0, MAPICON_LOCAL);
+
+	// ATMs.
+	for (new i = 0; i < sizeof(gBankLocation); i++)
+	{
+		SetPlayerMapIcon(playerid, i+1, Float:gBankLocation[i][0], Float:gBankLocation[i][1], Float:gBankLocation[i][2], E_MAPICON_ID_ROBBERY, 0, MAPICON_LOCAL);
+	}
+
+	// Oznaceni zavodist + stanovist tymu Dragsteru.
+	SetPlayerMapIcon(playerid, 10, 2620.14, 1195.76, 10.81, E_MAPICON_ID_RACE_TOURNAMENT, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, 10, 1882.48, -2419.96, 13.11, E_MAPICON_ID_RACE_TOURNAMENT, 0, MAPICON_LOCAL);
+
+	// Housing.
+	SetPlayerMapIcon(playerid, 20, 1442.6, -637.3, 95.1, E_MAPICON_ID_PROPERTY_NOT_FOR_SALE, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, 21, 541.0, 2364.8, 31.2, E_MAPICON_ID_PROPERTY_NOT_FOR_SALE, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, 22, -2657.27, 882.27, 79.34, E_MAPICON_ID_PROPERTY_NOT_FOR_SALE, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, 23, -2686.03, 205.63, 3.96, E_MAPICON_ID_PROPERTY_NOT_FOR_SALE, 0, MAPICON_LOCAL);
+
+	// Airports.
+	SetPlayerMapIcon(playerid, 30, 414.3, 2528.1, 16.6, E_MAPICON_ID_AIRYARD, 0, MAPICON_LOCAL);
+
+	// Jobs.
+	SetPlayerMapIcon(playerid, 40, 970.7, 2155.0, 10.8, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, 41, 2287.1, 2426.7, 10.8, E_MAPICON_ID_POLICE, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, 42, -91.76, -305.44, 1.42, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, 43, -81.32, -1135.79, 0.91, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
 }
-
-// Oznaceni zavodist + stanovist tymu Dragsteru.
-SetPlayerMapIcon(playerid, 10, 2620.14, 1195.76, 10.81, E_MAPICON_ID_RACE_TOURNAMENT, 0, MAPICON_LOCAL);
-SetPlayerMapIcon(playerid, 10, 1882.48, -2419.96, 13.11, E_MAPICON_ID_RACE_TOURNAMENT, 0, MAPICON_LOCAL);
-
-// Housing.
-SetPlayerMapIcon(playerid, 20, 1442.6, -637.3, 95.1, E_MAPICON_ID_PROPERTY_NOT_FOR_SALE, 0, MAPICON_LOCAL);
-SetPlayerMapIcon(playerid, 21, 541.0, 2364.8, 31.2, E_MAPICON_ID_PROPERTY_NOT_FOR_SALE, 0, MAPICON_LOCAL);
-SetPlayerMapIcon(playerid, 22, -2657.27, 882.27, 79.34, E_MAPICON_ID_PROPERTY_NOT_FOR_SALE, 0, MAPICON_LOCAL);
-SetPlayerMapIcon(playerid, 23, -2686.03, 205.63, 3.96, E_MAPICON_ID_PROPERTY_NOT_FOR_SALE, 0, MAPICON_LOCAL);
-
-// Airports.
-SetPlayerMapIcon(playerid, 30, 414.3, 2528.1, 16.6, E_MAPICON_ID_AIRYARD, 0, MAPICON_LOCAL);
-
-// Jobs.
-SetPlayerMapIcon(playerid, 40, 970.7, 2155.0, 10.8, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
-SetPlayerMapIcon(playerid, 41, 2287.1, 2426.7, 10.8, E_MAPICON_ID_POLICE, 0, MAPICON_LOCAL);
-SetPlayerMapIcon(playerid, 42, -91.76, -305.44, 1.42, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
-SetPlayerMapIcon(playerid, 43, -81.32, -1135.79, 0.91, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
-

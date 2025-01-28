@@ -48,14 +48,14 @@ new Text:gRaceInfoText[MAX_PLAYERS];
 //  Race props.
 //
 
-new gRaceWarp[E_RACE_ID][3] = 
+new gRaceWarp[E_RACE_ID][E_RACE_COORD] = 
 {
 	// E_RACE_ID_NONE
 	{0.0, 0.0, 0.0},
 	// E_RACE_ID_LV_PYRAMID
-	{0.0, 0.0, 0.0},
+	{2635.67, 1171.51, 10.37},
 	// E_RACE_ID_STUNT_LV_1
-	{1958.3783, 1343.1572, 15.3746},
+	{2635.67, 1171.51, 10.37},
 	// E_RACE_ID_CIRCUIT_SF_WANG
 	{-1951.58, 296.77, 41.04},
 	// SF to LS Airport race
@@ -89,6 +89,10 @@ new const gRaceFeePrize[E_RACE_ID][E_RACE_FEE] =
 	{1500, 20000},
 	// SF to LS Airport race
 	{2000, 35000}
+};
+
+new gRaceCoordsLVPyramid[][E_RACE_COORD] =
+{
 };
 
 // E_RACE_ID_STUNT_LV_1
@@ -227,12 +231,10 @@ public StartRace()
 stock SetPlayerRaceSingle(playerid, raceId, coords[][E_RACE_COORD], len)
 {
 	// Fetch the relative position in such race (position of checkpoints).
-	new lastCPNo, raceCPPosition = gPlayerRace[playerid][raceId] - 1;
+	new lastCPNo = len - 1, raceCPPosition = gPlayerRace[playerid][raceId] - 1;
 
 	// Prepare the coords to show a race checkpoint.
 	new x0, y0, z0, x1, y1, z1, cpType = CP_TYPE_GROUND_NORMAL;
-
-	lastCPNo = len - 1;
 
 	// End the race.
 	if (raceCPPosition > lastCPNo)
@@ -257,7 +259,6 @@ stock SetPlayerRaceSingle(playerid, raceId, coords[][E_RACE_COORD], len)
 
 	// Set the next checkpoint to reach.
 	SetPlayerRaceCheckpoint(playerid, cpType, Float:x0, Float:y0, Float:z0, Float:x1, Float:y1, Float:z0, 10.0);
-
 }
 
 public SetPlayerRace(playerid, raceId)
@@ -377,6 +378,33 @@ public CheckPlayerRaceState(playerid)
 
 	// The player does not seem to be in any race now.
 	return 0;
+}
+
+public SetPlayerRaceStartPos(playerid)
+{
+	new raceId = CheckPlayerRaceState(playerid);
+
+	if (!raceId)
+	{
+		 SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Nejsi prihlasen v zadnem zavode, warp se nekona!");
+		 return 0;
+	}
+
+	if (gPlayerRace[playerid][raceId] > 1)
+	{
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Zavod jiz zacal, warp na start uz neni mozny!");
+		return 0;
+	}
+
+	if (!IsPlayerInAnyVehicle(playerid) && GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
+	{
+		SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Pro warp je treba byt ve vozidle a byt ridicem!");
+		return 0;
+	}
+
+	SetVehiclePos(GetPlayerVehicleID(playerid), Float:gRaceWarp[raceId][E_RACE_COORD_X], Float:gRaceWarp[raceId][E_RACE_COORD_Y], Float:gRaceWarp[raceId][E_RACE_COORD_Z]);
+
+	return 1;
 }
 
 public UpdateRaceInfoText(playerid)

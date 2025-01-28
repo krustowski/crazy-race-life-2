@@ -255,7 +255,7 @@ public OnGameModeInit()
 	SetTimer("UpdatePlayerScore", 1 * SECOND_MS, 1);
 	SetTimer("SendPlayerSalary", 300 * SECOND_MS, 1);
 
-	SetTimer("DrawClockText", 60 * SECOND_MS, 1);
+	SetTimer("DrawClockText", 30 * SECOND_MS, 1);
 
 	SetTimer("ShowAdvert", 120 * SECOND_MS, 1);
 
@@ -681,6 +681,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	dcmd(odpocet, 7, cmdtext);        //rcon + 
 	dcmd(reset, 5, cmdtext);	  //rcon + lvl 4
 	dcmd(smazat, 6, cmdtext);         //rcon +
+	dcmd(spectate, 8, cmdtext);	  //rcon + lvl 2
 	dcmd(zbrane, 6, cmdtext); 	  //rcon + lvl 3
 
 	return InvalidCommand(playerid);

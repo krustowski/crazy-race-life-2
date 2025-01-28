@@ -10,7 +10,9 @@ public ShowAdvert()
 		"[ TIP ] Hotovost nevydrzi vecne (umrti, uraz apod), sver sve finance bance!",
 		"[ TIP ] Nevahej a vyuzij pestre nabidky zavodu! Pro vice informaci pouzij /race list",
 		"[ TIP ] Pokud jsi uvizl v zavodu, muzes ho opustit pomoci /race exit",
-		"[ TIP ] Po prihlaseni do jakehokoliv zavodu lze hodit warp ke startu pomoci /race warp"
+		"[ TIP ] Po prihlaseni do jakehokoliv zavodu lze hodit warp ke startu pomoci /race warp",
+		"[ TIP ] Po mape se lze volne premistovat pomoci /port [ID lokace], nelze vsak takto cestovat ve vozidle",
+		"[ TIP ] Malo penez? Sezen motorku a delej stunty, ktere jsou kdekoliv finance ohodnoceny!"
 	};
 
 	new advertId = random(sizeof(advertList)), stringToPrint[256];

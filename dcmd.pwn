@@ -708,8 +708,15 @@ dcmd_race(playerid, params[])
 	new token1[32], token2[32];
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
-	if (!strlen(params) || (strcmp(token1, "join") && strcmp(token1, "exit") && strcmp(token1, "list")) || (!strcmp(token1, "join") && !IsNumeric(token2)))
-		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /race [join/exit/list] [ID zavodu]");
+	if (!strlen(params) || (strcmp(token1, "join") && strcmp(token1, "exit") && strcmp(token1, "list") && strcmp(token1, "warp")) || (!strcmp(token1, "join") && !IsNumeric(token2)))
+	{
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /race join [ID zavodu]");
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /race exit");
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /race list");
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /race warp");
+
+		return 1;
+	}
 
 	if (!strcmp(token1, "join"))
 	{
@@ -732,6 +739,11 @@ dcmd_race(playerid, params[])
 			format(stringToPrint, sizeof(stringToPrint), "ID: %2d: %s ($%d / $%d)", i, gRaceNames[i], gRaceFeePrize[i][E_RACE_FEE_FEE], gRaceFeePrize[i][E_RACE_FEE_PRIZE]);
 			SendClientMessage(playerid, COLOR_SEDA, stringToPrint);
 		}
+	}
+	else if (!strcmp(token1, "warp"))
+	{
+		if (SetPlayerRaceStartPos(playerid))
+			return SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Warp ke startu zavodu probehl uspesne!");
 	}
 
 	return 1;
@@ -1132,3 +1144,37 @@ dcmd_soska(playerid, params[])
 	return 1;
 }
 
+dcmd_spectate(playerid, params[])
+{
+	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 2) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
+
+	if (!strlen(params) || !IsNumeric(params))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /spectate [playerID]");
+
+	new targetId = strval(params);
+
+	if (!IsPlayerConnected(targetId))
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+
+	if (playerid == targetId)
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nemuzes sledovat sam sebe!");
+
+	if (!gPlayerData[playerid][E_PLAYER_DATA_SPECTATE])
+	{
+		TogglePlayerSpectating(playerid, true);
+		PlayerSpectatePlayer(playerid, targetId);
+
+		gPlayerData[playerid][E_PLAYER_DATA_SPECTATE] = 1;
+		SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Sledovani daneho hrace zapnuto!");
+	}
+	else
+	{
+		TogglePlayerSpectating(playerid, false);
+
+		gPlayerData[playerid][E_PLAYER_DATA_SPECTATE] = 0;
+		SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Sledovani daneho hrace vypnuto!");
+	}
+
+	return 1;
+}

@@ -33,7 +33,14 @@ enum E_RACE_ID
 	E_RACE_ID_STUNT_LV_1,
 	E_RACE_ID_CIRCUIT_SF_WANG,
 	E_RACE_ID_SF_LS_AIRPORT,
-	E_RACE_ID_LV_MAP_CIRCUIT
+	E_RACE_ID_LV_MAP_CIRCUIT,
+	E_RACE_ID_DESERT_AIR_CIRCUIT
+}
+
+enum E_RACE_TYPE
+{
+	E_RACE_TYPE_GROUND,
+	E_RACE_TYPE_AIR
 }
 
 // gPlayerRace hold a reference to the state of a player's registration to such race. Thus if registered, a value for such RACE_ID should return true (1).
@@ -62,7 +69,9 @@ new gRaceWarp[E_RACE_ID][E_RACE_COORD] =
 	// SF to LS Airport race
 	{-1386.19, -407.38, 14.14},
 	// LV map circuit
-	{2046.05, 1009.33, 10.24}
+	{2046.05, 1009.33, 10.24},
+	// E_RACE_ID_DESERT_AIR_CIRCUIT
+	{400.64, 2504.60, 16.48}
 };
 
 // gRaceNames is an array to hold all race names referenced via E_RACE_ID.
@@ -76,10 +85,12 @@ new const gRaceNames[E_RACE_ID][] =
 	"Las Venturas Stunt Race No. 1",
 	// E_RACE_ID_CIRCUIT_SF_WANG
 	"San Fierro WangCars Circuit",
-	// SF to LS Airport race
+	// E_RACE_ID_SF_LS_AIRPORT
 	"San Fierro to Los Santos Airport race",
-	// LV map circuit
-	"Las Venturas to Whole Map Circuit"
+	// E_RACE_ID_LV_MAP_CIRCUIT
+	"Las Venturas to Whole Map Circuit",
+	// E_RACE_ID_DESERT_AIR_CIRCUIT
+	"Desert Air Circuit"
 };
 
 new const gRaceFeePrize[E_RACE_ID][E_RACE_FEE] =
@@ -92,10 +103,30 @@ new const gRaceFeePrize[E_RACE_ID][E_RACE_FEE] =
 	{1500, 25000},
 	// E_RACE_ID_CIRCUIT_SF_WANG
 	{1500, 20000},
-	// SF to LS Airport race
+	// E_RACE_ID_SF_LS_AIRPORT
 	{2000, 35000},
 	// E_RACE_ID_LV_MAP_CIRCUIT
-	{3500, 45000}
+	{3500, 45000},
+	// E_RACE_ID_DESERT_AIR_CIRCUIT
+	{4000, 65000}
+};
+
+new E_RACE_TYPE:gRaceTypes[E_RACE_ID] = 
+{
+	// E_RACE_ID_NONE
+	E_RACE_TYPE_GROUND,
+	// E_RACE_ID_LV_PYRAMID
+	E_RACE_TYPE_GROUND,
+	// E_RACE_ID_STUNT_LV_1
+	E_RACE_TYPE_GROUND,
+	// E_RACE_ID_CIRCUIT_SF_WANG
+	E_RACE_TYPE_GROUND,
+	// E_RACE_ID_SF_LS_AIRPORT
+	E_RACE_TYPE_GROUND,
+	// E_RACE_ID_LV_MAP_CIRCUIT
+	E_RACE_TYPE_GROUND,
+	// E_RACE_ID_DESERT_AIR_CIRCUIT
+	E_RACE_TYPE_AIR
 };
 
 new gRaceCoordsLVPyramid[][E_RACE_COORD] =
@@ -331,6 +362,27 @@ new gRaceCoordsLVMapCircuit[][E_RACE_COORD] =
 	{2046.41, 999.06, 10.24}
 };
 
+new gRaceCoordsDesertAirCircuit[][E_RACE_COORD] =
+{
+	{369.64, 2502.15, 17.40},
+	{-14.31, 2500.38, 48.37},
+	{-416.20, 2460.88, 99.84},
+	{-763.97, 2511.05, 148.77},
+	{-1165.76, 2715.24, 108.65},
+	{-1496.06, 2721.65, 135.44},
+	{-1818.74, 2634.10, 130.46},
+	{-1932.01, 2278.66, 130.03},
+	{-1784.93, 2042.32, 130.40},
+	{-1518.67, 1946.81, 136.81},
+	// 11
+	{-1148.50, 2143.69, 121.28},
+	{-861.34, 2313.76, 178.20},
+	{-591.26, 2500.01, 120.71},
+	{-267.54, 2545.04, 78.56},
+	{125.84, 2510.74, 35.65},
+	{353.49, 2505.97, 17.40}
+};
+
 //
 //  Race-related functions.
 //
@@ -343,10 +395,15 @@ public StartRace()
 stock SetPlayerRaceSingle(playerid, raceId, coords[][E_RACE_COORD], len)
 {
 	// Fetch the relative position in such race (position of checkpoints).
-	new lastCPNo = len - 1, raceCPPosition = gPlayerRace[playerid][raceId] - 1;
+	new lastCPNo = len - 1, raceCPPosition = gPlayerRace[playerid][raceId] - 1, raceType = gRaceTypes[raceId];
 
 	// Prepare the coords to show a race checkpoint.
-	new x0, y0, z0, x1, y1, z1, cpType = CP_TYPE_GROUND_NORMAL;
+	new x0, y0, z0, x1, y1, z1, cpType;
+
+	if (raceType == E_RACE_TYPE_GROUND)
+		cpType = CP_TYPE_GROUND_NORMAL;
+	else
+		cpType = CP_TYPE_AIR_NORMAL;
 
 	// End the race.
 	if (raceCPPosition > lastCPNo)
@@ -366,7 +423,10 @@ stock SetPlayerRaceSingle(playerid, raceId, coords[][E_RACE_COORD], len)
 		y1 = coords[raceCPPosition+1][E_RACE_COORD_Y];
 		z1 = coords[raceCPPosition+1][E_RACE_COORD_Z];
 	} else {
-		cpType = CP_TYPE_GROUND_FINISH;
+		if (raceType == E_RACE_TYPE_GROUND)
+			cpType = CP_TYPE_GROUND_FINISH;
+		else
+			cpType = CP_TYPE_AIR_FINISH;
 	}
 
 	// Set the next checkpoint to reach.
@@ -396,6 +456,10 @@ public SetPlayerRace(playerid, raceId)
 		case E_RACE_ID_LV_MAP_CIRCUIT:
 			{
 				SetPlayerRaceSingle(playerid, raceId, gRaceCoordsLVMapCircuit, sizeof(gRaceCoordsLVMapCircuit));
+			}
+		case E_RACE_ID_DESERT_AIR_CIRCUIT:
+			{
+				SetPlayerRaceSingle(playerid, raceId, gRaceCoordsDesertAirCircuit, sizeof(gRaceCoordsDesertAirCircuit));
 			}
 		default:
 			{
@@ -537,6 +601,8 @@ public UpdateRaceInfoText(playerid)
 			cpCount = sizeof(gRaceCoordsLSFLSAirport);
 		case E_RACE_ID_LV_MAP_CIRCUIT:
 			cpCount = sizeof(gRaceCoordsLVMapCircuit);
+		case E_RACE_ID_DESERT_AIR_CIRCUIT:
+			cpCount = sizeof(gRaceCoordsDesertAirCircuit);
 	}
 
 	gPlayerRaceTime[playerid] += 1000;

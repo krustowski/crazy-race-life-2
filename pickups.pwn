@@ -22,10 +22,11 @@ new gAdminDoorUp;
 new picktunel;
 
 // Drugz
-new gHeroinPackage;
-new gCocainePackage;
-new gFentPackage;
-new gMethPackage;
+new gHeroinPackage[5];
+new gCocainePackage[5];
+new gMethPackage[5];
+new gFentPackage[2];
+new gPCPPackage;
 
 new gPlayerMoneyPickup[MAX_PLAYERS];
 new gPlayerMoneyPickupAmount[MAX_PLAYERS];
@@ -66,39 +67,59 @@ public InitPickups()
 
 	//CreatePickup(xxx, 1, -1669.09, 1009.93, 7.75);
 
-	gCocainePackage = CreatePickup(1575, 8, -2044.38, 975.56, 54.24);
-	gHeroinPackage = CreatePickup(1580, 8, -1664.19, 1010.74, 7.49);
-	gFentPackage = CreatePickup(1580, 8, -2048.49, 757.83, 60.62);
-	gMethPackage = CreatePickup(1580, 8, -97.97, -1587.09, 2.61);
-
-	gFentPackage = CreatePickup(1580, 8, -2205.62, 939.30, 79.83);
-	gFentPackage = CreatePickup(1580, 8, -1956.59, 767.23, 55.72);
-
 	//
-	//
+	//  Drugz. Mostly SF.
 	//
 
-	gTeamPickup[E_PLAYER_TEAM_LAME] = CreatePickup(1239, 1, 2252.11, 1285.30, 19.17);
+	gCocainePackage[0] = CreatePickup(1575, PICKUP_TYPE_RESPAWN_30_SECONDS, -2117.20, 220.44, 35.22);
+	gCocainePackage[1] = CreatePickup(1575, PICKUP_TYPE_RESPAWN_30_SECONDS, -2555.85, 23.78, 12.60);
+	gCocainePackage[2] = CreatePickup(1575, PICKUP_TYPE_RESPAWN_30_SECONDS, -2040.96, 837.46, 55.10);
+	gCocainePackage[3] = CreatePickup(1575, PICKUP_TYPE_RESPAWN_30_SECONDS, -1807.20, 1334.54, 7.18);
+	gCocainePackage[4] = CreatePickup(1575, PICKUP_TYPE_RESPAWN_30_SECONDS, -2045.62, 975.51, 54.24);
+
+	gHeroinPackage[0] = CreatePickup(1577, PICKUP_TYPE_RESPAWN_30_SECONDS, -1664.19, 1010.74, 7.49);
+	gHeroinPackage[1] = CreatePickup(1577, PICKUP_TYPE_RESPAWN_30_SECONDS, -2457.18, -96.09, 25.99);
+	gHeroinPackage[2] = CreatePickup(1577, PICKUP_TYPE_RESPAWN_30_SECONDS, -1955.88, 766.31, 55.72);
+	gHeroinPackage[3] = CreatePickup(1577, PICKUP_TYPE_RESPAWN_30_SECONDS, -1725.84, 1243.85, 7.54);
+	gHeroinPackage[4] = CreatePickup(1577, PICKUP_TYPE_RESPAWN_30_SECONDS, -2708.04, 1459.45, 6.68);
+
+	gMethPackage[0] = CreatePickup(1579, PICKUP_TYPE_RESPAWN_30_SECONDS, -97.97, -1587.09, 2.61);
+	gMethPackage[1] = CreatePickup(1579, PICKUP_TYPE_RESPAWN_30_SECONDS, -2515.70, 300.41, 28.97);
+	gMethPackage[2] = CreatePickup(1579, PICKUP_TYPE_RESPAWN_30_SECONDS, -2563.58, 324.83, 10.56);
+	gMethPackage[3] = CreatePickup(1579, PICKUP_TYPE_RESPAWN_30_SECONDS, -2186.31, 695.96, 53.89);
+	gMethPackage[4] = CreatePickup(1579, PICKUP_TYPE_RESPAWN_30_SECONDS, -2449.87, 968.84, 44.86);
+
+	gFentPackage[0] = CreatePickup(1580, PICKUP_TYPE_RESPAWN_30_SECONDS, -2213.43, 109.71, 35.32);
+	gFentPackage[1] = CreatePickup(1580, PICKUP_TYPE_RESPAWN_30_SECONDS, -2720.09, 75.78, 4.33);
+
+	gPCPPackage = CreatePickup(1576, PICKUP_TYPE_RESPAWN_30_SECONDS, -2635.15, 957.42, 70.21);
+
+	//
+	//  Jobs/Teams.
+	//
+
+	//gTeamPickup[E_PLAYER_TEAM_LAME] = CreatePickup(1239, 1, 2252.11, 1285.30, 19.17);
+	gTeamPickup[E_PLAYER_TEAM_LAME] = CreatePickup(1581, 1, 2252.11, 1285.30, 19.17);
 	gTeamMenu[E_PLAYER_TEAM_LAME] = CreateMenu("Lamerz", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_LAME], 0, "Lamka");
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_LAME], 0, "Opustit tym");
 
-	gTeamPickup[E_PLAYER_TEAM_ADMINZ] = CreatePickup(1239, 1, 2304.43, 1151.95, 85.94);
+	gTeamPickup[E_PLAYER_TEAM_ADMINZ] = CreatePickup(1581, 1, 2304.43, 1151.95, 85.94);
 	gTeamMenu[E_PLAYER_TEAM_ADMINZ] = CreateMenu("Adminz", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_ADMINZ], 0, "Admin borec");
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_ADMINZ], 0, "Opustit tym");
 
-	gTeamPickup[E_PLAYER_TEAM_POLICE] = CreatePickup(1239, 1, 229.4, 167.4, 1003.0);
+	gTeamPickup[E_PLAYER_TEAM_POLICE] = CreatePickup(1581, 1, 229.4, 167.4, 1003.0);
 	gTeamMenu[E_PLAYER_TEAM_POLICE] = CreateMenu("Police LV", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_POLICE], 0, "Policajt");
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_POLICE], 0, "Opustit tym");
 
-	gTeamPickup[E_PLAYER_TEAM_GASMAN] = CreatePickup(1239, 1, 2637.36, 1127.04, 11.18);
+	gTeamPickup[E_PLAYER_TEAM_GASMAN] = CreatePickup(1581, 1, 2637.36, 1127.04, 11.18);
 	gTeamMenu[E_PLAYER_TEAM_GASMAN] = CreateMenu("Benzina", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_GASMAN], 0, "Benzinak");
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_GASMAN], 0, "Opustit tym");
 
-	gTeamPickup[E_PLAYER_TEAM_DRAGSTER] = CreatePickup(1239, 1, 2620.14, 1195.76, 10.81);
+	gTeamPickup[E_PLAYER_TEAM_DRAGSTER] = CreatePickup(1581, 1, 2620.14, 1195.76, 10.81);
 	gTeamMenu[E_PLAYER_TEAM_DRAGSTER] = CreateMenu("Dragsterz", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_DRAGSTER], 0, "DRaGsTeR");
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_DRAGSTER], 0, "Opustit tym");
@@ -118,15 +139,8 @@ public InitPickups()
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_HACKER], 0, "Hacker");
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_HACKER], 0, "Opustit tym");
 
-	//gTeamPickup[E_PLAYER_TEAM_CAR_REPAIR] = CreatePickup(1581,1, );
-	gTeamMenu[E_PLAYER_TEAM_CAR_REPAIR] = CreateMenu("Servicemen", 1, 150.0, 100.0, 250.0, 150.0);
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_CAR_REPAIR], 0, "Technik");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_CAR_REPAIR], 0, "Opustit tym");
-
-	//gTeamPickup[E_PLAYER_TEAM_PYRO] = CreatePickup(1581,1, );
-	gTeamMenu[E_PLAYER_TEAM_PYRO] = CreateMenu("Pyroz", 1, 150.0, 100.0, 250.0, 150.0);
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PYRO], 0, "Pyrotechnik");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PYRO], 0, "Opustit tym");
-
 	gTeamPickup[E_PLAYER_TEAM_DEALER] = CreatePickup(1581, 1, 2582.10, -956.28, 81.02);
+	gTeamMenu[E_PLAYER_TEAM_DEALER] = CreateMenu("Pyroz", 1, 150.0, 100.0, 250.0, 150.0);
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_DEALER], 0, "Drug Dealer");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_DEALER], 0, "Opustit tym");
 }

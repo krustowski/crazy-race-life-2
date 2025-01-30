@@ -29,8 +29,6 @@ enum E_PLAYER_TEAM
 	E_PLAYER_TEAM_GARBAGE,
 	E_PLAYER_TEAM_PIZZABOY,
 	E_PLAYER_TEAM_HACKER,
-	E_PLAYER_TEAM_CAR_REPAIR,
-	E_PLAYER_TEAM_PYRO,
 	E_PLAYER_TEAM_DEALER
 }
 
@@ -40,12 +38,16 @@ enum E_PLAYER_DRUGZ
 	E_PLAYER_DRUGZ_TOBACCO,
 	E_PLAYER_DRUGZ_PAPER,
 	E_PLAYER_DRUGZ_LIGHTER,
-	E_PLAYER_DRUGZ_JOINT
+	E_PLAYER_DRUGZ_JOINT,
+	E_PLAYER_DRUGZ_COCAINE,
+	E_PLAYER_DRUGZ_HEROIN,
+	E_PLAYER_DRUGZ_METH,
+	E_PLAYER_DRUGZ_FENT,
+	E_PLAYER_DRUGZ_PCP
 }
 
 new gPlayerAuth[MAX_PLAYERS];
 new gPlayerData[MAX_PLAYERS][E_PLAYER_DATA];
-
 new gPlayerDrugz[MAX_PLAYERS][E_PLAYER_DRUGZ];
 
 new PICKUP:gTeamPickup[E_PLAYER_TEAM];
@@ -84,6 +86,14 @@ public LoadPlayerData(playerid)
 		gPlayerData[playerid][E_PLAYER_DATA_HEALTH] = readcfgvalue(playerName, "", "health");
 		gPlayerData[playerid][E_PLAYER_DATA_ARMOUR] = readcfgvalue(playerName, "", "armour");
 
+		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_COCAINE] = readcfgvalue(playerName, "drugz", "cocaine");
+		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_HEROIN] = readcfgvalue(playerName, "drugz", "heroin");
+		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_METH] = readcfgvalue(playerName, "drugz", "meth");
+		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_FENT] = readcfgvalue(playerName, "drugz", "fent");
+		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_PCP] = readcfgvalue(playerName, "drugz", "pcp");
+		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_ZAZA] = readcfgvalue(playerName, "drugz", "zaza");
+		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_TOBACCO] = readcfgvalue(playerName, "drugz", "tobacco");
+
 		GivePlayerMoney(playerid, gPlayerData[playerid][E_PLAYER_DATA_CASH]);
 		SetPlayerHealth(playerid, gPlayerData[playerid][E_PLAYER_DATA_HEALTH]);
 		SetPlayerArmour(playerid, gPlayerData[playerid][E_PLAYER_DATA_ARMOUR]);
@@ -117,9 +127,16 @@ public SavePlayerData(playerid)
 		writecfgvalue(playerName, "", "adminlvl", gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL]);
 		writecfgvalue(playerName, "", "team", gPlayerData[playerid][E_PLAYER_DATA_TEAM]);
 		writecfgvalue(playerName, "", "class", GetPlayerSkin(playerid));
-
 		writecfgvalue(playerName, "", "health", floatround(health));
 		writecfgvalue(playerName, "", "armour", floatround(armour));
+
+		writecfgvalue(playerName, "drugz", "cocaine", gPlayerDrugz[playerid][E_PLAYER_DRUGZ_COCAINE]);
+		writecfgvalue(playerName, "drugz", "heroin", gPlayerDrugz[playerid][E_PLAYER_DRUGZ_HEROIN]);
+		writecfgvalue(playerName, "drugz", "meth", gPlayerDrugz[playerid][E_PLAYER_DRUGZ_METH]);
+		writecfgvalue(playerName, "drugz", "fent", gPlayerDrugz[playerid][E_PLAYER_DRUGZ_FENT]);
+		writecfgvalue(playerName, "drugz", "pcp", gPlayerDrugz[playerid][E_PLAYER_DRUGZ_PCP]);
+		writecfgvalue(playerName, "drugz", "zaza", gPlayerDrugz[playerid][E_PLAYER_DRUGZ_ZAZA]);
+		writecfgvalue(playerName, "drugz", "tobacco", gPlayerDrugz[playerid][E_PLAYER_DRUGZ_TOBACCO]);
 
 		SendClientMessage(playerid, GREEN, "[ AUTOSAVE ] Data uspesne ulozena! ");
 	}
@@ -141,61 +158,56 @@ public SendPlayerSalary()
 			case E_PLAYER_TEAM_NONE:
 				{
 					teamSalary = 100 + random(150);
-					format(stringToPrint, sizeof(stringToPrint), "Podpora v nezamestnanosti: $%d | Par drobku z mestske kasy :) A nemysli si ze nebudes pracovat!", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Podpora v nezamestnanosti: $%d | Par drobku z mestske kasy :) A nemysli si ze nebudes pracovat!", teamSalary);
 				}
 			case E_PLAYER_TEAM_LAME:
 				{
 					teamSalary = 5 + random(20);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Nemysli si ze lamam budeme davat tolik penez!", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Nemysli si ze lamam budeme davat tolik penez!", teamSalary);
 				}
 			case E_PLAYER_TEAM_ADMINZ:
 				{
 					teamSalary = 1500 + random(2000);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Uzijte peníze pro co chcete! :D", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Uzijte peníze pro co chcete! :D", teamSalary);
 				}
 			case E_PLAYER_TEAM_POLICE:
 				{
 					teamSalary = 1000 + random(600);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Pro pany fizle par papiru z mestske kasy! :)", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Pro pany fizle par papiru z mestske kasy! :)", teamSalary);
 				}
 			case E_PLAYER_TEAM_GASMAN:
 				{
 					teamSalary = 1000 + random(600);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Provize z benzinky! :D", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Provize z benzinky! :D", teamSalary);
 				}
 			case E_PLAYER_TEAM_DRAGSTER:
 				{
 					teamSalary = 1200 + random(1000);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Provize z dragu! :D", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Provize z dragu! :D", teamSalary);
 				}
 			case E_PLAYER_TEAM_GARBAGE:
 				{
 					teamSalary = 120 + random(100);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Podpora mesta a penize z popelnic! :D", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Podpora mesta a penize z popelnic! :D", teamSalary);
 				}
 			case E_PLAYER_TEAM_PIZZABOY:
 				{
 					teamSalary = 190 + random(200);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Pizza provize a spropitne! :D", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Pizza provize a spropitne! :D", teamSalary);
 				}
 			case E_PLAYER_TEAM_HACKER:
 				{
 					teamSalary = 1500 + random(800);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Vypalne a provize z prodeje ukradenych dat! :D", teamSalary);
+					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Vypalne a provize z prodeje ukradenych dat! :D", teamSalary);
 				}
-			case E_PLAYER_TEAM_CAR_REPAIR:
+			case E_PLAYER_TEAM_DEALER:
 				{
-					teamSalary = 300 + random(299);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Vyplata z autoservisu!", teamSalary);
-				}
-			case E_PLAYER_TEAM_PYRO:
-				{
-					teamSalary = 800 + random(210);
-					format(stringToPrint, sizeof(stringToPrint), "Vyplata povolani: $%d | Vyplata od ministerstva pyrotechniky! :D", teamSalary);
+					teamSalary = 1800 + random(2100);
+					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Prachy z cerneho trhu a prodeje narkotik!", teamSalary);
 				}
 		}
 
-		SendClientMessage(i, COLOR_ORANZCERV, stringToPrint);
+		SendClientMessage(i, COLOR_ZLUTA, stringToPrint);
 
 		format(gameText, sizeof(gameText), "~y~V~g~yplata~n~~y~$~g~%d", teamSalary);
 		GameTextForPlayer(i, gameText, 4000, 1);

@@ -16,7 +16,10 @@ new gBankLocation[][4] =
 	{2748.44, -1466.40, 30.01, 15},
 
 	// Bayside near SF
-	{-2477.54, 2323.47, 4.81}
+	{-2477.54, 2323.47, 4.81},
+
+	// Fort Carson Desert
+	{-178.05, 1110.06, 19.57}
 };
 
 public CheckPlayerBankLocation(playerid)

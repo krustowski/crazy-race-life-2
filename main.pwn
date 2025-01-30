@@ -223,7 +223,7 @@ public OnGameModeInit()
 	AllowInteriorWeapons(0);
 	EnableStuntBonusForAll(1);  
 
-	//InitDB();
+	InitGroups();
 
 	//
 	// Start various timers.
@@ -749,7 +749,15 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	//  Various joobs/teams pickups.
 	//
 
-	if (pickupid == gTeamPickup[E_PLAYER_TEAM_LAME])
+	for (new i = 0; i < sizeof(gTeams); i++)
+	{
+		if (pickupid == gTeams[i][Pickups][0])
+		{
+			ShowMenuForPlayer(Menu:gTeams[i][Menus][0], playerid);
+		}
+	}
+
+	/*if (pickupid == gTeamPickup[E_PLAYER_TEAM_LAME])
 	{
 		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_LAME], playerid);
 	}
@@ -784,13 +792,13 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	else if (pickupid == gTeamPickup[E_PLAYER_TEAM_DEALER])
 	{
 		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_DEALER], playerid);
-	}
+	}*/
 
 	//
 	//  Other pickups --- entries,  baggies etc.
 	//
 
-	else if (pickupid == gAdminRoomHealth)
+	if (pickupid == gAdminRoomHealth)
 	{
 		SetPlayerHealth(playerid, 100.0);
 	}
@@ -895,12 +903,27 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		ResetPlayerWeapons(playerid);
 		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_NONE;
 
-		SendClientMessage(playerid, COLOR_SEDA, "[ i ] Opustil jsi team: jsi nezarazen/nezamestnan.");
+		SendClientMessage(playerid, COLOR_SEDA, "[ TEAM ] Opustil jsi team: jsi nezarazen/nezamestnan.");
 
 		return 1;
 	}
 
-	if (currentMenu == gTeamMenu[E_PLAYER_TEAM_LAME])
+	for (new i = 0; i < sizeof(gTeams); i++)
+	{
+		if (currentMenu == gTeams[i][Menus][0])
+		{
+			GivePlayerWeapon(playerid, gTeams[i][Weapons][0], gTeams[i][Ammu][0]);
+			SetPlayerColor(playerid, gTeams[i][Color]);
+			SetPlayerSkin(playerid, gTeams[i][Skins][0]);
+
+			gPlayers[playerid][TeamID] = gTeams[i];
+
+			format(stringToPrint, sizeof(stringToPrint), "[ TEAM ] Hrac %s se pripojil k tymu %s!", gPlayers[playerid][Name], gTeams[i][TeamName]);
+			SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
+		}
+	}
+
+	/*if (currentMenu == gTeamMenu[E_PLAYER_TEAM_LAME])
 	{
 		GivePlayerWeapon(playerid, 5, 1);
 		SetPlayerColor(playerid, COLOR_ZLUTA);
@@ -1000,7 +1023,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Dealeru!", playerName);
 	}
 
-	SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
+	SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);*/
 
 	return 1;
 }

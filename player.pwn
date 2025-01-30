@@ -1,3 +1,237 @@
+#define MAX_TEAMS		10
+#define MAX_TEAM_PICKUPS	16
+#define MAX_TEAM_MENUS		16
+
+enum Team
+{
+	TeamName[64],
+	Color,
+	Skins[5],
+	Weapons[11],
+	Ammu[11],
+	SalaryBase,
+	SalaryVolatile,
+	PICKUP: Pickups[MAX_TEAM_PICKUPS],
+	Menu: Menus[MAX_TEAM_MENUS]
+}
+
+enum Teams
+{
+	None[Team],
+	Lames[Team],
+	Adminz[Team],
+	Police[Team],
+	Truckers[Team],
+	Dragsters[Team],
+	Garbagemen[Team],
+	Pizzaguys[Team],
+	Hackers[Team],
+	Dealers[Team]
+}
+
+//
+//  Player's props.
+//
+
+enum Drug
+{
+	DrugName[64],
+	DrugIniName[64],
+
+	Amount,
+	Price
+}
+
+enum Drugz 
+{
+	Zaza[Drug],
+	Tobacco[Drug],
+	Paper[Drug],
+	Lighter[Drug],
+	Joint[Drug],
+	Cocaine[Drug],
+	Heroin[Drug],
+	Meth[Drug],
+	Fent[Drug],
+	PCP[Drug]
+}
+
+enum Player
+{
+	ID,
+	Name[MAX_PLAYER_NAME],
+	bool: IsLogged,
+
+	PasswordHash[65],
+	PasswordSalt[17],
+
+	TeamID[Team],
+	Skin,
+	Cash,
+	Bank,
+	Float: Health,
+	Float: Armour,
+	AdminLevel,
+	LoginAttempts,
+	bool: AFK,
+	bool: Hidden,
+	bool: Spectating,
+	bool: Jailed,
+	Drugs[Drugz]
+}
+
+new gTeamNone[Team] = 
+{
+	"Nezarazeno",
+	COLOR_ZLUTA,
+	{0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	100,
+	150,
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
+};
+
+new gTeamLames[Team] = 
+{
+	"Lamky",
+	COLOR_ZLUTA,
+	{200, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	100,
+	150,
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
+};
+
+new gTeamAdminz[Team] = 
+{
+	"Admin Borci",
+	COLOR_SVZEL,
+	{29, 0, 0, 0, 0},
+	{32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	100,
+	150,
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
+};
+
+new gTeamPolice[Team] = 
+{
+	"Policie",
+	MODRA,
+	{285, 0, 0, 0, 0},
+	{30, 31, 32, 0, 0, 0, 0, 0, 0, 0, 0},
+	{100, 100, 111, 0, 0, 0, 0, 0, 0, 0, 0},
+	100,
+	150,
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
+};
+
+new gTeamTruckers[Team] = 
+{
+	"Truckeri",
+	COLOR_CERVENA,
+	{50, 0, 0, 0, 0},
+	{32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	100,
+	150,
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
+};
+
+new gTeamDragsters[Team] = 
+{
+	"Dragsteri",
+	COLOR_ZELENA,
+	{107, 0, 0, 0, 0},
+	{5, 30, 31, 0, 0, 0, 0, 0, 0, 0, 0},
+	{1, 100, 1000, 0, 0, 0, 0, 0, 0, 0, 0},
+	100,
+	150,
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
+};
+
+new gTeamGarbagemen[Team] = 
+{
+	"Popelari",
+	COLOR_HNEDA,
+	{230, 0, 0, 0, 0},
+	{4, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{1, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	100,
+	150,
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
+};
+
+new gTeamPizzaguys[Team] = 
+{
+	"Pizza hosi",
+	COLOR_ZELZLUT,
+	{250, 0, 0, 0, 0},
+	{4, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{1, 111, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	100,
+	150,
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
+};
+
+new gTeamHackers[Team] = 
+{
+	"Hackeri",
+	COLOR_BILA,
+	{170, 0, 0, 0, 0},
+	{4, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{100, 111, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	100,
+	150,
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
+};
+
+new gTeamDealers[Team] = 
+{
+	"Dealeri",
+	COLOR_ORANZOVA,
+	{29, 0, 0, 0, 0},
+	{4, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	100,
+	150,
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
+};
+
+
+new gPlayers[MAX_PLAYERS][Player];
+new gTeams[MAX_TEAMS][Team];
+
+public InitGroups()
+{
+	gTeams[0] = gTeamNone;
+	gTeams[1] = gTeamLames;
+	gTeams[2] = gTeamAdminz;
+	gTeams[3] = gTeamPolice;
+	gTeams[4] = gTeamTruckers;
+	gTeams[5] = gTeamDragsters;
+	gTeams[6] = gTeamGarbagemen;
+	gTeams[7] = gTeamPizzaguys;
+	gTeams[8] = gTeamHackers;
+	gTeams[9] = gTeamDealers;
+}
+
+//
+//
+//
+
 enum E_PLAYER_DATA
 {
 	E_PLAYER_DATA_ID,

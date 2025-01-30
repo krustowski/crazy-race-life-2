@@ -13,6 +13,11 @@ public ShowAdvert()
 		"[ TIP ] Po prihlaseni do jakehokoliv zavodu lze hodit warp ke startu pomoci /race warp",
 		"[ TIP ] Po mape se lze volne premistovat pomoci /port [ID lokace], nelze vsak takto cestovat ve vozidle",
 		"[ TIP ] Malo penez? Sezen motorku a delej stunty, ktere jsou kdekoliv financne ohodnoceny!",
+		"[ GAME ] Ve meste SF a na venkove byly ukryty balicky s ilegalnim obsahem. Pritomnost tahoveho obsahu u hrace muze byt potrestan clenem tymu Policistu!",
+		"[ GAME ] Distribuovat (i)legalni substance muze pouze clen tymu Dealeru",
+		"[ GAME ] Policiste muzou kohokoliv ve sve blizkosti zastavit a prohledat na ilegalni latky!",
+		"[ GAME ] Muzes vlastnit az 3 nemovitosti v lokalitach oznacenych na mape zelenym domkem",
+		"[ GAME ] Substance ci propriety zakoupene u clena tymu Dealeru lze ulozit pouze ve vlastnim dome, jinak je treba je mit u sebe!",
 		"[ TIP ] Skoc si skidive pomoci /skidive!"
 	};
 

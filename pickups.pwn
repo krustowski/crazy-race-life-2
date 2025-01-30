@@ -98,8 +98,35 @@ public InitPickups()
 	//  Jobs/Teams.
 	//
 
+	new teamPickups[][3] = 
+	{
+		{0.0, 0.0, 0.0},
+		{2252.11, 1285.30, 19.17},
+		{2304.43, 1151.95, 85.94},
+		{229.4, 167.4, 1003.0},
+		{2637.36, 1127.04, 11.18},
+		{2620.14, 1195.76, 10.81},
+		{2892.8, -2127.9, 3.2},
+		{2101.70, -1810.05, 13.55},
+		{2838.10, -2130.26, 0.19},
+		{2582.10, -956.28, 81.02}
+	};
+ 
+	for (new i = 0; i < MAX_TEAMS; i++)
+	{
+		gTeams[i][Pickups][0] = CreatePickup(1581, 1, Float:teamPickups[i][0], Float:teamPickups[i][1], Float:teamPickups[i][2]);
+		gTeams[i][Menus][0] = CreateMenu(gTeams[i][TeamName], 1, 150.0, 100.0, 250.0, 150.0);
+
+		new menuItem[64];
+
+		format(menuItem, sizeof(menuItem), "%s", gTeams[i][TeamName]);
+
+		AddMenuItem(gTeams[i][Menus][0], 0, menuItem);
+		AddMenuItem(gTeams[i][Menus][0], 0, "Opustit team");
+	}
+
 	//gTeamPickup[E_PLAYER_TEAM_LAME] = CreatePickup(1239, 1, 2252.11, 1285.30, 19.17);
-	gTeamPickup[E_PLAYER_TEAM_LAME] = CreatePickup(1581, 1, 2252.11, 1285.30, 19.17);
+	/*gTeamPickup[E_PLAYER_TEAM_LAME] = CreatePickup(1581, 1, 2252.11, 1285.30, 19.17);
 	gTeamMenu[E_PLAYER_TEAM_LAME] = CreateMenu("Lamerz", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_LAME], 0, "Lamka");
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_LAME], 0, "Opustit tym");
@@ -142,5 +169,5 @@ public InitPickups()
 	gTeamPickup[E_PLAYER_TEAM_DEALER] = CreatePickup(1581, 1, 2582.10, -956.28, 81.02);
 	gTeamMenu[E_PLAYER_TEAM_DEALER] = CreateMenu("Pyroz", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_DEALER], 0, "Drug Dealer");
-	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_DEALER], 0, "Opustit tym");
+	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_DEALER], 0, "Opustit tym");*/
 }

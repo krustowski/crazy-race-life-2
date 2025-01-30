@@ -129,10 +129,13 @@ dcmd_bank(playerid, params[])
 dcmd_cmd(playerid, params[])
 {
 #pragma unused params
-	SendClientMessage(playerid, COLOR_SVZEL, "[ i ] ZAKLADNI CMD SET");
-	SendClientMessage(playerid, COLOR_ZLUTA, "/admins /afk /bank /cmd /dance /deal /deathmatch /drugz /dwarp /fix");
-	SendClientMessage(playerid, COLOR_ZLUTA, "/givecash /help /hide /lay /locate /lock /login /race /register");
-	SendClientMessage(playerid, COLOR_ZLUTA, "/rules /skydive /soska /text /ucet /unlock / wanted");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ CMD ] Zakladni CMD set");
+	SendClientMessage(playerid, COLOR_ZLUTA, "/admins /afk /bank /cmd /dance /deathmatch /drugz /dwarp /fix");
+	SendClientMessage(playerid, COLOR_ZLUTA, "/givecash /help /lay /locate /lock /login /race /register");
+	SendClientMessage(playerid, COLOR_ZLUTA, "/rules /skydive /soska /text /ucet /unlock");
+	SendClientMessage(playerid, COLOR_NEVIDITEL, "");
+	SendClientMessage(playerid, COLOR_SVZEL, "[ CMD ] Specificky CMD set (team)");
+	SendClientMessage(playerid, COLOR_ZLUTA, "/deal /hide /wanted");
 
 	return 1;
 }

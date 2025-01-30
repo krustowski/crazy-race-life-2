@@ -711,7 +711,7 @@ dcmd_acmd(playerid, params[])
 
 	SendClientMessage(playerid, COLOR_ZELZLUT, "[ i ] ADMIN CMD SET");
 	SendClientMessage(playerid, COLOR_ZLUTA, "/acmd /admincol /ban /cam /ccmd /elevator /fakechat /get /goto");
-	SendClientMessage(playerid, COLOR_ZLUTA, "/kick /lvl /nitro /reset /smazat /spectate /zbrane ");
+	SendClientMessage(playerid, COLOR_ZLUTA, "/kick /lvl /nitro /reset /skin /smazat /spectate /vehicle /zbrane ");
 
 	return 1;
 }
@@ -1258,6 +1258,27 @@ dcmd_text(playerid, params[])
 	format(stringToPrint, sizeof(stringToPrint), "Hrac %s rika hraci %s, ze: %s", playerName, targetName, token2);
 
 	SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
+
+	return 1;
+}
+
+dcmd_vehicle(playerid, params[])
+{
+	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 3)
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
+
+	if (!strlen(params) || !IsNumeric(params))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti /vehicle [vehicleID]");
+
+	new vehicleId = strval(params);
+
+	if (vehicleId < 400 || vehicleId > 611)
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Neplatne ID vozidla! (IDs 400-611)");
+
+	new Float:X, Float:Y, Float:Z;
+
+	GetPlayerPos(playerid, X, Y, Z);
+	CreateVehicle(vehicleId, Float:X, Float:Y, Float:Z, 0.0, -1, -1, -1);
 
 	return 1;
 }

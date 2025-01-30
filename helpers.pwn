@@ -100,9 +100,9 @@ stock GetPlayerDistanceToPointEx(playerid, Float:x, Float:y, Float:z)
 
 stock bool:IsPlayerInValidNosVehicle(playerid, vehicleid)
 {
-#define MAX_VALID_NOS_VEHICLES 31
+#define MAX_INVALID_NOS_VEHICLES 31
 
-	new ValidNosVehicles[MAX_VALID_NOS_VEHICLES] =
+	new InvalidNosVehicles[MAX_INVALID_NOS_VEHICLES] =
 	{
 		581, 523, 462, 521, 463, 522, 461, 448, 468, 586,
 		509, 481, 510, 472, 473, 493, 595, 484, 430, 453,
@@ -116,13 +116,13 @@ stock bool:IsPlayerInValidNosVehicle(playerid, vehicleid)
 		return false;
 
 	// Loop over permitted NoS vehicles.
-	for (new i = 0; i < MAX_VALID_NOS_VEHICLES; i++)
+	for (new i = 0; i < MAX_INVALID_NOS_VEHICLES; i++)
 	{
-		if (GetVehicleModel(vehicleid) == ValidNosVehicles[i])
-			return true;
+		if (GetVehicleModel(vehicleid) == InvalidNosVehicles[i])
+			return false;
 	}
 
-	return false;
+	return true;
 }
 
 stock GetVehicleWithinDistance(playerid, Float:x1, Float:y1, Float:z1, Float:dist, &veh)

@@ -572,6 +572,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	dcmd(skin, 4, cmdtext); 	  //rcon + lvl 3
 	dcmd(smazat, 6, cmdtext);         //rcon +
 	dcmd(spectate, 8, cmdtext);	  //rcon + lvl 2
+	dcmd(vehicle, 7, cmdtext);	  //rcon + lvl 4
 	dcmd(zbrane, 6, cmdtext); 	  //rcon + lvl 3
 
 	return InvalidCommand(playerid);

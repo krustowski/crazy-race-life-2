@@ -393,23 +393,14 @@ dcmd_login(playerid, params[])
 	if (gPlayerAuth[playerid]) 
 		return SystemMsg(playerid, "[ AUTH ] Uz jsi prihlasen.");
 
-	if (!udb_Exists(playerName)) 
+	if (!fexist(playerName)) 
 		return SystemMsg(playerid, "[ AUTH ] Data pro dany nickname nenalezena --> /register *heslo*");
 
 	if (strlen(params) == 0) 
 		return SystemMsg(playerid, "[ AUTH ] Je treba se prihlasit --> /login *heslo*");
 
-	if (udb_CheckLogin(playerName, params))
-	{
-		gPlayerAuth[playerid] = true;
-		LoadPlayerData(playerid);
-
-		SpawnPlayer(playerid);
-
+	if (SetPlayerAccountLogin(playerid, params))
 		return SystemMsg(playerid, "[ AUTH ] Prihlaseni uspesne.");
-	}
-
-	return SystemMsg(playerid, "[ AUTH ] Prihlaseni se nezdarilo --> /login *heslo*");
 }
 
 dcmd_port(playerid, params[])
@@ -511,16 +502,16 @@ dcmd_register(playerid, params[])
 	if (gPlayerAuth[playerid])
 		return SystemMsg(playerid, "[ AUTH ] Registrace herniho uctu probehla uspesne! --> /login *heslo*");
 
-	if (udb_Exists(playerName))
+	if (fexist(playerName))
 		return SystemMsg(playerid, "[ AUTH ] Neni treba se znovu registrovat --> /login *heslo*.");
 
 	if (strlen(params) == 0)
 		return SystemMsg(playerid, "[ AUTH ] Registrace je povinna --> /register *heslo*");
 
-	if (udb_Create(playerName, params))
-		return SystemMsg(playerid, "[ AUTH ] Herni ucet uspesne vytvoren --> /login *heslo*.");
+	if (SetPlayerAccountRegistration(playerid, params))
+		return SystemMsg(playerid, "[ AUTH ] Herni ucet uspesne vytvoren. Automaticky prihlasen.");
 
-	return 1;
+	return SystemMsg(playerid, "[ AUTH ] REgistrace se nezdarila, zkuste prosim znovu.");
 }
 
 dcmd_rules(playerid, params[])

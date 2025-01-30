@@ -1,6 +1,10 @@
 enum E_PLAYER_DATA
 {
-	E_PLAYER_DATA_PWD_HASH,
+	E_PLAYER_DATA_ID,
+	E_PLAYER_DATA_ORM,
+	E_PLAYER_DATA_NAME[MAX_PLAYER_NAME],
+	E_PLAYER_DATA_PWD_HASH[65],
+	E_PLAYER_DATA_SALT[17],
 	E_PLAYER_DATA_CASH,
 	E_PLAYER_DATA_BANK,
 	E_PLAYER_DATA_HEALTH,
@@ -8,6 +12,7 @@ enum E_PLAYER_DATA
 	E_PLAYER_DATA_ADMIN_LVL,
 	E_PLAYER_DATA_TEAM,
 	E_PLAYER_DATA_CLASS,
+	E_PLAYER_DATA_LOGIN_ATT,
 	E_PLAYER_DATA_AFK,
 	E_PLAYER_DATA_HIDE,
 	E_PLAYER_DATA_SPECTATE
@@ -25,7 +30,8 @@ enum E_PLAYER_TEAM
 	E_PLAYER_TEAM_PIZZABOY,
 	E_PLAYER_TEAM_HACKER,
 	E_PLAYER_TEAM_CAR_REPAIR,
-	E_PLAYER_TEAM_PYRO
+	E_PLAYER_TEAM_PYRO,
+	E_PLAYER_TEAM_DEALER
 }
 
 enum E_PLAYER_DRUGZ
@@ -68,21 +74,23 @@ public LoadPlayerData(playerid)
 		new playerName[MAX_PLAYER_NAME];
 		GetPlayerName(playerid, playerName, sizeof(playerName));
 
-		GivePlayerMoney(playerid, dUserINT(playerName).("cash"));
-		gPlayerData[playerid][E_PLAYER_DATA_BANK] = dUserINT(playerName).("bank");
-		gPlayerData[playerid][E_PLAYER_DATA_HEALTH] = dUserINT(playerName).("health");
-		gPlayerData[playerid][E_PLAYER_DATA_ARMOUR] = dUserINT(playerName).("armour");
-		gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] = dUserINT(playerName).("adminlvl");
-		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = dUserINT(playerName).("team");
-		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = dUserINT(playerName).("class");
+		SetPlayerColor(playerid, COLOR_ZLUTA);
+
+		gPlayerData[playerid][E_PLAYER_DATA_CASH] = readcfgvalue(playerName, "", "cash");
+		gPlayerData[playerid][E_PLAYER_DATA_BANK] = readcfgvalue(playerName, "", "bank");
+		gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] = readcfgvalue(playerName, "", "adminlvl"); 
+		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = readcfgvalue(playerName, "", "team"); 
+		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = readcfgvalue(playerName, "", "class"); 
+		gPlayerData[playerid][E_PLAYER_DATA_HEALTH] = readcfgvalue(playerName, "", "health");
+		gPlayerData[playerid][E_PLAYER_DATA_ARMOUR] = readcfgvalue(playerName, "", "armour");
+
+		GivePlayerMoney(playerid, gPlayerData[playerid][E_PLAYER_DATA_CASH]);
+		SetPlayerHealth(playerid, gPlayerData[playerid][E_PLAYER_DATA_HEALTH]);
+		SetPlayerArmour(playerid, gPlayerData[playerid][E_PLAYER_DATA_ARMOUR]);
+		SetPlayerSkin(playerid, gPlayerData[playerid][E_PLAYER_DATA_CLASS]);
 
 		//joint[playerid] = dUserINT(PlayerName(playerid)).("joint");
 		//zapik[playerid] = dUserINT(PlayerName(playerid)).("zapik");
-
-		SetPlayerColor(playerid, COLOR_ZLUTA);
-		SetPlayerSkin(playerid, gPlayerData[playerid][E_PLAYER_DATA_CLASS]);
-		SetPlayerHealth(playerid, gPlayerData[playerid][E_PLAYER_DATA_HEALTH]);
-		SetPlayerArmour(playerid, gPlayerData[playerid][E_PLAYER_DATA_ARMOUR]);
 
 		SendClientMessage(playerid, GREEN, "[ DATA ] Data uspesne nactena!");
 
@@ -98,16 +106,20 @@ public SavePlayerData(playerid)
 	{
 		SendClientMessage(playerid, COLOR_ZLUTA, "[ AUTOSAVE ] Pripravuje se ulozeni uzivatelskych dat...");
 
-		new playerName[MAX_PLAYER_NAME];
+		new Float:armour, Float:health, playerName[MAX_PLAYER_NAME];
+
+		GetPlayerArmour(playerid, armour);
+		GetPlayerHealth(playerid, health);
 		GetPlayerName(playerid, playerName, sizeof(playerName));
 
-		dUserSetINT(playerName).("cash", GetPlayerMoney(playerid));
-		dUserSetINT(playerName).("bank", gPlayerData[playerid][E_PLAYER_DATA_BANK]);
-		dUserSetINT(playerName).("health", GetPlayerHealth(playerid));
-		dUserSetINT(playerName).("armour", GetPlayerArmour(playerid));
-		dUserSetINT(playerName).("adminlvl", gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL]);
-		dUserSetINT(playerName).("team", gPlayerData[playerid][E_PLAYER_DATA_TEAM]);
-		dUserSetINT(playerName).("class", GetPlayerSkin(playerid));
+		writecfgvalue(playerName, "", "cash", GetPlayerMoney(playerid));
+		writecfgvalue(playerName, "", "bank", gPlayerData[playerid][E_PLAYER_DATA_BANK]);
+		writecfgvalue(playerName, "", "adminlvl", gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL]);
+		writecfgvalue(playerName, "", "team", gPlayerData[playerid][E_PLAYER_DATA_TEAM]);
+		writecfgvalue(playerName, "", "class", GetPlayerSkin(playerid));
+
+		writecfgvalue(playerName, "", "health", floatround(health));
+		writecfgvalue(playerName, "", "armour", floatround(armour));
 
 		SendClientMessage(playerid, GREEN, "[ AUTOSAVE ] Data uspesne ulozena! ");
 	}

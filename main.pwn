@@ -25,21 +25,12 @@
 //  Generic includes.
 //
 
-#include <a_samp>
+//#include <a_samp>
+#include <open.mp>
 #include <core>
 #include <float>
-#include <dini>
-/*#include <a_objects>*/
-#include <y_objects>
+#include <file>
 #include <string>
-#include <a_mysql>
-
-//
-//  Registration
-//
-
-#include <dutils>		
-#include <dudb>	
 
 //
 //  Basic definitions.
@@ -153,8 +144,9 @@ forward SavePlayerData(playerid);
 forward SendPlayerSalary();
 forward UpdatePlayerScore();
 
-#include "mysql.pwn"
 #include "player.pwn"
+#include "auth.pwn"
+//#include "mysql.pwn"
 
 //
 //  Radar + Vehicle velocity/props.
@@ -221,7 +213,7 @@ main()
 public OnGameModeInit()
 {
 	// YSI object contructor.
-	Object_Object();
+	//Object_Object();
 
 	SetGameModeText(GAMEMODE_NAME);
 
@@ -231,7 +223,7 @@ public OnGameModeInit()
 	AllowInteriorWeapons(0);
 	EnableStuntBonusForAll(1);  
 
-	InitDB();
+	//InitDB();
 
 	//
 	// Start various timers.
@@ -259,11 +251,6 @@ public OnGameModeInit()
 	InitVehicles();
 	InitTexts();
 
-	if (!dini_Exists(STATS_FILE))
-	{
-		dini_Create(STATS_FILE);
-	}
-
 	AddPlayerClass(155, 2323.74, 1283.19, 97.60, 0, 0, 0, 0, 0, 0, 0);
 	AddPlayerClass(230, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 0, 0);
 	AddPlayerClass(121, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
@@ -288,14 +275,17 @@ public OnGameModeExit()
 
 	KillTimer(SetTimer("ShowAdvert", 1000 * 60 * 2, true));
 
+	//mysql_close(gSQL);
+
 	return 1;
 }
 
 public OnPlayerRequestClass(playerid, classid)
 {
-	SetPlayerPos(playerid, 1966.1, 1936.1, 127.5);
+	SetPlayerPos(playerid, 2323.73, 1283.18, 97.60);
+	/*SetPlayerPos(playerid, 1966.1, 1936.1, 127.5);
 	SetPlayerCameraPos(playerid, 1871.3, 1933.6, 127.5);
-	SetPlayerCameraLookAt(playerid, 1966.1, 1936.1, 127.5);
+	SetPlayerCameraLookAt(playerid, 1966.1, 1936.1, 127.5);*/
 
 	return 1;
 }
@@ -304,10 +294,12 @@ public OnPlayerRequestSpawn(playerid)
 {
 	if (!gPlayerAuth[playerid])
 	{
-		new playerName[MAX_PLAYER_NAME];
+		//ShowAuthDialog();
+
+		/*new playerName[MAX_PLAYER_NAME];
 		GetPlayerName(playerid, playerName, sizeof(playerName));
 
-		if (udb_Exists(playerName))
+		if (fexist(playerName))
 		{
 			GameTextForPlayer(playerid, "~w~Prihlas se!", 5000, 5);
 			SendClientMessage(playerid, COLOR_SVZEL, "Nejsi prihlasen --> /login heslo");
@@ -316,7 +308,7 @@ public OnPlayerRequestSpawn(playerid)
 		{
 			GameTextForPlayer(playerid, "~r~Registruj se!", 5000, 5);
 			SendClientMessage(playerid, COLOR_SVZEL, "Nejsi registrovan --> /register heslo");
-		}
+		}*/
 
 		return 0;
 	}
@@ -329,6 +321,8 @@ public OnPlayerRequestSpawn(playerid)
 public OnPlayerConnect(playerid)
 {
 	new playerName[MAX_PLAYER_NAME], stringToPrint[128];
+
+	//LoadPlayerDataDB(playerid);
 
 	// Reset the auth status for a new player.
 	gPlayerAuth[playerid] = false;
@@ -347,6 +341,8 @@ public OnPlayerConnect(playerid)
 	GetPlayerName(playerid, playerName, sizeof(playerName));
 	format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s se prave pripojil ke hre!", playerName);
 
+	gPlayerData[playerid][E_PLAYER_DATA_NAME] = playerName;
+
 	SendClientMessageToAll(COLOR_SEDA, stringToPrint);
 
 	// Send a welcome text to the connecting new player.
@@ -356,19 +352,24 @@ public OnPlayerConnect(playerid)
 
 	SendDeathMessage(playerid, INVALID_PLAYER_ID, 200);
 
+	ShowAuthDialog(playerid);
+
 	return 0;
 }
 
 public OnPlayerDisconnect(playerid, reason)
 {
-	Object_OnPlayerDisconnect(playerid, reason);
+	//Object_OnPlayerDisconnect(playerid, reason);
 
 	// Hide the vehicle velocity game text.
 	//TextDrawHideForPlayer(playerid, KPH[playerid]);
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
 	// Save player's data and set such player to unauthorized.
-	SavePlayerData(playerid);
+	if (reason == 1)
+		SavePlayerData(playerid);
+
+	//orm_destroy(gPlayerData[playerid][E_PLAYER_DATA_ORM]);
 	gPlayerAuth[playerid] = false;
 
 	SendDeathMessage(playerid, INVALID_PLAYER_ID, 201);
@@ -406,6 +407,7 @@ public OnPlayerDisconnect(playerid, reason)
 
 public OnPlayerSpawn(playerid)
 {
+	SetPlayerPos(playerid, 2323.73, 1283.18, 97.60);
 	SetPlayerSkin(playerid, gPlayerData[playerid][E_PLAYER_DATA_CLASS]);
 
 	// Set the player back to the paintball area if is set in game.
@@ -418,7 +420,7 @@ public OnPlayerSpawn(playerid)
 	return 1;
 }
 
-public OnPlayerDeath(playerid, killerid, reason)
+public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 {
 	new stringToPrint[256];
 
@@ -587,7 +589,7 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 	return 1;
 }
 
-public OnPlayerStateChange(playerid, newstate, oldstate)
+public OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstate)
 {
 	// Hide the velocity meter on vehicle exit.
 	if ((oldstate == PLAYER_STATE_DRIVER || oldstate == PLAYER_STATE_PASSENGER) && newstate == PLAYER_STATE_ONFOOT)
@@ -646,6 +648,54 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			SetVehicleHealth(GetPlayerVehicleID(playerid), 99999 * 1000);
 		}
 	}
+
+	return 1;
+}
+
+public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
+{
+	switch (dialogid)
+	{
+		case DIALOG_UNUSED: 
+			return 1; // Useful for dialogs that contain only information and we do nothing depending on whether they responded or not
+
+		case DIALOG_LOGIN:
+		{
+			if (!response) 
+				return Kick(playerid);
+
+			if (SetPlayerAccountLogin(playerid, inputtext))
+				return ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Uspesne prihlasen!", "Ok", "");
+			else
+			{
+				gPlayerData[playerid][E_PLAYER_DATA_LOGIN_ATT]++;
+
+				if (gPlayerData[playerid][E_PLAYER_DATA_LOGIN_ATT] >= 3)
+				{
+					ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Opakovane zadano spatne heslo (3x).", "Ok", "");
+					Kick(playerid);
+				}
+				else 
+					ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", "Spatne heslo!\nProsim zadej sve heslo!", "Login", "Zrusit");
+			}
+		}
+		case DIALOG_REGISTER:
+		{
+			if (!response) 
+				return Kick(playerid);
+
+			if (strlen(inputtext) <= 5) 
+				return ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registrace", "Heslo musi byt delsi jak 5 znaku!\nProsim zadej sve heslo!", "Registrovat", "Zrusit");
+
+			if (SetPlayerAccountRegistration(playerid, inputtext))
+				return 1;
+		}
+
+		default: 
+			return 0; // dialog ID was not found, search in other scripts
+	}
+
+	ShowAuthDialog(playerid);
 
 	return 1;
 }
@@ -805,6 +855,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		SetPlayerSkin(playerid, 200);
 
 		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_LAME;
+		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 200;
 		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Lamek!", playerName);
 	}
 	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_ADMINZ])
@@ -814,6 +865,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		SetPlayerSkin(playerid, 29);
 
 		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_ADMINZ;
+		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 29;
 		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Admin borcu!", playerName);
 	}
 	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_POLICE])
@@ -825,6 +877,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		SetPlayerSkin(playerid, 285);
 
 		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_POLICE;
+		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 285;
 		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Policajtu!", playerName);
 	}
 	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_GASMAN])
@@ -834,6 +887,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		SetPlayerSkin(playerid, 50);
 
 		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_GASMAN;
+		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 50;
 		format(stringToPrint, sizeof(stringToPrint), " [ ! ] Hrac %s se pripojil k tymu Pumparu/Benzinaku!", playerName);
 	}
 	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_DRAGSTER])
@@ -845,6 +899,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		SetPlayerSkin(playerid, 107);
 
 		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_DRAGSTER;
+		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 107;
 		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu DRaGsTeRù!", playerName);
 	}
 	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_GARBAGE])
@@ -855,6 +910,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		SetPlayerSkin(playerid, 230); // alternatively ID 137
 
 		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_GARBAGE; 
+		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 230;
 		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Tulaku!", playerName);
 	}
 	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_PIZZABOY])
@@ -865,6 +921,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		SetPlayerSkin(playerid, 250);
 
 		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_PIZZABOY;
+		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 250;
 		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Pizzaboyz!", playerName); 
 	}
 	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_HACKER])
@@ -875,6 +932,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		SetPlayerSkin(playerid, 170);
 
 		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_HACKER;
+		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 170;
 		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Hackeru!", playerName); 
 	}
 	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_CAR_REPAIR])
@@ -885,6 +943,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		SetPlayerSkin(playerid, 50);
 
 		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_CAR_REPAIR;
+		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 50;
 		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Automechaniku!", playerName);
 	}
 	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_PYRO])
@@ -895,6 +954,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		SetPlayerSkin(playerid, 230);
 
 		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_PYRO;
+		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 230;
 		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Pyrotechniku!", playerName);
 	}
 
@@ -908,7 +968,7 @@ public OnPlayerExitedMenu(playerid)
 	return 1;
 }
 
-public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
+public OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 {
 	if (newkeys == KEY_SECONDARY_ATTACK)
 	{

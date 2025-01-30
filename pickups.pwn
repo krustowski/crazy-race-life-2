@@ -24,6 +24,8 @@ new picktunel;
 // Drugz
 new gHeroinPackage;
 new gCocainePackage;
+new gFentPackage;
+new gMethPackage;
 
 new gPlayerMoneyPickup[MAX_PLAYERS];
 new gPlayerMoneyPickupAmount[MAX_PLAYERS];
@@ -66,6 +68,11 @@ public InitPickups()
 
 	gCocainePackage = CreatePickup(1575, 8, -2044.38, 975.56, 54.24);
 	gHeroinPackage = CreatePickup(1580, 8, -1664.19, 1010.74, 7.49);
+	gFentPackage = CreatePickup(1580, 8, -2048.49, 757.83, 60.62);
+	gMethPackage = CreatePickup(1580, 8, -97.97, -1587.09, 2.61);
+
+	gFentPackage = CreatePickup(1580, 8, -2205.62, 939.30, 79.83);
+	gFentPackage = CreatePickup(1580, 8, -1956.59, 767.23, 55.72);
 
 	//
 	//
@@ -120,4 +127,6 @@ public InitPickups()
 	gTeamMenu[E_PLAYER_TEAM_PYRO] = CreateMenu("Pyroz", 1, 150.0, 100.0, 250.0, 150.0);
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PYRO], 0, "Pyrotechnik");
 	AddMenuItem(gTeamMenu[E_PLAYER_TEAM_PYRO], 0, "Opustit tym");
+
+	gTeamPickup[E_PLAYER_TEAM_DEALER] = CreatePickup(1581, 1, 2582.10, -956.28, 81.02);
 }

@@ -526,7 +526,9 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	dcmd(bank, 4, cmdtext);		  //all
 	dcmd(cmd, 3, cmdtext);            //all
 	dcmd(dance, 5, cmdtext);	  //all
+	dcmd(deal, 4, cmdtext);	  	  //all
 	dcmd(deathmatch, 10, cmdtext);	  //all
+	dcmd(drugz, 5, cmdtext); 	  //all
 	dcmd(dwarp, 5, cmdtext); 	  //all
 	dcmd(fix, 3, cmdtext); 		  //all
 	dcmd(givecash, 8, cmdtext);       //all
@@ -567,6 +569,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	dcmd(nitro, 5, cmdtext);          //rcon + lvl 3
 	dcmd(odpocet, 7, cmdtext);        //rcon + 
 	dcmd(reset, 5, cmdtext);	  //rcon + lvl 4
+	dcmd(skin, 4, cmdtext); 	  //rcon + lvl 3
 	dcmd(smazat, 6, cmdtext);         //rcon +
 	dcmd(spectate, 8, cmdtext);	  //rcon + lvl 2
 	dcmd(zbrane, 6, cmdtext); 	  //rcon + lvl 3

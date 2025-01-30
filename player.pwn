@@ -48,7 +48,21 @@ enum E_PLAYER_DRUGZ
 
 new gPlayerAuth[MAX_PLAYERS];
 new gPlayerData[MAX_PLAYERS][E_PLAYER_DATA];
+
 new gPlayerDrugz[MAX_PLAYERS][E_PLAYER_DRUGZ];
+new gPlayerDrugNames[E_PLAYER_DRUGZ][] = 
+{
+	"zaza",
+	"tabak",
+	"vazky",
+	"zapik",
+	"brko",
+	"kokain",
+	"heroin",
+	"pernik",
+	"fent",
+	"andelak"
+};
 
 new PICKUP:gTeamPickup[E_PLAYER_TEAM];
 new gTeamMenu[E_PLAYER_TEAM];

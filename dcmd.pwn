@@ -130,8 +130,8 @@ dcmd_cmd(playerid, params[])
 {
 #pragma unused params
 	SendClientMessage(playerid, COLOR_SVZEL, "[ i ] ZAKLADNI CMD SET");
-	SendClientMessage(playerid, COLOR_ZLUTA, "/admins /afk /bank /cmd /dance /deathmatch /dwarp /fix /givecash");
-	SendClientMessage(playerid, COLOR_ZLUTA, "/help /hide /lay /locate /lock /login /race /register");
+	SendClientMessage(playerid, COLOR_ZLUTA, "/admins /afk /bank /cmd /dance /deal /deathmatch /drugz /dwarp /fix");
+	SendClientMessage(playerid, COLOR_ZLUTA, "/givecash /help /hide /lay /locate /lock /login /race /register");
 	SendClientMessage(playerid, COLOR_ZLUTA, "/rules /skydive /soska /text /ucet /unlock / wanted");
 
 	return 1;
@@ -172,6 +172,52 @@ dcmd_dance(playerid, params[])
 	return 1;
 }
 
+dcmd_deal(playerid, params[])
+{
+	new token1[32], token2[32];
+	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
+
+	if (gPlayerData[playerid][E_PLAYER_DATA_TEAM] != E_PLAYER_TEAM_DEALER)
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Tento prikaz je urcen pouze pro tym Dealeru!");
+
+	if (!strlen(params) || (!IsNumeric(token1) && !IsNumeric(token2) && !strcmp(token1, "list")) || (strcmp(token1, "list") && IsNumeric(token2)))
+	{
+	       	SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti /deal [playerID] [drugID]");
+	       	SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti /deal list");
+		return 1;
+	}
+
+	if (IsNumeric(token1) && IsNumeric(token2))
+	{
+		new targetId = strval(token1), targetAmount = strval(token2);
+
+		if (targetId == playerid)
+			return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Nelze dealovat sobe samemu!");
+
+		if (!IsPlayerConnected(targetId))
+			return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+
+		//
+		//
+		//
+
+	}
+	else if (!strcmp(token1, "list"))
+	{
+		new stringToPrint[128];
+
+		SendClientMessage(playerid, COLOR_ORANZOVA, "[ DRUGZ ] Seznam drog a propriet k dealovani:");
+
+		for (new i = 0; i < sizeof(gPlayerDrugNames); i++)
+		{
+			format(stringToPrint, sizeof(stringToPrint), "* [ID %2d]: %s (mas %d g nebo ks)", i, gPlayerDrugNames[i], gPlayerDrugz[playerid][i]);
+			SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+		}
+	}
+
+	return 1;
+}
+
 dcmd_deathmatch(playerid, params[])
 {
 	if (!strcmp(params, "join"))
@@ -201,6 +247,22 @@ dcmd_deathmatch(playerid, params[])
 	else
 	{
 		SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /deathmatch [join/exit]");
+	}
+
+	return 1;
+}
+
+dcmd_drugz(playerid, params[])
+{
+#pragma unused params
+	new stringToPrint[128];
+
+	SendClientMessage(playerid, COLOR_ORANZOVA, "[ DRUGZ ] Seznam drog a propriet, ktere mas u sebe:");
+
+	for (new i = 0; i < sizeof(gPlayerDrugNames); i++)
+	{
+		format(stringToPrint, sizeof(stringToPrint), "* %s (mas %d g nebo ks)", gPlayerDrugNames[i], gPlayerDrugz[playerid][i]);
+		SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
 	}
 
 	return 1;
@@ -1099,6 +1161,30 @@ dcmd_reset(playerid, params[])
 	return 1;
 }
 
+dcmd_skin(playerid, params[])
+{
+	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 3)
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
+
+	new token1[32], token2[32];
+	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
+
+	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti /skin [playerID] [skinID]");
+
+	new targetId = strval(token1), targetSkin = strval(token2);
+
+	if (targetSkin < 0 || targetSkin > 311)
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Neplatne ID skinu!");
+
+	if (!IsPlayerConnected(targetId))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+
+	SetPlayerSkin(targetId, targetSkin);
+
+	return 1;
+}
+
 dcmd_smazat(playerid, params[])
 {
 #pragma unused params
@@ -1123,8 +1209,16 @@ dcmd_spectate(playerid, params[])
 	if (!IsPlayerAdmin(playerid) && gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] < 2) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
 
-	if (!strlen(params) || !IsNumeric(params))
-		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /spectate [playerID]");
+	if ((!strlen(params) || !IsNumeric(params)) && !gPlayerData[playerid][E_PLAYER_DATA_SPECTATE])
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /spectate [playerID]");
+
+	if (gPlayerData[playerid][E_PLAYER_DATA_SPECTATE])
+	{
+		TogglePlayerSpectating(playerid, false);
+
+		gPlayerData[playerid][E_PLAYER_DATA_SPECTATE] = 0;
+		SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Sledovani hrace vypnuto!");
+	}
 
 	new targetId = strval(params);
 
@@ -1134,21 +1228,11 @@ dcmd_spectate(playerid, params[])
 	if (playerid == targetId)
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nemuzes sledovat sam sebe!");
 
-	if (!gPlayerData[playerid][E_PLAYER_DATA_SPECTATE])
-	{
-		TogglePlayerSpectating(playerid, true);
-		PlayerSpectatePlayer(playerid, targetId);
+	TogglePlayerSpectating(playerid, true);
+	PlayerSpectatePlayer(playerid, targetId);
 
-		gPlayerData[playerid][E_PLAYER_DATA_SPECTATE] = 1;
-		SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Sledovani daneho hrace zapnuto!");
-	}
-	else
-	{
-		TogglePlayerSpectating(playerid, false);
-
-		gPlayerData[playerid][E_PLAYER_DATA_SPECTATE] = 0;
-		SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Sledovani daneho hrace vypnuto!");
-	}
+	gPlayerData[playerid][E_PLAYER_DATA_SPECTATE] = 1;
+	SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Sledovani daneho hrace zapnuto! Pouzij /spectate znovu pro vypnuti sledovani.");
 
 	return 1;
 }

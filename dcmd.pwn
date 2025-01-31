@@ -1148,6 +1148,41 @@ dcmd_odpocet(playerid, params[])
 	return 1;
 }
 
+dcmd_property(playerid, params[])
+{
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4)
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
+
+	if (!strlen(params) || !IsNumeric(params))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti /property [interiorID]");
+
+	/*new vehicleId = strval(params);
+
+	if (vehicleId < 400 || vehicleId > 611)
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Neplatne ID interieru! (IDs 400-611)");*/
+
+	new Float:X, Float:Y, Float:Z;
+
+	GetPlayerPos(playerid, X, Y, Z);
+	//CreateVehicle(vehicleId, Float:X, Float:Y, Float:Z, 0.0, -1, -1, -1);
+
+	Z += 1500;
+
+	//CreatePlayerObject(playerid, 18056, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0,0); // varna
+	CreatePlayerObject(playerid, 14859, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0,0);
+	//SetPlayerInterior(playerid, 12);
+
+	CreatePickup(1318, 1, Float:(X-2.42), Float:(Y+1.25), Float:(Z-1.0));
+	CreatePickup(1240, 1, Float:(X-2.20), Float:(Y-2.50), Float:(Z-1.0));
+	CreatePickup(1241, 1, Float:(X+2.50), Float:(Y-2.50), Float:(Z-1.0));
+	CreatePickup(1239, 1, Float:(X+2.50), Float:(Y+2.20), Float:(Z-1.0));
+
+	SetPlayerPos(playerid, Float:X, Float:Y, Float:Z);
+	SetPlayerFacingAngle(playerid, 0.0);
+
+	return 1;
+}
+
 dcmd_reset(playerid, params[])
 {
 #pragma unused params

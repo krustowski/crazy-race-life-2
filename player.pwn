@@ -2,6 +2,7 @@
 #define MAX_TEAMS		10
 #define MAX_TEAM_PICKUPS	16
 #define MAX_TEAM_MENUS		16
+#define MAX_PLAYER_PROPERTIES	3
 
 //
 //  Drugz.
@@ -26,8 +27,8 @@ enum Drug
 	DrugName[64],
 	DrugIniName[64],
 
-	Amount,
-	Price
+	DrugAmount,
+	DrugPrice
 }
 
 new gDrugz[MAX_DRUGS][Drug];
@@ -162,7 +163,6 @@ enum Player
 {
 	ID,
 	Name[MAX_PLAYER_NAME],
-	bool: IsLogged,
 
 	PasswordHash[65],
 	PasswordSalt[17],
@@ -175,13 +175,21 @@ enum Player
 	Float: Armour,
 	AdminLevel,
 	LoginAttempts,
+
+	bool: IsLogged,
 	bool: AFK,
 	bool: Hidden,
 	bool: Spectating,
 	bool: Jailed,
+	bool: InsideProperty,
 
-	Drugs[MAX_DRUGS]
+	Drugs[MAX_DRUGS],
+	Properties[MAX_PLAYER_PROPERTIES]
 }
+
+//
+//  Team definitions.
+//
 
 new gTeamNone[Team] = 
 {

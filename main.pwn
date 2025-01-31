@@ -183,6 +183,7 @@ forward AddMapicons(playerid);
 #include "vehicles.pwn"
 #include "texts.pwn"
 #include "mapicons.pwn"
+#include "real.pwn"
 
 //
 //  DCMDs = command set definitions.
@@ -222,6 +223,7 @@ public OnGameModeInit()
 	UsePlayerPedAnims(1);
 	AllowInteriorWeapons(0);
 	EnableStuntBonusForAll(1);  
+	DisableInteriorEnterExits();
 
 	InitDrugValues();
 	InitTeams();
@@ -515,11 +517,11 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	dcmd(lay, 3, cmdtext);		  //all
 	dcmd(locate, 6, cmdtext); 	  //all
 	dcmd(lock, 4, cmdtext);           //all
-	dcmd(login, 5, cmdtext);          //all
+	//dcmd(login, 5, cmdtext);          //all
 	dcmd(pm, 2, cmdtext);		  //all
 	dcmd(port, 4, cmdtext); 	  //all
 	dcmd(race, 4, cmdtext);		  //all
-	dcmd(register, 8, cmdtext);       //all
+	//dcmd(register, 8, cmdtext);       //all
 	dcmd(rules, 5, cmdtext); 	  //all
 	dcmd(skydive, 7, cmdtext);        //all
 	dcmd(soska, 5, cmdtext); 	  //all
@@ -545,6 +547,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	dcmd(lvl, 3, cmdtext);            //rcon + lvl 4
 	dcmd(nitro, 5, cmdtext);          //rcon + lvl 3
 	dcmd(odpocet, 7, cmdtext);        //rcon + 
+	dcmd(property, 8, cmdtext);	  //rcon + lvl 4
 	dcmd(reset, 5, cmdtext);	  //rcon + lvl 4
 	dcmd(skin, 4, cmdtext); 	  //rcon + lvl 3
 	dcmd(smazat, 6, cmdtext);         //rcon +

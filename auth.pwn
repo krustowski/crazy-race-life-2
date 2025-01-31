@@ -11,12 +11,10 @@ enum
 
 public SetPlayerAccountLogin(playerid, text[])
 {
-	new hashedPwd[65], hashedPwdDb[65], playerName[MAX_PLAYER_NAME], saltDb[17];
+	new hashedPwd[65], hashedPwdDb[65], saltDb[17];
 
-	GetPlayerName(playerid, playerName, sizeof(playerName));
-
-	readcfg(playerName, "", "pwdhash", hashedPwdDb);
-	readcfg(playerName, "", "salt", saltDb);
+	readcfg(gPlayers[playerid][Name], "", "pwdhash", hashedPwdDb);
+	readcfg(gPlayers[playerid][Name], "", "salt", saltDb);
 
 	SHA256_PassHash(text, saltDb, hashedPwd, sizeof(hashedPwd));
 
@@ -26,7 +24,7 @@ public SetPlayerAccountLogin(playerid, text[])
 		return 0;
 	}
 
-	gPlayerAuth[playerid] = true;
+	gPlayers[playerid][IsLogged] = true;
 	LoadPlayerData(playerid);
 
 	SpawnPlayer(playerid);
@@ -36,11 +34,9 @@ public SetPlayerAccountLogin(playerid, text[])
 
 public SetPlayerAccountRegistration(playerid, text[])
 {
-	new hashedPwd[65], playerName[MAX_PLAYER_NAME], salt[17];
+	new hashedPwd[65], salt[17];
 
-	GetPlayerName(playerid, playerName, sizeof(playerName));
-	
-	if (fexist(playerName))
+	if (fexist(gPlayers[playerid][Name]))
 		return 0;
 
 	// 16 random characters from 33 to 126 (in ASCII) for the salt
@@ -49,15 +45,14 @@ public SetPlayerAccountRegistration(playerid, text[])
 
 	SHA256_PassHash(text, salt, hashedPwd, sizeof(hashedPwd));
 
-	writecfg(playerName, "", "pwdhash", hashedPwd);
-	writecfg(playerName, "", "salt", salt);
-	writecfgvalue(playerName, "", "health", 100);
+	writecfg(gPlayers[playerid][Name], "", "pwdhash", hashedPwd);
+	writecfg(gPlayers[playerid][Name], "", "salt", salt);
+	writecfgvalue(gPlayers[playerid][Name], "", "health", 100);
 
-	gPlayerAuth[playerid] = true;
+	gPlayers[playerid][IsLogged] = true;
 	LoadPlayerData(playerid);
 
 	SetPlayerHealth(playerid, 100.0);
-
 	SpawnPlayer(playerid);
 
 	return 1; 
@@ -65,13 +60,11 @@ public SetPlayerAccountRegistration(playerid, text[])
 
 public ShowAuthDialog(playerid)
 {
-	new playerName[MAX_PLAYER_NAME], stringToPrint[128];
+	new stringToPrint[128];
 
-	GetPlayerName(playerid, playerName, sizeof(playerName));
-
-	if (fexist(playerName))
+	if (fexist(gPlayers[playerid][Name]))
 	{
-		format(stringToPrint, sizeof(stringToPrint), "[ AUTH ] Ucet hrace (%s) je jiz registrovan. Prihlas se pomoci dialogu nize:", gPlayerData[playerid][E_PLAYER_DATA_NAME]);
+		format(stringToPrint, sizeof(stringToPrint), "[ AUTH ] Ucet hrace (%s) je jiz registrovan. Prihlas se pomoci dialogu nize:", gPlayers[playerid][Name]);
 
 		ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", stringToPrint, "Login", "Zrusit");
 
@@ -80,7 +73,7 @@ public ShowAuthDialog(playerid)
 	}
 	else
 	{
-		format(stringToPrint, sizeof(stringToPrint), "[ AUTH ] Vitej %s! Zaregistruj svuj ucet zadanim sveho hesla nize:", gPlayerData[playerid][E_PLAYER_DATA_NAME]);
+		format(stringToPrint, sizeof(stringToPrint), "[ AUTH ] Vitej %s! Zaregistruj svuj ucet zadanim sveho hesla nize:", gPlayers[playerid][Name]);
 
 		ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registrace", stringToPrint, "Registrovat", "Zrusit");
 	}

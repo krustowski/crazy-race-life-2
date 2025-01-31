@@ -17,7 +17,7 @@
  [ Created: 	Jan 2025 (Extends legacy GameMode CRL (2008-2010)) ]
  [ Credits: 	krusty, kompry, DRaGsTeR ]
  [ Language: 	CZ, EN ]
- [ Version: 	0.1.Z ]
+ [ Version: 	0.2.Z ]
 
  *****************************************************************************************************************************************/
 
@@ -251,12 +251,12 @@ public OnGameModeInit()
 	InitVehicles();
 	InitTexts();
 
-	AddPlayerClass(155, 2323.74, 1283.19, 97.60, 0, 0, 0, 0, 0, 0, 0);
+	/*AddPlayerClass(155, 2323.74, 1283.19, 97.60, 0, 0, 0, 0, 0, 0, 0);
 	AddPlayerClass(230, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 0, 0);
 	AddPlayerClass(121, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
 	AddPlayerClass(29, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
 	AddPlayerClass(45, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
-	AddPlayerClass(169, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
+	AddPlayerClass(169, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);*/
 
 	// Set the unique Vehlicle Plate for all vehicles possible.
 	for (new i = 0; i < MAX_VEHICLES; i++)
@@ -275,8 +275,6 @@ public OnGameModeExit()
 
 	KillTimer(SetTimer("ShowAdvert", 1000 * 60 * 2, true));
 
-	//mysql_close(gSQL);
-
 	return 1;
 }
 
@@ -292,26 +290,8 @@ public OnPlayerRequestClass(playerid, classid)
 
 public OnPlayerRequestSpawn(playerid)
 {
-	if (!gPlayerAuth[playerid])
-	{
-		//ShowAuthDialog();
-
-		/*new playerName[MAX_PLAYER_NAME];
-		GetPlayerName(playerid, playerName, sizeof(playerName));
-
-		if (fexist(playerName))
-		{
-			GameTextForPlayer(playerid, "~w~Prihlas se!", 5000, 5);
-			SendClientMessage(playerid, COLOR_SVZEL, "Nejsi prihlasen --> /login heslo");
-		}
-		else
-		{
-			GameTextForPlayer(playerid, "~r~Registruj se!", 5000, 5);
-			SendClientMessage(playerid, COLOR_SVZEL, "Nejsi registrovan --> /register heslo");
-		}*/
-
+	if (!gPlayers[playerid][IsLogged])
 		return 0;
-	}
 
 	SpawnPlayer(playerid);
 
@@ -325,7 +305,7 @@ public OnPlayerConnect(playerid)
 	//LoadPlayerDataDB(playerid);
 
 	// Reset the auth status for a new player.
-	gPlayerAuth[playerid] = false;
+	gPlayers[playerid][IsLogged] = false;
 
 	// Reset the paintball states.
 	gPaintball[playerid][E_PAINTBALL_INGAME] = 0;
@@ -339,10 +319,9 @@ public OnPlayerConnect(playerid)
 
 	// Fetch player's name and print it out to outhers online.
 	GetPlayerName(playerid, playerName, sizeof(playerName));
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s se prave pripojil ke hre!", playerName);
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s se prave pripojil(a) ke hre!", playerName);
 
-	gPlayerData[playerid][E_PLAYER_DATA_NAME] = playerName;
-
+	gPlayers[playerid][Name] = playerName;
 	SendClientMessageToAll(COLOR_SEDA, stringToPrint);
 
 	// Send a welcome text to the connecting new player.
@@ -352,6 +331,7 @@ public OnPlayerConnect(playerid)
 
 	SendDeathMessage(playerid, INVALID_PLAYER_ID, 200);
 
+	// Ask the user to login/register.
 	ShowAuthDialog(playerid);
 
 	return 0;
@@ -370,33 +350,30 @@ public OnPlayerDisconnect(playerid, reason)
 		SavePlayerData(playerid);
 
 	//orm_destroy(gPlayerData[playerid][E_PLAYER_DATA_ORM]);
-	gPlayerAuth[playerid] = false;
+	gPlayers[playerid][IsLogged] = false;
 
 	SendDeathMessage(playerid, INVALID_PLAYER_ID, 201);
 
-	new playerName[MAX_PLAYER_NAME], stringToPrint[128];
-
-	// Fetch player's name to print a statement for other online players.
-	GetPlayerName(playerid, playerName, sizeof(playerName));
+	new stringToPrint[128];
 
 	// Prepare the statement for others.
 	switch (reason)
 	{
 		case 0: 
 			{
-				format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s odpojen(a) [spadla hra].", playerName);
+				format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s odpojen(a) [spadla hra].", gPlayers[playerid][Name]);
 			}
 		case 1: 
 			{
-				format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s odpojen(a) [odchod].", playerName); 
+				format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s odpojen(a) [odchod].", gPlayers[playerid][Name]); 
 			}
 		case 2: 
 			{
-				format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s odpojen(a) [kick/ban].", playerName);
+				format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s odpojen(a) [kick/ban].", gPlayers[playerid][Name]);
 			}
 		default: 
 			{
-				format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s odpojen(a) [neznamy duvod].", playerName);
+				format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s odpojen(a) [neznamy duvod].", gPlayers[playerid][Name]);
 			}
 	}
 
@@ -408,7 +385,8 @@ public OnPlayerDisconnect(playerid, reason)
 public OnPlayerSpawn(playerid)
 {
 	SetPlayerPos(playerid, 2323.73, 1283.18, 97.60);
-	SetPlayerSkin(playerid, gPlayerData[playerid][E_PLAYER_DATA_CLASS]);
+	SetPlayerSkin(playerid, gPlayers[playerid][Skin]);
+	SetPlayerColor(playerid, gPlayers[playerid][TeamID][Color]);
 
 	// Set the player back to the paintball area if is set in game.
 	if (gPaintball[playerid][E_PAINTBALL_INGAME])
@@ -498,17 +476,15 @@ public OnPlayerText(playerid, text[])
 {
 	if (strlen(text) > 1 && text[0] == '!')
 	{
-		new playerName[MAX_PLAYER_NAME], stringToPrint[256];
-
-		GetPlayerName(playerid, playerName, sizeof(playerName));
+		new stringToPrint[256];
 
 		text[0] == '\0';
-		format(stringToPrint, sizeof(stringToPrint), "%s [Team Chat]: %s", playerName, text);
+		format(stringToPrint, sizeof(stringToPrint), "%s [Team Chat]: %s", gPlayers[playerid][Name], text);
 
 		for (new i = 0; i < MAX_PLAYERS; i++)
 		{
-			if (IsPlayerConnected(i) && gPlayerData[i][E_PLAYER_DATA_TEAM] == gPlayerData[playerid][E_PLAYER_DATA_TEAM])
-				SendClientMessage(i, GetPlayerColor(playerid), stringToPrint);
+			if (IsPlayerConnected(i) && gPlayers[i][TeamID] == gPlayers[playerid][TeamID])
+				SendClientMessage(i, gPlayers[i][TeamID][Color], stringToPrint);
 		}
 
 		return 0;
@@ -648,7 +624,7 @@ public OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstat
 		}
 		else
 		{
-			SendClientMessage(playerid, COLOR_CYAN, "Jsi admin, auto bylo opancerovano");
+			SendClientMessage(playerid, COLOR_CYAN, "[ AA ] Jsi admin, auto bylo opancerovano");
 			SetVehicleHealth(GetPlayerVehicleID(playerid), 99999 * 1000);
 		}
 	}
@@ -672,9 +648,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				return ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Uspesne prihlasen!", "Ok", "");
 			else
 			{
-				gPlayerData[playerid][E_PLAYER_DATA_LOGIN_ATT]++;
+				gPlayers[playerid][LoginAttempts]++;
 
-				if (gPlayerData[playerid][E_PLAYER_DATA_LOGIN_ATT] >= 3)
+				if (gPlayers[playerid][LoginAttempts] >= 3)
 				{
 					ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Opakovane zadano spatne heslo (3x).", "Ok", "");
 					Kick(playerid);
@@ -894,14 +870,12 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 public OnPlayerSelectedMenuRow(playerid, row)
 {
-	new Menu:currentMenu = GetPlayerMenu(playerid), playerName[MAX_PLAYER_NAME], stringToPrint[256];
-
-	GetPlayerName(playerid, playerName, sizeof(playerName));
+	new Menu:currentMenu = GetPlayerMenu(playerid), stringToPrint[256];
 
 	if (row == 1)
 	{
 		ResetPlayerWeapons(playerid);
-		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_NONE;
+		gPlayers[playerid][TeamID] = gTeamNone;
 
 		SendClientMessage(playerid, COLOR_SEDA, "[ TEAM ] Opustil jsi team: jsi nezarazen/nezamestnan.");
 

@@ -1,6 +1,120 @@
+#define MAX_DRUGS		10
 #define MAX_TEAMS		10
 #define MAX_TEAM_PICKUPS	16
 #define MAX_TEAM_MENUS		16
+
+//
+//  Drugz.
+//
+
+enum Drug
+{
+	DrugName[64],
+	DrugIniName[64],
+
+	Amount,
+	Price
+}
+
+new gDrugz[MAX_DRUGS][Drug];
+
+new gDrugZaza[Drug] = 
+{
+	"zaza",
+	"zaza",
+	0,
+	50
+};
+
+new gDrugTobacco[Drug] = 
+{
+	"tabak",
+	"tobacco",
+	0,
+	5
+};
+
+new gDrugPaper[Drug] = 
+{
+	"vazky",
+	"wafers",
+	0,
+	5
+};
+
+new gDrugLighter[Drug] = 
+{
+	"zapik",
+	"lighter",
+	0,
+	5
+};
+
+new gDrugJoint[Drug] = 
+{
+	"brko",
+	"joint",
+	0,
+	30
+};
+
+new gDrugCoke[Drug] = 
+{
+	"koks",
+	"cocaine",
+	0,
+	150
+};
+
+new gDrugHeroin[Drug] = 
+{
+	"hero",
+	"heroin",
+	0,
+	200
+};
+
+new gDrugMeth[Drug] = 
+{
+	"pernik",
+	"meth",
+	0,
+	180
+};
+
+new gDrugFent[Drug] = 
+{
+	"fent",
+	"fent",
+	0,
+	400
+};
+
+new gDrugPCP[Drug] = 
+{
+	"andelak",
+	"pcp",
+	0,
+	350
+};
+
+public InitDrugValues()
+{
+	gDrugz[0] = gDrugZaza;
+	gDrugz[1] = gDrugTobacco;
+	gDrugz[2] = gDrugPaper;
+	gDrugz[3] = gDrugLighter;
+	gDrugz[4] = gDrugJoint;
+	gDrugz[5] = gDrugCoke;
+	gDrugz[6] = gDrugHeroin;
+	gDrugz[7] = gDrugMeth;
+	gDrugz[8] = gDrugFent;
+	gDrugz[9] = gDrugPCP;
+}
+
+//
+//  Player's props.
+//
 
 enum Team
 {
@@ -13,47 +127,6 @@ enum Team
 	SalaryVolatile,
 	PICKUP: Pickups[MAX_TEAM_PICKUPS],
 	Menu: Menus[MAX_TEAM_MENUS]
-}
-
-enum Teams
-{
-	None[Team],
-	Lames[Team],
-	Adminz[Team],
-	Police[Team],
-	Truckers[Team],
-	Dragsters[Team],
-	Garbagemen[Team],
-	Pizzaguys[Team],
-	Hackers[Team],
-	Dealers[Team]
-}
-
-//
-//  Player's props.
-//
-
-enum Drug
-{
-	DrugName[64],
-	DrugIniName[64],
-
-	Amount,
-	Price
-}
-
-enum Drugz 
-{
-	Zaza[Drug],
-	Tobacco[Drug],
-	Paper[Drug],
-	Lighter[Drug],
-	Joint[Drug],
-	Cocaine[Drug],
-	Heroin[Drug],
-	Meth[Drug],
-	Fent[Drug],
-	PCP[Drug]
 }
 
 enum Player
@@ -77,7 +150,7 @@ enum Player
 	bool: Hidden,
 	bool: Spectating,
 	bool: Jailed,
-	Drugs[Drugz]
+	Drugs[MAX_DRUGS]
 }
 
 new gTeamNone[Team] = 
@@ -100,8 +173,8 @@ new gTeamLames[Team] =
 	{200, 0, 0, 0, 0},
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	100,
-	150,
+	10,
+	20,
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 };
@@ -113,8 +186,8 @@ new gTeamAdminz[Team] =
 	{29, 0, 0, 0, 0},
 	{32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	{1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	100,
-	150,
+	1550,
+	2100,
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 };
@@ -126,8 +199,8 @@ new gTeamPolice[Team] =
 	{285, 0, 0, 0, 0},
 	{30, 31, 32, 0, 0, 0, 0, 0, 0, 0, 0},
 	{100, 100, 111, 0, 0, 0, 0, 0, 0, 0, 0},
-	100,
-	150,
+	1000,
+	1500,
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 };
@@ -139,8 +212,8 @@ new gTeamTruckers[Team] =
 	{50, 0, 0, 0, 0},
 	{32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	{100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	100,
-	150,
+	1000,
+	1150,
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 };
@@ -152,8 +225,8 @@ new gTeamDragsters[Team] =
 	{107, 0, 0, 0, 0},
 	{5, 30, 31, 0, 0, 0, 0, 0, 0, 0, 0},
 	{1, 100, 1000, 0, 0, 0, 0, 0, 0, 0, 0},
-	100,
-	150,
+	1200,
+	1500,
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 };
@@ -165,8 +238,8 @@ new gTeamGarbagemen[Team] =
 	{230, 0, 0, 0, 0},
 	{4, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	{1, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	100,
-	150,
+	250,
+	500,
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 };
@@ -178,8 +251,8 @@ new gTeamPizzaguys[Team] =
 	{250, 0, 0, 0, 0},
 	{4, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	{1, 111, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	100,
-	150,
+	500,
+	1250,
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 };
@@ -191,8 +264,8 @@ new gTeamHackers[Team] =
 	{170, 0, 0, 0, 0},
 	{4, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	{100, 111, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	100,
-	150,
+	1500,
+	900,
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 };
@@ -204,8 +277,8 @@ new gTeamDealers[Team] =
 	{29, 0, 0, 0, 0},
 	{4, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	{100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	100,
-	150,
+	1800,
+	2100,
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 };
@@ -232,7 +305,7 @@ public InitGroups()
 //
 //
 
-enum E_PLAYER_DATA
+/*enum E_PLAYER_DATA
 {
 	E_PLAYER_DATA_ID,
 	E_PLAYER_DATA_ORM,
@@ -299,7 +372,7 @@ new gPlayerDrugNames[E_PLAYER_DRUGZ][] =
 };
 
 new PICKUP:gTeamPickup[E_PLAYER_TEAM];
-new gTeamMenu[E_PLAYER_TEAM];
+new gTeamMenu[E_PLAYER_TEAM];*/
 
 //
 //
@@ -317,38 +390,43 @@ public BatchSavePlayerData()
 
 public LoadPlayerData(playerid)
 {
-	if (IsPlayerConnected(playerid) && gPlayerAuth[playerid])
+	if (IsPlayerConnected(playerid) && gPlayers[playerid][IsLogged])
 	{
 		SendClientMessage(playerid, COLOR_ZLUTA, "[ DATA ] Nacitam ulozena uzivatelska data...");
 
-		new playerName[MAX_PLAYER_NAME];
-		GetPlayerName(playerid, playerName, sizeof(playerName));
-
 		SetPlayerColor(playerid, COLOR_ZLUTA);
 
-		gPlayerData[playerid][E_PLAYER_DATA_CASH] = readcfgvalue(playerName, "", "cash");
-		gPlayerData[playerid][E_PLAYER_DATA_BANK] = readcfgvalue(playerName, "", "bank");
-		gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL] = readcfgvalue(playerName, "", "adminlvl"); 
-		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = readcfgvalue(playerName, "", "team"); 
-		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = readcfgvalue(playerName, "", "class"); 
-		gPlayerData[playerid][E_PLAYER_DATA_HEALTH] = readcfgvalue(playerName, "", "health");
-		gPlayerData[playerid][E_PLAYER_DATA_ARMOUR] = readcfgvalue(playerName, "", "armour");
+		new Drugs:drugs, teamID;
 
-		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_COCAINE] = readcfgvalue(playerName, "drugz", "cocaine");
-		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_HEROIN] = readcfgvalue(playerName, "drugz", "heroin");
-		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_METH] = readcfgvalue(playerName, "drugz", "meth");
-		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_FENT] = readcfgvalue(playerName, "drugz", "fent");
-		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_PCP] = readcfgvalue(playerName, "drugz", "pcp");
-		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_ZAZA] = readcfgvalue(playerName, "drugz", "zaza");
-		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_TOBACCO] = readcfgvalue(playerName, "drugz", "tobacco");
+		gPlayers[playerid][Cash] 	= readcfgvalue(gPlayers[playerid][Name], "", "cash");
+		gPlayers[playerid][Bank] 	= readcfgvalue(gPlayers[playerid][Name], "", "bank");
+		gPlayers[playerid][AdminLevel] 	= readcfgvalue(gPlayers[playerid][Name], "", "adminlvl"); 
+		gPlayers[playerid][Skin] 	= readcfgvalue(gPlayers[playerid][Name], "", "class"); 
+		gPlayers[playerid][Health] 	= readcfgvalue(gPlayers[playerid][Name], "", "health");
+		gPlayers[playerid][Armour] 	= readcfgvalue(gPlayers[playerid][Name], "", "armour");
 
-		GivePlayerMoney(playerid, gPlayerData[playerid][E_PLAYER_DATA_CASH]);
-		SetPlayerHealth(playerid, gPlayerData[playerid][E_PLAYER_DATA_HEALTH]);
-		SetPlayerArmour(playerid, gPlayerData[playerid][E_PLAYER_DATA_ARMOUR]);
-		SetPlayerSkin(playerid, gPlayerData[playerid][E_PLAYER_DATA_CLASS]);
+		teamID 				= readcfgvalue(gPlayers[playerid][Name], "", "team"); 
+		gPlayers[playerid][TeamID] 	= gTeams[teamID];
 
-		//joint[playerid] = dUserINT(PlayerName(playerid)).("joint");
-		//zapik[playerid] = dUserINT(PlayerName(playerid)).("zapik");
+		/*gPlayers[playerid][Drugs][Cocaine][Amount] 	= readcfgvalue(gPlayers[playerid][Name], "drugz", "cocaine");
+		gPlayers[playerid][Drugs][Heroin][Amount] 	= readcfgvalue(gPlayers[playerid][Name], "drugz", "heroin");
+		gPlayers[playerid][Drugs][Meth][Amount] 	= readcfgvalue(gPlayers[playerid][Name], "drugz", "meth");
+		gPlayers[playerid][Drugs][Fent][Amount] 	= readcfgvalue(gPlayers[playerid][Name], "drugz", "fent");
+		gPlayers[playerid][Drugs][PCP][Amount] 		= readcfgvalue(gPlayers[playerid][Name], "drugz", "pcp");
+
+		gPlayers[playerid][Drugs][0] 	= readcfgvalue(gPlayers[playerid][Name], "drugz", "zaza");
+		gPlayers[playerid][Drugs][1] 	= readcfgvalue(gPlayers[playerid][Name], "drugz", "tobacco");*/
+
+		for (new i = 0; i < MAX_DRUGS; i++)
+		{
+			gPlayers[playerid][Drugs][i] = readcfgvalue(gPlayers[playerid][Name], "drugz", gDrugz[i][DrugIniName]);
+		}
+
+		GivePlayerMoney(playerid, gPlayers[playerid][Cash]);
+		SetPlayerHealth(playerid, gPlayers[playerid][Health]);
+		SetPlayerArmour(playerid, gPlayers[playerid][Armour]);
+		SetPlayerSkin(playerid, gPlayers[playerid][Skin]);
+		SetPlayerColor(playerid, gPlayers[playerid][TeamID][Color]);
 
 		SendClientMessage(playerid, GREEN, "[ DATA ] Data uspesne nactena!");
 
@@ -360,31 +438,35 @@ public LoadPlayerData(playerid)
 
 public SavePlayerData(playerid)
 {
-	if (IsPlayerConnected(playerid) && gPlayerAuth[playerid])
+	if (IsPlayerConnected(playerid) && gPlayers[playerid][IsLogged])
 	{
 		SendClientMessage(playerid, COLOR_ZLUTA, "[ AUTOSAVE ] Pripravuje se ulozeni uzivatelskych dat...");
 
-		new Float:armour, Float:health, playerName[MAX_PLAYER_NAME];
+		new Float:armour, Float:health;
 
 		GetPlayerArmour(playerid, armour);
 		GetPlayerHealth(playerid, health);
-		GetPlayerName(playerid, playerName, sizeof(playerName));
 
-		writecfgvalue(playerName, "", "cash", GetPlayerMoney(playerid));
-		writecfgvalue(playerName, "", "bank", gPlayerData[playerid][E_PLAYER_DATA_BANK]);
-		writecfgvalue(playerName, "", "adminlvl", gPlayerData[playerid][E_PLAYER_DATA_ADMIN_LVL]);
-		writecfgvalue(playerName, "", "team", gPlayerData[playerid][E_PLAYER_DATA_TEAM]);
-		writecfgvalue(playerName, "", "class", GetPlayerSkin(playerid));
-		writecfgvalue(playerName, "", "health", floatround(health));
-		writecfgvalue(playerName, "", "armour", floatround(armour));
+		writecfgvalue(gPlayers[playerid][Name], "", "cash", GetPlayerMoney(playerid));
+		writecfgvalue(gPlayers[playerid][Name], "", "bank", gPlayers[playerid][Bank]);
+		writecfgvalue(gPlayers[playerid][Name], "", "adminlvl", gPlayers[playerid][AdminLevel]);
+		writecfgvalue(gPlayers[playerid][Name], "", "team", gPlayers[playerid][TeamID]);
+		writecfgvalue(gPlayers[playerid][Name], "", "class", GetPlayerSkin(playerid));
+		writecfgvalue(gPlayers[playerid][Name], "", "health", floatround(health));
+		writecfgvalue(gPlayers[playerid][Name], "", "armour", floatround(armour));
 
-		writecfgvalue(playerName, "drugz", "cocaine", gPlayerDrugz[playerid][E_PLAYER_DRUGZ_COCAINE]);
-		writecfgvalue(playerName, "drugz", "heroin", gPlayerDrugz[playerid][E_PLAYER_DRUGZ_HEROIN]);
-		writecfgvalue(playerName, "drugz", "meth", gPlayerDrugz[playerid][E_PLAYER_DRUGZ_METH]);
-		writecfgvalue(playerName, "drugz", "fent", gPlayerDrugz[playerid][E_PLAYER_DRUGZ_FENT]);
-		writecfgvalue(playerName, "drugz", "pcp", gPlayerDrugz[playerid][E_PLAYER_DRUGZ_PCP]);
-		writecfgvalue(playerName, "drugz", "zaza", gPlayerDrugz[playerid][E_PLAYER_DRUGZ_ZAZA]);
-		writecfgvalue(playerName, "drugz", "tobacco", gPlayerDrugz[playerid][E_PLAYER_DRUGZ_TOBACCO]);
+		for (new i = 0; i < MAX_DRUGS; i++)
+		{
+			writecfgvalue(gPlayers[playerid][Name], "drugz", gDrugz[i][DrugIniName], gPlayers[playerid][Drugs][i]);
+		}
+
+		/*writecfgvalue(gPlayers[playerid][Name], "drugz", "cocaine", 	gPlayerDrugz[playerid][E_PLAYER_DRUGZ_COCAINE]);
+		writecfgvalue(gPlayers[playerid][Name], "drugz", "heroin", 	gPlayerDrugz[playerid][E_PLAYER_DRUGZ_HEROIN]);
+		writecfgvalue(gPlayers[playerid][Name], "drugz", "meth", 	gPlayerDrugz[playerid][E_PLAYER_DRUGZ_METH]);
+		writecfgvalue(gPlayers[playerid][Name], "drugz", "fent", 	gPlayerDrugz[playerid][E_PLAYER_DRUGZ_FENT]);
+		writecfgvalue(gPlayers[playerid][Name], "drugz", "pcp", 	gPlayerDrugz[playerid][E_PLAYER_DRUGZ_PCP]);
+		writecfgvalue(gPlayers[playerid][Name], "drugz", "zaza", 	gPlayerDrugz[playerid][E_PLAYER_DRUGZ_ZAZA]);
+		writecfgvalue(gPlayers[playerid][Name], "drugz", "tobacco", 	gPlayerDrugz[playerid][E_PLAYER_DRUGZ_TOBACCO]);*/
 
 		SendClientMessage(playerid, GREEN, "[ AUTOSAVE ] Data uspesne ulozena! ");
 	}
@@ -401,7 +483,11 @@ public SendPlayerSalary()
 		if (!IsPlayerConnected(i)) 
 			continue;
 
-		switch (gPlayerData[i][E_PLAYER_DATA_TEAM]) 
+		teamSalary = gPlayers[i][TeamID][SalaryBase] + random(gPlayers[i][TeamID][SalaryVolatile]);
+
+		format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Tymova vyplata pristala do kapsy: $%d");
+
+		/*switch (gPlayerData[i][E_PLAYER_DATA_TEAM]) 
 		{
 			case E_PLAYER_TEAM_NONE:
 				{
@@ -453,7 +539,7 @@ public SendPlayerSalary()
 					teamSalary = 1800 + random(2100);
 					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Prachy z cerneho trhu a prodeje narkotik!", teamSalary);
 				}
-		}
+		}*/
 
 		SendClientMessage(i, COLOR_ZLUTA, stringToPrint);
 
@@ -489,14 +575,10 @@ public OnPlayerPrivMsg(playerid, receiverid, text[])
 		return 0;
 	}
 
-	new senderName[MAX_PLAYER_NAME], receiverName[MAX_PLAYER_NAME], stringForReceiver[256], stringForSender[256]; 
+       	new stringForReceiver[256], stringForSender[256]; 
 
-	// Get both counterparts' nicknames.
-	GetPlayerName(playerid, senderName, sizeof(senderName)); 
-	GetPlayerName(receiverid, receiverName, sizeof(receiverName)); 
-
-	format(stringForReceiver, sizeof(stringForReceiver), "[ PM ] od %s (ID: %d): %s", senderName, playerid, text);
-	format(stringForSender, sizeof(stringForSender), "[ PM ] pro %s (ID: %d): %s", receiverName, receiverid, text);
+	format(stringForReceiver, sizeof(stringForReceiver), "[ PM ] od %s (ID: %d): %s", gPlayers[playerid][Name], playerid, text);
+	format(stringForSender, sizeof(stringForSender), "[ PM ] pro %s (ID: %d): %s", gPlayers[receiverid][Name], receiverid, text);
 
 	SendClientMessage(receiverid, GREEN, stringForReceiver);
 	SendClientMessage(playerid, GREEN, stringForSender);

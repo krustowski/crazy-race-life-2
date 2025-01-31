@@ -7,6 +7,20 @@
 //  Drugz.
 //
 
+enum
+{
+	ZAZA,
+	TOBACCO,
+	PAPER,
+	LIGHTER,
+	JOINT,
+	COCAINE,
+	HEROIN,
+	METH,
+	FENT,
+	PCP
+}
+
 enum Drug
 {
 	DrugName[64],
@@ -37,7 +51,7 @@ new gDrugTobacco[Drug] =
 new gDrugPaper[Drug] = 
 {
 	"vazky",
-	"wafers",
+	"paper",
 	0,
 	5
 };
@@ -116,8 +130,23 @@ public InitDrugValues()
 //  Player's props.
 //
 
+enum 
+{
+	TEAM_NONE,
+	TEAM_LAMES,
+	TEAM_ADMINZ,
+	TEAM_POLICE,
+	TEAM_TRUCKERS,
+	TEAM_DRAGSTERS,
+	TEAM_GARBAGEMEN,
+	TEAM_PIZZAGUYS,
+	TEAM_HACKERS,
+	TEAM_DEALERS
+}
+
 enum Team
 {
+	ID,
 	TeamName[64],
 	Color,
 	Skins[5],
@@ -150,11 +179,13 @@ enum Player
 	bool: Hidden,
 	bool: Spectating,
 	bool: Jailed,
+
 	Drugs[MAX_DRUGS]
 }
 
 new gTeamNone[Team] = 
 {
+	TEAM_NONE,
 	"Nezarazeno",
 	COLOR_ZLUTA,
 	{0, 0, 0, 0, 0},
@@ -168,6 +199,7 @@ new gTeamNone[Team] =
 
 new gTeamLames[Team] = 
 {
+	TEAM_LAMES,
 	"Lamky",
 	COLOR_ZLUTA,
 	{200, 0, 0, 0, 0},
@@ -181,6 +213,7 @@ new gTeamLames[Team] =
 
 new gTeamAdminz[Team] = 
 {
+	TEAM_ADMINZ,
 	"Admin Borci",
 	COLOR_SVZEL,
 	{29, 0, 0, 0, 0},
@@ -194,6 +227,7 @@ new gTeamAdminz[Team] =
 
 new gTeamPolice[Team] = 
 {
+	TEAM_POLICE,
 	"Policie",
 	MODRA,
 	{285, 0, 0, 0, 0},
@@ -207,6 +241,7 @@ new gTeamPolice[Team] =
 
 new gTeamTruckers[Team] = 
 {
+	TEAM_TRUCKERS,
 	"Truckeri",
 	COLOR_CERVENA,
 	{50, 0, 0, 0, 0},
@@ -220,6 +255,7 @@ new gTeamTruckers[Team] =
 
 new gTeamDragsters[Team] = 
 {
+	TEAM_DRAGSTERS,
 	"Dragsteri",
 	COLOR_ZELENA,
 	{107, 0, 0, 0, 0},
@@ -233,6 +269,7 @@ new gTeamDragsters[Team] =
 
 new gTeamGarbagemen[Team] = 
 {
+	TEAM_GARBAGEMEN,
 	"Popelari",
 	COLOR_HNEDA,
 	{230, 0, 0, 0, 0},
@@ -246,6 +283,7 @@ new gTeamGarbagemen[Team] =
 
 new gTeamPizzaguys[Team] = 
 {
+	TEAM_PIZZAGUYS,
 	"Pizza hosi",
 	COLOR_ZELZLUT,
 	{250, 0, 0, 0, 0},
@@ -259,6 +297,7 @@ new gTeamPizzaguys[Team] =
 
 new gTeamHackers[Team] = 
 {
+	TEAM_HACKERS,
 	"Hackeri",
 	COLOR_BILA,
 	{170, 0, 0, 0, 0},
@@ -272,6 +311,7 @@ new gTeamHackers[Team] =
 
 new gTeamDealers[Team] = 
 {
+	TEAM_DEALERS,
 	"Dealeri",
 	COLOR_ORANZOVA,
 	{29, 0, 0, 0, 0},
@@ -287,7 +327,7 @@ new gTeamDealers[Team] =
 new gPlayers[MAX_PLAYERS][Player];
 new gTeams[MAX_TEAMS][Team];
 
-public InitGroups()
+public InitTeams()
 {
 	gTeams[0] = gTeamNone;
 	gTeams[1] = gTeamLames;
@@ -300,79 +340,6 @@ public InitGroups()
 	gTeams[8] = gTeamHackers;
 	gTeams[9] = gTeamDealers;
 }
-
-//
-//
-//
-
-/*enum E_PLAYER_DATA
-{
-	E_PLAYER_DATA_ID,
-	E_PLAYER_DATA_ORM,
-	E_PLAYER_DATA_NAME[MAX_PLAYER_NAME],
-	E_PLAYER_DATA_PWD_HASH[65],
-	E_PLAYER_DATA_SALT[17],
-	E_PLAYER_DATA_CASH,
-	E_PLAYER_DATA_BANK,
-	E_PLAYER_DATA_HEALTH,
-	E_PLAYER_DATA_ARMOUR,
-	E_PLAYER_DATA_ADMIN_LVL,
-	E_PLAYER_DATA_TEAM,
-	E_PLAYER_DATA_CLASS,
-	E_PLAYER_DATA_LOGIN_ATT,
-	E_PLAYER_DATA_AFK,
-	E_PLAYER_DATA_HIDE,
-	E_PLAYER_DATA_SPECTATE
-}
-
-enum E_PLAYER_TEAM
-{
-	E_PLAYER_TEAM_NONE,
-	E_PLAYER_TEAM_LAME,
-	E_PLAYER_TEAM_ADMINZ,
-	E_PLAYER_TEAM_POLICE,
-	E_PLAYER_TEAM_GASMAN,
-	E_PLAYER_TEAM_DRAGSTER,
-	E_PLAYER_TEAM_GARBAGE,
-	E_PLAYER_TEAM_PIZZABOY,
-	E_PLAYER_TEAM_HACKER,
-	E_PLAYER_TEAM_DEALER
-}
-
-enum E_PLAYER_DRUGZ
-{
-	E_PLAYER_DRUGZ_ZAZA,
-	E_PLAYER_DRUGZ_TOBACCO,
-	E_PLAYER_DRUGZ_PAPER,
-	E_PLAYER_DRUGZ_LIGHTER,
-	E_PLAYER_DRUGZ_JOINT,
-	E_PLAYER_DRUGZ_COCAINE,
-	E_PLAYER_DRUGZ_HEROIN,
-	E_PLAYER_DRUGZ_METH,
-	E_PLAYER_DRUGZ_FENT,
-	E_PLAYER_DRUGZ_PCP
-}
-
-new gPlayerAuth[MAX_PLAYERS];
-new gPlayerData[MAX_PLAYERS][E_PLAYER_DATA];
-
-new gPlayerDrugz[MAX_PLAYERS][E_PLAYER_DRUGZ];
-new gPlayerDrugNames[E_PLAYER_DRUGZ][] = 
-{
-	"zaza",
-	"tabak",
-	"vazky",
-	"zapik",
-	"brko",
-	"kokain",
-	"heroin",
-	"pernik",
-	"fent",
-	"andelak"
-};
-
-new PICKUP:gTeamPickup[E_PLAYER_TEAM];
-new gTeamMenu[E_PLAYER_TEAM];*/
 
 //
 //
@@ -396,26 +363,13 @@ public LoadPlayerData(playerid)
 
 		SetPlayerColor(playerid, COLOR_ZLUTA);
 
-		new Drugs:drugs, teamID;
-
 		gPlayers[playerid][Cash] 	= readcfgvalue(gPlayers[playerid][Name], "", "cash");
 		gPlayers[playerid][Bank] 	= readcfgvalue(gPlayers[playerid][Name], "", "bank");
 		gPlayers[playerid][AdminLevel] 	= readcfgvalue(gPlayers[playerid][Name], "", "adminlvl"); 
+		gPlayers[playerid][TeamID]	= readcfgvalue(gPlayers[playerid][Name], "", "team"); 
 		gPlayers[playerid][Skin] 	= readcfgvalue(gPlayers[playerid][Name], "", "class"); 
 		gPlayers[playerid][Health] 	= readcfgvalue(gPlayers[playerid][Name], "", "health");
 		gPlayers[playerid][Armour] 	= readcfgvalue(gPlayers[playerid][Name], "", "armour");
-
-		teamID 				= readcfgvalue(gPlayers[playerid][Name], "", "team"); 
-		gPlayers[playerid][TeamID] 	= gTeams[teamID];
-
-		/*gPlayers[playerid][Drugs][Cocaine][Amount] 	= readcfgvalue(gPlayers[playerid][Name], "drugz", "cocaine");
-		gPlayers[playerid][Drugs][Heroin][Amount] 	= readcfgvalue(gPlayers[playerid][Name], "drugz", "heroin");
-		gPlayers[playerid][Drugs][Meth][Amount] 	= readcfgvalue(gPlayers[playerid][Name], "drugz", "meth");
-		gPlayers[playerid][Drugs][Fent][Amount] 	= readcfgvalue(gPlayers[playerid][Name], "drugz", "fent");
-		gPlayers[playerid][Drugs][PCP][Amount] 		= readcfgvalue(gPlayers[playerid][Name], "drugz", "pcp");
-
-		gPlayers[playerid][Drugs][0] 	= readcfgvalue(gPlayers[playerid][Name], "drugz", "zaza");
-		gPlayers[playerid][Drugs][1] 	= readcfgvalue(gPlayers[playerid][Name], "drugz", "tobacco");*/
 
 		for (new i = 0; i < MAX_DRUGS; i++)
 		{
@@ -426,7 +380,7 @@ public LoadPlayerData(playerid)
 		SetPlayerHealth(playerid, gPlayers[playerid][Health]);
 		SetPlayerArmour(playerid, gPlayers[playerid][Armour]);
 		SetPlayerSkin(playerid, gPlayers[playerid][Skin]);
-		SetPlayerColor(playerid, gPlayers[playerid][TeamID][Color]);
+		SetPlayerColor(playerid, gTeams[ gPlayers[playerid][TeamID] ][Color]);
 
 		SendClientMessage(playerid, GREEN, "[ DATA ] Data uspesne nactena!");
 
@@ -460,14 +414,6 @@ public SavePlayerData(playerid)
 			writecfgvalue(gPlayers[playerid][Name], "drugz", gDrugz[i][DrugIniName], gPlayers[playerid][Drugs][i]);
 		}
 
-		/*writecfgvalue(gPlayers[playerid][Name], "drugz", "cocaine", 	gPlayerDrugz[playerid][E_PLAYER_DRUGZ_COCAINE]);
-		writecfgvalue(gPlayers[playerid][Name], "drugz", "heroin", 	gPlayerDrugz[playerid][E_PLAYER_DRUGZ_HEROIN]);
-		writecfgvalue(gPlayers[playerid][Name], "drugz", "meth", 	gPlayerDrugz[playerid][E_PLAYER_DRUGZ_METH]);
-		writecfgvalue(gPlayers[playerid][Name], "drugz", "fent", 	gPlayerDrugz[playerid][E_PLAYER_DRUGZ_FENT]);
-		writecfgvalue(gPlayers[playerid][Name], "drugz", "pcp", 	gPlayerDrugz[playerid][E_PLAYER_DRUGZ_PCP]);
-		writecfgvalue(gPlayers[playerid][Name], "drugz", "zaza", 	gPlayerDrugz[playerid][E_PLAYER_DRUGZ_ZAZA]);
-		writecfgvalue(gPlayers[playerid][Name], "drugz", "tobacco", 	gPlayerDrugz[playerid][E_PLAYER_DRUGZ_TOBACCO]);*/
-
 		SendClientMessage(playerid, GREEN, "[ AUTOSAVE ] Data uspesne ulozena! ");
 	}
 
@@ -483,64 +429,9 @@ public SendPlayerSalary()
 		if (!IsPlayerConnected(i)) 
 			continue;
 
-		teamSalary = gPlayers[i][TeamID][SalaryBase] + random(gPlayers[i][TeamID][SalaryVolatile]);
+		teamSalary = gTeams[ gPlayers[i][TeamID] ][SalaryBase] + random(gTeams[ gPlayers[i][TeamID] ][SalaryVolatile]);
 
-		format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Tymova vyplata pristala do kapsy: $%d");
-
-		/*switch (gPlayerData[i][E_PLAYER_DATA_TEAM]) 
-		{
-			case E_PLAYER_TEAM_NONE:
-				{
-					teamSalary = 100 + random(150);
-					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Podpora v nezamestnanosti: $%d | Par drobku z mestske kasy :) A nemysli si ze nebudes pracovat!", teamSalary);
-				}
-			case E_PLAYER_TEAM_LAME:
-				{
-					teamSalary = 5 + random(20);
-					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Nemysli si ze lamam budeme davat tolik penez!", teamSalary);
-				}
-			case E_PLAYER_TEAM_ADMINZ:
-				{
-					teamSalary = 1500 + random(2000);
-					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Uzijte peníze pro co chcete! :D", teamSalary);
-				}
-			case E_PLAYER_TEAM_POLICE:
-				{
-					teamSalary = 1000 + random(600);
-					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Pro pany fizle par papiru z mestske kasy! :)", teamSalary);
-				}
-			case E_PLAYER_TEAM_GASMAN:
-				{
-					teamSalary = 1000 + random(600);
-					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Provize z benzinky! :D", teamSalary);
-				}
-			case E_PLAYER_TEAM_DRAGSTER:
-				{
-					teamSalary = 1200 + random(1000);
-					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Provize z dragu! :D", teamSalary);
-				}
-			case E_PLAYER_TEAM_GARBAGE:
-				{
-					teamSalary = 120 + random(100);
-					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Podpora mesta a penize z popelnic! :D", teamSalary);
-				}
-			case E_PLAYER_TEAM_PIZZABOY:
-				{
-					teamSalary = 190 + random(200);
-					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Pizza provize a spropitne! :D", teamSalary);
-				}
-			case E_PLAYER_TEAM_HACKER:
-				{
-					teamSalary = 1500 + random(800);
-					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Vypalne a provize z prodeje ukradenych dat! :D", teamSalary);
-				}
-			case E_PLAYER_TEAM_DEALER:
-				{
-					teamSalary = 1800 + random(2100);
-					format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Vyplata povolani: $%d | Prachy z cerneho trhu a prodeje narkotik!", teamSalary);
-				}
-		}*/
-
+		format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Tymova vyplata pristala do kapsy: $%d", teamSalary);
 		SendClientMessage(i, COLOR_ZLUTA, stringToPrint);
 
 		format(gameText, sizeof(gameText), "~y~V~g~yplata~n~~y~$~g~%d", teamSalary);

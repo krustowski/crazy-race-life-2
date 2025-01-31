@@ -223,7 +223,8 @@ public OnGameModeInit()
 	AllowInteriorWeapons(0);
 	EnableStuntBonusForAll(1);  
 
-	InitGroups();
+	InitDrugValues();
+	InitTeams();
 
 	//
 	// Start various timers.
@@ -386,7 +387,7 @@ public OnPlayerSpawn(playerid)
 {
 	SetPlayerPos(playerid, 2323.73, 1283.18, 97.60);
 	SetPlayerSkin(playerid, gPlayers[playerid][Skin]);
-	SetPlayerColor(playerid, gPlayers[playerid][TeamID][Color]);
+	SetPlayerColor(playerid, gTeams[ gPlayers[playerid][TeamID] ][Color]);
 
 	// Set the player back to the paintball area if is set in game.
 	if (gPaintball[playerid][E_PAINTBALL_INGAME])
@@ -484,7 +485,7 @@ public OnPlayerText(playerid, text[])
 		for (new i = 0; i < MAX_PLAYERS; i++)
 		{
 			if (IsPlayerConnected(i) && gPlayers[i][TeamID] == gPlayers[playerid][TeamID])
-				SendClientMessage(i, gPlayers[i][TeamID][Color], stringToPrint);
+				SendClientMessage(i, gTeams[ gPlayers[i][TeamID] ][Color], stringToPrint);
 		}
 
 		return 0;
@@ -733,43 +734,6 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		}
 	}
 
-	/*if (pickupid == gTeamPickup[E_PLAYER_TEAM_LAME])
-	{
-		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_LAME], playerid);
-	}
-	else if (pickupid == gTeamPickup[E_PLAYER_TEAM_ADMINZ])
-	{
-		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_ADMINZ], playerid);
-	}
-	else if (pickupid == gTeamPickup[E_PLAYER_TEAM_POLICE])
-	{
-		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_POLICE], playerid);
-	}
-	else if (pickupid == gTeamPickup[E_PLAYER_TEAM_GASMAN])
-	{
-		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_GASMAN], playerid);
-	}
-	else if (pickupid == gTeamPickup[E_PLAYER_TEAM_DRAGSTER])
-	{
-		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_DRAGSTER], playerid);
-	}
-	else if (pickupid == gTeamPickup[E_PLAYER_TEAM_GARBAGE])
-	{
-		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_GARBAGE], playerid);
-	}
-	else if (pickupid == gTeamPickup[E_PLAYER_TEAM_PIZZABOY])
-	{
-		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_PIZZABOY], playerid);
-	}
-	else if (pickupid == gTeamPickup[E_PLAYER_TEAM_HACKER])
-	{
-		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_HACKER], playerid);
-	}
-	else if (pickupid == gTeamPickup[E_PLAYER_TEAM_DEALER])
-	{
-		ShowMenuForPlayer(Menu:gTeamMenu[E_PLAYER_TEAM_DEALER], playerid);
-	}*/
-
 	//
 	//  Other pickups --- entries,  baggies etc.
 	//
@@ -808,7 +772,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	{
 		new amount = random(10);
 
-		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_COCAINE] += amount;
+		gPlayers[playerid][Drugs][COCAINE] += amount;
 
 		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy kokainu.", amount);
 		SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
@@ -817,7 +781,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	{
 		new amount = random(10);
 
-		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_HEROIN] += amount;
+		gPlayers[playerid][Drugs][HEROIN] += amount;
 
 		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy heroinu.", amount);
 		SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
@@ -826,7 +790,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	{
 		new amount = random(10);
 
-		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_METH] += amount;
+		gPlayers[playerid][Drugs][METH] += amount;
 
 		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy methamphetaminu.", amount);
 		SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
@@ -835,7 +799,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	{
 		new amount = random(10);
 
-		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_FENT] += amount;
+		gPlayers[playerid][Drugs][FENT] += amount;
 
 		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy fentanylu.", amount);
 		SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
@@ -844,7 +808,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	{
 		new amount = random(10);
 
-		gPlayerDrugz[playerid][E_PLAYER_DRUGZ_PCP] += amount;
+		gPlayers[playerid][Drugs][PCP] += amount;
 
 		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy PCP.", amount);
 		SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
@@ -875,7 +839,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 	if (row == 1)
 	{
 		ResetPlayerWeapons(playerid);
-		gPlayers[playerid][TeamID] = gTeamNone;
+		gPlayers[playerid][TeamID] = TEAM_NONE;
 
 		SendClientMessage(playerid, COLOR_SEDA, "[ TEAM ] Opustil jsi team: jsi nezarazen/nezamestnan.");
 
@@ -890,114 +854,12 @@ public OnPlayerSelectedMenuRow(playerid, row)
 			SetPlayerColor(playerid, gTeams[i][Color]);
 			SetPlayerSkin(playerid, gTeams[i][Skins][0]);
 
-			gPlayers[playerid][TeamID] = gTeams[i];
+			gPlayers[playerid][TeamID] = gTeams[i][ID];
 
 			format(stringToPrint, sizeof(stringToPrint), "[ TEAM ] Hrac %s se pripojil k tymu %s!", gPlayers[playerid][Name], gTeams[i][TeamName]);
 			SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
 		}
 	}
-
-	/*if (currentMenu == gTeamMenu[E_PLAYER_TEAM_LAME])
-	{
-		GivePlayerWeapon(playerid, 5, 1);
-		SetPlayerColor(playerid, COLOR_ZLUTA);
-		SetPlayerSkin(playerid, 200);
-
-		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_LAME;
-		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 200;
-		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Lamek!", playerName);
-	}
-	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_ADMINZ])
-	{
-		GivePlayerWeapon(playerid, 32, 1000);
-		SetPlayerColor(playerid, COLOR_SVZEL);
-		SetPlayerSkin(playerid, 29);
-
-		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_ADMINZ;
-		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 29;
-		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Admin borcu!", playerName);
-	}
-	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_POLICE])
-	{
-		GivePlayerWeapon(playerid, 30, 100);
-		GivePlayerWeapon(playerid, 31, 100);
-		GivePlayerWeapon(playerid, 32, 111);
-		SetPlayerColor(playerid, MODRA);
-		SetPlayerSkin(playerid, 285);
-
-		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_POLICE;
-		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 285;
-		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Policajtu!", playerName);
-	}
-	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_GASMAN])
-	{
-		GivePlayerWeapon(playerid, 32, 1);
-		SetPlayerColor(playerid, COLOR_CERVENA);
-		SetPlayerSkin(playerid, 50);
-
-		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_GASMAN;
-		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 50;
-		format(stringToPrint, sizeof(stringToPrint), " [ ! ] Hrac %s se pripojil k tymu Pumparu/Benzinaku!", playerName);
-	}
-	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_DRAGSTER])
-	{
-		GivePlayerWeapon(playerid, 5, 1);
-		GivePlayerWeapon(playerid, 30, 100);
-		GivePlayerWeapon(playerid, 31, 1000);
-		SetPlayerColor(playerid, COLOR_ORANZOVA);
-		SetPlayerSkin(playerid, 107);
-
-		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_DRAGSTER;
-		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 107;
-		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu DRaGsTeRù!", playerName);
-	}
-	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_GARBAGE])
-	{
-		GivePlayerWeapon(playerid, 4, 1);
-		GivePlayerWeapon(playerid, 32, 1);
-		SetPlayerColor(playerid, COLOR_SVZEL);
-		SetPlayerSkin(playerid, 230); // alternatively ID 137
-
-		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_GARBAGE; 
-		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 230;
-		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Tulaku!", playerName);
-	}
-	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_PIZZABOY])
-	{
-		GivePlayerWeapon(playerid, 4, 1);
-		GivePlayerWeapon(playerid, 24, 111);
-		SetPlayerColor(playerid, COLOR_ZELZLUT);
-		SetPlayerSkin(playerid, 250);
-
-		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_PIZZABOY;
-		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 250;
-		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Pizzaboyz!", playerName); 
-	}
-	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_HACKER])
-	{
-		GivePlayerWeapon(playerid, 4, 100);
-		GivePlayerWeapon(playerid, 24, 100);
-		SetPlayerColor(playerid, COLOR_BILA);
-		SetPlayerSkin(playerid, 170);
-
-		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_HACKER;
-		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 170;
-		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Hackeru!", playerName); 
-	}
-	else if (currentMenu == gTeamMenu[E_PLAYER_TEAM_DEALER])
-	{
-		GivePlayerWeapon(playerid, 4, 100);
-		GivePlayerWeapon(playerid, 24, 100);
-		SetPlayerArmour(playerid, 100.0);
-		SetPlayerColor(playerid, COLOR_ORANZOVA);
-		SetPlayerSkin(playerid, 29);
-
-		gPlayerData[playerid][E_PLAYER_DATA_TEAM] = E_PLAYER_TEAM_DEALER;
-		gPlayerData[playerid][E_PLAYER_DATA_CLASS] = 29;
-		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s se pripojil k tymu Dealeru!", playerName);
-	}
-
-	SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);*/
 
 	return 1;
 }

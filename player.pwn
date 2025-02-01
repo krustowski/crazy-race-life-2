@@ -175,6 +175,7 @@ enum Player
 	Float: Armour,
 	AdminLevel,
 	LoginAttempts,
+	SpawnPoint,
 
 	bool: IsLogged,
 	bool: AFK,
@@ -378,6 +379,7 @@ public LoadPlayerData(playerid)
 		gPlayers[playerid][Skin] 	= readcfgvalue(gPlayers[playerid][Name], "", "class"); 
 		gPlayers[playerid][Health] 	= readcfgvalue(gPlayers[playerid][Name], "", "health");
 		gPlayers[playerid][Armour] 	= readcfgvalue(gPlayers[playerid][Name], "", "armour");
+		gPlayers[playerid][SpawnPoint] 	= readcfgvalue(gPlayers[playerid][Name], "", "spawn");
 
 		for (new i = 0; i < MAX_DRUGS; i++)
 		{
@@ -416,6 +418,7 @@ public SavePlayerData(playerid)
 		writecfgvalue(gPlayers[playerid][Name], "", "class", GetPlayerSkin(playerid));
 		writecfgvalue(gPlayers[playerid][Name], "", "health", floatround(health));
 		writecfgvalue(gPlayers[playerid][Name], "", "armour", floatround(armour));
+		writecfgvalue(gPlayers[playerid][Name], "", "spawn", gPlayers[playerid][SpawnPoint]);
 
 		for (new i = 0; i < MAX_DRUGS; i++)
 		{

@@ -468,6 +468,24 @@ dcmd_login(playerid, params[])
 		return SystemMsg(playerid, "[ AUTH ] Prihlaseni uspesne.");
 }
 
+dcmd_pm(playerid, params[])
+{
+	new token1[32], token2[32];
+	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
+
+	if (!strlen(params) || count != 2 || !IsNumeric(token1))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti /pm [playerID] [text]");
+
+	new targetId = strval(token1);
+
+	if (!IsPlayerConnected(targetId))
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+
+	OnPlayerPrivMsg(playerid, targetId, token2);
+
+	return 1;
+}
+
 dcmd_port(playerid, params[])
 {
 	if (IsPlayerInAnyVehicle(playerid))
@@ -495,20 +513,51 @@ dcmd_port(playerid, params[])
 	return 1;
 }
 
-dcmd_pm(playerid, params[])
+dcmd_property(playerid, params[])
 {
 	new token1[32], token2[32];
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
-	if (!strlen(params) || count != 2 || !IsNumeric(token1))
-		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti /pm [playerID] [text]");
+	if (!strlen(params) || (strcmp(token1, "buy") && strcmp(token1, "list") && strcmp(token1, "spawn") && strcmp(token1, "vehicle")) || (!strcmp(token1, "buy") && !IsNumeric(token2)))
+	{
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /property buy [property ID]");
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /property list");
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /property spawn");
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /property vehicle");
 
-	new targetId = strval(token1);
+		return 1;
+	}
 
-	if (!IsPlayerConnected(targetId))
-		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+	if (!strcmp(token1, "buy"))
+	{
 
-	OnPlayerPrivMsg(playerid, targetId, token2);
+	}
+	else if (!strcmp(token1, "list"))
+	{}
+	else if (!strcmp(token1, "spawn"))
+	{}
+	else if (!strcmp(token1, "vehicle"))
+	{}
+
+
+	new Float:X, Float:Y, Float:Z;
+
+	GetPlayerPos(playerid, X, Y, Z);
+	//CreateVehicle(vehicleId, Float:X, Float:Y, Float:Z, 0.0, -1, -1, -1);
+
+	Z += 1500;
+
+	//CreatePlayerObject(playerid, 18056, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0,0); // varna
+	//SetPlayerInterior(playerid, 12);
+	CreatePlayerObject(playerid, 14859, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0,0);
+
+	CreatePickup(1318, 1, Float:(X-2.42), Float:(Y+1.25), Float:(Z-1.0));
+	CreatePickup(1240, 1, Float:(X-2.20), Float:(Y-2.50), Float:(Z-1.0));
+	CreatePickup(1241, 1, Float:(X+2.50), Float:(Y-2.50), Float:(Z-1.0));
+	CreatePickup(1239, 1, Float:(X+2.50), Float:(Y+2.20), Float:(Z-1.0));
+
+	SetPlayerPos(playerid, Float:X, Float:Y, Float:Z);
+	SetPlayerFacingAngle(playerid, 0.0);
 
 	return 1;
 }
@@ -1144,41 +1193,6 @@ dcmd_odpocet(playerid, params[])
 
 	//format(stringToPrint, sizeof(stringToPrint), "~n~~n~~n~~n~~n~~n~%d", strval(params));
 	//GameTextForPlayer(playerid, stringToPrint, 2000, 3);
-
-	return 1;
-}
-
-dcmd_property(playerid, params[])
-{
-	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4)
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
-
-	if (!strlen(params) || !IsNumeric(params))
-		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti /property [interiorID]");
-
-	/*new vehicleId = strval(params);
-
-	if (vehicleId < 400 || vehicleId > 611)
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Neplatne ID interieru! (IDs 400-611)");*/
-
-	new Float:X, Float:Y, Float:Z;
-
-	GetPlayerPos(playerid, X, Y, Z);
-	//CreateVehicle(vehicleId, Float:X, Float:Y, Float:Z, 0.0, -1, -1, -1);
-
-	Z += 1500;
-
-	//CreatePlayerObject(playerid, 18056, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0,0); // varna
-	//SetPlayerInterior(playerid, 12);
-	CreatePlayerObject(playerid, 14859, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0,0);
-
-	CreatePickup(1318, 1, Float:(X-2.42), Float:(Y+1.25), Float:(Z-1.0));
-	CreatePickup(1240, 1, Float:(X-2.20), Float:(Y-2.50), Float:(Z-1.0));
-	CreatePickup(1241, 1, Float:(X+2.50), Float:(Y-2.50), Float:(Z-1.0));
-	CreatePickup(1239, 1, Float:(X+2.50), Float:(Y+2.20), Float:(Z-1.0));
-
-	SetPlayerPos(playerid, Float:X, Float:Y, Float:Z);
-	SetPlayerFacingAngle(playerid, 0.0);
 
 	return 1;
 }

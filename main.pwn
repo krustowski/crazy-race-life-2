@@ -17,7 +17,7 @@
  [ Created: 	Jan 2025 (Extends legacy GameMode CRL (2008-2010)) ]
  [ Credits: 	krusty, kompry, DRaGsTeR ]
  [ Language: 	CZ, EN ]
- [ Version: 	0.2.Z ]
+ [ Version: 	0.2.1 ]
 
  *****************************************************************************************************************************************/
 
@@ -748,10 +748,22 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		if (pickupid != gProperties[i][Pickups][0] && pickupid != gProperties[i][Pickups][1])
 			continue;
 
-		if (pickupid == gProperties[i][Pickups][0])
-			return SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Tento dum je na prodej.");
+		if (pickupid == gProperties[i][Pickups][0] && !gProperties[i][Occupied])
+		{
+			new stringToPrint[128];
 
-		if (pickupid == gProperties[i][Pickups][1] && !IsPlayerOwner(playerid, gProperties[i]))
+			format(stringToPrint, sizeof(stringToPrint), "[ REAL ] Nemovitost '%s' je na prodej za cenu $%d.", gProperties[i][Label], gProperties[i][Cost]);
+			SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+			format(stringToPrint, sizeof(stringToPrint), "* Pro zakoupeni nemovitosti pouzij /property buy %d", gProperties[i][ID]);
+			SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+
+			return 1;
+		}
+
+		if (pickupid == gProperties[i][Pickups][0] && !gProperties[i][Occupied])
+			return SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Tato nemovitost byla jiz prodana jinemu hraci..");
+
+		if (pickupid == gProperties[i][Pickups][1] && !IsPlayerOwner(playerid, gProperties[i][ID]))
 			return SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Neni mozne vstoupit na dany pozemek!");
 
 		new Float:X, Float:Y, Float:Z;

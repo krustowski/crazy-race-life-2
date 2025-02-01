@@ -146,6 +146,7 @@ forward UpdatePlayerScore();
 
 #include "player.pwn"
 #include "auth.pwn"
+#include "real.pwn"
 //#include "mysql.pwn"
 
 //
@@ -183,7 +184,6 @@ forward AddMapicons(playerid);
 #include "vehicles.pwn"
 #include "texts.pwn"
 #include "mapicons.pwn"
-#include "real.pwn"
 
 //
 //  DCMDs = command set definitions.
@@ -248,6 +248,8 @@ public OnGameModeInit()
 	//
 	// Create pickups, static objects and static vehicles + DrawTexts.
 	//
+
+	InitRealEstateProperties();
 
 	InitPickups();
 	InitObjects();
@@ -735,6 +737,43 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		{
 			ShowMenuForPlayer(Menu:gTeams[i][Menus][0], playerid);
 		}
+	}
+
+	//
+	//  Real Estate Pickups.
+	//
+
+	for (new i = 0; i < sizeof(gProperties); i++)
+	{
+		if (pickupid != gProperties[i][Pickups][0] && pickupid != gProperties[i][Pickups][1])
+			continue;
+
+		if (pickupid == gProperties[i][Pickups][0])
+			return SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Tento dum je na prodej.");
+
+		if (pickupid == gProperties[i][Pickups][1] && !IsPlayerOwner(playerid, gProperties[i]))
+			return SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Neni mozne vstoupit na dany pozemek!");
+
+		new Float:X, Float:Y, Float:Z;
+
+		GetPlayerPos(playerid, X, Y, Z);
+
+		Z += 1500;
+
+		// The room
+		CreatePlayerObject(playerid, 14859, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0,0);
+
+		// Exit
+		CreatePickup(1318, 1, Float:(X-2.42), Float:(Y+1.25), Float:(Z-1.0));
+		// Health
+		CreatePickup(1240, 1, Float:(X-2.20), Float:(Y-2.50), Float:(Z-1.0));
+		// Pills
+		CreatePickup(1241, 1, Float:(X+2.50), Float:(Y-2.50), Float:(Z-1.0));
+		// Info
+		CreatePickup(1239, 1, Float:(X+2.50), Float:(Y+2.20), Float:(Z-1.0));
+
+		SetPlayerPos(playerid, Float:X, Float:Y, Float:Z);
+		SetPlayerFacingAngle(playerid, 0.0);
 	}
 
 	//

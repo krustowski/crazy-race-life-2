@@ -19,6 +19,7 @@ public ShowAdvert()
 		"[ GAME ] Muzes vlastnit az 3 nemovitosti v lokalitach oznacenych na mape zelenym domkem",
 		"[ GAME ] Substance ci propriety zakoupene u clena tymu Dealeru lze ulozit pouze ve vlastnim dome, jinak je treba je mit u sebe!",
 		"[ GAME ] Ilegalni substance lze obchodovat i na cernem trhu. Existuje vsak sance, ze na sebe privolas pozornost zvysenim Wanted levelu!",
+		"[ GAME ] Cervene domky na mape znaci oblasti, kde se v budoucnu budou vyskytovat nemovistosti ke koupi",
 		"[ TIP ] Skoc si skidive pomoci /skidive!"
 	};
 

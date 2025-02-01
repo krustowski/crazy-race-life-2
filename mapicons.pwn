@@ -83,6 +83,8 @@ public AddMapicons(playerid)
 	SetPlayerMapIcon(playerid, 22, -2657.27, 882.27, 79.34, E_MAPICON_ID_PROPERTY_NOT_FOR_SALE, 0, MAPICON_LOCAL);
 	SetPlayerMapIcon(playerid, 23, -2686.03, 205.63, 3.96, E_MAPICON_ID_PROPERTY_NOT_FOR_SALE, 0, MAPICON_LOCAL);
 
+	SetPlayerMapIcon(playerid, 23, -1497.76, 2671.87, 55.25, E_MAPICON_ID_PROPERTY_NOT_FOR_SALE, 0, MAPICON_LOCAL);
+
 	// Jobs.
 	SetPlayerMapIcon(playerid, 40, 970.7, 2155.0, 10.8, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
 	SetPlayerMapIcon(playerid, 41, 2287.1, 2426.7, 10.8, E_MAPICON_ID_POLICE, 0, MAPICON_LOCAL);

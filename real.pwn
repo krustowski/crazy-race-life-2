@@ -47,6 +47,7 @@ enum Property
 // Those references are set for the elements to be destroyed afterwards (when player leaves).
 enum PlayerPropertyObject
 {
+	PropertyArrayID,
 	Objects[2],
 	Pickups[4]
 }
@@ -419,4 +420,30 @@ stock ExtractCoordsFromString(input[], coords[Coords])
 	} while (strcmp(token2, ""));
 
 	return coords;
+}
+
+stock SpawnPropertyInterior(playerid, arrayID)
+{
+	gPlayerInteriors[playerid][PropertyArrayID] = arrayID;
+
+	new Float:X, Float:Y, Float:Z;
+
+	GetPlayerPos(playerid, X, Y, Z);
+
+	Z += 1500;
+
+	// The room
+	gPlayerInteriors[playerid][Objects][0] = CreatePlayerObject(playerid, 14859, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0,0);
+
+	// Exit
+	gPlayerInteriors[playerid][Pickups][0] = CreatePickup(1318, 1, Float:(X-2.42), Float:(Y+1.25), Float:(Z-1.0));
+	// Health
+	gPlayerInteriors[playerid][Pickups][1] = CreatePickup(1240, 1, Float:(X-2.20), Float:(Y-2.50), Float:(Z-1.0));
+	// Pills
+	gPlayerInteriors[playerid][Pickups][2] = CreatePickup(1241, 1, Float:(X+2.50), Float:(Y-2.50), Float:(Z-1.0));
+	// Info
+	gPlayerInteriors[playerid][Pickups][3] = CreatePickup(1239, 1, Float:(X+2.50), Float:(Y+2.20), Float:(Z-1.0));
+
+	SetPlayerPos(playerid, Float:X, Float:Y, Float:Z);
+	SetPlayerFacingAngle(playerid, 0.0);
 }

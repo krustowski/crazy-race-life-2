@@ -762,32 +762,32 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 			return 1;
 		}
 
-		if (pickupid == gProperties[i][Pickups][0] && !gProperties[i][Occupied])
+		if (pickupid == gProperties[i][Pickups][0] && gProperties[i][Occupied])
 			return SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Tato nemovitost byla jiz prodana jinemu hraci..");
 
 		if (pickupid == gProperties[i][Pickups][1] && !IsPlayerOwner(playerid, gProperties[i][ID]))
 			return SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Neni mozne vstoupit na dany pozemek!");
 
-		new Float:X, Float:Y, Float:Z;
+		// Spawn the room.
+		SpawnPropertyInterior(playerid, i);
+	}
 
-		GetPlayerPos(playerid, X, Y, Z);
+	if (gPlayerInteriors[playerid][Objects][0])
+	{
+		if (pickupid == gPlayerInteriors[playerid][Pickups][0])
+		{
+			new locationOffer[Coords];
+			locationOffer = gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ][LocationOffer];
 
-		Z += 1500;
+			SetPlayerPos(playerid, Float:locationOffer[0], Float:locationOffer[1], Float:locationOffer[2]);
 
-		// The room
-		CreatePlayerObject(playerid, 14859, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0,0);
+			DestroyPlayerObject(playerid, gPlayerInteriors[playerid][Objects][0]);
 
-		// Exit
-		CreatePickup(1318, 1, Float:(X-2.42), Float:(Y+1.25), Float:(Z-1.0));
-		// Health
-		CreatePickup(1240, 1, Float:(X-2.20), Float:(Y-2.50), Float:(Z-1.0));
-		// Pills
-		CreatePickup(1241, 1, Float:(X+2.50), Float:(Y-2.50), Float:(Z-1.0));
-		// Info
-		CreatePickup(1239, 1, Float:(X+2.50), Float:(Y+2.20), Float:(Z-1.0));
-
-		SetPlayerPos(playerid, Float:X, Float:Y, Float:Z);
-		SetPlayerFacingAngle(playerid, 0.0);
+			for (new j = 0; j < 4; j++)
+			{
+				DestroyPickup(gPlayerInteriors[playerid][Pickups][j]);
+			}
+		}
 	}
 
 	//

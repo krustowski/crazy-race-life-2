@@ -248,7 +248,7 @@ new gProperties[MAX_PROPERTIES][Property];
 
 public InitRealEstateProperties()
 {
-	gProperties[0] = gPropertySF0101;
+	/*gProperties[0] = gPropertySF0101;
 	gProperties[1] = gPropertyDE0101;
 	gProperties[2] = gPropertyDE0102;
 	gProperties[3] = gPropertyDE0103;
@@ -258,7 +258,9 @@ public InitRealEstateProperties()
 	gProperties[7] = gPropertyOT0102;
 	gProperties[8] = gPropertyOT0103;
 	gProperties[9] = gPropertyOT0104;
-	gProperties[10] = gPropertyOT0105;
+	gProperties[10] = gPropertyOT0105;*/
+
+	LoadRealEstateData();
 
 	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
@@ -344,22 +346,62 @@ public SaveRealEstateData()
 
 public LoadRealEstateData()
 {
-	new fileName[64] = "_data_RealEstateProperties", properties[256], token1[256], token2[256];
+	new fileName[64] = "_data_RealEstateProperties", i = 0, properties[256], token1[256], token2[256];
 
 	readcfg(fileName, "", "properties", properties); 
 
-	new count = SplitIntoTwo(properties, token1, token2, sizeof(token1), ","), i = 0;
+	do {
+		SplitIntoTwo(properties, token1, token2, sizeof(token1), ",");
 
-	while (strcmp(token2, ""))
-	{
+		printf("LoadRealEstateData: loading %s", token1);
+
 		if (!IsNumeric(token1) || !strval(token1))
+		{
+			strcopy(properties, token2);
 			continue;
+		}
+
+		//
+		//  Extract the values (ints and strings).
+		//
+
+		gProperties[i][ID] = readcfgvalue(fileName, token1, "id");
+		gProperties[i][Cost] = readcfgvalue(fileName, token1, "cost");
+		gProperties[i][VehicleID] = readcfgvalue(fileName, token1, "vehicleID");
+		gProperties[i][Occupied] = readcfgvalue(fileName, token1, "occupied");
+
+		readcfg(fileName, token1, "label", gProperties[i][Label]); 
+
+		//
+		//  Extract the floats.
+		//
+
+		new 
+			locationOffer[Coords], locationOfferString[64], 
+			locationEntrance[Coords], locationEntranceString[64], 
+			locationVehicle[Coords], locationVehicleString[64];
+
+		readcfg(fileName, token1, "locationOffer", locationOfferString); 
+		readcfg(fileName, token1, "locationEntrance", locationEntranceString); 
+		readcfg(fileName, token1, "locationVehicle", locationVehicleString); 
+
+		ExtractCoordsFromString(locationOfferString, locationOffer);
+		ExtractCoordsFromString(locationEntranceString, locationEntrance);
+		ExtractCoordsFromString(locationVehicleString, locationVehicle);
+
+		gProperties[i][LocationOffer] = locationOffer;
+		gProperties[i][LocationEntrance] = locationEntrance;
+		gProperties[i][LocationVehicle] = locationVehicle;
 
 		// Prepare vars for the next run.
-		properties = token2;
-		count = SplitIntoTwo(properties, token1, token2, sizeof(token1));
+		strcopy(properties, token2);
 		i++;
-	}
+
+		if (i > MAX_PROPERTIES)
+			break;
+	} while (strcmp(token2, ""));
+
+	return 1;
 }
 
 stock ExtractCoordsFromString(input[], coords[Coords])

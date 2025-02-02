@@ -143,6 +143,7 @@ forward LoadPlayerData(playerid);
 forward SavePlayerData(playerid);
 forward SendPlayerSalary();
 forward UpdatePlayerScore();
+forward InitRealEstateProperties();
 
 #include "player.pwn"
 #include "auth.pwn"

@@ -213,3 +213,9 @@ public PrintAsciiLogoToLogs()
 	printf(" ");
 	printf(" *************************************************************************************   ");
 }
+
+public AutosaveData()
+{
+	BatchSavePlayerData();
+	SaveRealEstateData();
+}

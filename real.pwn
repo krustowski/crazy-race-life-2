@@ -268,13 +268,18 @@ public InitRealEstateProperties()
 		if (!gProperties[i][Occupied])
 			gProperties[i][Pickups][0] = CreatePickup(1273, 1, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ]);
 		else
-			gProperties[i][Pickups][0] = CreatePickup(1318, 1, Float:gProperties[i][LocationEntrance][CoordX], Float:gProperties[i][LocationEntrance][CoordY], Float:gProperties[i][LocationEntrance][CoordZ]);
+		{
+			gProperties[i][Pickups][0] = CreatePickup(19522, 1, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ]);
+			gProperties[i][Pickups][1] = CreatePickup(1318, 1, Float:gProperties[i][LocationEntrance][CoordX], Float:gProperties[i][LocationEntrance][CoordY], Float:gProperties[i][LocationEntrance][CoordZ]);
+		}
 
 		if (gProperties[i][VehicleID] && gProperties[i][VehicleID] >= 400 && gProperties[i][VehicleID] <= 611)
 		{
 			gProperties[i][Vehicle] = CreateVehicle(gProperties[i][VehicleID], Float:gProperties[i][LocationVehicle][CoordX], Float:gProperties[i][LocationVehicle][CoordY], Float:gProperties[i][LocationVehicle][CoordZ], Float:gProperties[i][LocationVehicle][CoordR], 0, 0, -1);
 		}
 	}
+
+	return 1;
 }
 
 public IsPlayerOwner(playerid, propertyId)
@@ -286,4 +291,54 @@ public IsPlayerOwner(playerid, propertyId)
 	}
 
 	return false;
+}
+
+public SaveRealEstateData()
+{
+	new fileName[64] = "realEstateData", stringName[8], stringNames[256];
+
+	writecfg(fileName, "", "properties", "xxx");
+
+	for (new i = 0; i < sizeof(gProperties); i++)
+	{
+		if (!gProperties[i][ID])
+			continue;
+
+		format(stringName, sizeof(stringName), "%d", gProperties[i][ID]);
+		format(stringNames, sizeof(stringNames), "%s,%d", stringNames, gProperties[i][ID]);
+
+		writecfgvalue(fileName, stringName, "id", gProperties[i][ID]);
+		writecfg(fileName, stringName, "label", gProperties[i][Label]);
+		writecfgvalue(fileName, stringName, "cost", gProperties[i][Cost]);
+
+		new coordStringOffer[256], coordStringEntrance[256], coordStringVehicle[256];
+
+		new locationOffer = gProperties[i][LocationOffer];
+
+		for (new j = 0; j < 4; j++)
+		{
+			if (!strcmp(coordStringOffer, ""))
+			{
+				format(coordStringOffer, sizeof(coordStringOffer), "%.2f", gProperties[i][LocationOffer][j]);
+				format(coordStringEntrance, sizeof(coordStringEntrance), "%.2f", gProperties[i][LocationEntrance][j]);
+				format(coordStringVehicle, sizeof(coordStringVehicle), "%.2f", gProperties[i][LocationVehicle][j]);
+				continue;
+			}
+
+			format(coordStringOffer, sizeof(coordStringOffer), "%s,%.2f", coordStringOffer, gProperties[i][LocationOffer][j]);
+			format(coordStringEntrance, sizeof(coordStringEntrance), "%s,%.2f", coordStringEntrance, gProperties[i][LocationEntrance][j]);
+			format(coordStringVehicle, sizeof(coordStringVehicle), "%s,%.2f", coordStringVehicle, gProperties[i][LocationVehicle][j]);
+		}
+
+		writecfg(fileName, stringName, "locationOffer", coordStringOffer);
+		writecfg(fileName, stringName, "locationEntrance", coordStringEntrance);
+		writecfg(fileName, stringName, "locationVehicle", coordStringVehicle);
+
+		writecfgvalue(fileName, stringName, "vehicleID", gProperties[i][VehicleID]);
+		writecfgvalue(fileName, stringName, "occupied", gProperties[i][Occupied]);
+	}
+
+	writecfg(fileName, "", "properties", stringNames);
+
+	return 1;
 }

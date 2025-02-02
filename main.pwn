@@ -153,6 +153,7 @@ forward UpdatePlayerScore();
 //  Radar + Vehicle velocity/props.
 //
 
+forward AutosaveData();
 forward OnRadarCheckpoint();
 forward OffRadarCheckpoint(playerid);
 
@@ -237,7 +238,7 @@ public OnGameModeInit()
 
 	SetTimer("OnRadarCheckpoint", 300, 1);
 
-	SetTimer("BatchSavePlayerData", 200 * SECOND_MS, 1);
+	SetTimer("AutosaveData", 200 * SECOND_MS, 1);
 	SetTimer("UpdatePlayerScore", 1 * SECOND_MS, 1);
 	SetTimer("SendPlayerSalary", 300 * SECOND_MS, 1);
 
@@ -522,6 +523,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	//dcmd(login, 5, cmdtext);          //all
 	dcmd(pm, 2, cmdtext);		  //all
 	dcmd(port, 4, cmdtext); 	  //all
+	dcmd(property, 8, cmdtext);	  //all
 	dcmd(race, 4, cmdtext);		  //all
 	//dcmd(register, 8, cmdtext);       //all
 	dcmd(rules, 5, cmdtext); 	  //all
@@ -549,7 +551,6 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	dcmd(lvl, 3, cmdtext);            //rcon + lvl 4
 	dcmd(nitro, 5, cmdtext);          //rcon + lvl 3
 	dcmd(odpocet, 7, cmdtext);        //rcon + 
-	dcmd(property, 8, cmdtext);	  //rcon + lvl 4
 	dcmd(reset, 5, cmdtext);	  //rcon + lvl 4
 	dcmd(skin, 4, cmdtext); 	  //rcon + lvl 3
 	dcmd(smazat, 6, cmdtext);         //rcon +

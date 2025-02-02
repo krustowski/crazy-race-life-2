@@ -381,6 +381,12 @@ public LoadPlayerData(playerid)
 		gPlayers[playerid][Armour] 	= readcfgvalue(gPlayers[playerid][Name], "", "armour");
 		gPlayers[playerid][SpawnPoint] 	= readcfgvalue(gPlayers[playerid][Name], "", "spawn");
 
+		new properties[MAX_PLAYER_PROPERTIES], propertiesString[64];
+		readcfg(gPlayers[playerid][Name], "", "properties", propertiesString);
+
+		ExtractPropperties(propertiesString, properties);
+		gPlayers[playerid][Properties] = properties;
+
 		for (new i = 0; i < MAX_DRUGS; i++)
 		{
 			gPlayers[playerid][Drugs][i] = readcfgvalue(gPlayers[playerid][Name], "drugz", gDrugz[i][DrugIniName]);
@@ -398,6 +404,23 @@ public LoadPlayerData(playerid)
 	}
 
 	return 0;
+}
+
+stock ExtractPropperties(input[], properties[MAX_PLAYER_PROPERTIES])
+{
+	new i = 0, token1[128], token2[128], toSplit[128];
+
+	strcopy(toSplit, input);
+
+	do {
+		SplitIntoTwo(toSplit, token1, token2, sizeof(token1), ",");
+		properties[i] = strval(token1);
+
+		strcopy(toSplit, token2);
+		i++;
+	} while (strcmp(token2, ""));
+
+	return properties;
 }
 
 public SavePlayerData(playerid)

@@ -4,6 +4,7 @@
 
 #define MAX_PROPERTIES		128
 #define MAX_PLAYER_PROPERTIES	3
+#define SPAWN_PICKUP_COUNT	4
 
 enum 
 {
@@ -432,18 +433,43 @@ stock SpawnPropertyInterior(playerid, arrayID)
 
 	Z += 1500;
 
-	// The room
+	// The very room object.
 	gPlayerInteriors[playerid][Objects][0] = CreatePlayerObject(playerid, 14859, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0,0);
 
-	// Exit
-	gPlayerInteriors[playerid][Pickups][0] = CreatePickup(1318, 1, Float:(X-2.42), Float:(Y+1.25), Float:(Z-1.0));
-	// Health
-	gPlayerInteriors[playerid][Pickups][1] = CreatePickup(1240, 1, Float:(X-2.20), Float:(Y-2.50), Float:(Z-1.0));
-	// Pills
-	gPlayerInteriors[playerid][Pickups][2] = CreatePickup(1241, 1, Float:(X+2.50), Float:(Y-2.50), Float:(Z-1.0));
-	// Info
-	gPlayerInteriors[playerid][Pickups][3] = CreatePickup(1239, 1, Float:(X+2.50), Float:(Y+2.20), Float:(Z-1.0));
+	// Exit pickup.
+	gPlayerInteriors[playerid][Pickups][0] = CreatePickup(1318, 1, Float:(X-2.42), Float:(Y+1.25), Float:(Z-1.0), -1);
+	// Health pickup.
+	gPlayerInteriors[playerid][Pickups][1] = CreatePickup(1240, 1, Float:(X-2.20), Float:(Y-2.50), Float:(Z-1.0), -1);
+	// Pills/drugz pickup.
+	gPlayerInteriors[playerid][Pickups][2] = CreatePickup(1241, 1, Float:(X+2.50), Float:(Y-2.50), Float:(Z-1.0), -1);
+	// Info pickup.
+	gPlayerInteriors[playerid][Pickups][3] = CreatePickup(1239, 1, Float:(X+2.50), Float:(Y+2.20), Float:(Z-1.0), -1);
+
+	for (new i = 0; i < SPAWN_PICKUP_COUNT; i++)
+	{
+		if (!gPlayerInteriors[playerid][Pickups][i] || gPlayerInteriors[playerid][Pickups][i] == -1)
+		{
+			SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nebylo mozne vygenerovat vsechny pickupy v dome!");
+			DestroyPropertyInterior(playerid);
+
+			return 0;
+		}
+	}
 
 	SetPlayerPos(playerid, Float:X, Float:Y, Float:Z);
 	SetPlayerFacingAngle(playerid, 0.0);
+
+	return 1;
+}
+
+stock DestroyPropertyInterior(playerid)
+{
+	DestroyPlayerObject(playerid, gPlayerInteriors[playerid][Objects][0]);
+
+	for (new j = 0; j < SPAWN_PICKUP_COUNT; j++)
+	{
+		DestroyPickup(gPlayerInteriors[playerid][Pickups][j]);
+	}
+
+	return 1;
 }

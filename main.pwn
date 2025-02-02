@@ -750,20 +750,25 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		if (pickupid != gProperties[i][Pickups][0] && pickupid != gProperties[i][Pickups][1])
 			continue;
 
-		if (pickupid == gProperties[i][Pickups][0] && !gProperties[i][Occupied])
+		if (pickupid == gProperties[i][Pickups][0])
 		{
-			new stringToPrint[128];
+			if (IsPlayerOwner(playerid, gProperties[i][ID]))
+				return SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Tato nemovitost ti jiz patri!");
 
-			format(stringToPrint, sizeof(stringToPrint), "[ REAL ] Nemovitost '%s' je na prodej za cenu $%d.", gProperties[i][Label], gProperties[i][Cost]);
-			SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
-			format(stringToPrint, sizeof(stringToPrint), "* Pro zakoupeni nemovitosti pouzij /property buy %d", gProperties[i][ID]);
-			SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+			if (!gProperties[i][Occupied])
+			{
+				new stringToPrint[128];
 
-			return 1;
+				format(stringToPrint, sizeof(stringToPrint), "[ REAL ] Nemovitost '%s' je na prodej za cenu $%d.", gProperties[i][Label], gProperties[i][Cost]);
+				SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+				format(stringToPrint, sizeof(stringToPrint), "* Pro zakoupeni nemovitosti pouzij /property buy %d", gProperties[i][ID]);
+				SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+
+				return 1;
+			} 
+			else 
+				return SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Tato nemovitost byla jiz prodana jinemu hraci.");
 		}
-
-		if (pickupid == gProperties[i][Pickups][0] && gProperties[i][Occupied])
-			return SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Tato nemovitost byla jiz prodana jinemu hraci..");
 
 		if (pickupid == gProperties[i][Pickups][1] && !IsPlayerOwner(playerid, gProperties[i][ID]))
 			return SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Neni mozne vstoupit na dany pozemek!");
@@ -772,22 +777,15 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		SpawnPropertyInterior(playerid, i);
 	}
 
-	if (gPlayerInteriors[playerid][Objects][0])
+	if (pickupid == gPlayerInteriors[playerid][Pickups][0])
 	{
-		if (pickupid == gPlayerInteriors[playerid][Pickups][0])
-		{
-			new locationOffer[Coords];
-			locationOffer = gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ][LocationOffer];
+		new arrayID, locationOffer[Coords];
 
-			SetPlayerPos(playerid, Float:locationOffer[0], Float:locationOffer[1], Float:locationOffer[2]);
+		arrayID = gPlayerInteriors[playerid][PropertyArrayID];
 
-			DestroyPlayerObject(playerid, gPlayerInteriors[playerid][Objects][0]);
+		SetPlayerPos(playerid, Float:gProperties[arrayID][LocationOffer][0], Float:gProperties[arrayID][LocationOffer][1], Float:gProperties[arrayID][LocationOffer][2]);
 
-			for (new j = 0; j < 4; j++)
-			{
-				DestroyPickup(gPlayerInteriors[playerid][Pickups][j]);
-			}
-		}
+		DestroyPropertyInterior(playerid);
 	}
 
 	//

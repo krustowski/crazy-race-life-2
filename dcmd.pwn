@@ -583,14 +583,25 @@ dcmd_property(playerid, params[])
 		return SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Nemovitost uspesne zakoupena!");
 	}
 	else if (!strcmp(token1, "list"))
-	{}
+	{
+		new coords[Coords], stringToPrint[128];
+		ExtractCoordsFromString(token2, coords);
+
+		SendClientMessage(playerid, COLOR_CYAN, token2);
+
+		for (new i = 0; i < 4; i++)
+		{
+			format(stringToPrint, sizeof(stringToPrint), "[%d]: %.2f", i, coords[i]);
+			SendClientMessage(playerid, COLOR_CYAN, stringToPrint);
+		}
+	}
 	else if (!strcmp(token1, "spawn"))
 	{}
 	else if (!strcmp(token1, "vehicle"))
 	{}
 
 
-	new Float:X, Float:Y, Float:Z;
+	/*new Float:X, Float:Y, Float:Z;
 
 	GetPlayerPos(playerid, X, Y, Z);
 	//CreateVehicle(vehicleId, Float:X, Float:Y, Float:Z, 0.0, -1, -1, -1);
@@ -607,7 +618,7 @@ dcmd_property(playerid, params[])
 	CreatePickup(1239, 1, Float:(X+2.50), Float:(Y+2.20), Float:(Z-1.0));
 
 	SetPlayerPos(playerid, Float:X, Float:Y, Float:Z);
-	SetPlayerFacingAngle(playerid, 0.0);
+	SetPlayerFacingAngle(playerid, 0.0);*/
 
 	return 1;
 }

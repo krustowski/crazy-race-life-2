@@ -85,7 +85,7 @@ new const GAMEMODE_CREDITS[] = "krusty, kompry, DRaGsTeR";
 new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 new const VEHICLE_PLATE[] = "-CRL-2-";
 
-forward SplitIntoTwo(input[], token1[], token2[], tokenSize);
+//forward SplitIntoTwo(input[], token1[], token2[], tokenSize, delimiter);
 forward StartServerReset();
 
 //

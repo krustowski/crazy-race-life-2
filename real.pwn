@@ -295,7 +295,7 @@ public IsPlayerOwner(playerid, propertyId)
 
 public SaveRealEstateData()
 {
-	new fileName[64] = "realEstateData", stringName[8], stringNames[256];
+	new fileName[64] = "_data_RealEstateProperties", stringName[8], stringNames[256] = "0";
 
 	writecfg(fileName, "", "properties", "xxx");
 
@@ -312,7 +312,6 @@ public SaveRealEstateData()
 		writecfgvalue(fileName, stringName, "cost", gProperties[i][Cost]);
 
 		new coordStringOffer[256], coordStringEntrance[256], coordStringVehicle[256];
-
 		new locationOffer = gProperties[i][LocationOffer];
 
 		for (new j = 0; j < 4; j++)
@@ -341,4 +340,41 @@ public SaveRealEstateData()
 	writecfg(fileName, "", "properties", stringNames);
 
 	return 1;
+}
+
+public LoadRealEstateData()
+{
+	new fileName[64] = "_data_RealEstateProperties", properties[256], token1[256], token2[256];
+
+	readcfg(fileName, "", "properties", properties); 
+
+	new count = SplitIntoTwo(properties, token1, token2, sizeof(token1), ","), i = 0;
+
+	while (strcmp(token2, ""))
+	{
+		if (!IsNumeric(token1) || !strval(token1))
+			continue;
+
+		// Prepare vars for the next run.
+		properties = token2;
+		count = SplitIntoTwo(properties, token1, token2, sizeof(token1));
+		i++;
+	}
+}
+
+stock ExtractCoordsFromString(input[], coords[Coords])
+{
+	new i = 0, token1[128], token2[128], toSplit[128];
+
+	strcopy(toSplit, input);
+
+	do {
+		SplitIntoTwo(toSplit, token1, token2, sizeof(token1), ",");
+		coords[i] = floatstr(token1);
+
+		strcopy(toSplit, token2);
+		i++;
+	} while (strcmp(token2, ""));
+
+	return coords;
 }

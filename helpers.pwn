@@ -163,9 +163,9 @@ stock IsVehicleRcTram(vehicleid)
 	return 0;
 }
 
-public SplitIntoTwo(input[], token1[], token2[], tokenSize)
+stock SplitIntoTwo(input[], token1[], token2[], tokenSize, delimiter[2] = " ")
 {
-	new spacePos = strfind(input, " ");
+	new spacePos = strfind(input, delimiter);
 	if (spacePos == -1)
 	{
 		strmid(token1, input, 0, strlen(input), tokenSize);

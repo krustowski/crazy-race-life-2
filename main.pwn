@@ -747,18 +747,23 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 	for (new i = 0; i < sizeof(gProperties); i++)
 	{
-		if (pickupid != gProperties[i][Pickups][0] && pickupid != gProperties[i][Pickups][1])
+		if (pickupid != gProperties[i][Pickups][PICKUP_OFFER] && pickupid != gProperties[i][Pickups][PICKUP_ENTRANCE])
 			continue;
 
-		if (pickupid == gProperties[i][Pickups][0])
+		if (pickupid == gProperties[i][Pickups][PICKUP_OFFER])
 		{
 			if (IsPlayerOwner(playerid, gProperties[i][ID]))
-				return SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Tato nemovitost ti jiz patri!");
+			{
+				SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Tato nemovitost ti jiz patri!");
+				format(stringToPrint, sizeof(stringToPrint), "* Lze ji prodat pomoci /property sell %d", gProperties[i][Cost]);
+				SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+				SendClientMessage(playerid, COLOR_ZLUTA, "* Bude vsak strzena provize realitni kancelare ve vysi 15 %% ceny nemovitosti!");
+
+				return 1; 
+			}
 
 			if (!gProperties[i][Occupied])
 			{
-				new stringToPrint[128];
-
 				format(stringToPrint, sizeof(stringToPrint), "[ REAL ] Nemovitost '%s' je na prodej za cenu $%d.", gProperties[i][Label], gProperties[i][Cost]);
 				SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
 				format(stringToPrint, sizeof(stringToPrint), "* Pro zakoupeni nemovitosti pouzij /property buy %d", gProperties[i][ID]);
@@ -770,22 +775,50 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 				return SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Tato nemovitost byla jiz prodana jinemu hraci.");
 		}
 
-		if (pickupid == gProperties[i][Pickups][1] && !IsPlayerOwner(playerid, gProperties[i][ID]))
+		if (pickupid == gProperties[i][Pickups][PICKUP_ENTRANCE] && !IsPlayerOwner(playerid, gProperties[i][ID]))
 			return SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Neni mozne vstoupit na cizi pozemek!");
 
 		// Spawn the room.
 		SpawnPropertyInterior(playerid, i);
+		gPlayers[playerid][InsideProperty] = 1;
 	}
 
-	if (pickupid == gPlayerInteriors[playerid][Pickups][0])
+	for (new i = 0; i < SPAWN_PICKUP_COUNT; i++)
 	{
-		new arrayID, locationOffer[Coords];
+		if (pickupid != gPlayerInteriors[playerid][Pickups][i])
+			continue;
 
-		arrayID = gPlayerInteriors[playerid][PropertyArrayID];
+		switch (i)
+		{
+			case PICKUP_EXIT:
+				{
+					new arrayID;
+					arrayID = gPlayerInteriors[playerid][PropertyArrayID];
 
-		// Make the player exit the property interior, which is then destroyed.
-		SetPlayerPos(playerid, Float:gProperties[arrayID][LocationOffer][0], Float:gProperties[arrayID][LocationOffer][1], Float:gProperties[arrayID][LocationOffer][2]);
-		DestroyPropertyInterior(playerid);
+					// Make the player exit the property interior, which is then destroyed.
+					SetPlayerPos(playerid, Float:gProperties[arrayID][LocationOffer][0], Float:gProperties[arrayID][LocationOffer][1], Float:gProperties[arrayID][LocationOffer][2]);
+					DestroyPropertyInterior(playerid);
+					gPlayers[playerid][InsideProperty] = 0;
+
+					break;
+				}
+			case PICKUP_HEALTH:
+				{
+					SetPlayerHealth(playerid, 100.0);
+
+					break;
+				}
+			case PICKUP_PILLS:
+				{
+					//...
+					break;
+				}
+			case PICKUP_INFO:
+				{
+					//...
+					break;
+				}
+		}
 	}
 
 	//

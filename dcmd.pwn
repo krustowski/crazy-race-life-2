@@ -488,10 +488,11 @@ dcmd_pm(playerid, params[])
 
 dcmd_port(playerid, params[])
 {
+	if (gPlayers[playerid][InsideProperty])
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Nelze pouzit port, pokud jsi uvnitr nemovitosti!");
+
 	if (IsPlayerInAnyVehicle(playerid))
-	{
 		RemovePlayerFromVehicle(playerid);
-	}
 
 	if (!strlen(params) || !IsNumeric(params))
 		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti: /port [ID lokace]");

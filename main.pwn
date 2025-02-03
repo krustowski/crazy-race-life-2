@@ -771,7 +771,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		}
 
 		if (pickupid == gProperties[i][Pickups][1] && !IsPlayerOwner(playerid, gProperties[i][ID]))
-			return SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Neni mozne vstoupit na dany pozemek!");
+			return SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Neni mozne vstoupit na cizi pozemek!");
 
 		// Spawn the room.
 		SpawnPropertyInterior(playerid, i);
@@ -783,8 +783,8 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 		arrayID = gPlayerInteriors[playerid][PropertyArrayID];
 
+		// Make the player exit the property interior, which is then destroyed.
 		SetPlayerPos(playerid, Float:gProperties[arrayID][LocationOffer][0], Float:gProperties[arrayID][LocationOffer][1], Float:gProperties[arrayID][LocationOffer][2]);
-
 		DestroyPropertyInterior(playerid);
 	}
 

@@ -50,7 +50,7 @@ enum PlayerPropertyObject
 {
 	PropertyArrayID,
 	Objects[2],
-	Pickups[4]
+	Pickups[SPAWN_PICKUP_COUNT]
 }
 
 new gPlayerInteriors[MAX_PLAYERS][PlayerPropertyObject];
@@ -427,7 +427,7 @@ stock SpawnPropertyInterior(playerid, arrayID)
 {
 	gPlayerInteriors[playerid][PropertyArrayID] = arrayID;
 
-	new Float:X, Float:Y, Float:Z;
+	new i = 0, Float:X, Float:Y, Float:Z;
 
 	GetPlayerPos(playerid, X, Y, Z);
 
@@ -436,27 +436,51 @@ stock SpawnPropertyInterior(playerid, arrayID)
 	// The very room object.
 	gPlayerInteriors[playerid][Objects][0] = CreatePlayerObject(playerid, 14859, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0,0);
 
+	// Exit, Health, Pills, Info pickups.
+	new pickupIds[4] = {1318, 1240, 1241, 1239};
+	new pickupCoords[4][3];
+
 	// Exit pickup.
-	gPlayerInteriors[playerid][Pickups][0] = CreatePickup(1318, 1, Float:(X-2.42), Float:(Y+1.25), Float:(Z-1.0), -1);
+	pickupCoords[0][0] = X-2.42; pickupCoords[0][1] = Y+1.25; pickupCoords[0][2] = Z-1.0;
 	// Health pickup.
-	gPlayerInteriors[playerid][Pickups][1] = CreatePickup(1240, 1, Float:(X-2.20), Float:(Y-2.50), Float:(Z-1.0), -1);
+	pickupCoords[1][0] = X-2.20; pickupCoords[1][1] = Y-2.50; pickupCoords[1][2] = Z-1.0;
 	// Pills/drugz pickup.
-	gPlayerInteriors[playerid][Pickups][2] = CreatePickup(1241, 1, Float:(X+2.50), Float:(Y-2.50), Float:(Z-1.0), -1);
+	pickupCoords[2][0] = X+2.50; pickupCoords[2][1] = Y-2.50; pickupCoords[2][2] = Z-1.0;
 	// Info pickup.
-	gPlayerInteriors[playerid][Pickups][3] = CreatePickup(1239, 1, Float:(X+2.50), Float:(Y+2.20), Float:(Z-1.0), -1);
+	pickupCoords[3][0] = X+2.50; pickupCoords[3][1] = Y+2.20; pickupCoords[3][2] = Z-1.0;
+
+	for (;;)
+	{
+		new pId;
+		pId = CreatePickup(pickupIds[i], 1, Float:pickupCoords[i][0], Float:pickupCoords[i][1], Float:pickupCoords[i][2], -1);
+
+		// Hotfix to bypass the bug when CreatePickup returns 0 and the pickup wont show up at all.
+		if (!pId)
+			continue;
+
+		gPlayerInteriors[playerid][Pickups][i] = pId;
+		i++;
+
+		if (i == SPAWN_PICKUP_COUNT)
+			break;
+	}
 
 	for (new i = 0; i < SPAWN_PICKUP_COUNT; i++)
 	{
-		if (!gPlayerInteriors[playerid][Pickups][i] || gPlayerInteriors[playerid][Pickups][i] == -1)
+		if (gPlayerInteriors[playerid][Pickups][i] == -1)
 		{
-			SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nebylo mozne vygenerovat vsechny pickupy v dome!");
+			printf("SpawnPropertyInterior: pickup creation error: pickup no. %d, value: %d", i, gPlayerInteriors[playerid][Pickups][i]);
+			SendClientMessage(playerid, COLOR_CERVENA, "[ ERROR ] Nebylo mozne vygenerovat vsechny pickupy v dome!");
 			DestroyPropertyInterior(playerid);
 
 			return 0;
 		}
+
+		printf("SpawnPropertyInterior: pickup no. %d: %d", i, gPlayerInteriors[playerid][Pickups][i]);
+		//ShowPickupForPlayer(playerid, gPlayerInteriors[playerid][Pickups][i]);
 	}
 
-	SetPlayerPos(playerid, Float:X, Float:Y, Float:Z);
+	SetPlayerPos(playerid, Float:X, Float:Y, Float:(Z-1.0));
 	SetPlayerFacingAngle(playerid, 0.0);
 
 	return 1;
@@ -466,9 +490,14 @@ stock DestroyPropertyInterior(playerid)
 {
 	DestroyPlayerObject(playerid, gPlayerInteriors[playerid][Objects][0]);
 
+	gPlayerInteriors[playerid][PropertyArrayID] = -1;
+
 	for (new j = 0; j < SPAWN_PICKUP_COUNT; j++)
 	{
-		DestroyPickup(gPlayerInteriors[playerid][Pickups][j]);
+		if (!DestroyPickup(gPlayerInteriors[playerid][Pickups][j]))
+			printf("DestroyPropertyInterior: failed to delete pickup no. %d!", j);
+		else
+			gPlayerInteriors[playerid][Pickups][j] = 0;
 	}
 
 	return 1;

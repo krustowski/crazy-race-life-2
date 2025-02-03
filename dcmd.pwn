@@ -274,6 +274,9 @@ dcmd_drugz(playerid, params[])
 dcmd_dwarp(playerid, params[])
 {
 #pragma unused params
+	if (gPlayers[playerid][InsideProperty])
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Nelze pouzit warp, pokud jsi uvnitr nemovitosti!");
+
 	new playerState = GetPlayerState(playerid), senderName[MAX_PLAYER_NAME], stringToPrint[256], vehicleId = GetPlayerVehicleID(playerid);
 
 	SetPlayerInterior(playerid, 0);
@@ -305,7 +308,7 @@ dcmd_fix(playerid, params[])
 	SendClientMessage(playerid, COLOR_ZLUTA, "[ i ] Opravil sis auto!");
 	SetVehicleHealth(GetPlayerVehicleID(playerid), 1000.0);
 
-	//RepairVehicle(GetPlayerVedicleID(playerid));
+	//RepairVehicle(GetPlayerVehicleID(playerid));
 	return 1;
 }
 
@@ -519,15 +522,19 @@ dcmd_property(playerid, params[])
 	new token1[32], token2[32];
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
-	if (!strlen(params) || (strcmp(token1, "buy") && strcmp(token1, "list") && strcmp(token1, "spawn") && strcmp(token1, "vehicle")) || (!strcmp(token1, "buy") && !IsNumeric(token2)))
+	if (!strlen(params) || (strcmp(token1, "buy") && strcmp(token1, "list") && strcmp(token1, "spawn") && strcmp(token1, "vehicle")) || (strcmp(token1, "list") && !IsNumeric(token2)))
 	{
 		SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /property buy [property ID]");
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /property sell [property ID]");
 		SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /property list");
-		SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /property spawn");
-		SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /property vehicle");
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /property spawn [property ID]");
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /property vehicle [propertyID]");
 
 		return 1;
 	}
+
+	if (!strval(token2) && strcmp(token1, "list"))
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Neplatne cislo nemovistosti.");
 
 	if (!strcmp(token1, "buy"))
 	{
@@ -547,9 +554,6 @@ dcmd_property(playerid, params[])
 			return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Jiz vlastnis limitni pocet nemocitosti, je treba nejakou prodat, abys mohl nakoupit novou.");
 
 		new propertyID = strval(token2), success = false;
-
-		if (!propertyID)
-			return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Neplatne cislo nemovistosti.");
 
 		for (new j = 0; j < sizeof(gProperties); j++)
 		{
@@ -583,28 +587,127 @@ dcmd_property(playerid, params[])
 
 		return SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Nemovitost uspesne zakoupena!");
 	}
+	else if (!strcmp(token1, "sell"))
+	{
+		new propertyID = strval(token2), success = false;
+
+		for (new i = 0; i < sizeof(gProperties); i++)
+		{
+			if (gProperties[i][ID] != propertyID)
+				continue;
+
+			if (!IsPlayerInSphere(playerid, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ], 15))
+				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Je treba byt v okoli puvodniho pickupu (nyni rotujici cerveny domek).");
+
+			if (!gProperties[i][Occupied])
+				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Nelze prodat nemovitost, ktera neni prodana/obsazena.");
+
+			if (!IsPlayerOwner(playerid, propertyID))
+				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Dana nemovitost ti nepatri!");
+
+			//
+			//  Ok, sell the property.
+			//
+
+			if (gPlayers[playerid][SpawnPoint] == propertyID)
+				gPlayers[playerid][SpawnPoint] = 0;
+
+			for (new j = 0; i < MAX_PLAYER_PROPERTIES; i++)
+			{
+				if (gPlayers[playerid][Properties][j] == propertyID)
+				{
+					gPlayers[playerid][Properties][j] = 0;
+					break;
+				}
+			}
+
+			gProperties[i][Occupied] = false;
+
+			if (IsValidPickup(gProperties[i][Pickups][0]))
+				DestroyPickup(gProperties[i][Pickups][0]);
+
+			gProperties[i][Pickups][0] = CreatePickup(1273, 1, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ]);
+
+			GivePlayerMoney(playerid, floatround(float(gProperties[i][Cost]) * 0.75));
+
+			success = true;
+			break;
+		}
+
+		if (!success)
+			return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Transkace se nezdarila, zkus znovu pozdeji.");
+
+		return SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Nemovitost byla uspesne prodana!");
+	}
 	else if (!strcmp(token1, "list"))
 	{
-		new coords[Coords], stringToPrint[128];
-		ExtractCoordsFromString(token2, coords);
+		new stringToPrint[128];
 
-		SendClientMessage(playerid, COLOR_CYAN, token2);
+		SendClientMessage(playerid, COLOR_CYAN, "[ REAL ] Tve sloty pro nemovitosti:");
 
-		for (new i = 0; i < 4; i++)
+		for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
 		{
-			format(stringToPrint, sizeof(stringToPrint), "[%d]: %.2f", i, coords[i]);
+			format(stringToPrint, sizeof(stringToPrint), "%d: ID %5d", i, gPlayers[playerid][Properties][i]);
 			SendClientMessage(playerid, COLOR_CYAN, stringToPrint);
 		}
 	}
 	else if (!strcmp(token1, "spawn"))
-	{}
+	{
+		new propertyID = strval(token2);
+
+		if (!IsPlayerOwner(playerid, propertyID))
+			return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Dana nemovitost ti nepatri!");
+
+		for (new i = 0; i < sizeof(gProperties); i++)
+		{
+			if (gProperties[i][ID] != propertyID || !gProperties[i][Occupied])
+				continue;
+			
+			gPlayers[playerid][SpawnPoint] = propertyID;
+
+			SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Spawn point byl zmenen na lokaci u tve nemovitosti.");
+
+			break;
+		}
+	}
 	else if (!strcmp(token1, "vehicle"))
-	{}
+	{
+		new propertyID = strval(token2);
+
+		if (!IsPlayerOwner(playerid, propertyID))
+			return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Dana nemovitost ti nepatri!");
+
+		for (new i = 0; i < sizeof(gProperties); i++)
+		{
+			if (gProperties[i][ID] != propertyID || !gProperties[i][Occupied])
+				continue;
+			
+			if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
+				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Nejsi v aute, nebo nejsi ridicem auta!");
+
+			new vehicleId = GetPlayerVehicleID(playerid);
+			new modelId = GetVehicleModel(vehicleId);
+
+			if (gProperties[i][VehicleID] == modelId)
+				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Tento model auta jiz byl k nemovitosti prirazen.");
+
+			gProperties[i][VehicleID] = modelId;
+
+			if (gProperties[i][Vehicle])
+				DestroyVehicle(gProperties[i][Vehicle]);
+
+			gProperties[i][Vehicle] = CreateVehicle(gProperties[i][VehicleID], Float:gProperties[i][LocationVehicle][CoordX], Float:gProperties[i][LocationVehicle][CoordY], Float:gProperties[i][LocationVehicle][CoordZ], Float:gProperties[i][LocationVehicle][CoordR], 0, 0, -1);
+
+			SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Toto auto bylo prirazeno k tve nemovitosti.");
+
+			break;
+		}
+	}
 
 
 	/*new Float:X, Float:Y, Float:Z;
 
-	GetPlayerPos(playerid, X, Y, Z);
+	  GetPlayerPos(playerid, X, Y, Z);
 	//CreateVehicle(vehicleId, Float:X, Float:Y, Float:Z, 0.0, -1, -1, -1);
 
 	Z += 1500;
@@ -663,6 +766,9 @@ dcmd_race(playerid, params[])
 	}
 	else if (!strcmp(token1, "warp"))
 	{
+		if (gPlayers[playerid][InsideProperty])
+			return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Nelze pouzit warp, pokud jsi uvnitr nemovitosti!");
+
 		if (SetPlayerRaceStartPos(playerid))
 			return SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Warp ke startu zavodu probehl uspesne!");
 	}

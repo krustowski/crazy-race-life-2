@@ -394,6 +394,12 @@ public OnPlayerSpawn(playerid)
 	SetPlayerSkin(playerid, gPlayers[playerid][Skin]);
 	SetPlayerColor(playerid, gTeams[ gPlayers[playerid][TeamID] ][Color]);
 
+	if (gPlayers[playerid][InsideProperty])
+	{
+		DestroyPropertyInterior(playerid);
+		gPlayers[playerid][InsideProperty] = 0;
+	}
+
 	// Set the player back to the paintball area if is set in game.
 	if (gPaintball[playerid][E_PAINTBALL_INGAME])
 	{
@@ -766,9 +772,9 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 			if (IsPlayerOwner(playerid, gProperties[i][ID]))
 			{
 				SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Tato nemovitost ti jiz patri!");
-				format(stringToPrint, sizeof(stringToPrint), "* Lze ji prodat pomoci /property sell %d", gProperties[i][Cost]);
+				format(stringToPrint, sizeof(stringToPrint), "* Hodnota: $%d. Lze ji prodat pomoci /property sell %d", gProperties[i][Cost], gProperties[i][ID]);
 				SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
-				SendClientMessage(playerid, COLOR_ZLUTA, "* Bude vsak strzena provize realitni kancelare ve vysi 15 %% ceny nemovitosti!");
+				SendClientMessage(playerid, COLOR_ZLUTA, "* Bude vsak strzena provize realitni kancelare ve vysi 15 \% ceny nemovitosti!");
 
 				return 1; 
 			}
@@ -816,6 +822,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 			case PICKUP_HEALTH:
 				{
 					SetPlayerHealth(playerid, 100.0);
+					SetPlayerArmour(playerid, 100.0);
 
 					break;
 				}

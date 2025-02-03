@@ -14,10 +14,10 @@ enum
 
 enum
 {
-	PICKUP_EXIT,
+	PICKUP_INFO,
 	PICKUP_HEALTH,
 	PICKUP_PILLS,
-	PICKUP_INFO
+	PICKUP_EXIT
 }
 
 enum Coords
@@ -429,17 +429,17 @@ stock SpawnPropertyInterior(playerid, arrayID)
 	gPlayerInteriors[playerid][Objects][0] = CreatePlayerObject(playerid, 14859, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0,0);
 
 	// Exit, Health, Pills, Info pickups.
-	new pickupIds[4] = {1318, 1240, 1241, 1239};
+	new pickupIds[4] = {1239, 1240, 1241, 1318};
 	new pickupCoords[4][3];
 
-	// Exit pickup.
-	pickupCoords[0][0] = X-2.42; pickupCoords[0][1] = Y+1.25; pickupCoords[0][2] = Z-1.0;
+	// Info pickup.
+	pickupCoords[0][0] = X+2.50; pickupCoords[0][1] = Y+2.20; pickupCoords[0][2] = Z-1.0;
 	// Health pickup.
 	pickupCoords[1][0] = X-2.20; pickupCoords[1][1] = Y-2.50; pickupCoords[1][2] = Z-1.0;
 	// Pills/drugz pickup.
 	pickupCoords[2][0] = X+2.50; pickupCoords[2][1] = Y-2.50; pickupCoords[2][2] = Z-1.0;
-	// Info pickup.
-	pickupCoords[3][0] = X+2.50; pickupCoords[3][1] = Y+2.20; pickupCoords[3][2] = Z-1.0;
+	// Exit pickup.
+	pickupCoords[3][0] = X-2.42; pickupCoords[3][1] = Y+1.25; pickupCoords[3][2] = Z-1.0;
 
 	for (;;)
 	{

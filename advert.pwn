@@ -25,7 +25,7 @@ public ShowAdvert()
 		"[ GAME ] Muzes vlastnit az 3 nemovitosti v lokalitach oznacenych na mape zelenym domkem",
 		"[ GAME ] Cervene domky na mape znaci oblasti, kde se v budoucnu budou vyskytovat nemovitosti ke koupi",
 		"[ TIP ] Pridej si oblibene auto (pokud je dostupne) ke sve nemovitosti pomoci /property vehicle [property ID]",
-		"[ TIP ] Nebavi te vychozi spawn point v LV? Sezen si nemovitost a svuj (re)spawn point muzes mit jednoduse tam!"
+		"[ TIP ] Nebavi te vychozi spawn point v LV? Sezen si nemovitost a svuj (re)spawn point muzes mit jednoduse tam!",
 		// Endtip.
 		"[ TIP ] Skoc si skidive pomoci /skidive!"
 	};

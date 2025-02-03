@@ -566,7 +566,7 @@ dcmd_property(playerid, params[])
 					return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Na danou transakci nemas dostatek hotovosti!");
 
 				gProperties[j][Occupied] = true;
-				gPlayers[playerid][Properties][freeSlot] == propertyID;
+				gPlayers[playerid][Properties][freeSlot] = propertyID;
 
 				if (IsValidPickup(gProperties[j][Pickups][0]))
 					DestroyPickup(gProperties[j][Pickups][0]);

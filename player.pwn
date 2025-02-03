@@ -443,6 +443,24 @@ public SavePlayerData(playerid)
 		writecfgvalue(gPlayers[playerid][Name], "", "armour", floatround(armour));
 		writecfgvalue(gPlayers[playerid][Name], "", "spawn", gPlayers[playerid][SpawnPoint]);
 
+		// Properties, Real Estate elements.
+		new properties[MAX_PLAYER_PROPERTIES], propertiesString[64];
+
+		for (new j = 0; j < MAX_PLAYER_PROPERTIES; j++)
+		{
+			if (!strcmp(propertiesString, ""))
+			{
+				format(propertiesString, sizeof(propertiesString), "%d", gPlayers[playerid][Properties][j]);
+
+				continue;
+			}
+
+			format(propertiesString, sizeof(propertiesString), "%s,%d", propertiesString, gPlayers[playerid][Properties][j]);
+		}
+
+		writecfg(gPlayers[playerid][Name], "", "properties", propertiesString);
+
+		// Drugz.
 		for (new i = 0; i < MAX_DRUGS; i++)
 		{
 			writecfgvalue(gPlayers[playerid][Name], "drugz", gDrugz[i][DrugIniName], gPlayers[playerid][Drugs][i]);

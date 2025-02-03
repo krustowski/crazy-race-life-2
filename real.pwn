@@ -254,18 +254,6 @@ new gProperties[MAX_PROPERTIES][Property];
 
 public InitRealEstateProperties()
 {
-	/*gProperties[0] = gPropertySF0101;
-	gProperties[1] = gPropertyDE0101;
-	gProperties[2] = gPropertyDE0102;
-	gProperties[3] = gPropertyDE0103;
-	gProperties[4] = gPropertyDE0104;
-	gProperties[5] = gPropertyDE0105;
-	gProperties[6] = gPropertyOT0101;
-	gProperties[7] = gPropertyOT0102;
-	gProperties[8] = gPropertyOT0103;
-	gProperties[9] = gPropertyOT0104;
-	gProperties[10] = gPropertyOT0105;*/
-
 	LoadRealEstateData();
 
 	for (new i = 0; i < MAX_PROPERTIES; i++)
@@ -471,7 +459,7 @@ stock SpawnPropertyInterior(playerid, arrayID)
 
 	for (new i = 0; i < SPAWN_PICKUP_COUNT; i++)
 	{
-		if (gPlayerInteriors[playerid][Pickups][i] == -1)
+		if (!gPlayerInteriors[playerid][Pickups][i] || gPlayerInteriors[playerid][Pickups][i] == -1)
 		{
 			printf("SpawnPropertyInterior: pickup creation error: pickup no. %d, value: %d", i, gPlayerInteriors[playerid][Pickups][i]);
 			SendClientMessage(playerid, COLOR_CERVENA, "[ ERROR ] Nebylo mozne vygenerovat vsechny pickupy v dome!");
@@ -505,4 +493,25 @@ stock DestroyPropertyInterior(playerid)
 	}
 
 	return 1;
+}
+
+stock SpawnPlayerAtProperty(playerid)
+{
+	if (!IsPlayerOwner(playerid, gPlayers[playerid][SpawnPoint]))
+		return 0;
+
+	for (new i = 0; i < sizeof(gProperties); i++)
+	{
+		if (!gProperties[i][ID] || !gProperties[i][Occupied])
+			continue;
+
+		if (gProperties[i][ID] != gPlayers[playerid][SpawnPoint])
+			continue;
+
+		SetPlayerPos(playerid, Float:gProperties[i][LocationOffer][0], FLoat:gProperties[i][LocationOffer][1], Float:gProperties[i][LocationOffer][2]);
+
+		return 1;
+	}
+
+	return 0;
 }

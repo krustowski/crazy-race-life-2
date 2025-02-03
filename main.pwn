@@ -391,7 +391,6 @@ public OnPlayerDisconnect(playerid, reason)
 
 public OnPlayerSpawn(playerid)
 {
-	SetPlayerPos(playerid, 2323.73, 1283.18, 97.60);
 	SetPlayerSkin(playerid, gPlayers[playerid][Skin]);
 	SetPlayerColor(playerid, gTeams[ gPlayers[playerid][TeamID] ][Color]);
 
@@ -400,7 +399,19 @@ public OnPlayerSpawn(playerid)
 	{
 		SetPlayerPos(playerid, -1365.1, -2307.0, 39.1);
 		GivePlayerWeapon(playerid, 29, 999);
+
+		return 1;
 	}
+
+	// Respawn at player(s house.
+	if (gPlayers[playerid][SpawnPoint])
+	{
+		if (SpawnPlayerAtProperty(playerid))
+			return 1;
+	}
+
+	// Default location to spawrn a player (LV pyramid).
+	SetPlayerPos(playerid, 2323.73, 1283.18, 97.60);
 
 	return 1;
 }

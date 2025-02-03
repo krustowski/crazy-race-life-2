@@ -67,6 +67,12 @@ public InitPickups()
 
 	//CreatePickup(xxx, 1, -1669.09, 1009.93, 7.75);
 
+	// ATMs.
+	for (new i = 0; i < sizeof(gBankLocation); i++)
+	{
+		CreatePickup(1274, PICKUP_TYPE_ALWAYS, Float:gBankLocation[i][0], Float:gBankLocation[i][1], Float:gBankLocation[i][2]);
+	}
+
 	//
 	//  Drugz. Mostly SF.
 	//

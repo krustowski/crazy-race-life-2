@@ -502,9 +502,9 @@ stock SpawnPlayerAtProperty(playerid)
 	return 0;
 }
 
-stock BuyPlayerProperty(playerid, propertyIdString[])
+stock BuyPlayerProperty(playerid, propertyID)
 {
-	new freeSlot = -1, propertyID = strval(propertyIdString), success = false;
+	new freeSlot = -1, success = false;
 
 	// Check if there is a free slot for such player.
 	for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
@@ -549,4 +549,60 @@ stock BuyPlayerProperty(playerid, propertyIdString[])
 		return SendClientMessage(playerid, COLOR_CERVENA, "{ REAL } Transakce se nezdarila, zkus znovu pozdeji.");
 
 	return SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Nemovitost uspesne zakoupena!");
+}
+
+stock SellPlayerProperty(playerid, propertyID)
+{
+	new success = false;
+
+	for (new i = 0; i < sizeof(gProperties); i++)
+	{
+		if (gProperties[i][ID] != propertyID)
+			continue;
+
+		if (!IsPlayerInSphere(playerid, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ], 15))
+			return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Je treba byt v okoli puvodniho pickupu (nyni rotujici cerveny domek).");
+
+		if (!gProperties[i][Occupied])
+			return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Nelze prodat nemovitost, ktera neni prodana/obsazena.");
+
+		if (!IsPlayerOwner(playerid, propertyID))
+			return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Dana nemovitost ti nepatri!");
+
+		//
+		//  Ok, sell the property.
+		//
+
+		if (gPlayers[playerid][SpawnPoint] == propertyID)
+			gPlayers[playerid][SpawnPoint] = 0;
+
+		for (new j = 0; j < MAX_PLAYER_PROPERTIES; j++)
+		{
+			if (gPlayers[playerid][Properties][j] == propertyID)
+			{
+				gPlayers[playerid][Properties][j] = 0;
+				break;
+			}
+		}
+
+		gProperties[i][Occupied] = false;
+
+		DestroyPickup(gProperties[i][Pickups][PICKUP_OFFER]);
+		gProperties[i][Pickups][PICKUP_OFFER];
+
+		DestroyPickup(gProperties[i][Pickups][PICKUP_ENTRANCE]);
+		gProperties[i][Pickups][PICKUP_ENTRANCE];
+
+		gProperties[i][Pickups][PICKUP_OFFER] = EnsurePickupCreated(1273, 1, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ]);
+
+		GivePlayerMoney(playerid, floatround(float(gProperties[i][Cost]) * 0.9));
+
+		success = true;
+		break;
+	}
+
+	if (!success)
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Transkace se nezdarila, zkus znovu pozdeji.");
+
+	return SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Nemovitost byla uspesne prodana!");
 }

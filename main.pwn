@@ -700,7 +700,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			if (!response)
 				return 1;
 
-			BuyPlayerProperty(playerid, inputtext);
+			BuyPlayerProperty(playerid, strval(inputtext));
 
 			return 1;
 		}
@@ -709,7 +709,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			if (!response)
 				return 1;
 
-			//SellPlayerProperty(playerid, inputtext);
+			SellPlayerProperty(playerid, strval(inputtext));
 
 			return 1;
 		}
@@ -803,8 +803,11 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 			if (!IsPlayerOwner(playerid, gProperties[i][ID]))
 				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Tato nemovitost byla jiz prodana jinemu hraci.");
 
-			format(stringToPrint, sizeof(stringToPrint), "Nemovitost '%s' je tvoje.\n\nHodnota: $%d\n\nPri prodeji bude strzena provize realitni kancelari ve vysi 10 \% ceny nemovitosti.", gProperties[i][Label], gProperties[i][Cost]);
-			return ShowPlayerDialog(playerid, DIALOG_PROPERTY_SELL, DIALOG_STYLE_MSGBOX, "Real Estate", stringToPrint, "Prodat", "Zrusit");
+			if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
+				return 1;
+
+			format(stringToPrint, sizeof(stringToPrint), "Nemovitost '%s' je tvoje.\n\nHodnota: $%d (%.2f mil)\n\nKod nemovitosti: %d\n\nPri prodeji bude strzena provize realitni kancelari ve vysi 10 procent ceny nemovitosti.\nNapis jeji kod nize pro prodej:", gProperties[i][Label], gProperties[i][Cost], float(gProperties[i][Cost]) / 1000000, gProperties[i][ID]);
+			return ShowPlayerDialog(playerid, DIALOG_PROPERTY_SELL, DIALOG_STYLE_INPUT, "Real Estate", stringToPrint, "Prodat", "Zrusit");
 		}
 		else if (pickupid == gProperties[i][Pickups][PICKUP_ENTRANCE])
 		{

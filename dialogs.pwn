@@ -1,0 +1,13 @@
+//
+//  Everything dialogs.
+//
+
+enum
+{
+	DIALOG_UNUSED,
+	DIALOG_LOGIN,
+	DIALOG_REGISTER,
+	DIALOG_PROPERTY_BUY,
+	DIALOG_PROPERTY_SELL
+};
+

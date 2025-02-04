@@ -501,3 +501,52 @@ stock SpawnPlayerAtProperty(playerid)
 
 	return 0;
 }
+
+stock BuyPlayerProperty(playerid, propertyIdString[])
+{
+	new freeSlot = -1, propertyID = strval(propertyIdString), success = false;
+
+	// Check if there is a free slot for such player.
+	for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
+	{
+		if (!gPlayers[playerid][Properties][i])
+		{
+			freeSlot = i;
+			break;
+		}
+	}
+
+	if (freeSlot < 0)
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Jiz vlastnis limitni pocet nemocitosti, je treba nejakou prodat, abys mohl nakoupit novou.");
+
+	for (new j = 0; j < sizeof(gProperties); j++)
+	{
+		if (!gProperties[j][Occupied] && gProperties[j][ID] == propertyID)
+		{
+			if (!IsPlayerInSphere(playerid, Float:gProperties[j][LocationOffer][CoordX], Float:gProperties[j][LocationOffer][CoordY], Float:gProperties[j][LocationOffer][CoordZ], 15))
+				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Je treba byt v okoli puvodniho pickupu (rotujici zeleny domek).");
+
+			if (GetPlayerMoney(playerid) < gProperties[j][Cost])
+				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Na danou transakci nemas dostatek hotovosti!");
+
+			gProperties[j][Occupied] = true;
+			gPlayers[playerid][Properties][freeSlot] = propertyID;
+
+			DestroyPickup(gProperties[j][Pickups][PICKUP_OFFER]);
+			gProperties[j][Pickups][PICKUP_OFFER];
+
+			gProperties[j][Pickups][PICKUP_OFFER] = EnsurePickupCreated(19522, 1, Float:gProperties[j][LocationOffer][CoordX], Float:gProperties[j][LocationOffer][CoordY], Float:gProperties[j][LocationOffer][CoordZ]);
+			gProperties[j][Pickups][PICKUP_ENTRANCE] = EnsurePickupCreated(1318, 1, Float:gProperties[j][LocationEntrance][CoordX], Float:gProperties[j][LocationEntrance][CoordY], Float:gProperties[j][LocationEntrance][CoordZ]);
+
+			GivePlayerMoney(playerid, -gProperties[j][Cost]);
+			success = true;
+
+			break;
+		}
+	}
+
+	if (!success) 
+		return SendClientMessage(playerid, COLOR_CERVENA, "{ REAL } Transakce se nezdarila, zkus znovu pozdeji.");
+
+	return SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Nemovitost uspesne zakoupena!");
+}

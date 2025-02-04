@@ -186,6 +186,7 @@ forward AddMapicons(playerid);
 #include "vehicles.pwn"
 #include "texts.pwn"
 #include "mapicons.pwn"
+#include "dialogs.pwn"
 
 //
 //  DCMDs = command set definitions.
@@ -670,19 +671,18 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				return Kick(playerid);
 
 			if (SetPlayerAccountLogin(playerid, inputtext))
-				return ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Uspesne prihlasen!", "Ok", "");
-			else
-			{
-				gPlayers[playerid][LoginAttempts]++;
+				return 1;
+			//return ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Uspesne prihlasen!", "Ok", "");
 
-				if (gPlayers[playerid][LoginAttempts] >= 3)
-				{
-					ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Opakovane zadano spatne heslo (3x).", "Ok", "");
-					Kick(playerid);
-				}
-				else 
-					ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", "Spatne heslo!\nProsim zadej sve heslo!", "Login", "Zrusit");
+			gPlayers[playerid][LoginAttempts]++;
+
+			if (gPlayers[playerid][LoginAttempts] >= 3)
+			{
+				ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Opakovane zadano spatne heslo (3x).", "Ok", "");
+				Kick(playerid);
 			}
+			else 
+				ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", "Spatne heslo!\nProsim zadej sve heslo!", "Login", "Zrusit");
 		}
 		case DIALOG_REGISTER:
 		{
@@ -695,9 +695,27 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			if (SetPlayerAccountRegistration(playerid, inputtext))
 				return 1;
 		}
+		case DIALOG_PROPERTY_BUY:
+		{
+			if (!response)
+				return 1;
+
+			BuyPlayerProperty(playerid, inputtext);
+
+			return 1;
+		}
+		case DIALOG_PROPERTY_SELL:
+		{
+			if (!response)
+				return 1;
+
+			//SellPlayerProperty(playerid, inputtext);
+
+			return 1;
+		}
 
 		default: 
-			return 0; // dialog ID was not found, search in other scripts
+		return 0; // dialog ID was not found, search in other scripts
 	}
 
 	ShowAuthDialog(playerid);
@@ -744,7 +762,7 @@ public OnPlayerObjectMoved(playerid, objectid)
 
 public OnPlayerPickUpPickup(playerid, pickupid)
 {
-	new stringToPrint[128];
+	new stringToPrint[256];
 
 	// hotfix due to the logic of EnsurePickupCreated(...) function
 	if (!pickupid)
@@ -775,24 +793,18 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		{
 			if (!gProperties[i][Occupied])
 			{
-				format(stringToPrint, sizeof(stringToPrint), "[ REAL ] Nemovitost '%s' je na prodej za cenu $%d.", gProperties[i][Label], gProperties[i][Cost]);
-				SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
-				format(stringToPrint, sizeof(stringToPrint), "* Pro zakoupeni nemovitosti pouzij /property buy %d", gProperties[i][ID]);
-				SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+				if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
+					return 1;
 
-				return 1;
+				format(stringToPrint, sizeof(stringToPrint), "Nemovitost '%s' je na prodej.\n\n\tCena: $%d (%.2f mil)\n\n\tKod nemovitosti: %d\n\nPro zakoupeni nemovitosti zadej jeji kod nize:", gProperties[i][Label], gProperties[i][Cost], float(gProperties[i][Cost]) / 1000000, gProperties[i][ID]);
+				return ShowPlayerDialog(playerid, DIALOG_PROPERTY_BUY, DIALOG_STYLE_INPUT, "Real Estate", stringToPrint, "Koupit", "Zrusit");
 			} 
 
 			if (!IsPlayerOwner(playerid, gProperties[i][ID]))
 				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Tato nemovitost byla jiz prodana jinemu hraci.");
 
-			format(stringToPrint, sizeof(stringToPrint), "[ REAL ] Nemovitost '%s' je tvoje", gProperties[i][Label]);
-			SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
-			format(stringToPrint, sizeof(stringToPrint), "* Hodnota: $%d. Lze ji prodat pomoci /property sell %d", gProperties[i][Cost], gProperties[i][ID]);
-			SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
-			SendClientMessage(playerid, COLOR_ZLUTA, "* Bude vsak strzena provize realitni kancelare ve vysi 10 \% ceny nemovitosti!");
-
-			return 1; 
+			format(stringToPrint, sizeof(stringToPrint), "Nemovitost '%s' je tvoje.\n\nHodnota: $%d\n\nPri prodeji bude strzena provize realitni kancelari ve vysi 10 \% ceny nemovitosti.", gProperties[i][Label], gProperties[i][Cost]);
+			return ShowPlayerDialog(playerid, DIALOG_PROPERTY_SELL, DIALOG_STYLE_MSGBOX, "Real Estate", stringToPrint, "Prodat", "Zrusit");
 		}
 		else if (pickupid == gProperties[i][Pickups][PICKUP_ENTRANCE])
 		{
@@ -844,6 +856,8 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 					break;
 				}
 		}
+
+		return 1;
 	}
 
 	//

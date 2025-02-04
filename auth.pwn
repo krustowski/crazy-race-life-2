@@ -2,12 +2,7 @@
 //  auth.pwn
 //
 
-enum
-{
-	DIALOG_UNUSED,
-	DIALOG_LOGIN,
-	DIALOG_REGISTER
-};
+#include "dialogs.pwn"
 
 public SetPlayerAccountLogin(playerid, text[])
 {
@@ -64,7 +59,7 @@ public ShowAuthDialog(playerid)
 
 	if (fexist(gPlayers[playerid][Name]))
 	{
-		format(stringToPrint, sizeof(stringToPrint), "[ AUTH ] Ucet hrace (%s) je jiz registrovan. Prihlas se pomoci dialogu nize:", gPlayers[playerid][Name]);
+		format(stringToPrint, sizeof(stringToPrint), "Ucet hrace (%s) je jiz registrovan. Prihlas se zadanim sveho hesla nize:", gPlayers[playerid][Name]);
 
 		ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", stringToPrint, "Login", "Zrusit");
 
@@ -73,7 +68,7 @@ public ShowAuthDialog(playerid)
 	}
 	else
 	{
-		format(stringToPrint, sizeof(stringToPrint), "[ AUTH ] Vitej %s! Zaregistruj svuj ucet zadanim sveho hesla nize:", gPlayers[playerid][Name]);
+		format(stringToPrint, sizeof(stringToPrint), "Vitej %s! Zaregistruj svuj ucet zadanim sveho hesla nize:", gPlayers[playerid][Name]);
 
 		ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registrace", stringToPrint, "Registrovat", "Zrusit");
 	}

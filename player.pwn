@@ -185,7 +185,9 @@ enum Player
 	bool: InsideProperty,
 
 	Drugs[MAX_DRUGS],
-	Properties[MAX_PLAYER_PROPERTIES]
+	Properties[MAX_PLAYER_PROPERTIES],
+
+	Temp
 }
 
 //

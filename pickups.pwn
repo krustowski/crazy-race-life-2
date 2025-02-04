@@ -9,6 +9,8 @@
 //  Global static team objects.
 //
 
+new gDruggeryEntrance;
+
 new gAdminRoomHealth;
 
 new gHackerzInteriorEntrance;
@@ -52,14 +54,18 @@ public AddPlayerDeathPickups(playerid, Float:X, Float:Y, Float:Z)
 
 public InitPickups()
 {
-	gAdminRoomHealth = CreatePickup(1240, 1, 2302.85, 1155.93, 85.94);
+	// Dillimore vs Montgomery
+	//gDruggeryEntrance = CreatePickup(1318, 1, 645.68, -510.51, 16.33);
+	gDruggeryEntrance = EnsurePickupCreated(1318, 1, 1280.85, 304.07, 19.55);
 
-	gHackerzInteriorEntrance = CreatePickup(1318, 1, 2866.62, -2125.24, 5.72);
-	gHackerzInteriorExit = CreatePickup(1318, 1, 2853.09, -2125.16, 0.19);
-	gHackerzMoneyBag = CreatePickup(1550, 1, 2838.59, -2141.25, 0.19);
+	gAdminRoomHealth = EnsurePickupCreated(1240, 1, 2302.85, 1155.93, 85.94);
+
+	gHackerzInteriorEntrance = EnsurePickupCreated(1318, 1, 2866.62, -2125.24, 5.72);
+	gHackerzInteriorExit = EnsurePickupCreated(1318, 1, 2853.09, -2125.16, 0.19);
+	gHackerzMoneyBag = EnsurePickupCreated(1550, 1, 2838.59, -2141.25, 0.19);
 
 	// ???
-	picktunel = CreatePickup(1318, 1, 2263.41, -755.52, 38.04);
+	picktunel = EnsurePickupCreated(1318, 1, 2263.41, -755.52, 38.04);
 
 	//------------------------
 	//CreatePickup(1274, 1,2029.54, 1320.78, 10.82);
@@ -70,7 +76,7 @@ public InitPickups()
 	// ATMs.
 	for (new i = 0; i < sizeof(gBankLocation); i++)
 	{
-		CreatePickup(1274, PICKUP_TYPE_ALWAYS, Float:gBankLocation[i][0], Float:gBankLocation[i][1], Float:gBankLocation[i][2]);
+		EnsurePickupCreated(1274, PICKUP_TYPE_ALWAYS, Float:gBankLocation[i][0], Float:gBankLocation[i][1], Float:gBankLocation[i][2]);
 	}
 
 	//

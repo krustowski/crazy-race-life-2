@@ -3,7 +3,7 @@
 //
 
 #define MAX_PROPERTIES		128
-#define MAX_PLAYER_PROPERTIES	3
+#define MAX_PLAYER_PROPERTIES	5
 #define SPAWN_PICKUP_COUNT	4
 
 enum 
@@ -262,11 +262,11 @@ public InitRealEstateProperties()
 			continue;
 
 		if (!gProperties[i][Occupied])
-			gProperties[i][Pickups][0] = CreatePickup(1273, 1, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ]);
+			gProperties[i][Pickups][0] = EnsurePickupCreated(1273, 1, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ]);
 		else
 		{
-			gProperties[i][Pickups][0] = CreatePickup(19522, 1, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ]);
-			gProperties[i][Pickups][1] = CreatePickup(1318, 1, Float:gProperties[i][LocationEntrance][CoordX], Float:gProperties[i][LocationEntrance][CoordY], Float:gProperties[i][LocationEntrance][CoordZ]);
+			gProperties[i][Pickups][0] = EnsurePickupCreated(19522, 1, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ]);
+			gProperties[i][Pickups][1] = EnsurePickupCreated(1318, 1, Float:gProperties[i][LocationEntrance][CoordX], Float:gProperties[i][LocationEntrance][CoordY], Float:gProperties[i][LocationEntrance][CoordZ]);
 		}
 
 		if (gProperties[i][VehicleID] && gProperties[i][VehicleID] >= 400 && gProperties[i][VehicleID] <= 611)
@@ -347,13 +347,13 @@ public LoadRealEstateData()
 	do {
 		SplitIntoTwo(properties, token1, token2, sizeof(token1), ",");
 
-		printf("LoadRealEstateData: loading %s", token1);
-
 		if (!IsNumeric(token1) || !strval(token1))
 		{
 			strcopy(properties, token2);
 			continue;
 		}
+
+		printf("LoadRealEstateData: loading %s", token1);
 
 		//
 		//  Extract the values (ints and strings).

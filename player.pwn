@@ -2,7 +2,7 @@
 #define MAX_TEAMS		10
 #define MAX_TEAM_PICKUPS	16
 #define MAX_TEAM_MENUS		16
-#define MAX_PLAYER_PROPERTIES	3
+#define MAX_PLAYER_PROPERTIES	5
 
 //
 //  Drugz.

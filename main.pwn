@@ -771,10 +771,11 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		{
 			if (IsPlayerOwner(playerid, gProperties[i][ID]))
 			{
-				SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Tato nemovitost ti jiz patri!");
+				format(stringToPrint, sizeof(stringToPrint), "[ REAL ] Nemovitost '%s' je tvoje", gProperties[i][Label]);
+				SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
 				format(stringToPrint, sizeof(stringToPrint), "* Hodnota: $%d. Lze ji prodat pomoci /property sell %d", gProperties[i][Cost], gProperties[i][ID]);
 				SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
-				SendClientMessage(playerid, COLOR_ZLUTA, "* Bude vsak strzena provize realitni kancelare ve vysi 15 \% ceny nemovitosti!");
+				SendClientMessage(playerid, COLOR_ZLUTA, "* Bude vsak strzena provize realitni kancelare ve vysi 10 \% ceny nemovitosti!");
 
 				return 1; 
 			}
@@ -782,18 +783,18 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 			if (!gProperties[i][Occupied])
 			{
 				format(stringToPrint, sizeof(stringToPrint), "[ REAL ] Nemovitost '%s' je na prodej za cenu $%d.", gProperties[i][Label], gProperties[i][Cost]);
-				SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+				SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
 				format(stringToPrint, sizeof(stringToPrint), "* Pro zakoupeni nemovitosti pouzij /property buy %d", gProperties[i][ID]);
 				SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
 
 				return 1;
 			} 
 			else 
-				return SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Tato nemovitost byla jiz prodana jinemu hraci.");
+				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Tato nemovitost byla jiz prodana jinemu hraci.");
 		}
 
 		if (pickupid == gProperties[i][Pickups][PICKUP_ENTRANCE] && !IsPlayerOwner(playerid, gProperties[i][ID]))
-			return SendClientMessage(playerid, COLOR_ZLUTA, "[ REAL ] Neni mozne vstoupit na cizi pozemek!");
+			return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Neni mozne vstoupit na cizi pozemek!");
 
 		// Spawn the room.
 		SpawnPropertyInterior(playerid, i);

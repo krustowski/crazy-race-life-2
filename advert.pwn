@@ -17,6 +17,7 @@ public ShowAdvert()
 		"[ TIP ] Nevahej a vyuzij pestre nabidky zavodu! Pro vice informaci pouzij /race list",
 		"[ TIP ] Pokud jsi uvizl v zavodu, muzes ho opustit pomoci /race exit",
 		"[ TIP ] Po prihlaseni do jakehokoliv zavodu lze hodit warp ke startu pomoci /race warp",
+		"[ GAME ] Po prihlaseni do zavodu neni mozne si opravit vozidlo, funkcionalita se obnovi s dokoncenim zavodu nebo jeho prerusenim",
 		// Drugz.
 		"[ GAME ] Ve meste SF a na venkove byly ukryty balicky s ilegalnim obsahem. Pritomnost tahoveho obsahu u hrace muze byt potrestan clenem tymu Policistu!",
 		"[ GAME ] Distribuovat (i)legalni substance muze pouze clen tymu Dealeru pomoci /deal",

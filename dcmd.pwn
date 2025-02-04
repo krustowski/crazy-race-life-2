@@ -305,10 +305,14 @@ dcmd_fix(playerid, params[])
 	if (!IsPlayerInAnyVehicle(playerid)) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nejsi v aute!");
 
-	SendClientMessage(playerid, COLOR_ZLUTA, "[ i ] Opravil sis auto!");
+	if (CheckPlayerRaceState(playerid))
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Pri zavodu neni mozne si opravit auto.");
+
 	SetVehicleHealth(GetPlayerVehicleID(playerid), 1000.0);
 
 	//RepairVehicle(GetPlayerVehicleID(playerid));
+	SendClientMessage(playerid, COLOR_ZLUTA, "[ i ] Opravil sis auto!");
+
 	return 1;
 }
 
@@ -522,7 +526,7 @@ dcmd_property(playerid, params[])
 	new token1[32], token2[32];
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
-	if (!strlen(params) || (strcmp(token1, "buy") && strcmp(token1, "list") && strcmp(token1, "spawn") && strcmp(token1, "vehicle")) || (strcmp(token1, "list") && !IsNumeric(token2)))
+	if (!strlen(params) || (strcmp(token1, "buy") && strcmp(token1, "sell") && strcmp(token1, "list") && strcmp(token1, "spawn") && strcmp(token1, "vehicle")) || (strcmp(token1, "list") && !IsNumeric(token2)))
 	{
 		SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /property buy [property ID]");
 		SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /property sell [property ID]");
@@ -612,7 +616,7 @@ dcmd_property(playerid, params[])
 			if (gPlayers[playerid][SpawnPoint] == propertyID)
 				gPlayers[playerid][SpawnPoint] = 0;
 
-			for (new j = 0; i < MAX_PLAYER_PROPERTIES; i++)
+			for (new j = 0; j < MAX_PLAYER_PROPERTIES; j++)
 			{
 				if (gPlayers[playerid][Properties][j] == propertyID)
 				{
@@ -626,9 +630,12 @@ dcmd_property(playerid, params[])
 			if (IsValidPickup(gProperties[i][Pickups][0]))
 				DestroyPickup(gProperties[i][Pickups][0]);
 
+			if (IsValidPickup(gProperties[i][Pickups][1]))
+				DestroyPickup(gProperties[i][Pickups][1]);
+
 			gProperties[i][Pickups][0] = CreatePickup(1273, 1, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ]);
 
-			GivePlayerMoney(playerid, floatround(float(gProperties[i][Cost]) * 0.75));
+			GivePlayerMoney(playerid, floatround(float(gProperties[i][Cost]) * 0.9));
 
 			success = true;
 			break;
@@ -643,12 +650,12 @@ dcmd_property(playerid, params[])
 	{
 		new stringToPrint[128];
 
-		SendClientMessage(playerid, COLOR_CYAN, "[ REAL ] Tve sloty pro nemovitosti:");
+		SendClientMessage(playerid, COLOR_ORANZOVA, "[ REAL ] Tve sloty pro nemovitosti:");
 
 		for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
 		{
 			format(stringToPrint, sizeof(stringToPrint), "%d: ID %5d", i, gPlayers[playerid][Properties][i]);
-			SendClientMessage(playerid, COLOR_CYAN, stringToPrint);
+			SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
 		}
 	}
 	else if (!strcmp(token1, "spawn"))

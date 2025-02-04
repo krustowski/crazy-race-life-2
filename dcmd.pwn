@@ -532,7 +532,7 @@ dcmd_property(playerid, params[])
 		SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /property sell [property ID]");
 		SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /property list");
 		SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /property spawn [property ID]");
-		SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /property vehicle [propertyID]");
+		SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti: /property vehicle [property ID]");
 
 		return 1;
 	}
@@ -575,11 +575,10 @@ dcmd_property(playerid, params[])
 				if (IsValidPickup(gProperties[j][Pickups][0]))
 					DestroyPickup(gProperties[j][Pickups][0]);
 
-				gProperties[j][Pickups][0] = CreatePickup(19522, 1, Float:gProperties[j][LocationOffer][CoordX], Float:gProperties[j][LocationOffer][CoordY], Float:gProperties[j][LocationOffer][CoordZ]);
-				gProperties[j][Pickups][1] = CreatePickup(1318, 1, Float:gProperties[j][LocationEntrance][CoordX], Float:gProperties[j][LocationEntrance][CoordY], Float:gProperties[j][LocationEntrance][CoordZ]);
+				gProperties[j][Pickups][0] = EnsurePickupCreated(19522, 1, Float:gProperties[j][LocationOffer][CoordX], Float:gProperties[j][LocationOffer][CoordY], Float:gProperties[j][LocationOffer][CoordZ]);
+				gProperties[j][Pickups][1] = EnsurePickupCreated(1318, 1, Float:gProperties[j][LocationEntrance][CoordX], Float:gProperties[j][LocationEntrance][CoordY], Float:gProperties[j][LocationEntrance][CoordZ]);
 
 				GivePlayerMoney(playerid, -gProperties[j][Cost]);
-
 				success = true;
 
 				break;
@@ -633,7 +632,7 @@ dcmd_property(playerid, params[])
 			if (IsValidPickup(gProperties[i][Pickups][1]))
 				DestroyPickup(gProperties[i][Pickups][1]);
 
-			gProperties[i][Pickups][0] = CreatePickup(1273, 1, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ]);
+			gProperties[i][Pickups][0] = EnsurePickupCreated(1273, 1, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ]);
 
 			GivePlayerMoney(playerid, floatround(float(gProperties[i][Cost]) * 0.9));
 
@@ -710,26 +709,6 @@ dcmd_property(playerid, params[])
 			break;
 		}
 	}
-
-
-	/*new Float:X, Float:Y, Float:Z;
-
-	  GetPlayerPos(playerid, X, Y, Z);
-	//CreateVehicle(vehicleId, Float:X, Float:Y, Float:Z, 0.0, -1, -1, -1);
-
-	Z += 1500;
-
-	//CreatePlayerObject(playerid, 18056, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0,0); // varna
-	//SetPlayerInterior(playerid, 12);
-	CreatePlayerObject(playerid, 14859, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0,0);
-
-	CreatePickup(1318, 1, Float:(X-2.42), Float:(Y+1.25), Float:(Z-1.0));
-	CreatePickup(1240, 1, Float:(X-2.20), Float:(Y-2.50), Float:(Z-1.0));
-	CreatePickup(1241, 1, Float:(X+2.50), Float:(Y-2.50), Float:(Z-1.0));
-	CreatePickup(1239, 1, Float:(X+2.50), Float:(Y+2.20), Float:(Z-1.0));
-
-	SetPlayerPos(playerid, Float:X, Float:Y, Float:Z);
-	SetPlayerFacingAngle(playerid, 0.0);*/
 
 	return 1;
 }

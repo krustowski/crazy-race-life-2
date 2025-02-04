@@ -9,7 +9,7 @@
 enum 
 {
 	PICKUP_OFFER,
-	PICKUP_ENTRANCE,
+	PICKUP_ENTRANCE
 }
 
 enum

@@ -793,12 +793,15 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Tato nemovitost byla jiz prodana jinemu hraci.");
 		}
 
-		if (pickupid == gProperties[i][Pickups][PICKUP_ENTRANCE] && !IsPlayerOwner(playerid, gProperties[i][ID]))
-			return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Neni mozne vstoupit na cizi pozemek!");
+		if (pickupid == gProperties[i][Pickups][PICKUP_ENTRANCE])
+		{
+			if (!IsPlayerOwner(playerid, gProperties[i][ID]))
+				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Neni mozne vstoupit na cizi pozemek!");
 
-		// Spawn the room.
-		SpawnPropertyInterior(playerid, i);
-		gPlayers[playerid][InsideProperty] = 1;
+			// Spawn the room.
+			SpawnPropertyInterior(playerid, i);
+			gPlayers[playerid][InsideProperty] = 1;
+		}
 	}
 
 	for (new i = 0; i < SPAWN_PICKUP_COUNT; i++)

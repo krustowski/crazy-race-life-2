@@ -46,7 +46,9 @@ enum Property
 
 	Objects[5],
 	Menu[5],
-	Pickups[6]
+	Pickups[6],
+
+	Drugs[MAX_DRUGS]
 }
 
 // The structure of the object+pickups system shown to a player when entering a house.
@@ -292,7 +294,7 @@ public IsPlayerOwner(playerid, propertyId)
 
 public SaveRealEstateData()
 {
-	new fileName[64] = "_data_RealEstateProperties", stringName[8], stringNames[256] = "0";
+	new fileName[64] = "_data_RealEstateProperties", stringName[16], stringNames[256] = "0";
 
 	writecfg(fileName, "", "properties", "xxx");
 
@@ -332,6 +334,15 @@ public SaveRealEstateData()
 
 		writecfgvalue(fileName, stringName, "vehicleID", gProperties[i][VehicleID]);
 		writecfgvalue(fileName, stringName, "occupied", gProperties[i][Occupied]);
+
+		// Drugz.
+		new label[7] = "_drugz";
+		strcat(stringName, label);
+
+		for (new j = 0; j < MAX_DRUGS; j++)
+		{
+			writecfgvalue(fileName, stringName, gDrugz[j][DrugIniName], gProperties[i][Drugs][j]);
+		}
 	}
 
 	writecfg(fileName, "", "properties", stringNames);
@@ -387,6 +398,15 @@ public LoadRealEstateData()
 		gProperties[i][LocationOffer] = locationOffer;
 		gProperties[i][LocationEntrance] = locationEntrance;
 		gProperties[i][LocationVehicle] = locationVehicle;
+
+		// Drugz.
+		new label[7] = "_drugz";
+		strcat(token1, label);
+
+		for (new j = 0; j < MAX_DRUGS; j++)
+		{
+			gProperties[i][Drugs][j] = readcfgvalue(fileName, token1, gDrugz[j][DrugIniName]);
+		}
 
 		// Prepare vars for the next run.
 		strcopy(properties, token2);

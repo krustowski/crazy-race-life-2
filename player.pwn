@@ -543,4 +543,3 @@ public OnPlayerPrivMsg(playerid, receiverid, text[])
 
 	return 1;
 }
-

@@ -5,6 +5,7 @@
 #define MAX_PROPERTIES		128
 #define MAX_PLAYER_PROPERTIES	5
 #define SPAWN_PICKUP_COUNT	4
+#define INVALID_PROPERTY_ID	-1
 
 enum 
 {
@@ -502,9 +503,22 @@ stock SpawnPlayerAtProperty(playerid)
 	return 0;
 }
 
+stock GetPropertyArrayIDfromID(propertyID)
+{
+	for (new i = 0; i < sizeof(gProperties); i++)
+	{
+		if (gProperties[i][ID] == propertyID)
+			return i;
+	}
+
+	return -1;
+}
+
 stock BuyPlayerProperty(playerid, propertyID)
 {
-	new freeSlot = -1, success = false;
+	new arrayID, freeSlot = -1;
+
+	arrayID = GetPropertyArrayIDfromID(propertyID);
 
 	// Check if there is a free slot for such player.
 	for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
@@ -516,93 +530,89 @@ stock BuyPlayerProperty(playerid, propertyID)
 		}
 	}
 
+	//
+	//  Validations.
+	//
+
+	if (arrayID == INVALID_PROPERTY_ID || !propertyID)
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Neplatny kod nemovitosti!");
+
 	if (freeSlot < 0)
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Jiz vlastnis limitni pocet nemocitosti, je treba nejakou prodat, abys mohl nakoupit novou.");
 
-	for (new j = 0; j < sizeof(gProperties); j++)
-	{
-		if (!gProperties[j][Occupied] && gProperties[j][ID] == propertyID)
-		{
-			if (!IsPlayerInSphere(playerid, Float:gProperties[j][LocationOffer][CoordX], Float:gProperties[j][LocationOffer][CoordY], Float:gProperties[j][LocationOffer][CoordZ], 15))
-				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Je treba byt v okoli puvodniho pickupu (rotujici zeleny domek).");
+	if (gProperties[arrayID][Occupied])
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Tato nemovitost je jiz obsazena. Neplatna akce!");
 
-			if (GetPlayerMoney(playerid) < gProperties[j][Cost])
-				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Na danou transakci nemas dostatek hotovosti!");
+	if (!IsPlayerInSphere(playerid, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ], 15))
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Je treba byt v okoli puvodniho pickupu (rotujici zeleny domek).");
 
-			gProperties[j][Occupied] = true;
-			gPlayers[playerid][Properties][freeSlot] = propertyID;
+	if (GetPlayerMoney(playerid) < gProperties[arrayID][Cost])
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Na danou transakci nemas dostatek hotovosti!");
 
-			DestroyPickup(gProperties[j][Pickups][PICKUP_OFFER]);
-			gProperties[j][Pickups][PICKUP_OFFER];
+	//
+	//  Ok, proceed with the transaction.
+	//
 
-			gProperties[j][Pickups][PICKUP_OFFER] = EnsurePickupCreated(19522, 1, Float:gProperties[j][LocationOffer][CoordX], Float:gProperties[j][LocationOffer][CoordY], Float:gProperties[j][LocationOffer][CoordZ]);
-			gProperties[j][Pickups][PICKUP_ENTRANCE] = EnsurePickupCreated(1318, 1, Float:gProperties[j][LocationEntrance][CoordX], Float:gProperties[j][LocationEntrance][CoordY], Float:gProperties[j][LocationEntrance][CoordZ]);
+	gProperties[arrayID][Occupied] = true;
+	gPlayers[playerid][Properties][freeSlot] = propertyID;
 
-			GivePlayerMoney(playerid, -gProperties[j][Cost]);
-			success = true;
+	DestroyPickup(gProperties[arrayID][Pickups][PICKUP_OFFER]);
+	gProperties[arrayID][Pickups][PICKUP_OFFER];
 
-			break;
-		}
-	}
+	gProperties[arrayID][Pickups][PICKUP_OFFER] = EnsurePickupCreated(19522, 1, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ]);
+	gProperties[arrayID][Pickups][PICKUP_ENTRANCE] = EnsurePickupCreated(1318, 1, Float:gProperties[arrayID][LocationEntrance][CoordX], Float:gProperties[arrayID][LocationEntrance][CoordY], Float:gProperties[arrayID][LocationEntrance][CoordZ]);
 
-	if (!success) 
-		return SendClientMessage(playerid, COLOR_CERVENA, "{ REAL } Transakce se nezdarila, zkus znovu pozdeji.");
+	GivePlayerMoney(playerid, -gProperties[arrayID][Cost]);
 
 	return SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Nemovitost uspesne zakoupena!");
 }
 
 stock SellPlayerProperty(playerid, propertyID)
 {
-	new success = false;
+	new arrayID;
 
-	for (new i = 0; i < sizeof(gProperties); i++)
+	arrayID = GetPropertyArrayIDfromID(propertyID);
+
+	if (arrayID == INVALID_PROPERTY_ID || !propertyID)
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Neplatny kod nemovitosti!");
+
+	if (!IsPlayerInSphere(playerid, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ], 15))
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Je treba byt v okoli puvodniho pickupu (nyni rotujici cerveny domek).");
+
+	if (!gProperties[arrayID][Occupied])
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Nelze prodat nemovitost, ktera neni prodana/obsazena.");
+
+	if (!IsPlayerOwner(playerid, propertyID))
+		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Dana nemovitost ti nepatri!");
+
+	//
+	//  Ok, sell the property.
+	//
+
+	if (gPlayers[playerid][SpawnPoint] == propertyID)
+		gPlayers[playerid][SpawnPoint] = 0;
+
+	// Free the property slot.
+	for (new j = 0; j < MAX_PLAYER_PROPERTIES; j++)
 	{
-		if (gProperties[i][ID] != propertyID)
-			continue;
-
-		if (!IsPlayerInSphere(playerid, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ], 15))
-			return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Je treba byt v okoli puvodniho pickupu (nyni rotujici cerveny domek).");
-
-		if (!gProperties[i][Occupied])
-			return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Nelze prodat nemovitost, ktera neni prodana/obsazena.");
-
-		if (!IsPlayerOwner(playerid, propertyID))
-			return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Dana nemovitost ti nepatri!");
-
-		//
-		//  Ok, sell the property.
-		//
-
-		if (gPlayers[playerid][SpawnPoint] == propertyID)
-			gPlayers[playerid][SpawnPoint] = 0;
-
-		for (new j = 0; j < MAX_PLAYER_PROPERTIES; j++)
+		if (gPlayers[playerid][Properties][j] == propertyID)
 		{
-			if (gPlayers[playerid][Properties][j] == propertyID)
-			{
-				gPlayers[playerid][Properties][j] = 0;
-				break;
-			}
+			gPlayers[playerid][Properties][j] = 0;
+			break;
 		}
-
-		gProperties[i][Occupied] = false;
-
-		DestroyPickup(gProperties[i][Pickups][PICKUP_OFFER]);
-		gProperties[i][Pickups][PICKUP_OFFER];
-
-		DestroyPickup(gProperties[i][Pickups][PICKUP_ENTRANCE]);
-		gProperties[i][Pickups][PICKUP_ENTRANCE];
-
-		gProperties[i][Pickups][PICKUP_OFFER] = EnsurePickupCreated(1273, 1, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ]);
-
-		GivePlayerMoney(playerid, floatround(float(gProperties[i][Cost]) * 0.9));
-
-		success = true;
-		break;
 	}
 
-	if (!success)
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Transkace se nezdarila, zkus znovu pozdeji.");
+	gProperties[arrayID][Occupied] = false;
+
+	DestroyPickup(gProperties[arrayID][Pickups][PICKUP_OFFER]);
+	gProperties[arrayID][Pickups][PICKUP_OFFER] = 0;
+
+	DestroyPickup(gProperties[arrayID][Pickups][PICKUP_ENTRANCE]);
+	gProperties[arrayID][Pickups][PICKUP_ENTRANCE] = 0;
+
+	gProperties[arrayID][Pickups][PICKUP_OFFER] = EnsurePickupCreated(1273, 1, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ]);
+
+	GivePlayerMoney(playerid, floatround(float(gProperties[arrayID][Cost]) * 0.9));
 
 	return SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Nemovitost byla uspesne prodana!");
 }

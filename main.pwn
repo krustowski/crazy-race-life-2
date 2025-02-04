@@ -17,7 +17,7 @@
  [ Created: 	Jan 2025 (Extends legacy GameMode CRL (2008-2010)) ]
  [ Credits: 	krusty, kompry, DRaGsTeR ]
  [ Language: 	CZ, EN ]
- [ Version: 	0.2.1 ]
+ [ Version: 	0.3.0 ]
 
  *****************************************************************************************************************************************/
 
@@ -32,13 +32,13 @@
 #include <file>
 #include <string>
 
+#pragma tabsize 8
+
 //
 //  Basic definitions.
 //
 
 #define dcmd(%1,%2,%3) if ((strcmp((%3)[1], #%1, true, (%2)) == 0) && ((((%3)[(%2) + 1] == 0) && (dcmd_%1(playerid, "")))||(((%3)[(%2) + 1] == 32) && (dcmd_%1(playerid, (%3)[(%2) + 2]))))) return 1
-
-#pragma tabsize 0
 
 #define STATS_FILE 	"stats.cfg"
 
@@ -845,12 +845,17 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 				{
 					SetPlayerHealth(playerid, 100.0);
 					SetPlayerArmour(playerid, 100.0);
+					SendClientMessage(playerid, COLOR_SVZEL, "[ HP ] Doplneno zdravi a vesta.");
 
 					break;
 				}
 			case PICKUP_PILLS:
 				{
-					//...
+					if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
+						break;
+
+					ShowPlayerDrugzDialog(playerid);
+					
 					break;
 				}
 			case PICKUP_INFO:

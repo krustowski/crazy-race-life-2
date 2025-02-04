@@ -28,7 +28,10 @@ new gBankLocation[][4] =
 	{-1509.22, 2593.82, 55.40, 15},
 
 	// Montgomery
-	{1307.16, 307.68,19.55}
+	{1307.16, 307.68, 19.55, 15},
+
+	// Dillymore
+	{648.01, -521.63, 15.90, 15}
 };
 
 public CheckPlayerBankLocation(playerid)

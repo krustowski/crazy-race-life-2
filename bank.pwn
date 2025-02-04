@@ -31,7 +31,10 @@ new gBankLocation[][4] =
 	{1307.16, 307.68, 19.55, 15},
 
 	// Dillymore
-	{648.01, -521.63, 15.90, 15}
+	{648.01, -521.63, 15.90, 15},
+
+	// Angel Pine
+	{}
 };
 
 public CheckPlayerBankLocation(playerid)

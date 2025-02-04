@@ -80,7 +80,7 @@
 #define bezova          0xFFF8DC
 
 new const GAMEMODE_NAME[] = "CrazyRaceLife2";
-new const GAMEMODE_CREDITS[] = "krusty, kompry, DRaGsTeR";
+new const GAMEMODE_CREDITS[] = "krusty, kompry, DRaGsTeR, amdulka";
 
 new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 new const VEHICLE_PLATE[] = "-CRL-2-";

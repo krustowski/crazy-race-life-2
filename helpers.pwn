@@ -152,15 +152,14 @@ stock GetVehicleWithinDistance(playerid, Float:x1, Float:y1, Float:z1, Float:dis
 
 stock EnsurePickupCreated(model, type, Float:X, Float:Y, FLoat:Z)
 {
-	new i = 0, MAX_ITERATIONS = 50;
+	new i = 0, MAX_ITERATIONS = 50, pId;
 
 	for (;;)
 	{
-		new pId;
 		pId = CreatePickup(model, type, Float:X, Float:Y, Float:Z);
 
 		if (pId)
-			return pId;
+			break;
 
 		if (i == MAX_ITERATIONS)
 			break;
@@ -168,7 +167,7 @@ stock EnsurePickupCreated(model, type, Float:X, Float:Y, FLoat:Z)
 		i++;
 	}
 
-	return -1;
+	return pId;
 }
 
 stock IsVehicleRcTram(vehicleid)

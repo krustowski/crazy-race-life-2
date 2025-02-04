@@ -322,7 +322,7 @@ dcmd_givecash(playerid, params[])
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
-		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Pouziti /givecash [playerID] [castka]");
+		return SendClientMessage(playerid, COLOR_ZLUTA, "[ CMD ] Pouziti /givecash [playerID] [castka]");
 
 	new targetId = strval(token1), targetAmount = strval(token2);
 
@@ -342,7 +342,7 @@ dcmd_givecash(playerid, params[])
 	GetPlayerName(targetId, targetName, sizeof(targetName));
 
 	// Send an informative statement to the receiving player.
-	format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s [ID: %d] ti poslal castku $%d!", playerName, playerid, targetAmount);
+	format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Hrac %s [ID: %d] ti poslal castku $%d!", playerName, playerid, targetAmount);
 	SendClientMessage(targetId, COLOR_SVZEL, stringToPrint);
 
 	// Transfer money.
@@ -350,7 +350,7 @@ dcmd_givecash(playerid, params[])
 	GivePlayerMoney(playerid, -targetAmount);
 
 	// Send an informative statement to the sending player.
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Castka $%s uspesne zaslana hraci %s [ID: %d]!");
+	format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Castka $%s uspesne zaslana hraci %s [ID: %d]!", targetAmount, targetName, targetId);
 	SendClientMessage(playerid, COLOR_SVZEL, stringToPrint);
 
 	return 1;
@@ -572,11 +572,11 @@ dcmd_property(playerid, params[])
 				gProperties[j][Occupied] = true;
 				gPlayers[playerid][Properties][freeSlot] = propertyID;
 
-				if (IsValidPickup(gProperties[j][Pickups][0]))
-					DestroyPickup(gProperties[j][Pickups][0]);
-
-				gProperties[j][Pickups][0] = EnsurePickupCreated(19522, 1, Float:gProperties[j][LocationOffer][CoordX], Float:gProperties[j][LocationOffer][CoordY], Float:gProperties[j][LocationOffer][CoordZ]);
-				gProperties[j][Pickups][1] = EnsurePickupCreated(1318, 1, Float:gProperties[j][LocationEntrance][CoordX], Float:gProperties[j][LocationEntrance][CoordY], Float:gProperties[j][LocationEntrance][CoordZ]);
+				DestroyPickup(gProperties[j][Pickups][PICKUP_OFFER]);
+				gProperties[j][Pickups][PICKUP_OFFER];
+				
+				gProperties[j][Pickups][PICKUP_OFFER] = EnsurePickupCreated(19522, 1, Float:gProperties[j][LocationOffer][CoordX], Float:gProperties[j][LocationOffer][CoordY], Float:gProperties[j][LocationOffer][CoordZ]);
+				gProperties[j][Pickups][PICKUP_ENTRANCE] = EnsurePickupCreated(1318, 1, Float:gProperties[j][LocationEntrance][CoordX], Float:gProperties[j][LocationEntrance][CoordY], Float:gProperties[j][LocationEntrance][CoordZ]);
 
 				GivePlayerMoney(playerid, -gProperties[j][Cost]);
 				success = true;
@@ -626,13 +626,13 @@ dcmd_property(playerid, params[])
 
 			gProperties[i][Occupied] = false;
 
-			if (IsValidPickup(gProperties[i][Pickups][0]))
-				DestroyPickup(gProperties[i][Pickups][0]);
+			DestroyPickup(gProperties[i][Pickups][PICKUP_OFFER]);
+			gProperties[i][Pickups][PICKUP_OFFER];
 
-			if (IsValidPickup(gProperties[i][Pickups][1]))
-				DestroyPickup(gProperties[i][Pickups][1]);
+			DestroyPickup(gProperties[i][Pickups][PICKUP_ENTRANCE]);
+			gProperties[i][Pickups][PICKUP_ENTRANCE];
 
-			gProperties[i][Pickups][0] = EnsurePickupCreated(1273, 1, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ]);
+			gProperties[i][Pickups][PICKUP_OFFER] = EnsurePickupCreated(1273, 1, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ]);
 
 			GivePlayerMoney(playerid, floatround(float(gProperties[i][Cost]) * 0.9));
 

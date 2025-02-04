@@ -746,6 +746,10 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 {
 	new stringToPrint[128];
 
+	// hotfix due to the logic of EnsurePickupCreated(...) function
+	if (!pickupid)
+		return 1;
+
 	//
 	//  Various joobs/teams pickups.
 	//
@@ -769,17 +773,6 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 		if (pickupid == gProperties[i][Pickups][PICKUP_OFFER])
 		{
-			if (IsPlayerOwner(playerid, gProperties[i][ID]))
-			{
-				format(stringToPrint, sizeof(stringToPrint), "[ REAL ] Nemovitost '%s' je tvoje", gProperties[i][Label]);
-				SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
-				format(stringToPrint, sizeof(stringToPrint), "* Hodnota: $%d. Lze ji prodat pomoci /property sell %d", gProperties[i][Cost], gProperties[i][ID]);
-				SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
-				SendClientMessage(playerid, COLOR_ZLUTA, "* Bude vsak strzena provize realitni kancelare ve vysi 10 \% ceny nemovitosti!");
-
-				return 1; 
-			}
-
 			if (!gProperties[i][Occupied])
 			{
 				format(stringToPrint, sizeof(stringToPrint), "[ REAL ] Nemovitost '%s' je na prodej za cenu $%d.", gProperties[i][Label], gProperties[i][Cost]);
@@ -789,11 +782,19 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 				return 1;
 			} 
-			else 
-				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Tato nemovitost byla jiz prodana jinemu hraci.");
-		}
 
-		if (pickupid == gProperties[i][Pickups][PICKUP_ENTRANCE])
+			if (!IsPlayerOwner(playerid, gProperties[i][ID]))
+				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Tato nemovitost byla jiz prodana jinemu hraci.");
+
+			format(stringToPrint, sizeof(stringToPrint), "[ REAL ] Nemovitost '%s' je tvoje", gProperties[i][Label]);
+			SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
+			format(stringToPrint, sizeof(stringToPrint), "* Hodnota: $%d. Lze ji prodat pomoci /property sell %d", gProperties[i][Cost], gProperties[i][ID]);
+			SendClientMessage(playerid, COLOR_ZLUTA, stringToPrint);
+			SendClientMessage(playerid, COLOR_ZLUTA, "* Bude vsak strzena provize realitni kancelare ve vysi 10 \% ceny nemovitosti!");
+
+			return 1; 
+		}
+		else if (pickupid == gProperties[i][Pickups][PICKUP_ENTRANCE])
 		{
 			if (!IsPlayerOwner(playerid, gProperties[i][ID]))
 				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Neni mozne vstoupit na cizi pozemek!");
@@ -801,6 +802,8 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 			// Spawn the room.
 			SpawnPropertyInterior(playerid, i);
 			gPlayers[playerid][InsideProperty] = 1;
+
+			return 1;
 		}
 	}
 
@@ -863,6 +866,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	{
 		GivePlayerMoney(playerid, 10000);
 		DestroyPickup(gHackerzMoneyBag);
+		gHackerzMoneyBag = 0;
 	}
 	else if (pickupid == gAdminDoorDown)
 	{
@@ -933,8 +937,9 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 			continue;
 
 		DestroyPickup(gPlayerMoneyPickup[i]);
-		GivePlayerMoney(playerid, gPlayerMoneyPickupAmount[i]);
+		gPlayerMoneyPickup[i] = 0;
 
+		GivePlayerMoney(playerid, gPlayerMoneyPickupAmount[i]);
 		gPlayerMoneyPickupAmount[i] = 0;
 	}
 

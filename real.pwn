@@ -441,24 +441,10 @@ stock SpawnPropertyInterior(playerid, arrayID)
 	// Exit pickup.
 	pickupCoords[3][0] = X-2.42; pickupCoords[3][1] = Y+1.25; pickupCoords[3][2] = Z-1.0;
 
-	for (;;)
-	{
-		new pId;
-		pId = CreatePickup(pickupIds[i], 1, Float:pickupCoords[i][0], Float:pickupCoords[i][1], Float:pickupCoords[i][2], -1);
-
-		// Hotfix to bypass the bug when CreatePickup returns 0 and the pickup wont show up at all.
-		if (!pId)
-			continue;
-
-		gPlayerInteriors[playerid][Pickups][i] = pId;
-		i++;
-
-		if (i == SPAWN_PICKUP_COUNT)
-			break;
-	}
-
 	for (new i = 0; i < SPAWN_PICKUP_COUNT; i++)
 	{
+		gPlayerInteriors[playerid][Pickups][i] = EnsurePickupCreated(pickupIds[i], 1, Float:pickupCoords[i][0], Float:pickupCoords[i][1], Float:pickupCoords[i][2], -1);
+
 		if (!gPlayerInteriors[playerid][Pickups][i] || gPlayerInteriors[playerid][Pickups][i] == -1)
 		{
 			printf("SpawnPropertyInterior: pickup creation error: pickup no. %d, value: %d", i, gPlayerInteriors[playerid][Pickups][i]);
@@ -468,7 +454,7 @@ stock SpawnPropertyInterior(playerid, arrayID)
 			return 0;
 		}
 
-		printf("SpawnPropertyInterior: pickup no. %d: %d", i, gPlayerInteriors[playerid][Pickups][i]);
+		//printf("SpawnPropertyInterior: pickup no. %d: %d", i, gPlayerInteriors[playerid][Pickups][i]);
 		//ShowPickupForPlayer(playerid, gPlayerInteriors[playerid][Pickups][i]);
 	}
 
@@ -488,8 +474,8 @@ stock DestroyPropertyInterior(playerid)
 	{
 		if (!DestroyPickup(gPlayerInteriors[playerid][Pickups][j]))
 			printf("DestroyPropertyInterior: failed to delete pickup no. %d!", j);
-		else
-			gPlayerInteriors[playerid][Pickups][j] = 0;
+
+		gPlayerInteriors[playerid][Pickups][j] = 0;
 	}
 
 	return 1;

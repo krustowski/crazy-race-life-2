@@ -34,7 +34,10 @@ new gBankLocation[][4] =
 	{648.01, -521.63, 15.90, 15},
 
 	// Angel Pine
-	{}
+	//...
+
+	// Palomino Creek
+	{2302.73, -20.05, 26.25, 15}
 };
 
 public CheckPlayerBankLocation(playerid)

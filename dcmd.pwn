@@ -309,8 +309,8 @@ dcmd_fix(playerid, params[])
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Pri zavodu neni mozne si opravit auto.");
 
 	SetVehicleHealth(GetPlayerVehicleID(playerid), 1000.0);
+	RepairVehicle(GetPlayerVehicleID(playerid));
 
-	//RepairVehicle(GetPlayerVehicleID(playerid));
 	SendClientMessage(playerid, COLOR_ZLUTA, "[ i ] Opravil sis auto!");
 
 	return 1;
@@ -597,15 +597,33 @@ dcmd_property(playerid, params[])
 			new vehicleId = GetPlayerVehicleID(playerid);
 			new modelId = GetVehicleModel(vehicleId);
 
-			if (gProperties[i][VehicleID] == modelId)
+			if (gProperties[i][Vehicle][Model] == modelId)
 				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Tento model auta jiz byl k nemovitosti prirazen.");
 
-			gProperties[i][VehicleID] = modelId;
+			gProperties[i][Vehicle][Model] = modelId;
 
-			if (gProperties[i][Vehicle])
+			new colour1, colour2;
+
+			GetVehicleColor(vehicleId, colour1, colour2);
+
+			gProperties[i][Vehicle][Colours][0] = colour1;
+			gProperties[i][Vehicle][Colours][1] = colour2;
+
+			for (new j = 0; j < 16; j++)
+			{
+				gProperties[i][Vehicle][Components][j] = GetVehicleComponentInSlot(vehicleId, j);
+			}
+
+			if (gProperties[i][Vehicle][ID])
 				DestroyVehicle(gProperties[i][Vehicle]);
 
-			gProperties[i][Vehicle] = CreateVehicle(gProperties[i][VehicleID], Float:gProperties[i][LocationVehicle][CoordX], Float:gProperties[i][LocationVehicle][CoordY], Float:gProperties[i][LocationVehicle][CoordZ], Float:gProperties[i][LocationVehicle][CoordR], 0, 0, -1);
+			gProperties[i][Vehicle] = CreateVehicle(gProperties[i][Vehicle][Model], Float:gProperties[i][LocationVehicle][CoordX], Float:gProperties[i][LocationVehicle][CoordY], Float:gProperties[i][LocationVehicle][CoordZ], Float:gProperties[i][LocationVehicle][CoordR], colour1, colour2, -1);
+
+			for (new j = 0; j < 16; j++)
+			{
+				if (gProperties[i][Vehicle][Components][j])
+					AddVehicleComponent(vehicleId, gProperties[i][Vehicle][Components][j]);
+			}
 
 			SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Toto auto bylo prirazeno k tve nemovitosti.");
 

@@ -1079,6 +1079,16 @@ public OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 	}
 }
 
+public OnEnterExitModShop(playerid, enterexit, interiorid)
+{
+	if (enterexit == 0) // If enterexit is 0, this means they are exiting
+	{
+		UpdatePropertyVehicle(playerid);
+	}
+
+	return 1;
+}
+
 /*************************************************************************************
  *
  *       ______                       ____                  __    _ ____    ___ 

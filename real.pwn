@@ -6,6 +6,7 @@
 #define MAX_PLAYER_PROPERTIES	5
 #define SPAWN_PICKUP_COUNT	4
 #define INVALID_PROPERTY_ID	-1
+#define CARMODTYPE_NONE		-1
 
 enum 
 {
@@ -29,6 +30,14 @@ enum Coords
         Float: CoordR
 }
 
+enum VehicleProps
+{
+	ID,
+	Model,
+	Colours[2],
+	Components[16]
+}
+
 enum Property
 {
 	ID,
@@ -39,8 +48,7 @@ enum Property
 	LocationEntrance[Coords],
 	LocationVehicle[Coords],
 
-	VehicleID,
-	Vehicle,
+	Vehicle[VehicleProps],
 
 	bool:Occupied,
 
@@ -62,198 +70,11 @@ enum PlayerPropertyObject
 
 new gPlayerInteriors[MAX_PLAYERS][PlayerPropertyObject];
 
-//
-//
-//
-
-new gPropertySF0101[Property] =
-{
-	10101,
-	"SF The Very First House for Sell",
-	1500000,
-	{-2685.81, 201.33, 4.33, 0.0},
-	{-2688.66, 198.50, 7.15, 0.0},
-	{-2691.9761, 204.5431, 3.9995, 0.1673},
-	560,
-	INVALID_VEHICLE_ID,
-	false,
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1, -1}
-},
-
-// El Quebrados
-gPropertyDE0101[Property] = 
-{
-	20101,
-	"El Quebrados prop no. 1",
-	750000,
-	{-1469.00, 2686.69, 55.83, 0.0},
-	{-1466.22, 2693.31, 56.26, 0.0},
-	{-1470.55, 2692.82, 55.83, 179.92},
-	0,
-	INVALID_VEHICLE_ID,
-	false,
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1, -1}
-},
-	gPropertyDE0102[Property] = 
-{
-	20102,
-	"El Quebrados prop no. 2",
-	650000,
-	{-1482.20, 2698.43, 55.83, 0.0},
-	{-1482.59, 2702.20, 56.25, 0.0},
-	{-1486.32, 2697.17, 55.83, 183.70},
-	0,
-	INVALID_VEHICLE_ID,
-	false,
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1, -1}
-},
-	gPropertyDE0103[Property] = 
-{
-	20103,
-	"El Quebrados prop no. 3",
-	600000,
-	{-1491.39, 2685.03, 55.85, 0.0},
-	{-1491.39, 2685.03, 55.85, 0.0},
-	{-1502.57, 2689.98, 55.83, 179.70},
-	0,
-	INVALID_VEHICLE_ID,
-	false,
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1, -1}
-},
-	gPropertyDE0104[Property] = 
-{
-	20104,
-	"El Quebrados prop no. 4",
-	600000,
-	{-1554.95, 2692.75, 55.84, 0.0},
-	{-1550.51, 2699.88, 56.26, 0.0},
-	{-1555.55, 2700.95, 55.83, 175.10},
-	0,
-	INVALID_VEHICLE_ID,
-	false,
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1, -1}
-},
-	gPropertyDE0105[Property] = 
-{
-	20105,
-	"El Quebrados prop no. 5",
-	750000,
-	{-1600.46, 2679.16, 55.10, 0.0},
-	{-1603.47, 2689.46, 55.28, 0.0},
-	{-1597.83, 2696.68, 55.07, 180.89},
-	560,
-	INVALID_VEHICLE_ID,
-	false,
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1, -1}
-},
-	// Trailer park btw LS/SF
-	gPropertyOT0101[Property] = 
-{
-	50101,
-	"Trailer park no. 1",
-	900000,
-	{755.21, 378.67, 23.17, 0.0},
-	{758.40, 375.05, 23.19, 0.0},
-	{745.17, 374.02, 23.21, 20.16},
-	0,
-	INVALID_VEHICLE_ID,
-	false,
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1, -1}
-},
-	gPropertyOT0102[Property] = 
-{
-	50102,
-	"Trailer park no. 2",
-	900000,
-	{800.38, 360.85, 19.39, 0.0},
-	{804.85, 359.52, 19.76, 0.0},
-	{509.70, 363.27, 19.34, 90.41},
-	0,
-	INVALID_VEHICLE_ID,
-	false,
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1, -1}
-},
-	gPropertyOT0103[Property] = 
-{
-	501003,
-	"Trailer park no. 3",
-	900000,
-	{767.57, 346.78, 19.99, 0.0},
-	{771.79, 347.46, 20.15, 0.0},
-	{778.72, 351.01, 19.63, 14.67},
-	0,
-	INVALID_VEHICLE_ID,
-	false,
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1, -1}
-},
-	gPropertyOT0104[Property] = 
-{
-	50104,
-	"Trailer park no. 4",
-	900000,
-	{751.35, 270.73, 27.12, 0.0},
-	{748.03, 277.72, 27.22, 0.0},
-	{754.29, 278.50, 27.51, 191.54},
-	0,
-	INVALID_VEHICLE_ID,
-	false,
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1, -1}
-},
-	gPropertyOT0105[Property] = 
-{
-	50105,
-	"El Quebrados prop no. 5",
-	900000,
-	{752.73, 261.89, 27.08, 0.0},
-	{748.40, 257.87, 27.08, 0.0},
-	{739.71, 250.67, 27.21, 15.21},
-	0,
-	INVALID_VEHICLE_ID,
-	false,
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1, -1}
-},
-	// LS
-	gPropertyLS0101[Property] = 
-{
-	40101,
-	"LS Vinewood Ville",
-	2000000,
-	{},
-	{},
-	{0.0, 0.0, 0.0, 0.0},
-	0,
-	INVALID_VEHICLE_ID,
-	false,
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1},
-	{-1, -1, -1, -1, -1, -1}
-};
-
-//
-
 new gProperties[MAX_PROPERTIES][Property];
+
+//
+//
+//
 
 public InitRealEstateProperties()
 {
@@ -272,9 +93,15 @@ public InitRealEstateProperties()
 			gProperties[i][Pickups][1] = EnsurePickupCreated(1318, 1, Float:gProperties[i][LocationEntrance][CoordX], Float:gProperties[i][LocationEntrance][CoordY], Float:gProperties[i][LocationEntrance][CoordZ]);
 		}
 
-		if (gProperties[i][VehicleID] && gProperties[i][VehicleID] >= 400 && gProperties[i][VehicleID] <= 611)
+		if (gProperties[i][Vehicle][Model] && gProperties[i][Vehicle][Model] >= 400 && gProperties[i][Vehicle][Model] <= 611)
 		{
-			gProperties[i][Vehicle] = CreateVehicle(gProperties[i][VehicleID], Float:gProperties[i][LocationVehicle][CoordX], Float:gProperties[i][LocationVehicle][CoordY], Float:gProperties[i][LocationVehicle][CoordZ], Float:gProperties[i][LocationVehicle][CoordR], 0, 0, -1);
+			gProperties[i][Vehicle][ID] = CreateVehicle(gProperties[i][Vehicle][Model], Float:gProperties[i][LocationVehicle][CoordX], Float:gProperties[i][LocationVehicle][CoordY], Float:gProperties[i][LocationVehicle][CoordZ], Float:gProperties[i][LocationVehicle][CoordR], gProperties[i][Vehicle][Colours][0], gProperties[i][Vehicle][Colours][1], -1);
+
+			for (new j = 0; j < 16; j++)
+			{
+				if (gProperties[i][Vehicle][Components][j])
+					AddVehicleComponent(gProperties[i][Vehicle][ID], gProperties[i][Vehicle][Components][j]);
+			}
 		}
 	}
 
@@ -294,7 +121,7 @@ public IsPlayerOwner(playerid, propertyId)
 
 public SaveRealEstateData()
 {
-	new fileName[64] = "_data_RealEstateProperties", stringName[16], stringNames[256] = "0";
+	new fileName[64] = "_data_RealEstateProperties", stringName[20], stringNames[256] = "0";
 
 	writecfg(fileName, "", "properties", "xxx");
 
@@ -332,22 +159,67 @@ public SaveRealEstateData()
 		writecfg(fileName, stringName, "locationEntrance", coordStringEntrance);
 		writecfg(fileName, stringName, "locationVehicle", coordStringVehicle);
 
-		writecfgvalue(fileName, stringName, "vehicleID", gProperties[i][VehicleID]);
 		writecfgvalue(fileName, stringName, "occupied", gProperties[i][Occupied]);
 
+		//
+		// Vehicle props.
+		//
+
+		new componentsString[128], stringCopy[20];
+		strcopy(stringCopy, stringName);
+		strcat(stringCopy, "_vehicle");
+
+		writecfgvalue(fileName, stringCopy, "model", gProperties[i][Vehicle][Model]);
+		writecfgvalue(fileName, stringCopy, "colour1", gProperties[i][Vehicle][Colours][0]);
+		writecfgvalue(fileName, stringCopy, "colour2", gProperties[i][Vehicle][Colours][1]);
+
+		for (new j = 0; j < 16; j++)
+		{
+			if (!strcmp(componentsString, ""))
+			{
+				format(componentsString, sizeof(componentsString), "%d", gProperties[i][Vehicle][Components][j]);
+				continue;
+			}
+
+			format(componentsString, sizeof(componentsString), "%s,%d", componentsString, gProperties[i][Vehicle][Components][j]);
+		}
+
+		writecfg(fileName, stringCopy, "components", componentsString);
+
+		//
 		// Drugz.
+		//
+
 		new label[7] = "_drugz";
-		strcat(stringName, label);
+		strcopy(stringCopy, stringName);
+		strcat(stringCopy, label);
 
 		for (new j = 0; j < MAX_DRUGS; j++)
 		{
-			writecfgvalue(fileName, stringName, gDrugz[j][DrugIniName], gProperties[i][Drugs][j]);
+			writecfgvalue(fileName, stringCopy, gDrugz[j][DrugIniName], gProperties[i][Drugs][j]);
 		}
 	}
 
 	writecfg(fileName, "", "properties", stringNames);
 
 	return 1;
+}
+
+stock ExtractIntsFromString(input[], ints[16])
+{
+	new i = 0, token1[128], token2[128], toSplit[128];
+
+	strcopy(toSplit, input);
+
+	do {
+		SplitIntoTwo(toSplit, token1, token2, sizeof(token1), ",");
+		ints[i] = strval(token1);
+
+		strcopy(toSplit, token2);
+		i++;
+	} while (strcmp(token2, ""));
+
+	return ints;
 }
 
 public LoadRealEstateData()
@@ -373,7 +245,6 @@ public LoadRealEstateData()
 
 		gProperties[i][ID] = readcfgvalue(fileName, token1, "id");
 		gProperties[i][Cost] = readcfgvalue(fileName, token1, "cost");
-		gProperties[i][VehicleID] = readcfgvalue(fileName, token1, "vehicleID");
 		gProperties[i][Occupied] = readcfgvalue(fileName, token1, "occupied");
 
 		readcfg(fileName, token1, "label", gProperties[i][Label]); 
@@ -398,6 +269,20 @@ public LoadRealEstateData()
 		gProperties[i][LocationOffer] = locationOffer;
 		gProperties[i][LocationEntrance] = locationEntrance;
 		gProperties[i][LocationVehicle] = locationVehicle;
+
+		// VehicleProps
+		new componentsString[256], components[16], token1Copy[256];
+		strcopy(token1Copy, token1);
+		strcat(token1Copy, "_vehicle");
+
+		readcfg(fileName, token1Copy, "components", componentsString);
+
+		ExtractIntsFromString(componentsString, components);
+		gProperties[i][Vehicle][Components] = components;
+
+		gProperties[i][Vehicle][Model] = readcfgvalue(fileName, token1Copy, "model");
+		gProperties[i][Vehicle][Colours][0] = readcfgvalue(fileName, token1Copy, "colour1"); 
+		gProperties[i][Vehicle][Colours][1] = readcfgvalue(fileName, token1Copy, "colour2"); 
 
 		// Drugz.
 		new label[7] = "_drugz";
@@ -636,3 +521,50 @@ stock SellPlayerProperty(playerid, propertyID)
 
 	return SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Nemovitost byla uspesne prodana!");
 }
+
+stock UpdatePropertyVehicle(playerid)
+{
+	if (!IsPlayerInAnyVehicle(playerid))
+		return 0;
+
+	new arrayID, colour1, colour2, bool:modelMatch = false, vehicleID;
+
+	vehicleID = GetPlayerVehicleID(playerid);
+
+	for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
+	{
+		new propertyID = gPlayers[playerid][Properties][i];
+
+		if (!propertyID)
+			continue;
+
+		arrayID = GetPropertyArrayIDfromID(playerid, propertyID);
+
+		if (arrayID == -1)
+			continue;
+
+		if (GetVehicleModel(vehicleID) == gProperties[arrayID][Vehicle][Model] && vehicleID == gProperties[arrayID][Vehicle][ID])
+		{
+			modelMatch = true;
+			break;
+		}
+	}
+
+	if (!modelMatch)
+		return 0;
+
+	GetVehicleColor(GetPlayerVehicleID(playerid), colour1, colour2);
+
+	gProperties[arrayID][Vehicle][Colours][0] = colour1;
+	gProperties[arrayID][Vehicle][Colours][1] = colour2;
+
+	for (new i = 0; i < 16; i++)
+	{
+		gProperties[arrayID][Vehicle][Components][i] = GetVehicleComponentInSlot(vehicleID, i);
+	}
+
+	SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Modifikace auta ulozeny k zaparkovanemu autu.");
+
+	return 1;
+}
+

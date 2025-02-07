@@ -489,11 +489,42 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 
 public OnVehicleSpawn(vehicleid)
 {
+	for (new i = 0; sizeof(gProperties); i++)
+	{
+		if (gProperties[i][Vehicle][ID] != vehicleid)
+			continue;
+
+		for (new j = 0; j < 16; j++)
+		{
+			if (gProperties[i][Vehicle][Components][j])
+				AddVehicleComponent(gProperties[i][Vehicle][ID], gProperties[i][Vehicle][Components][j]);
+		}
+	}
+
 	return 1;
 }
 
 public OnVehicleDeath(vehicleid, killerid)
 {
+	return 1;
+}
+
+public OnVehicleMod(playerid, vehicleid, componentid)
+{
+	for (new i = 0; sizeof(gProperties); i++)
+	{
+		if (gProperties[i][Vehicle][ID] != vehicleid)
+			continue;
+		
+		new CARMODETYPE:componentType = GetVehicleComponentType(componentid);
+
+		if (componentType == CARMODTYPE_NONE)
+			break;
+
+		gProperties[i][Vehicle][Components][componentType] = componentid;
+		SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Modifikace zaparkovaneho auta byla ulozena.");
+	}
+
 	return 1;
 }
 
@@ -539,12 +570,12 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	dcmd(lay, 3, cmdtext);		  //all
 	dcmd(locate, 6, cmdtext); 	  //all
 	dcmd(lock, 4, cmdtext);           //all
-	//dcmd(login, 5, cmdtext);          //all
+					  //dcmd(login, 5, cmdtext);          //all
 	dcmd(pm, 2, cmdtext);		  //all
 	dcmd(port, 4, cmdtext); 	  //all
 	dcmd(property, 8, cmdtext);	  //all
 	dcmd(race, 4, cmdtext);		  //all
-	//dcmd(register, 8, cmdtext);       //all
+					  //dcmd(register, 8, cmdtext);       //all
 	dcmd(rules, 5, cmdtext); 	  //all
 	dcmd(skydive, 7, cmdtext);        //all
 	dcmd(soska, 5, cmdtext); 	  //all
@@ -666,100 +697,100 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			return 1; // Useful for dialogs that contain only information and we do nothing depending on whether they responded or not
 
 		case DIALOG_LOGIN:
-		{
-			if (!response) 
-				return Kick(playerid);
-
-			if (SetPlayerAccountLogin(playerid, inputtext))
-				return 1;
-			//return ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Uspesne prihlasen!", "Ok", "");
-
-			gPlayers[playerid][LoginAttempts]++;
-
-			if (gPlayers[playerid][LoginAttempts] >= 3)
 			{
-				ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Opakovane zadano spatne heslo (3x).", "Ok", "");
-				Kick(playerid);
+				if (!response) 
+					return Kick(playerid);
+
+				if (SetPlayerAccountLogin(playerid, inputtext))
+					return 1;
+				//return ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Uspesne prihlasen!", "Ok", "");
+
+				gPlayers[playerid][LoginAttempts]++;
+
+				if (gPlayers[playerid][LoginAttempts] >= 3)
+				{
+					ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Opakovane zadano spatne heslo (3x).", "Ok", "");
+					Kick(playerid);
+				}
+				else 
+					ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", "Spatne heslo!\nProsim zadej sve heslo!", "Login", "Zrusit");
 			}
-			else 
-				ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", "Spatne heslo!\nProsim zadej sve heslo!", "Login", "Zrusit");
-		}
 		case DIALOG_REGISTER:
-		{
-			if (!response) 
-				return Kick(playerid);
-
-			if (strlen(inputtext) <= 5) 
-				return ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registrace", "Heslo musi byt delsi jak 5 znaku!\nProsim zadej sve heslo!", "Registrovat", "Zrusit");
-
-			if (SetPlayerAccountRegistration(playerid, inputtext))
-				return 1;
-		}
-		case DIALOG_PROPERTY_BUY:
-		{
-			if (!response)
-				return 1;
-
-			BuyPlayerProperty(playerid, strval(inputtext));
-
-			return 1;
-		}
-		case DIALOG_PROPERTY_SELL:
-		{
-			if (!response)
-				return 1;
-
-			SellPlayerProperty(playerid, strval(inputtext));
-
-			return 1;
-		}
-		case DIALOG_PROPERTY_DRUGZ:
-		{
-			if (!response)
-				return 1;
-			
-			if (!strlen(inputtext))
-				return SendClientMessage(playerid, COLOR_CERVENA, "[ DRUGZ ] Neplatna volba.");
-
-			// Save to the temporary user's var.
-			gPlayers[playerid][Temp] = listitem;
-
-			ShowPlayerDialog(playerid, DIALOG_PROPERTY_DRUGZ_TRANS, DIALOG_STYLE_LIST, "Drugz", "Ulozit doma vsechno\nVybrat z domu vsechno", "Potvrdit", "Zrusit");
-
-			return 1;
-		}
-		case DIALOG_PROPERTY_DRUGZ_TRANS:
-		{
-			if (!response)
-				return 1;
-
-			new amount, drugID = gPlayers[playerid][Temp], propertyID = gPlayerInteriors[playerid][PropertyArrayID];
-
-			switch (listitem)
 			{
-				case 0:
-					{
-						// "Ulozit vse doma"
-						gProperties[propertyID][Drugs][drugID] += gPlayers[playerid][Drugs][drugID];
-						gPlayers[playerid][Drugs][drugID] = 0;
+				if (!response) 
+					return Kick(playerid);
 
-						SendClientMessage(playerid, COLOR_ORANZOVA, "[ DRUGZ ] Uspesne ulozeno doma.");
-					}
-				case 1:
-					{
-						// "Vybrat vse z domu"
-						gPlayers[playerid][Drugs][drugID] += gProperties[propertyID][Drugs][drugID];
-						gProperties[propertyID][Drugs][drugID] = 0;
+				if (strlen(inputtext) <= 5) 
+					return ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registrace", "Heslo musi byt delsi jak 5 znaku!\nProsim zadej sve heslo!", "Registrovat", "Zrusit");
 
-						SendClientMessage(playerid, COLOR_ORANZOVA, "[ DRUGZ ] Uspesne ulozeno do kapes.");
-					}
+				if (SetPlayerAccountRegistration(playerid, inputtext))
+					return 1;
 			}
+		case DIALOG_PROPERTY_BUY:
+			{
+				if (!response)
+					return 1;
 
-			return 1;
-		}
+				BuyPlayerProperty(playerid, strval(inputtext));
+
+				return 1;
+			}
+		case DIALOG_PROPERTY_SELL:
+			{
+				if (!response)
+					return 1;
+
+				SellPlayerProperty(playerid, strval(inputtext));
+
+				return 1;
+			}
+		case DIALOG_PROPERTY_DRUGZ:
+			{
+				if (!response)
+					return 1;
+
+				if (!strlen(inputtext))
+					return SendClientMessage(playerid, COLOR_CERVENA, "[ DRUGZ ] Neplatna volba.");
+
+				// Save to the temporary user's var.
+				gPlayers[playerid][Temp] = listitem;
+
+				ShowPlayerDialog(playerid, DIALOG_PROPERTY_DRUGZ_TRANS, DIALOG_STYLE_LIST, "Drugz", "Ulozit doma vsechno\nVybrat z domu vsechno", "Potvrdit", "Zrusit");
+
+				return 1;
+			}
+		case DIALOG_PROPERTY_DRUGZ_TRANS:
+			{
+				if (!response)
+					return 1;
+
+				new amount, drugID = gPlayers[playerid][Temp], propertyID = gPlayerInteriors[playerid][PropertyArrayID];
+
+				switch (listitem)
+				{
+					case 0:
+						{
+							// "Ulozit vse doma"
+							gProperties[propertyID][Drugs][drugID] += gPlayers[playerid][Drugs][drugID];
+							gPlayers[playerid][Drugs][drugID] = 0;
+
+							SendClientMessage(playerid, COLOR_ORANZOVA, "[ DRUGZ ] Uspesne ulozeno doma.");
+						}
+					case 1:
+						{
+							// "Vybrat vse z domu"
+							gPlayers[playerid][Drugs][drugID] += gProperties[propertyID][Drugs][drugID];
+							gProperties[propertyID][Drugs][drugID] = 0;
+
+							SendClientMessage(playerid, COLOR_ORANZOVA, "[ DRUGZ ] Uspesne ulozeno do kapes.");
+						}
+				}
+
+				return 1;
+			}
 
 		default: 
-		return 0; // dialog ID was not found, search in other scripts
+			return 0; // dialog ID was not found, search in other scripts
 	}
 
 	ShowAuthDialog(playerid);
@@ -899,7 +930,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 						break;
 
 					ShowPlayerDrugzDialog(playerid);
-					
+
 					break;
 				}
 			case PICKUP_INFO:

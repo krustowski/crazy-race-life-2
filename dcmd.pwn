@@ -617,12 +617,12 @@ dcmd_property(playerid, params[])
 			if (gProperties[i][Vehicle][ID])
 				DestroyVehicle(gProperties[i][Vehicle]);
 
-			gProperties[i][Vehicle] = CreateVehicle(gProperties[i][Vehicle][Model], Float:gProperties[i][LocationVehicle][CoordX], Float:gProperties[i][LocationVehicle][CoordY], Float:gProperties[i][LocationVehicle][CoordZ], Float:gProperties[i][LocationVehicle][CoordR], colour1, colour2, -1);
+			gProperties[i][Vehicle][ID] = CreateVehicle(gProperties[i][Vehicle][Model], Float:gProperties[i][LocationVehicle][CoordX], Float:gProperties[i][LocationVehicle][CoordY], Float:gProperties[i][LocationVehicle][CoordZ], Float:gProperties[i][LocationVehicle][CoordR], colour1, colour2, -1);
 
 			for (new j = 0; j < 16; j++)
 			{
 				if (gProperties[i][Vehicle][Components][j])
-					AddVehicleComponent(vehicleId, gProperties[i][Vehicle][Components][j]);
+					AddVehicleComponent(gProperties[i][Vehicle][ID], gProperties[i][Vehicle][Components][j]);
 			}
 
 			SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Toto auto bylo prirazeno k tve nemovitosti.");

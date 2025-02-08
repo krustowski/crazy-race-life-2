@@ -996,7 +996,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy heroinu.", amount);
 		SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
 	}
-	else if (pickupid == gMethPackage[0] || pickupid == gMethPackage[1] || pickupid == gMethPackage[2] || pickupid == gMethPackage[3] || pickupid == gMethPackage[4])
+	else if (pickupid == gMethPackage[0] || pickupid == gMethPackage[1] || pickupid == gMethPackage[2] || pickupid == gMethPackage[3] || pickupid == gMethPackage[4] || pickupid == gMethPackage[5])
 	{
 		new amount = random(10);
 
@@ -1023,6 +1023,16 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy PCP.", amount);
 		SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
 	}
+	else if (pickupid == gTHCPackage[0] || pickupid == gTHCPackage[1] || pickupid == gTHCPackage[2] || pickupid == gTHCPackage[3] || pickupid == gTHCPackage[4] || pickupid == gTHCPackage[5] || pickupid == gTHCPackage[6] || pickupid == gTHCPackage[7] || pickupid == gTHCPackage[8] || pickupid == gTHCPackage[9])
+	{
+		new amount = random(10);
+
+		gPlayers[playerid][Drugs][ZAZA] += amount;
+
+		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy THC.", amount);
+		SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
+	}
+
 
 	//
 	//  Death pickups.

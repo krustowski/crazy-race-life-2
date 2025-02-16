@@ -413,5 +413,5 @@ new gVehicleName[][] = {
 	"Utility Trailer"
 };
 
-new gVehStats[200];
+//new gVehStats[200];
 

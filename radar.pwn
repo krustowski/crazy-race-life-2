@@ -12,8 +12,8 @@ new gPlayerPosition[MAX_PLAYERS][E_POSITION];
 new gRadarCaught[MAX_PLAYERS];
 
 // Text variables to show on player's screen.
-new Text:KPH[MAX_PLAYERS];
-new Text:KPHR[MAX_PLAYERS];
+//new Text:KPH[MAX_PLAYERS];
+//new Text:KPHR[MAX_PLAYERS];
 
 new Text:gVehicleStatesText[MAX_PLAYERS];
 

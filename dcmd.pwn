@@ -52,7 +52,7 @@ dcmd_afk(playerid, params[])
 		// Lock the player's animations.
 		TogglePlayerControllable(playerid, false);
 
-		gPlayers[playerid][AFK] = 1;
+		gPlayers[playerid][AFK] = true;
 	}
 	else
 	{
@@ -62,7 +62,7 @@ dcmd_afk(playerid, params[])
 		// Re-enable player's animations.
 		TogglePlayerControllable(playerid, true);
 
-		gPlayers[playerid][AFK] = 0;
+		gPlayers[playerid][AFK] = false;
 	}
 
 	return 1;
@@ -71,7 +71,7 @@ dcmd_afk(playerid, params[])
 dcmd_bank(playerid, params[])
 {
 	new token1[32], token2[32];
-	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
+	SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || (strcmp(token1, "vlozit") && strcmp(token1, "vybrat") && strcmp(token1, "stav")) || (!strcmp(token1, "vlozit") && !IsNumeric(token2)) || (!strcmp(token1, "vybrat") && !IsNumeric(token2)))
 	{
@@ -140,7 +140,7 @@ dcmd_cmd(playerid, params[])
 	return 1;
 }
 
-dcmd_dance(playerid, params[])
+dcmd_dance(playerid, const params[])
 {
 	if (IsPlayerInAnyVehicle(playerid))
 	{
@@ -178,7 +178,7 @@ dcmd_dance(playerid, params[])
 dcmd_deal(playerid, params[])
 {
 	new token1[32], token2[32];
-	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
+	SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (gPlayers[playerid][TeamID] != TEAM_DEALERS)
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Tento prikaz je urcen pouze pro tym Dealeru!");
@@ -192,7 +192,7 @@ dcmd_deal(playerid, params[])
 
 	if (IsNumeric(token1) && IsNumeric(token2))
 	{
-		new targetId = strval(token1), targetAmount = strval(token2);
+		new targetId = strval(token1);// targetAmount = strval(token2);
 
 		if (targetId == playerid)
 			return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Nelze dealovat sobe samemu!");
@@ -221,14 +221,14 @@ dcmd_deal(playerid, params[])
 	return 1;
 }
 
-dcmd_deathmatch(playerid, params[])
+dcmd_deathmatch(playerid, const params[])
 {
 	if (!strcmp(params, "join"))
 	{
 		SendClientMessageToAll(COLOR_ZLUTA, "[ ! ] Deathmatch zacne za 45 sekund! Pripojte se pomoci /deathmatch join");
 		SetPlayerPos(playerid, -1365.1, -2307.0, 39.1);
 
-		SetTimer("StartPaintball", 45000, 0);
+		SetTimer("StartPaintball", 45000, false);
 
 		gPaintball[playerid][E_PAINTBALL_INGAME] = 1;
 	}
@@ -277,7 +277,7 @@ dcmd_dwarp(playerid, params[])
 	if (gPlayers[playerid][InsideProperty])
 		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Nelze pouzit warp, pokud jsi uvnitr nemovitosti!");
 
-	new playerState = GetPlayerState(playerid), senderName[MAX_PLAYER_NAME], stringToPrint[256], vehicleId = GetPlayerVehicleID(playerid);
+	new t_PLAYER_STATE: playerState = GetPlayerState(playerid), senderName[MAX_PLAYER_NAME], stringToPrint[256], vehicleId = GetPlayerVehicleID(playerid);
 
 	SetPlayerInterior(playerid, 0);
 	GetPlayerName(playerid, senderName, sizeof(senderName));
@@ -411,7 +411,7 @@ dcmd_lay(playerid, params[])
 		return 1;
 	}
 
-	ApplyAnimation(playerid, "BEACH", "Lay_Bac_Loop", 4.1, 0, 1, 1, 1, 1);
+	ApplyAnimation(playerid, "BEACH", "Lay_Bac_Loop", 4.1, false, true, true, true, true);
 
 	return 1;
 }
@@ -457,7 +457,7 @@ dcmd_lock(playerid, params[])
 	return 1;
 }
 
-dcmd_login(playerid, params[])
+/*dcmd_login(playerid, params[])
 {
 	new playerName[MAX_PLAYER_NAME];
 	GetPlayerName(playerid, playerName, sizeof(playerName));
@@ -473,7 +473,7 @@ dcmd_login(playerid, params[])
 
 	if (SetPlayerAccountLogin(playerid, params))
 		return SystemMsg(playerid, "[ AUTH ] Prihlaseni uspesne.");
-}
+}*/
 
 dcmd_pm(playerid, params[])
 {
@@ -524,7 +524,7 @@ dcmd_port(playerid, params[])
 dcmd_property(playerid, params[])
 {
 	new token1[32], token2[32];
-	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
+	SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || (strcmp(token1, "buy") && strcmp(token1, "sell") && strcmp(token1, "list") && strcmp(token1, "spawn") && strcmp(token1, "vehicle")) || (strcmp(token1, "list") && !IsNumeric(token2)))
 	{
@@ -604,14 +604,14 @@ dcmd_property(playerid, params[])
 
 			new colour1, colour2;
 
-			GetVehicleColor(vehicleId, colour1, colour2);
+			GetVehicleColours(vehicleId, colour1, colour2);
 
 			gProperties[i][Vehicle][Colours][0] = colour1;
 			gProperties[i][Vehicle][Colours][1] = colour2;
 
 			for (new j = 0; j < 16; j++)
 			{
-				gProperties[i][Vehicle][Components][j] = GetVehicleComponentInSlot(vehicleId, j);
+				gProperties[i][Vehicle][Components][j] = GetVehicleComponentInSlot(vehicleId, t_CARMODTYPE: j);
 			}
 
 			if (gProperties[i][Vehicle][ID])
@@ -637,7 +637,7 @@ dcmd_property(playerid, params[])
 dcmd_race(playerid, params[])
 {
 	new token1[32], token2[32];
-	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
+	SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || (strcmp(token1, "join") && strcmp(token1, "exit") && strcmp(token1, "list") && strcmp(token1, "warp")) || (!strcmp(token1, "join") && !IsNumeric(token2)))
 	{
@@ -667,7 +667,7 @@ dcmd_race(playerid, params[])
 		{
 			new stringToPrint[256];
 
-			format(stringToPrint, sizeof(stringToPrint), "ID: %2d: %s ($%d / $%d)", i, gRaceNames[i], gRaceFeePrize[i][E_RACE_FEE_FEE], gRaceFeePrize[i][E_RACE_FEE_PRIZE]);
+			format(stringToPrint, sizeof(stringToPrint), "ID: %2d: %s ($%d / $%d)", i, gRaceNames[E_RACE_ID: i], gRaceFeePrize[E_RACE_ID: i][E_RACE_FEE_FEE], gRaceFeePrize[E_RACE_ID: i][E_RACE_FEE_PRIZE]);
 			SendClientMessage(playerid, COLOR_SEDA, stringToPrint);
 		}
 	}
@@ -683,7 +683,7 @@ dcmd_race(playerid, params[])
 	return 1;
 }
 
-dcmd_register(playerid, params[])
+/*dcmd_register(playerid, params[])
 {
 	new playerName[MAX_PLAYER_NAME];
 	GetPlayerName(playerid, playerName, sizeof(playerName));
@@ -701,7 +701,7 @@ dcmd_register(playerid, params[])
 		return SystemMsg(playerid, "[ AUTH ] Herni ucet uspesne vytvoren. Automaticky prihlasen.");
 
 	return SystemMsg(playerid, "[ AUTH ] REgistrace se nezdarila, zkuste prosim znovu.");
-}
+}*/
 
 dcmd_rules(playerid, params[])
 {
@@ -718,7 +718,7 @@ dcmd_skydive(playerid, params[])
 {
 #pragma unused params
 	// Give such user a parachute.
-	GivePlayerWeapon(playerid, 46, 1);
+	GivePlayerWeapon(playerid, t_WEAPON: 46, 1);
 
 	// Set their position high above the LV pyramide.
 	SetPlayerPos(playerid, 2247.61, 1260.14, 1313.40);
@@ -914,7 +914,7 @@ dcmd_ban(playerid, params[])
 	return 1;
 }
 
-dcmd_cam(playerid, params[])
+dcmd_cam(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 2) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
@@ -964,7 +964,7 @@ dcmd_ccmd(playerid, params[])
 	return 1;
 }
 
-dcmd_elevator(playerid, params[])
+dcmd_elevator(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
@@ -1231,7 +1231,7 @@ dcmd_nitro(playerid, params[])
 	if (!IsPlayerInAnyVehicle(targetId))
 		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Hrac se nenachazi ve vozidle!");
 
-	new targetPlayerState = GetPlayerState(targetId), targetVehicleId = GetPlayerVehicleID(targetId);
+	new t_PLAYER_STATE: targetPlayerState = GetPlayerState(targetId), targetVehicleId = GetPlayerVehicleID(targetId);
 
 	if (targetPlayerState != PLAYER_STATE_DRIVER)
 		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Hrac je sice v aute, ale neni ridicem!");
@@ -1343,7 +1343,7 @@ dcmd_spectate(playerid, params[])
 	{
 		TogglePlayerSpectating(playerid, false);
 
-		gPlayers[playerid][Spectating] = 0;
+		gPlayers[playerid][Spectating] = false;
 		SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Sledovani hrace vypnuto!");
 	}
 
@@ -1358,7 +1358,7 @@ dcmd_spectate(playerid, params[])
 	TogglePlayerSpectating(playerid, true);
 	PlayerSpectatePlayer(playerid, targetId);
 
-	gPlayers[playerid][Spectating] = 1;
+	gPlayers[playerid][Spectating] = true;
 	SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Sledovani daneho hrace zapnuto! Pouzij /spectate znovu pro vypnuti sledovani.");
 
 	return 1;
@@ -1424,11 +1424,11 @@ dcmd_zbrane(playerid, params[])
 		//return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
 		targetId = playerid;
 
-	GivePlayerWeapon(targetId, 26, 400);
-	GivePlayerWeapon(targetId, 28, 400);
-	GivePlayerWeapon(targetId, 31, 400);
-	GivePlayerWeapon(targetId, 43, 1);
-	GivePlayerWeapon(targetId, 46, 1);
+	GivePlayerWeapon(targetId, t_WEAPON: 26, 400);
+	GivePlayerWeapon(targetId, t_WEAPON: 28, 400);
+	GivePlayerWeapon(targetId, t_WEAPON: 31, 400);
+	GivePlayerWeapon(targetId, t_WEAPON: 43, 1);
+	GivePlayerWeapon(targetId, t_WEAPON: 46, 1);
 
 	return 1;
 }

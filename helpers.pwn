@@ -39,7 +39,7 @@ stock KickAll()
 	}
 }
 
-stock SystemMsg(playerid, msg[])
+stock SystemMsg(playerid, const msg[])
 {
 	if (IsPlayerConnected(playerid) && strlen(msg) > 0)
 	{
@@ -49,7 +49,7 @@ stock SystemMsg(playerid, msg[])
 	return 1;
 }
 
-stock IsNumeric(input[])
+stock IsNumeric(const input[])
 {
 	for (new i = 0, j = strlen(input); i < j; i++) 
 	{
@@ -150,7 +150,7 @@ stock GetVehicleWithinDistance(playerid, Float:x1, Float:y1, Float:z1, Float:dis
 	}
 }
 
-stock EnsurePickupCreated(model, type, Float:X, Float:Y, FLoat:Z)
+stock EnsurePickupCreated(model, type, Float:X, Float:Y, Float:Z)
 {
 	new i = 0, MAX_ITERATIONS = 50, pId;
 
@@ -216,7 +216,7 @@ public StartServerReset()
 	return 1;
 }
 
-public PrintAsciiLogoToLogs()
+stock PrintAsciiLogoToLogs()
 {
 	printf(" *************************************************************************************   ");
 	printf(" *");

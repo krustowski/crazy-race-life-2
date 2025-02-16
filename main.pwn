@@ -221,11 +221,11 @@ public OnGameModeInit()
 
 	SetGameModeText(GAMEMODE_NAME);
 
-	ShowNameTags(1);
-	ShowPlayerMarkers(1); 
-	UsePlayerPedAnims(1);
-	AllowInteriorWeapons(0);
-	EnableStuntBonusForAll(1);  
+	ShowNameTags(true);
+	ShowPlayerMarkers(t_PLAYER_MARKERS_MODE: true); 
+	UsePlayerPedAnims();
+	AllowInteriorWeapons(false);
+	EnableStuntBonusForAll(true);  
 	DisableInteriorEnterExits();
 
 	InitDrugValues();
@@ -235,18 +235,18 @@ public OnGameModeInit()
 	// Start various timers.
 	//
 
-	SetTimer("AntiCheatWeapon", 30 * SECOND_MS, 1);
-	SetTimer("AntiFlood", 1 * SECOND_MS, 1);
+	SetTimer("AntiCheatWeapon", 30 * SECOND_MS, true);
+	SetTimer("AntiFlood", 1 * SECOND_MS, true);
 
-	SetTimer("OnRadarCheckpoint", 300, 1);
+	SetTimer("OnRadarCheckpoint", 300, true);
 
-	SetTimer("AutosaveData", 200 * SECOND_MS, 1);
-	SetTimer("UpdatePlayerScore", 1 * SECOND_MS, 1);
-	SetTimer("SendPlayerSalary", 300 * SECOND_MS, 1);
+	SetTimer("AutosaveData", 200 * SECOND_MS, true);
+	SetTimer("UpdatePlayerScore", 1 * SECOND_MS, true);
+	SetTimer("SendPlayerSalary", 300 * SECOND_MS, true);
 
-	SetTimer("DrawClockText", 30 * SECOND_MS, 1);
+	SetTimer("DrawClockText", 30 * SECOND_MS, true);
 
-	SetTimer("ShowAdvert", 120 * SECOND_MS, 1);
+	SetTimer("ShowAdvert", 120 * SECOND_MS, true);
 
 	//
 	// Create pickups, static objects and static vehicles + DrawTexts.
@@ -398,14 +398,14 @@ public OnPlayerSpawn(playerid)
 	if (gPlayers[playerid][InsideProperty])
 	{
 		DestroyPropertyInterior(playerid);
-		gPlayers[playerid][InsideProperty] = 0;
+		gPlayers[playerid][InsideProperty] = false;
 	}
 
 	// Set the player back to the paintball area if is set in game.
 	if (gPaintball[playerid][E_PAINTBALL_INGAME])
 	{
-		SetPlayerPos(playerid, -1365.1, -2307.0, 39.1);
-		GivePlayerWeapon(playerid, 29, 999);
+		SetPlayerPos(playerid, Float: -1365.1, Float: -2307.0, Float: 39.1);
+		GivePlayerWeapon(playerid, t_WEAPON: 29, 999);
 
 		return 1;
 	}
@@ -429,7 +429,7 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 
 	SendDeathMessage(killerid, playerid, reason);
 
-	new X, Y, Z;
+	new Float: X, Float: Y, Float: Z;
 
 	GetPlayerPos(playerid, X, Y, Z);
 	AddPlayerDeathPickups(playerid, Float:X, Float:Y, Float:Z);
@@ -464,11 +464,11 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 		return 1;
 	}
 
-	new killerState = GetPlayerState(killerid);
+	new t_PLAYER_STATE:killerState = GetPlayerState(killerid);
 
 	if (IsPlayerInAnyVehicle(killerid) && !IsPlayerInAnyVehicle(playerid) && killerState == PLAYER_STATE_DRIVER && reason != WEAPON_VEHICLE)
 	{
-		new killerName[MAX_PLAYER_NAME], stringToPrint[256]; 
+		new killerName[MAX_PLAYER_NAME]; 
 
 		GetPlayerName(killerid, killerName, MAX_PLAYER_NAME);
 
@@ -489,7 +489,7 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 
 public OnVehicleSpawn(vehicleid)
 {
-	for (new i = 0; sizeof(gProperties); i++)
+	for (new i = 0; i < sizeof(gProperties); i++)
 	{
 		if (gProperties[i][Vehicle][ID] != vehicleid)
 			continue;
@@ -511,12 +511,12 @@ public OnVehicleDeath(vehicleid, killerid)
 
 public OnVehicleMod(playerid, vehicleid, componentid)
 {
-	for (new i = 0; sizeof(gProperties); i++)
+	for (new i = 0; i < sizeof(gProperties); i++)
 	{
 		if (gProperties[i][Vehicle][ID] != vehicleid)
 			continue;
 		
-		new CARMODETYPE:componentType = GetVehicleComponentType(componentid);
+		new componentType = GetVehicleComponentType(componentid);
 
 		if (componentType == CARMODTYPE_NONE)
 			break;
@@ -534,7 +534,7 @@ public OnPlayerText(playerid, text[])
 	{
 		new stringToPrint[256];
 
-		text[0] == '\0';
+		text[0] = '\0';
 		format(stringToPrint, sizeof(stringToPrint), "%s [Team Chat]: %s", gPlayers[playerid][Name], text);
 
 		for (new i = 0; i < MAX_PLAYERS; i++)
@@ -641,7 +641,7 @@ public OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstat
 		gVehicleStatesText[playerid] = TextDrawCreate(256, 410, "~w~Stav:______%3d_%%~n~~w~Rychlost:_%3d");
 
 		TextDrawLetterSize(gVehicleStatesText[playerid], 0.5, 1.5);
-		TextDrawFont(gVehicleStatesText[playerid], 3);
+		TextDrawFont(Text: gVehicleStatesText[playerid], t_TEXT_DRAW_FONT: 3);
 		TextDrawSetOutline(gVehicleStatesText[playerid], 1);
 
 		/*KPH[playerid] = TextDrawCreate(256, 425, "Rychlost:");
@@ -764,7 +764,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if (!response)
 					return 1;
 
-				new amount, drugID = gPlayers[playerid][Temp], propertyID = gPlayerInteriors[playerid][PropertyArrayID];
+				new drugID = gPlayers[playerid][Temp], propertyID = gPlayerInteriors[playerid][PropertyArrayID];
 
 				switch (listitem)
 				{
@@ -849,7 +849,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 	for (new i = 0; i < sizeof(gTeams); i++)
 	{
-		if (pickupid == gTeams[i][Pickups][0])
+		if (pickupid == _: gTeams[i][Pickups][0])
 		{
 			ShowMenuForPlayer(Menu:gTeams[i][Menus][0], playerid);
 		}
@@ -891,7 +891,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 			// Spawn the room.
 			SpawnPropertyInterior(playerid, i);
-			gPlayers[playerid][InsideProperty] = 1;
+			gPlayers[playerid][InsideProperty] = true;
 
 			return 1;
 		}
@@ -910,9 +910,9 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 					arrayID = gPlayerInteriors[playerid][PropertyArrayID];
 
 					// Make the player exit the property interior, which is then destroyed.
-					SetPlayerPos(playerid, Float:gProperties[arrayID][LocationOffer][0], Float:gProperties[arrayID][LocationOffer][1], Float:gProperties[arrayID][LocationOffer][2]);
+					SetPlayerPos(playerid, Float:gProperties[arrayID][LocationOffer][Coords: 0], Float:gProperties[arrayID][LocationOffer][Coords: 1], Float:gProperties[arrayID][LocationOffer][Coords: 2]);
 					DestroyPropertyInterior(playerid);
-					gPlayers[playerid][InsideProperty] = 0;
+					gPlayers[playerid][InsideProperty] = false;
 
 					break;
 				}
@@ -1071,7 +1071,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 	{
 		if (currentMenu == gTeams[i][Menus][0])
 		{
-			GivePlayerWeapon(playerid, gTeams[i][Weapons][0], gTeams[i][Ammu][0]);
+			GivePlayerWeapon(playerid, t_WEAPON: gTeams[i][Weapons][0], gTeams[i][Ammu][0]);
 			SetPlayerColor(playerid, gTeams[i][Color]);
 			SetPlayerSkin(playerid, gTeams[i][Skins][0]);
 

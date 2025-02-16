@@ -19,7 +19,7 @@ new gAdminDoorDown;
 new gAdminDoorUp;
 
 // ????
-new picktunel;
+//new picktunel;
 
 // Drugz
 new gHeroinPackage[5];
@@ -34,13 +34,13 @@ new gDruggeryEntrance;
 new gPlayerMoneyPickup[MAX_PLAYERS];
 new gPlayerMoneyPickupAmount[MAX_PLAYERS];
 
-new gPlayerWeaponPickup[MAX_PLAYERS];
+//new gPlayerWeaponPickup[MAX_PLAYERS];
 
 //
 //
 //
 
-public AddPlayerDeathPickups(playerid, Float:X, Float:Y, Float:Z)
+stock AddPlayerDeathPickups(playerid, Float:X, Float:Y, Float:Z)
 {
 	if (GetPlayerMoney(playerid) > 0)
 	{
@@ -62,7 +62,7 @@ public InitPickups()
 	gHackerzMoneyBag = EnsurePickupCreated(1550, 1, 2838.59, -2141.25, 0.19);
 
 	// ???
-	picktunel = EnsurePickupCreated(1318, 1, 2263.41, -755.52, 38.04);
+	//picktunel = EnsurePickupCreated(1318, 1, 2263.41, -755.52, 38.04);
 
 	//------------------------
 	//CreatePickup(1274, 1,2029.54, 1320.78, 10.82);
@@ -132,7 +132,7 @@ public InitPickups()
 	//  Jobs/Teams.
 	//
 
-	new teamPickups[][3] = 
+	new Float: teamPickups[][3] = 
 	{
 		{0.0, 0.0, 0.0},
 		{2252.11, 1285.30, 19.17},
@@ -148,7 +148,7 @@ public InitPickups()
  
 	for (new i = 0; i < MAX_TEAMS; i++)
 	{
-		gTeams[i][Pickups][0] = EnsurePickupCreated(1581, 1, Float:teamPickups[i][0], Float:teamPickups[i][1], Float:teamPickups[i][2]);
+		gTeams[i][Pickups][0] = PICKUP: EnsurePickupCreated(1581, 1, Float:teamPickups[i][0], Float:teamPickups[i][1], Float:teamPickups[i][2]);
 		gTeams[i][Menus][0] = CreateMenu(gTeams[i][TeamName], 1, 150.0, 100.0, 250.0, 150.0);
 
 		new menuItem[64];

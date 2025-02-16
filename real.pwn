@@ -6,7 +6,6 @@
 #define MAX_PLAYER_PROPERTIES	5
 #define SPAWN_PICKUP_COUNT	4
 #define INVALID_PROPERTY_ID	-1
-#define CARMODTYPE_NONE		-1
 
 enum 
 {
@@ -44,13 +43,13 @@ enum Property
 	Label[64],
 	Cost,
 
-	LocationOffer[Coords],
-	LocationEntrance[Coords],
-	LocationVehicle[Coords],
+	Float: LocationOffer[Coords],
+	Float: LocationEntrance[Coords],
+	Float: LocationVehicle[Coords],
 
 	Vehicle[VehicleProps],
 
-	bool:Occupied,
+	bool: Occupied,
 
 	Objects[5],
 	Menu[5],
@@ -108,7 +107,7 @@ public InitRealEstateProperties()
 	return 1;
 }
 
-public IsPlayerOwner(playerid, propertyId)
+stock IsPlayerOwner(playerid, propertyId)
 {
 	for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
 	{
@@ -119,7 +118,7 @@ public IsPlayerOwner(playerid, propertyId)
 	return false;
 }
 
-public SaveRealEstateData()
+stock SaveRealEstateData()
 {
 	new fileName[64] = "_data_RealEstateProperties", stringName[20], stringNames[256] = "0";
 
@@ -138,21 +137,21 @@ public SaveRealEstateData()
 		writecfgvalue(fileName, stringName, "cost", gProperties[i][Cost]);
 
 		new coordStringOffer[256], coordStringEntrance[256], coordStringVehicle[256];
-		new locationOffer = gProperties[i][LocationOffer];
+		//new Float: locationOffer = gProperties[i][LocationOffer];
 
 		for (new j = 0; j < 4; j++)
 		{
 			if (!strcmp(coordStringOffer, ""))
 			{
-				format(coordStringOffer, sizeof(coordStringOffer), "%.2f", gProperties[i][LocationOffer][j]);
-				format(coordStringEntrance, sizeof(coordStringEntrance), "%.2f", gProperties[i][LocationEntrance][j]);
-				format(coordStringVehicle, sizeof(coordStringVehicle), "%.2f", gProperties[i][LocationVehicle][j]);
+				format(coordStringOffer, sizeof(coordStringOffer), "%.2f", gProperties[i][LocationOffer][Coords: j]);
+				format(coordStringEntrance, sizeof(coordStringEntrance), "%.2f", gProperties[i][LocationEntrance][Coords: j]);
+				format(coordStringVehicle, sizeof(coordStringVehicle), "%.2f", gProperties[i][LocationVehicle][Coords: j]);
 				continue;
 			}
 
-			format(coordStringOffer, sizeof(coordStringOffer), "%s,%.2f", coordStringOffer, gProperties[i][LocationOffer][j]);
-			format(coordStringEntrance, sizeof(coordStringEntrance), "%s,%.2f", coordStringEntrance, gProperties[i][LocationEntrance][j]);
-			format(coordStringVehicle, sizeof(coordStringVehicle), "%s,%.2f", coordStringVehicle, gProperties[i][LocationVehicle][j]);
+			format(coordStringOffer, sizeof(coordStringOffer), "%s,%.2f", coordStringOffer, gProperties[i][LocationOffer][Coords: j]);
+			format(coordStringEntrance, sizeof(coordStringEntrance), "%s,%.2f", coordStringEntrance, gProperties[i][LocationEntrance][Coords: j]);
+			format(coordStringVehicle, sizeof(coordStringVehicle), "%s,%.2f", coordStringVehicle, gProperties[i][LocationVehicle][Coords: j]);
 		}
 
 		writecfg(fileName, stringName, "locationOffer", coordStringOffer);
@@ -205,7 +204,7 @@ public SaveRealEstateData()
 	return 1;
 }
 
-stock ExtractIntsFromString(input[], ints[16])
+stock ExtractIntsFromString(const input[], ints[16])
 {
 	new i = 0, token1[128], token2[128], toSplit[128];
 
@@ -222,7 +221,7 @@ stock ExtractIntsFromString(input[], ints[16])
 	return ints;
 }
 
-public LoadRealEstateData()
+stock LoadRealEstateData()
 {
 	new fileName[64] = "_data_RealEstateProperties", i = 0, properties[256], token1[256], token2[256];
 
@@ -245,7 +244,7 @@ public LoadRealEstateData()
 
 		gProperties[i][ID] = readcfgvalue(fileName, token1, "id");
 		gProperties[i][Cost] = readcfgvalue(fileName, token1, "cost");
-		gProperties[i][Occupied] = readcfgvalue(fileName, token1, "occupied");
+		gProperties[i][Occupied] = bool: readcfgvalue(fileName, token1, "occupied");
 
 		readcfg(fileName, token1, "label", gProperties[i][Label]); 
 
@@ -254,9 +253,9 @@ public LoadRealEstateData()
 		//
 
 		new 
-			locationOffer[Coords], locationOfferString[64], 
-			locationEntrance[Coords], locationEntranceString[64], 
-			locationVehicle[Coords], locationVehicleString[64];
+			Float: locationOffer[Coords], locationOfferString[64], 
+			Float: locationEntrance[Coords], locationEntranceString[64], 
+			Float: locationVehicle[Coords], locationVehicleString[64];
 
 		readcfg(fileName, token1, "locationOffer", locationOfferString); 
 		readcfg(fileName, token1, "locationEntrance", locationEntranceString); 
@@ -304,7 +303,7 @@ public LoadRealEstateData()
 	return 1;
 }
 
-stock ExtractCoordsFromString(input[], coords[Coords])
+stock ExtractCoordsFromString(const input[], Float: coords[Coords])
 {
 	new i = 0, token1[128], token2[128], toSplit[128];
 
@@ -312,31 +311,31 @@ stock ExtractCoordsFromString(input[], coords[Coords])
 
 	do {
 		SplitIntoTwo(toSplit, token1, token2, sizeof(token1), ",");
-		coords[i] = floatstr(token1);
+		coords[Coords: i] = floatstr(token1);
 
 		strcopy(toSplit, token2);
 		i++;
 	} while (strcmp(token2, ""));
 
-	return coords;
+	return 1;
 }
 
 stock SpawnPropertyInterior(playerid, arrayID)
 {
 	gPlayerInteriors[playerid][PropertyArrayID] = arrayID;
 
-	new i = 0, Float:X, Float:Y, Float:Z;
+	new Float:X, Float:Y, Float:Z;
 
 	GetPlayerPos(playerid, X, Y, Z);
 
 	Z += 1500;
 
 	// The very room object.
-	gPlayerInteriors[playerid][Objects][0] = CreatePlayerObject(playerid, 14859, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0,0);
+	gPlayerInteriors[playerid][Objects][0] = CreatePlayerObject(playerid, 14859, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0.0);
 
 	// Exit, Health, Pills, Info pickups.
 	new pickupIds[4] = {1239, 1240, 1241, 1318};
-	new pickupCoords[4][3];
+	new Float: pickupCoords[4][3];
 
 	// Info pickup.
 	pickupCoords[0][0] = X+2.50; pickupCoords[0][1] = Y+2.20; pickupCoords[0][2] = Z-1.0;
@@ -349,7 +348,7 @@ stock SpawnPropertyInterior(playerid, arrayID)
 
 	for (new i = 0; i < SPAWN_PICKUP_COUNT; i++)
 	{
-		gPlayerInteriors[playerid][Pickups][i] = EnsurePickupCreated(pickupIds[i], 1, Float:pickupCoords[i][0], Float:pickupCoords[i][1], Float:pickupCoords[i][2], -1);
+		gPlayerInteriors[playerid][Pickups][i] = EnsurePickupCreated(pickupIds[i], 1, Float:pickupCoords[i][0], Float:pickupCoords[i][1], Float:pickupCoords[i][2]);
 
 		if (!gPlayerInteriors[playerid][Pickups][i] || gPlayerInteriors[playerid][Pickups][i] == -1)
 		{
@@ -400,7 +399,7 @@ stock SpawnPlayerAtProperty(playerid)
 		if (gProperties[i][ID] != gPlayers[playerid][SpawnPoint])
 			continue;
 
-		SetPlayerPos(playerid, Float:gProperties[i][LocationOffer][0], FLoat:gProperties[i][LocationOffer][1], Float:gProperties[i][LocationOffer][2]);
+		SetPlayerPos(playerid, Float:gProperties[i][LocationOffer][Coords: 0], Float:gProperties[i][LocationOffer][Coords: 1], Float:gProperties[i][LocationOffer][Coords: 2]);
 
 		return 1;
 	}
@@ -462,7 +461,7 @@ stock BuyPlayerProperty(playerid, propertyID)
 	gPlayers[playerid][Properties][freeSlot] = propertyID;
 
 	DestroyPickup(gProperties[arrayID][Pickups][PICKUP_OFFER]);
-	gProperties[arrayID][Pickups][PICKUP_OFFER];
+	//gProperties[arrayID][Pickups][PICKUP_OFFER];
 
 	gProperties[arrayID][Pickups][PICKUP_OFFER] = EnsurePickupCreated(19522, 1, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ]);
 	gProperties[arrayID][Pickups][PICKUP_ENTRANCE] = EnsurePickupCreated(1318, 1, Float:gProperties[arrayID][LocationEntrance][CoordX], Float:gProperties[arrayID][LocationEntrance][CoordY], Float:gProperties[arrayID][LocationEntrance][CoordZ]);
@@ -538,7 +537,7 @@ stock UpdatePropertyVehicle(playerid)
 		if (!propertyID)
 			continue;
 
-		arrayID = GetPropertyArrayIDfromID(playerid, propertyID);
+		arrayID = GetPropertyArrayIDfromID(propertyID);
 
 		if (arrayID == -1)
 			continue;
@@ -553,14 +552,14 @@ stock UpdatePropertyVehicle(playerid)
 	if (!modelMatch)
 		return 0;
 
-	GetVehicleColor(GetPlayerVehicleID(playerid), colour1, colour2);
+	GetVehicleColours(GetPlayerVehicleID(playerid), colour1, colour2);
 
 	gProperties[arrayID][Vehicle][Colours][0] = colour1;
 	gProperties[arrayID][Vehicle][Colours][1] = colour2;
 
 	for (new i = 0; i < 16; i++)
 	{
-		gProperties[arrayID][Vehicle][Components][i] = GetVehicleComponentInSlot(vehicleID, i);
+		gProperties[arrayID][Vehicle][Components][i] = GetVehicleComponentInSlot(vehicleID, t_CARMODTYPE: i);
 	}
 
 	SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Modifikace auta ulozeny k zaparkovanemu autu.");

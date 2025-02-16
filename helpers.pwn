@@ -183,7 +183,7 @@ stock IsVehicleRcTram(vehicleid)
 	return 0;
 }
 
-stock SplitIntoTwo(input[], token1[], token2[], tokenSize, delimiter[2] = " ")
+stock SplitIntoTwo(const input[], token1[], token2[], tokenSize, const delimiter[2] = " ")
 {
 	new spacePos = strfind(input, delimiter);
 	if (spacePos == -1)

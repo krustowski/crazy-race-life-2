@@ -4,14 +4,14 @@
 
 #include "dialogs.pwn"
 
-public SetPlayerAccountLogin(playerid, text[])
+stock SetPlayerAccountLogin(playerid, const text[])
 {
 	new hashedPwd[65], hashedPwdDb[65], saltDb[17];
 
 	readcfg(gPlayers[playerid][Name], "", "pwdhash", hashedPwdDb);
 	readcfg(gPlayers[playerid][Name], "", "salt", saltDb);
 
-	SHA256_PassHash(text, saltDb, hashedPwd, sizeof(hashedPwd));
+	SHA256_Hash(text, saltDb, hashedPwd, sizeof(hashedPwd));
 
 	if (strcmp(hashedPwd, hashedPwdDb))
 	{
@@ -27,7 +27,7 @@ public SetPlayerAccountLogin(playerid, text[])
 	return 1;
 }
 
-public SetPlayerAccountRegistration(playerid, text[])
+stock SetPlayerAccountRegistration(playerid, const text[])
 {
 	new hashedPwd[65], salt[17];
 
@@ -38,7 +38,7 @@ public SetPlayerAccountRegistration(playerid, text[])
 	for (new i = 0; i < 16; i++) 
 		salt[i] = random(94) + 33;
 
-	SHA256_PassHash(text, salt, hashedPwd, sizeof(hashedPwd));
+	SHA256_Hash(text, salt, hashedPwd, sizeof(hashedPwd));
 
 	writecfg(gPlayers[playerid][Name], "", "pwdhash", hashedPwd);
 	writecfg(gPlayers[playerid][Name], "", "salt", salt);
@@ -53,7 +53,7 @@ public SetPlayerAccountRegistration(playerid, text[])
 	return 1; 
 }
 
-public ShowAuthDialog(playerid)
+stock ShowAuthDialog(playerid)
 {
 	new stringToPrint[128];
 

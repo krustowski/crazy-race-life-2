@@ -13,11 +13,11 @@ public StartPaintball()
 		if (IsPlayerConnected(i))
 		{
 			ResetPlayerWeapons(i);
-			GivePlayerWeapon(i, 29, 999);
-			TogglePlayerControllable(i, 1);
+			GivePlayerWeapon(i, t_WEAPON: 29, 999);
+			TogglePlayerControllable(i, true);
 			SendClientMessage(i, COLOR_ZLUTA, "[ ! ] Paintball zaèal, 4 minuty do konce.");
 			PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);//xD
-			SetTimer("konecpaint", 240000, 0);
+			SetTimer("konecpaint", 240000, false);
 		}
 	}
 	return 1;

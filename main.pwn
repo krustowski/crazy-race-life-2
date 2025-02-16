@@ -516,7 +516,7 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 		if (gProperties[i][Vehicle][ID] != vehicleid)
 			continue;
 		
-		new componentType = GetVehicleComponentType(componentid);
+		new t_CARMODTYPE: componentType = GetVehicleComponentType(componentid);
 
 		if (componentType == CARMODTYPE_NONE)
 			break;

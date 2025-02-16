@@ -17,20 +17,20 @@ new gRadarCaught[MAX_PLAYERS];
 
 new Text:gVehicleStatesText[MAX_PLAYERS];
 
-new gRadarPositions[][4] =
+new Float: gRadarPositions[][4] =
 {
 	// LV
-	{2048.4158, 1173.2195, 10.6719, 15},
-	{2066.5464, 1623.2606, 10.6719, 15},
-	{2347.6807, 2413.1965, 10.6719, 15},
-	{2507.3359, 1880.9712, 10.6719, 15},
-	{2260.2791, 1373.3129, 10.6719, 15},
-	{2427.2900, 1257.8555, 10.7901, 15},
-	{2210.5552, 973.2725, 10.6719, 15},
-	{1536.0039, 1133.1715, 10.6719, 15},
-	{1007.3343, 1540.1764, 10.6719, 15},
-	{1448.2607, 2589.8904, 10.6719, 15},
-	{1691.7292, 2173.2539, 10.6719, 15}
+	{2048.4158, 1173.2195, 10.6719, 15.0},
+	{2066.5464, 1623.2606, 10.6719, 15.0},
+	{2347.6807, 2413.1965, 10.6719, 15.0},
+	{2507.3359, 1880.9712, 10.6719, 15.0},
+	{2260.2791, 1373.3129, 10.6719, 15.0},
+	{2427.2900, 1257.8555, 10.7901, 15.0},
+	{2210.5552, 973.2725, 10.6719, 15.0},
+	{1536.0039, 1133.1715, 10.6719, 15.0},
+	{1007.3343, 1540.1764, 10.6719, 15.0},
+	{1448.2607, 2589.8904, 10.6719, 15.0},
+	{1691.7292, 2173.2539, 10.6719, 15.0}
 };
 
 
@@ -69,7 +69,7 @@ public OnRadarCheckpoint()
 
 		for (new j = 0; j < sizeof(gRadarPositions); j++)
 		{
-			if (IsPlayerInSphere(i, Float:gRadarPositions[j][0], Float:gRadarPositions[j][1], Float:gRadarPositions[j][2], Float:gRadarPositions[j][3]))
+			if (IsPlayerInSphere(i, Float:gRadarPositions[j][0], Float:gRadarPositions[j][1], Float:gRadarPositions[j][2], _:gRadarPositions[j][3]))
 			{
 				// Compare the current position with the radar positions.
 				if (gRadarCaught[i] == 0 && floatround(radarValue / 1400) > 65 && GetPlayerState(i) == PLAYER_STATE_DRIVER)
@@ -82,7 +82,7 @@ public OnRadarCheckpoint()
 					format(stringToPrint, 128, "[ RADAR ] Jel jsi prilis vysokou rychlosti ( %3d km/h )! Pokuta: $%d", floatround(radarValue / 1400), RADAR_FEE);
 					SendClientMessage(i, COLOR_CERVENA, stringToPrint);
 
-					SetTimerEx("OffRadarCheckpoint", 5000, 0, "i", i);
+					SetTimerEx("OffRadarCheckpoint", 5000, false, "i", i);
 
 					return 1;
 				}

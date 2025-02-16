@@ -2,7 +2,7 @@
 //  DCMDs --- COMMON COMMANDS
 //
 
-dcmd_admins(playerid, params[])
+dcmd_admins(playerid, const params[])
 #pragma unused params
 {
 	SendClientMessage(playerid, COLOR_ZLUTA, "[ i ] Administratori online:");
@@ -37,7 +37,7 @@ dcmd_admins(playerid, params[])
 	return 1;
 }
 
-dcmd_afk(playerid, params[])
+dcmd_afk(playerid, const params[])
 {
 #pragma unused params
 	new playerName[MAX_PLAYER_NAME], stringToPrint[256];
@@ -68,7 +68,7 @@ dcmd_afk(playerid, params[])
 	return 1;
 }
 
-dcmd_bank(playerid, params[])
+dcmd_bank(playerid, const params[])
 {
 	new token1[32], token2[32];
 	SplitIntoTwo(params, token1, token2, sizeof(token1));
@@ -126,7 +126,7 @@ dcmd_bank(playerid, params[])
 	return 1;
 }
 
-dcmd_cmd(playerid, params[])
+dcmd_cmd(playerid, const params[])
 {
 #pragma unused params
 	SendClientMessage(playerid, COLOR_SVZEL, "[ CMD ] Zakladni CMD set");
@@ -175,7 +175,7 @@ dcmd_dance(playerid, const params[])
 	return 1;
 }
 
-dcmd_deal(playerid, params[])
+dcmd_deal(playerid, const params[])
 {
 	new token1[32], token2[32];
 	SplitIntoTwo(params, token1, token2, sizeof(token1));
@@ -255,7 +255,7 @@ dcmd_deathmatch(playerid, const params[])
 	return 1;
 }
 
-dcmd_drugz(playerid, params[])
+dcmd_drugz(playerid, const params[])
 {
 #pragma unused params
 	new stringToPrint[128];
@@ -271,7 +271,7 @@ dcmd_drugz(playerid, params[])
 	return 1;
 }
 
-dcmd_dwarp(playerid, params[])
+dcmd_dwarp(playerid, const params[])
 {
 #pragma unused params
 	if (gPlayers[playerid][InsideProperty])
@@ -297,7 +297,7 @@ dcmd_dwarp(playerid, params[])
 	return 1;
 }
 
-dcmd_fix(playerid, params[])
+dcmd_fix(playerid, const params[])
 {
 #pragma unused params
 	//if(GetPlayerVehicleID(playerid) == gAdminAuto && !IsPlayerAdmin(playerid)) return SendClientMessage(playerid, COLOR_CERVENA, "Nelze opravit");
@@ -316,7 +316,7 @@ dcmd_fix(playerid, params[])
 	return 1;
 }
 
-dcmd_givecash(playerid, params[])
+dcmd_givecash(playerid, const params[])
 {
 	new token1[32], token2[32];
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
@@ -356,7 +356,7 @@ dcmd_givecash(playerid, params[])
 	return 1;
 }
 
-dcmd_help(playerid, params[])
+dcmd_help(playerid, const params[])
 {
 #pragma unused params
 	SendClientMessage(playerid, COLOR_ZELZLUT, "[ i ] NAPOVEDA/POMOC");
@@ -367,7 +367,7 @@ dcmd_help(playerid, params[])
 	return 1;
 }
 
-dcmd_hide(playerid, params[]) 
+dcmd_hide(playerid, const params[]) 
 {
 #pragma unused params
 	if (gPlayers[playerid][TeamID] != TEAM_ADMINZ)
@@ -387,7 +387,7 @@ dcmd_hide(playerid, params[])
 	return 1;
 }
 
-dcmd_kill(playerid, params[])
+dcmd_kill(playerid, const params[])
 {
 #pragma unused params
 	new playerName[MAX_PLAYER_NAME], stringToPrint[256];
@@ -402,7 +402,7 @@ dcmd_kill(playerid, params[])
 	return 1;
 }
 
-dcmd_lay(playerid, params[])
+dcmd_lay(playerid, const params[])
 {
 #pragma unused params
 	if (IsPlayerInAnyVehicle(playerid))
@@ -416,7 +416,7 @@ dcmd_lay(playerid, params[])
 	return 1;
 }
 
-dcmd_locate(playerid, params[])
+dcmd_locate(playerid, const params[])
 {
 #pragma unused params
 	new stringToPrint[256], interiorNo = GetPlayerInterior(playerid), Float:X, Float:Y, Float:Z, Float:Angle;
@@ -430,7 +430,7 @@ dcmd_locate(playerid, params[])
 	return 1;
 }
 
-dcmd_lock(playerid, params[])
+dcmd_lock(playerid, const params[])
 {
 #pragma unused params
 	if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
@@ -475,7 +475,7 @@ dcmd_lock(playerid, params[])
 		return SystemMsg(playerid, "[ AUTH ] Prihlaseni uspesne.");
 }*/
 
-dcmd_pm(playerid, params[])
+dcmd_pm(playerid, const params[])
 {
 	new token1[32], token2[32];
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
@@ -493,7 +493,7 @@ dcmd_pm(playerid, params[])
 	return 1;
 }
 
-dcmd_port(playerid, params[])
+dcmd_port(playerid, const params[])
 {
 	if (gPlayers[playerid][InsideProperty])
 		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Nelze pouzit port, pokud jsi uvnitr nemovitosti!");
@@ -521,7 +521,7 @@ dcmd_port(playerid, params[])
 	return 1;
 }
 
-dcmd_property(playerid, params[])
+dcmd_property(playerid, const params[])
 {
 	new token1[32], token2[32];
 	SplitIntoTwo(params, token1, token2, sizeof(token1));
@@ -634,7 +634,7 @@ dcmd_property(playerid, params[])
 	return 1;
 }
 
-dcmd_race(playerid, params[])
+dcmd_race(playerid, const params[])
 {
 	new token1[32], token2[32];
 	SplitIntoTwo(params, token1, token2, sizeof(token1));
@@ -653,11 +653,11 @@ dcmd_race(playerid, params[])
 	{
 		new raceId = strval(token2);
 
-		SetPlayerRaceState(playerid, raceId);
+		SetPlayerRaceState(playerid, E_RACE_ID: raceId);
 	}
 	else if (!strcmp(token1, "exit"))
 	{
-		ResetPlayerRaceState(playerid, 0, false);
+		ResetPlayerRaceState(playerid, E_RACE_ID: 0, false);
 	}
 	else if (!strcmp(token1, "list"))
 	{
@@ -703,7 +703,7 @@ dcmd_race(playerid, params[])
 	return SystemMsg(playerid, "[ AUTH ] REgistrace se nezdarila, zkuste prosim znovu.");
 }*/
 
-dcmd_rules(playerid, params[])
+dcmd_rules(playerid, const params[])
 {
 #pragma unused params
 	SendClientMessage(playerid, COLOR_ORANZCERV, "[ -- PRAVIDLA SERVER/MODU -- ]");
@@ -714,7 +714,7 @@ dcmd_rules(playerid, params[])
 	return 1;
 }
 
-dcmd_skydive(playerid, params[])
+dcmd_skydive(playerid, const params[])
 {
 #pragma unused params
 	// Give such user a parachute.
@@ -728,7 +728,7 @@ dcmd_skydive(playerid, params[])
 	return 1;
 }
 
-dcmd_soska(playerid, params[])
+dcmd_soska(playerid, const params[])
 {
 #pragma unused params
 	SendClientMessage(playerid, COLOR_SVZEL, "[ INFO ] Sosky");
@@ -739,7 +739,7 @@ dcmd_soska(playerid, params[])
 	return 1;
 }
 
-dcmd_ucet(playerid, params[])
+dcmd_ucet(playerid, const params[])
 {
 #pragma unused params
 	new accountPropsText[][] =
@@ -777,7 +777,7 @@ dcmd_ucet(playerid, params[])
 	return 1;
 }
 
-dcmd_unlock(playerid, params[])
+dcmd_unlock(playerid, const params[])
 {
 #pragma unused params
 	if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
@@ -804,7 +804,7 @@ dcmd_unlock(playerid, params[])
 	return 1;
 }
 
-dcmd_wanted(playerid, params[]) 
+dcmd_wanted(playerid, const params[]) 
 {
 #pragma unused params
 	if (gPlayers[playerid][TeamID] != TEAM_POLICE && !IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1)
@@ -830,7 +830,7 @@ dcmd_wanted(playerid, params[])
 //  DCMDs --- ADMIN COMMANDS
 //
 
-dcmd_acmd(playerid, params[])
+dcmd_acmd(playerid, const params[])
 {
 #pragma unused params
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
@@ -843,7 +843,7 @@ dcmd_acmd(playerid, params[])
 	return 1;
 }
 
-dcmd_admincol(playerid, params[])
+dcmd_admincol(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
@@ -889,7 +889,7 @@ dcmd_admincol(playerid, params[])
 	return 1;
 }
 
-dcmd_ban(playerid, params[])
+dcmd_ban(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
@@ -953,7 +953,7 @@ dcmd_cam(playerid, const params[])
 	return 1;
 }
 
-dcmd_ccmd(playerid, params[])
+dcmd_ccmd(playerid, const params[])
 {
 #pragma unused params
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
@@ -1002,7 +1002,7 @@ dcmd_elevator(playerid, const params[])
 	return 1;
 }
 
-dcmd_fakechat(playerid, params[])
+dcmd_fakechat(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
@@ -1025,7 +1025,7 @@ dcmd_fakechat(playerid, params[])
 	return 1;
 }
 
-dcmd_flip(playerid, params[])
+dcmd_flip(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
@@ -1051,7 +1051,7 @@ dcmd_flip(playerid, params[])
 	return 1;
 }
 
-dcmd_get(playerid, params[])
+dcmd_get(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 2) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
@@ -1088,7 +1088,7 @@ dcmd_get(playerid, params[])
 	return 1;
 }
 
-dcmd_goto(playerid, params[])
+dcmd_goto(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 2) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
@@ -1127,7 +1127,7 @@ dcmd_goto(playerid, params[])
 	return 1;
 }
 
-dcmd_hp(playerid, params[])
+dcmd_hp(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
@@ -1148,7 +1148,7 @@ dcmd_hp(playerid, params[])
 	return 1;
 }
 
-dcmd_kick(playerid, params[])
+dcmd_kick(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
@@ -1172,7 +1172,7 @@ dcmd_kick(playerid, params[])
 	return 1;
 }
 
-dcmd_lvl(playerid, params[])
+dcmd_lvl(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
@@ -1215,7 +1215,7 @@ dcmd_lvl(playerid, params[])
 	return 1;
 }
 
-dcmd_nitro(playerid, params[])
+dcmd_nitro(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
@@ -1254,7 +1254,7 @@ dcmd_nitro(playerid, params[])
 	return 1;
 }
 
-dcmd_odpocet(playerid, params[])
+dcmd_odpocet(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
@@ -1272,7 +1272,7 @@ dcmd_odpocet(playerid, params[])
 	return 1;
 }
 
-dcmd_reset(playerid, params[])
+dcmd_reset(playerid, const params[])
 {
 #pragma unused params
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4)
@@ -1288,7 +1288,7 @@ dcmd_reset(playerid, params[])
 	return 1;
 }
 
-dcmd_skin(playerid, params[])
+dcmd_skin(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
@@ -1312,7 +1312,7 @@ dcmd_skin(playerid, params[])
 	return 1;
 }
 
-dcmd_smazat(playerid, params[])
+dcmd_smazat(playerid, const params[])
 {
 #pragma unused params
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
@@ -1331,7 +1331,7 @@ dcmd_smazat(playerid, params[])
 	return 1;
 }
 
-dcmd_spectate(playerid, params[])
+dcmd_spectate(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 2) 
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
@@ -1364,7 +1364,7 @@ dcmd_spectate(playerid, params[])
 	return 1;
 }
 
-dcmd_text(playerid, params[])
+dcmd_text(playerid, const params[])
 {
 	new token1[32], token2[32];
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
@@ -1389,7 +1389,7 @@ dcmd_text(playerid, params[])
 	return 1;
 }
 
-dcmd_vehicle(playerid, params[])
+dcmd_vehicle(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");
@@ -1410,7 +1410,7 @@ dcmd_vehicle(playerid, params[])
 	return 1;
 }
 
-dcmd_zbrane(playerid, params[])
+dcmd_zbrane(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
 		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Nedostatecny Admin level!");

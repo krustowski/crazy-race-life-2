@@ -1,23 +1,12 @@
-#define UNKNOWN_CP_TYPE 	-1
-#define CP_TYPE_GROUND_NORMAL 	0
-#define CP_TYPE_GROUND_FINISH 	1
-#define CP_TYPE_GROUND_EMPTY 	2
-#define CP_TYPE_AIR_NORMAL 	3
-#define CP_TYPE_AIR_FINISH 	4
-#define CP_TYPE_AIR_ROTATING 	5
-#define CP_TYPE_AIR_STROBING 	6
-#define CP_TYPE_AIR_SWINGING 	7
-#define CP_TYPE_AIR_BOBBING 	8
-
 #define MAX_RACE_NAME		64
 #define MAX_RACE_CP		64
 #define MAX_RACE_COORD		3
 
 enum E_RACE_COORD
 {
-	E_RACE_COORD_X,
-	E_RACE_COORD_Y,
-	E_RACE_COORD_Z
+	Float: E_RACE_COORD_X,
+	Float: E_RACE_COORD_Y,
+	Float: E_RACE_COORD_Z
 }
 
 enum E_RACE_FEE
@@ -37,7 +26,7 @@ enum E_RACE_ID
 	E_RACE_ID_DESERT_AIR_CIRCUIT
 }
 
-enum E_RACE_TYPE
+enum
 {
 	E_RACE_TYPE_GROUND,
 	E_RACE_TYPE_AIR
@@ -56,7 +45,7 @@ new Text:gRaceInfoText[MAX_PLAYERS];
 //  Race props.
 //
 
-new gRaceWarp[E_RACE_ID][E_RACE_COORD] = 
+new Float: gRaceWarp[E_RACE_ID][E_RACE_COORD] = 
 {
 	// E_RACE_ID_NONE
 	{0.0, 0.0, 0.0},
@@ -111,10 +100,10 @@ new const gRaceFeePrize[E_RACE_ID][E_RACE_FEE] =
 	{4000, 65000}
 };
 
-new E_RACE_TYPE:gRaceTypes[E_RACE_ID] = 
+new gRaceTypes[E_RACE_ID] = 
 {
 	// E_RACE_ID_NONE
-	E_RACE_TYPE_GROUND,
+ 	E_RACE_TYPE_GROUND,
 	// E_RACE_ID_LV_PYRAMID
 	E_RACE_TYPE_GROUND,
 	// E_RACE_ID_STUNT_LV_1
@@ -129,12 +118,12 @@ new E_RACE_TYPE:gRaceTypes[E_RACE_ID] =
 	E_RACE_TYPE_AIR
 };
 
-new gRaceCoordsLVPyramid[][E_RACE_COORD] =
+new Float: gRaceCoordsLVPyramid[][E_RACE_COORD] =
 {
 };
 
 // E_RACE_ID_STUNT_LV_1
-new gRaceCoordsLVStuntNo1[][E_RACE_COORD] =
+new Float: gRaceCoordsLVStuntNo1[][E_RACE_COORD] =
 {
 	{2605.1, 1193.9, 10.4},
 	{2393.16, 1192.98, 10.50},
@@ -150,7 +139,7 @@ new gRaceCoordsLVStuntNo1[][E_RACE_COORD] =
 };
 
 // E_RACE_ID_CIRCUIT_SF_WANG
-new gRaceCoordsSFCircuitWang[][E_RACE_COORD] = 
+new Float: gRaceCoordsSFCircuitWang[][E_RACE_COORD] = 
 {
 	{-2005.41, 288.46, 33.52},
 	{-2007.04, 110.69, 27.11},
@@ -195,7 +184,7 @@ new gRaceCoordsSFCircuitWang[][E_RACE_COORD] =
 	{-2005.41, 288.46, 33.52}
 };
 
-new gRaceCoordsLSFLSAirport[][E_RACE_COORD] =
+new Float: gRaceCoordsLSFLSAirport[][E_RACE_COORD] =
 {
 	{-1440.25, -287.26, 13.82},
 	{-1665.94, -546.80, 11.19},
@@ -257,7 +246,7 @@ new gRaceCoordsLSFLSAirport[][E_RACE_COORD] =
 	{1889.86, -2411.43, 13.16}
 };
 
-new gRaceCoordsLVMapCircuit[][E_RACE_COORD] =
+new Float: gRaceCoordsLVMapCircuit[][E_RACE_COORD] =
 {
 	{2046.95, 982.90, 10.21},
 	{2048.64, 842.09, 6.27},
@@ -362,7 +351,7 @@ new gRaceCoordsLVMapCircuit[][E_RACE_COORD] =
 	{2046.41, 999.06, 10.24}
 };
 
-new gRaceCoordsDesertAirCircuit[][E_RACE_COORD] =
+new Float: gRaceCoordsDesertAirCircuit[][E_RACE_COORD] =
 {
 	{369.64, 2502.15, 17.40},
 	{-14.31, 2500.38, 48.37},
@@ -387,18 +376,18 @@ new gRaceCoordsDesertAirCircuit[][E_RACE_COORD] =
 //  Race-related functions.
 //
 
-public StartRace()
+stock StartRace()
 {
 	return 1;
 }
 
-stock SetPlayerRaceSingle(playerid, raceId, coords[][E_RACE_COORD], len)
+stock SetPlayerRaceSingle(playerid, E_RACE_ID: raceId, const Float:coords[][E_RACE_COORD], len)
 {
 	// Fetch the relative position in such race (position of checkpoints).
 	new lastCPNo = len - 1, raceCPPosition = gPlayerRace[playerid][raceId] - 1, raceType = gRaceTypes[raceId];
 
 	// Prepare the coords to show a race checkpoint.
-	new x0, y0, z0, x1, y1, z1, cpType;
+	new Float: x0, Float: y0, Float: z0, Float: x1, Float: y1, Float: z1, t_CP_TYPE: cpType;
 
 	if (raceType == E_RACE_TYPE_GROUND)
 		cpType = CP_TYPE_GROUND_NORMAL;
@@ -430,10 +419,12 @@ stock SetPlayerRaceSingle(playerid, raceId, coords[][E_RACE_COORD], len)
 	}
 
 	// Set the next checkpoint to reach.
-	SetPlayerRaceCheckpoint(playerid, cpType, Float:x0, Float:y0, Float:z0, Float:x1, Float:y1, Float:z0, 10.0);
+	SetPlayerRaceCheckpoint(playerid, cpType, Float:x0, Float:y0, Float:z0, Float:x1, Float:y1, Float:z1, 10.0);
+
+	return 1;
 }
 
-public SetPlayerRace(playerid, raceId)
+stock SetPlayerRace(playerid, E_RACE_ID: raceId)
 {
 	// Check if player has joined such race.
 	if (!IsPlayerConnected(playerid) || raceId == E_RACE_ID_NONE || !gPlayerRace[playerid][raceId])
@@ -470,7 +461,7 @@ public SetPlayerRace(playerid, raceId)
 	return 1;
 }
 
-public SetPlayerRaceState(playerid, raceId)
+stock SetPlayerRaceState(playerid, E_RACE_ID: raceId)
 {
 	new stringToPrint[256];
 
@@ -505,16 +496,16 @@ public SetPlayerRaceState(playerid, raceId)
 	return 1;
 }
 
-public ResetPlayerRaceState(playerid, raceId, finishedSuccessfully)
+stock ResetPlayerRaceState(playerid, E_RACE_ID: raceId, finishedSuccessfully)
 {
 	if (!CheckPlayerRaceState(playerid))
 		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Nejsi prihlasen v zadnem zavode.");
 
 	DisablePlayerRaceCheckpoint(playerid);
 	TextDrawHideForPlayer(playerid, gRaceInfoText[playerid]);
-	KillTimer(gPlayerRaceTimer[playerid]);
+	KillTimer(_: gPlayerRaceTimer[playerid]);
 
-	gPlayerRaceTimer[playerid] = 0;
+	gPlayerRaceTimer[playerid] = Timer: 0;
 	gPlayerRaceTime[playerid] = 0;
 
 	if (finishedSuccessfully)
@@ -538,18 +529,18 @@ public ResetPlayerRaceState(playerid, raceId, finishedSuccessfully)
 	// Reset all race states to be sure not to interfere with others.
 	for (new i = 0; i < sizeof(gRaceNames); i++)
 	{
-		gPlayerRace[playerid][i] = 0;
+		gPlayerRace[playerid][E_RACE_ID: i] = 0;
 	}
 
 	return 1;
 }
 
 // This number should be aither 0, or 1 at max! This means the player must be in just one race at the time!
-public CheckPlayerRaceState(playerid)
+stock CheckPlayerRaceState(playerid)
 {
 	for (new i = 0; i < sizeof(gRaceNames); i++)
 	{
-		if (gPlayerRace[playerid][i])
+		if (gPlayerRace[playerid][E_RACE_ID: i])
 		{
 			// The player is racing at the moment!
 			return i;
@@ -560,9 +551,9 @@ public CheckPlayerRaceState(playerid)
 	return 0;
 }
 
-public SetPlayerRaceStartPos(playerid)
+stock SetPlayerRaceStartPos(playerid)
 {
-	new raceId = CheckPlayerRaceState(playerid);
+	new E_RACE_ID: raceId = E_RACE_ID: CheckPlayerRaceState(playerid);
 
 	if (!raceId)
 	{
@@ -587,7 +578,7 @@ public SetPlayerRaceStartPos(playerid)
 	return 1;
 }
 
-public UpdateRaceInfoText(playerid)
+stock UpdateRaceInfoText(playerid)
 {
 	new cpCount, raceId = CheckPlayerRaceState(playerid), stringToPrint[128];
 
@@ -616,11 +607,11 @@ public UpdateRaceInfoText(playerid)
 	return 1;
 }
 
-public CheckRaceCheckpoint(playerid)
+stock CheckRaceCheckpoint(playerid)
 {
 	if (!gPlayerRaceTimer[playerid])
 	{
-		gPlayerRaceTimer[playerid] = SetTimerEx("UpdateRaceInfoText", 1 * SECOND_MS, 1, "i", playerid);
+		gPlayerRaceTimer[playerid] = Timer: SetTimerEx("UpdateRaceInfoText", 1 * SECOND_MS, true, "i", playerid);
 		TextDrawShowForPlayer(playerid, gRaceInfoText[playerid]);
 	}
 
@@ -629,10 +620,10 @@ public CheckRaceCheckpoint(playerid)
 
 	for (new i = 0; i <= sizeof(gRaceNames); i++)
 	{
-		if (gPlayerRace[playerid][i])
+		if (gPlayerRace[playerid][E_RACE_ID: i])
 		{
-			gPlayerRace[playerid][i]++;
-			SetPlayerRace(playerid, i);
+			gPlayerRace[playerid][E_RACE_ID: i]++;
+			SetPlayerRace(playerid, E_RACE_ID: i);
 			break;
 		}
 	}

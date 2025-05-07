@@ -69,7 +69,7 @@ public OnRadarCheckpoint()
 
 		for (new j = 0; j < sizeof(gRadarPositions); j++)
 		{
-			if (IsPlayerInSphere(i, Float:gRadarPositions[j][0], Float:gRadarPositions[j][1], Float:gRadarPositions[j][2], _:gRadarPositions[j][3]))
+			if (IsPlayerInSphere(i, Float:gRadarPositions[j][0], Float:gRadarPositions[j][1], Float:gRadarPositions[j][2], floatround(gRadarPositions[j][3])))
 			{
 				// Compare the current position with the radar positions.
 				if (gRadarCaught[i] == 0 && floatround(radarValue / 1400) > 65 && GetPlayerState(i) == PLAYER_STATE_DRIVER)

@@ -578,9 +578,9 @@ stock SetPlayerRaceStartPos(playerid)
 	return 1;
 }
 
-stock UpdateRaceInfoText(playerid)
+public UpdateRaceInfoText(playerid)
 {
-	new cpCount, raceId = CheckPlayerRaceState(playerid), stringToPrint[128];
+	new cpCount, E_RACE_ID:raceId = E_RACE_ID:CheckPlayerRaceState(playerid), stringToPrint[128];
 
 	switch (raceId)
 	{
@@ -598,11 +598,11 @@ stock UpdateRaceInfoText(playerid)
 
 	gPlayerRaceTime[playerid] += 1000;
 
-	format(stringToPrint, sizeof(stringToPrint), "~w~Zavod:_________~g~%3d~n~~w~Checkpoint:_~r~%2d~y~/~r~%2d~n~~w~Cas:_______~b~%4d~y~:~b~%2d", raceId, gPlayerRace[playerid][raceId]-1, cpCount, floatround(floatround(gPlayerRaceTime[playerid] / 1000) / 60), floatround(gPlayerRaceTime[playerid] / 1000) % 60);
+	format(stringToPrint, sizeof(stringToPrint), "~w~Zavod:_________~g~%3d~n~~w~Checkpoint:_~r~%2d~y~/~r~%2d~n~~w~Cas:_______~b~%4d~y~:~b~%2d", float:raceId, gPlayerRace[playerid][raceId]-1, cpCount, floatround(floatround(gPlayerRaceTime[playerid] / 1000) / 60), floatround(gPlayerRaceTime[playerid] / 1000) % 60);
 
 	// Redraw the player's current velocity.
 	TextDrawSetString(gRaceInfoText[playerid], stringToPrint);
-	//TextDrawShowForPlayer(playerid, gRaceInfoText[playerid]);
+	TextDrawShowForPlayer(playerid, gRaceInfoText[playerid]);
 
 	return 1;
 }

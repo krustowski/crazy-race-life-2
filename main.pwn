@@ -121,6 +121,7 @@ forward DrawClockText();
 forward CheckRaceCheckpoint(playerid);
 forward SetRaceForUser(playerid, raceId);
 forward StartRace();
+forward UpdateRaceInfoText(playerid);
 
 #include "race.pwn"
 

@@ -1,3 +1,65 @@
+public LoadDcmdAll(playerid, cmdtext[]) {
+	//--------------[ COMMON COMMANDS ]-------------|
+
+	dcmd(admins, 6, cmdtext);         //all
+	dcmd(afk, 3, cmdtext);            //all
+	dcmd(bank, 4, cmdtext);		  //all
+	dcmd(cmd, 3, cmdtext);            //all
+	dcmd(dance, 5, cmdtext);	  //all
+	dcmd(deal, 4, cmdtext);	  	  //all
+	dcmd(deathmatch, 10, cmdtext);	  //all
+	dcmd(drugz, 5, cmdtext); 	  //all
+	dcmd(dwarp, 5, cmdtext); 	  //all
+	dcmd(fix, 3, cmdtext); 		  //all
+	dcmd(givecash, 8, cmdtext);       //all
+	dcmd(help, 4, cmdtext);           //all
+	dcmd(hide, 4, cmdtext); 	  //all
+	dcmd(kill, 4, cmdtext); 	  //all
+	dcmd(lay, 3, cmdtext);		  //all
+	dcmd(locate, 6, cmdtext); 	  //all
+	dcmd(lock, 4, cmdtext);           //all
+					  //dcmd(login, 5, cmdtext);          //all
+	dcmd(pm, 2, cmdtext);		  //all
+	dcmd(port, 4, cmdtext); 	  //all
+	dcmd(property, 8, cmdtext);	  //all
+	dcmd(race, 4, cmdtext);		  //all
+					  //dcmd(register, 8, cmdtext);       //all
+	dcmd(rules, 5, cmdtext); 	  //all
+	dcmd(skydive, 7, cmdtext);        //all
+	dcmd(soska, 5, cmdtext); 	  //all
+	dcmd(text, 4, cmdtext);           //all
+	dcmd(ucet, 4, cmdtext);           //all
+	dcmd(unlock, 6, cmdtext);         //all
+	dcmd(wanted, 6, cmdtext);	  //all
+
+	//--------------[ ADMIN COMMANDS ]-------------|
+
+	dcmd(acmd, 4, cmdtext);           //rcon + lvl 1
+	dcmd(admincol, 8, cmdtext);       //rcon +
+	dcmd(ban, 3, cmdtext);            //rcon + lvl 4
+	dcmd(cam, 3, cmdtext); 		  //rcon + 
+	dcmd(ccmd, 4, cmdtext);           //rcon + lvl 1
+	dcmd(elevator, 8, cmdtext);	  //rcon + lvl 4
+	dcmd(fakechat, 8, cmdtext);       //rcon + lvl 2
+	dcmd(flip, 4, cmdtext);           //rcon + 
+	dcmd(get, 3, cmdtext);            //rcon + lvl 3
+	dcmd(goto, 4, cmdtext);           //rcon + lvl 3
+	dcmd(hp, 2, cmdtext); 		  //rcon + 
+	dcmd(kick, 4, cmdtext);           //rcon +
+	dcmd(lvl, 3, cmdtext);            //rcon + lvl 4
+	dcmd(nitro, 5, cmdtext);          //rcon + lvl 3
+	dcmd(odpocet, 7, cmdtext);        //rcon + 
+	dcmd(reset, 5, cmdtext);	  //rcon + lvl 4
+	dcmd(skin, 4, cmdtext); 	  //rcon + lvl 3
+	dcmd(smazat, 6, cmdtext);         //rcon +
+	dcmd(spectate, 8, cmdtext);	  //rcon + lvl 2
+	dcmd(vehicle, 7, cmdtext);	  //rcon + lvl 4
+	dcmd(zbrane, 6, cmdtext); 	  //rcon + lvl 3
+
+	return InvalidCommand(playerid);
+}
+
+
 //
 //  DCMDs --- COMMON COMMANDS
 //

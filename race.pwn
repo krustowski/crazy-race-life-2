@@ -580,7 +580,10 @@ stock SetPlayerRaceStartPos(playerid)
 
 public UpdateRaceInfoText(playerid)
 {
-	new cpCount, E_RACE_ID:raceId = E_RACE_ID:CheckPlayerRaceState(playerid), stringToPrint[128];
+	new 
+		cpCount, 
+		E_RACE_ID:raceId = E_RACE_ID:CheckPlayerRaceState(playerid), 
+		stringToPrint[128];
 
 	switch (raceId)
 	{

@@ -1,9 +1,9 @@
 {
 	"user": "vxn",
 	"repo": "crazy-and-race-life-2",
-	"tag": "0.0.1",
+	"tag": "0.3.0",
 	"entry": "main.pwn",
-	"output": "gamemodes/crl.amx",
+	"output": "gamemodes/crl2.amx",
 	"dependencies": [
 		"openmultiplayer/omp-stdlib",
 		"pawn-lang/samp-stdlib@open.mp",

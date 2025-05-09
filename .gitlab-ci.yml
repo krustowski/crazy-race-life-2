@@ -20,7 +20,8 @@ stages:
     - ssh-add "$DEPLOY_SSH_KEY"
   script:
     - export DOCKER_HOST=ssh://$DEPLOY_USER@$DEPLOY_TARGET
-    - make run
+    - scp ./gamemodes/crl2.amx $DEPLOY_USER@$DEPLOY_TARGET:/opt/open.mp/data/gamemodes/crl2.amx
+    - docker restart samp-server
 
 deploy-stage:    
   environment: 

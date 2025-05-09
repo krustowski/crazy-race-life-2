@@ -1,0 +1,34 @@
+# SAMP (open.mp) Gitlab CI configuration file
+
+workflow:
+  rules:
+    - when: manual
+
+stages:
+  - deploy
+
+.deploy_common:
+  stage: deploy
+  when: manual
+  before_script:
+    - eval $(ssh-agent -s)
+    - chmod 400 "$DEPLOY_SSH_KEY"
+    - ssh-add "$DEPLOY_SSH_KEY"
+  script:
+    - export DOCKER_HOST=ssh://$DEPLOY_USER@$DEPLOY_TARGET
+    - make run
+
+deploy-stage:    
+  environment: 
+    name: stage
+  variables:
+    APP_ENVIRONMENT: 'stage'
+  extends: .deploy_common
+
+deploy-prod: 
+  environment: 
+    name: prod
+  variables:
+    APP_ENVIRONMENT: 'prod'
+  extends: .deploy_common
+

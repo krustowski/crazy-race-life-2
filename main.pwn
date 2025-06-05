@@ -151,7 +151,7 @@ forward InitDB();
 #include "player.pwn"
 #include "auth.pwn"
 #include "real.pwn"
-#include "mysql.pwn"
+#include "sql.pwn"
 
 //
 //  Radar + Vehicle velocity/props.
@@ -221,8 +221,6 @@ main()
 
 public OnGameModeInit()
 {
-	// YSI object contructor.
-	//Object_Object();
 	InitDB();
 
 	SetGameModeText(GAMEMODE_NAME);
@@ -286,6 +284,11 @@ public OnGameModeExit()
 	PrintAsciiLogoToLogs();
 	printf(" ");
 	printf(" * Shutting down...");
+
+	if (DB_Close(gDbConnectionHandle))
+	{
+		gDbConnectionHandle = DB:0;
+	}
 
 	KillTimer(SetTimer("ShowAdvert", 1000 * 60 * 2, true));
 

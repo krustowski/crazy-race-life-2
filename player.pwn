@@ -4,6 +4,8 @@
 #define MAX_TEAM_MENUS		16
 #define MAX_PLAYER_PROPERTIES	5
 
+#include "sql.pwn"
+
 //
 //  Drugz.
 //
@@ -33,7 +35,7 @@ enum Drug
 
 new gDrugz[MAX_DRUGS][Drug];
 
-new gDrugZaza[Drug] = 
+/*new gDrugZaza[Drug] = 
 {
 	"zaza",
 	"zaza",
@@ -111,11 +113,11 @@ new gDrugPCP[Drug] =
 	"pcp",
 	0,
 	350
-};
+};*/
 
 stock InitDrugValues()
 {
-	gDrugz[0] = gDrugZaza;
+	/*gDrugz[0] = gDrugZaza;
 	gDrugz[1] = gDrugTobacco;
 	gDrugz[2] = gDrugPaper;
 	gDrugz[3] = gDrugLighter;
@@ -124,7 +126,35 @@ stock InitDrugValues()
 	gDrugz[6] = gDrugHeroin;
 	gDrugz[7] = gDrugMeth;
 	gDrugz[8] = gDrugFent;
-	gDrugz[9] = gDrugPCP;
+	gDrugz[9] = gDrugPCP;*/
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, "SELECT name, name_alt, price FROM drug_prices ORDER BY id ASC");
+	if (!result) {
+		print("Database error: cannot fetch drug prices!");
+		return;
+	}
+
+	new 
+		i = 0,
+		name[64], 
+		name_alt[64], 
+		price;
+
+	while (DB_SelectNextRow(result))
+	{
+		DB_GetFieldString(result, 0, name, sizeof(name));
+		DB_GetFieldString(result, 1, name_alt, sizeof(name_alt));
+		price = DB_GetFieldInt(result, 2);
+
+		gDrugz[i][DrugName] = name_alt;
+		gDrugz[i][DrugIniName] = name;
+		gDrugz[i][DrugAmount] = 0;
+		gDrugz[i][DrugPrice] = price;
+		i++;
+	}
+
+	print("Drug prices initialized!");
+	DB_FreeResultSet(result);
 }
 
 //
@@ -162,6 +192,7 @@ enum Team
 enum Player
 {
 	ID,
+	OrmID,
 	Name[MAX_PLAYER_NAME],
 
 	PasswordHash[65],

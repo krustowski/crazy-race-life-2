@@ -402,28 +402,38 @@ public LoadPlayerData(playerid)
 	if (IsPlayerConnected(playerid) && gPlayers[playerid][IsLogged])
 	{
 		SendClientMessage(playerid, COLOR_ZLUTA, "[ DATA ] Nacitam ulozena uzivatelska data...");
-
 		SetPlayerColor(playerid, COLOR_ZLUTA);
 
-		gPlayers[playerid][Cash] 	= readcfgvalue(gPlayers[playerid][Name], "", "cash");
-		gPlayers[playerid][Bank] 	= readcfgvalue(gPlayers[playerid][Name], "", "bank");
-		gPlayers[playerid][AdminLevel] 	= readcfgvalue(gPlayers[playerid][Name], "", "adminlvl"); 
-		gPlayers[playerid][TeamID]	= readcfgvalue(gPlayers[playerid][Name], "", "team"); 
-		gPlayers[playerid][Skin] 	= readcfgvalue(gPlayers[playerid][Name], "", "class"); 
-		gPlayers[playerid][Health] 	= readcfgvalue(gPlayers[playerid][Name], "", "health");
-		gPlayers[playerid][Armour] 	= readcfgvalue(gPlayers[playerid][Name], "", "armour");
-		gPlayers[playerid][SpawnPoint] 	= readcfgvalue(gPlayers[playerid][Name], "", "spawn");
+		new query[256];
+		format(query, sizeof(query), "SELECT cash, bank, adminlvl, team, class, health, armour, spawn, properties FROM users WHERE nickname = '%s';", gPlayers[playerid][Name]);
 
-		new properties[MAX_PLAYER_PROPERTIES], propertiesString[64];
-		readcfg(gPlayers[playerid][Name], "", "properties", propertiesString);
+		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result) {
+			print("Database error: cannot fetch user data!");
+			return 0;
+		}
+
+		new properties[MAX_PLAYER_PROPERTIES], propertiesString[128];
+
+		gPlayers[playerid][Cash] = DB_GetFieldInt(result, 0);
+		gPlayers[playerid][Bank] = DB_GetFieldInt(result, 1);
+		gPlayers[playerid][AdminLevel] = DB_GetFieldInt(result, 2);
+		gPlayers[playerid][TeamID] = DB_GetFieldInt(result, 3);
+		gPlayers[playerid][Skin] = DB_GetFieldInt(result, 4);
+		gPlayers[playerid][Health] = DB_GetFieldInt(result, 5);
+		gPlayers[playerid][Armour] = DB_GetFieldInt(result, 6);
+		gPlayers[playerid][SpawnPoint] = DB_GetFieldInt(result, 7);
+		DB_GetFieldString(result, 8, propertiesString, sizeof(propertiesString));
 
 		ExtractPropperties(propertiesString, properties);
 		gPlayers[playerid][Properties] = properties;
 
-		for (new i = 0; i < MAX_DRUGS; i++)
-		{
-			gPlayers[playerid][Drugs][i] = readcfgvalue(gPlayers[playerid][Name], "drugz", gDrugz[i][DrugIniName]);
-		}
+		DB_FreeResultSet(result);
+
+		/*for (new i = 0; i < MAX_DRUGS; i++)
+		  {
+		  gPlayers[playerid][Drugs][i] = readcfgvalue(gPlayers[playerid][Name], "drugz", gDrugz[i][DrugIniName]);
+		  }*/
 
 		GivePlayerMoney(playerid, gPlayers[playerid][Cash]);
 		SetPlayerHealth(playerid, gPlayers[playerid][Health]);
@@ -551,7 +561,7 @@ stock OnPlayerPrivMsg(playerid, receiverid, text[])
 		return 0;
 	}
 
-       	new stringForReceiver[256], stringForSender[256]; 
+	new stringForReceiver[256], stringForSender[256]; 
 
 	format(stringForReceiver, sizeof(stringForReceiver), "[ PM ] od %s (ID: %d): %s", gPlayers[playerid][Name], playerid, text);
 	format(stringForSender, sizeof(stringForSender), "[ PM ] pro %s (ID: %d): %s", gPlayers[receiverid][Name], receiverid, text);

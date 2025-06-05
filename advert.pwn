@@ -28,7 +28,7 @@ public ShowAdvert()
 		"[ TIP ] Pridej si oblibene auto (pokud je dostupne) ke sve nemovitosti pomoci /property vehicle [property ID]",
 		"[ TIP ] Nebavi te vychozi spawn point v LV? Sezen si nemovitost a svuj (re)spawn point muzes mit jednoduse tam!",
 		// Endtip.
-		"[ TIP ] Skoc si skidive pomoci /skidive!"
+		"[ TIP ] Skoc si skydive pomoci /skydive!"
 	};
 
 	new advertId = random(sizeof(advertList)), stringToPrint[256];

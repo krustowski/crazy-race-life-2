@@ -1,0 +1,42 @@
+---
+
+name: samp-stack
+
+networks:
+  samp-net: null
+
+volumes:
+  mariadb-data:
+
+services:
+  mariadb:
+    restart: always
+    container_name: samp-mariadb
+    image: mariadb:11.7.2
+    volumes:
+      - "mariadb-data:/var/lib/mysql"
+    networks:
+      - samp-net
+    environment:
+      MARIADB_ROOT_PASSWORD: fd445dpKY0SNEd533dVFsAQqL3
+      MARIADB_USER: samp_gg_vxn_dev
+      MARIADB_DATABASE: samp_gg_vxn_dev
+      MARIADB_PASSWORD: sd4f4a65f4sa65f4as8f7as9f7as9df7
+
+  server:
+    restart: always
+    container_name: samp-server
+    depends_on:
+      - mariadb
+    image: registry.vxn.dev/open.mp/run:ubuntu-22.04
+    networks:
+      - samp-net
+    volumes:
+      - /opt/open.mp/data:/data
+      - /opt/open.mp/libssl.so.1.1:/usr/lib/libssl.so.1.1
+      - /opt/open.mp/libcrypto.so.1.1:/usr/lib/libcrypto.so.1.1
+    ports:
+      - 39876:39876/udp
+      - 39876:39876/tcp
+
+

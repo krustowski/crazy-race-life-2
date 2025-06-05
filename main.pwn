@@ -27,6 +27,7 @@
 
 //#include <a_samp>
 #include <open.mp>
+#include <a_mysql>
 #include <core>
 #include <float>
 #include <file>
@@ -145,11 +146,12 @@ forward SavePlayerData(playerid);
 forward SendPlayerSalary();
 forward UpdatePlayerScore();
 forward InitRealEstateProperties();
+forward InitDB();
 
 #include "player.pwn"
 #include "auth.pwn"
 #include "real.pwn"
-//#include "mysql.pwn"
+#include "mysql.pwn"
 
 //
 //  Radar + Vehicle velocity/props.
@@ -182,9 +184,9 @@ forward InitTexts();
 forward AddTexts(playerid);
 forward AddMapicons(playerid);
 
-#include "pickups.pwn"
-#include "objects.pwn"
-#include "vehicles.pwn"
+#include "elements/pickups.pwn"
+#include "elements/objects.pwn"
+#include "elements/vehicles.pwn"
 #include "texts.pwn"
 #include "mapicons.pwn"
 #include "dialogs.pwn"
@@ -221,6 +223,7 @@ public OnGameModeInit()
 {
 	// YSI object contructor.
 	//Object_Object();
+	InitDB();
 
 	SetGameModeText(GAMEMODE_NAME);
 

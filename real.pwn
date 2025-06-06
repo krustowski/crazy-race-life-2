@@ -7,6 +7,8 @@
 #define SPAWN_PICKUP_COUNT	4
 #define INVALID_PROPERTY_ID	-1
 
+#include "sql.pwn"
+
 enum 
 {
 	PICKUP_OFFER,
@@ -221,68 +223,118 @@ stock ExtractIntsFromString(const input[], ints[16])
 	return ints;
 }
 
+// Helper enum for the real estate data field parsing.
+enum {
+	FIELD_ID,
+	FIELD_VEHICLE_ID,
+	FIELD_LABEL,
+	FIELD_COST,
+	FIELD_LOCATION_OFFER_X,
+	FIELD_LOCATION_OFFER_Y,
+	FIELD_LOCATION_OFFER_Z,
+	FIELD_LOCATION_OFFER_ROT,
+	FIELD_LOCATION_ENTRANCE_X,
+	FIELD_LOCATION_ENTRANCE_Y,
+	FIELD_LOCATION_ENTRANCE_Z,
+	FIELD_LOCATION_ENTRANCE_ROT,
+	FIELD_LOCATION_VEHICLE_X,
+	FIELD_LOCATION_VEHICLE_Y,
+	FIELD_LOCATION_VEHICLE_Z,
+	FIELD_LOCATION_VEHICLE_ROT,
+	FIELD_OCCUPIED
+}
+
+enum {
+	FIELD_VEHICLE_MODEL,
+	FIELD_VEHICLE_COLOR1,
+	FIELD_VEHICLE_COLOR2,
+	FIELD_VEHICLE_COMPONENTS
+}
+
 stock LoadRealEstateData()
 {
-	new fileName[64] = "_data_RealEstateProperties", i = 0, properties[256], token1[256], token2[256];
+	new i = 0, query[512];
 
-	readcfg(fileName, "", "properties", properties); 
+	format(query, sizeof(query), "SELECT id,vehicle_id,label,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied FROM properties");
 
-	do {
-		SplitIntoTwo(properties, token1, token2, sizeof(token1), ",");
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) {
+		print("Database error: cannot fetch property data!");
+		return 0;
+	}
 
-		if (!IsNumeric(token1) || !strval(token1))
-		{
-			strcopy(properties, token2);
+	while (DB_SelectNextRow(result))
+	{
+		new label[64];
+
+		gProperties[i][ID] = DB_GetFieldInt(result, FIELD_ID);
+		gProperties[i][Cost] = DB_GetFieldInt(result, FIELD_COST);
+		gProperties[i][Occupied] = bool: DB_GetFieldInt(result, FIELD_OCCUPIED);
+
+		// Offer/Sell pickup coords
+		gProperties[i][LocationOffer][CoordX] = DB_GetFieldInt(result, FIELD_LOCATION_OFFER_X);
+		gProperties[i][LocationOffer][CoordY] = DB_GetFieldInt(result, FIELD_LOCATION_OFFER_Y);
+		gProperties[i][LocationOffer][CoordZ] = DB_GetFieldInt(result, FIELD_LOCATION_OFFER_Z);
+		gProperties[i][LocationOffer][CoordR] = DB_GetFieldInt(result, FIELD_LOCATION_OFFER_ROT);
+
+		// Entrance pickup coords
+		gProperties[i][LocationEntrance][CoordX] = DB_GetFieldInt(result, FIELD_LOCATION_ENTRANCE_X);
+		gProperties[i][LocationEntrance][CoordY] = DB_GetFieldInt(result, FIELD_LOCATION_ENTRANCE_Y);
+		gProperties[i][LocationEntrance][CoordZ] = DB_GetFieldInt(result, FIELD_LOCATION_ENTRANCE_Z);
+		gProperties[i][LocationEntrance][CoordR] = DB_GetFieldInt(result, FIELD_LOCATION_ENTRANCE_ROT);
+
+		// Vehicle pickup coords
+		gProperties[i][LocationVehicle][CoordX] = DB_GetFieldInt(result, FIELD_LOCATION_VEHICLE_X);
+		gProperties[i][LocationVehicle][CoordY] = DB_GetFieldInt(result, FIELD_LOCATION_VEHICLE_Y);
+		gProperties[i][LocationVehicle][CoordZ] = DB_GetFieldInt(result, FIELD_LOCATION_VEHICLE_Z);
+		gProperties[i][LocationVehicle][CoordR] = DB_GetFieldInt(result, FIELD_LOCATION_VEHICLE_ROT);
+
+		DB_GetFieldString(result, FIELD_LABEL, label, sizeof(label));
+
+		gProperties[i][Label] = label;
+
+		//
+		//  Vehicle props extraction
+		//
+
+		new vehicle_id;
+
+		vehicle_id = DB_GetFieldInt(result, FIELD_VEHICLE_ID);
+
+		if (!vehicle_id) {
+			i++;
 			continue;
 		}
 
-		printf("LoadRealEstateData: loading %s", token1);
+		format(query, sizeof(query), "SELECT model,color1,color2,components FROM vehicles WHERE id = %d", vehicle_id);
 
-		//
-		//  Extract the values (ints and strings).
-		//
+		new DBResult: result_vehicle = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result_vehicle) {
+			print("Database error: cannot fetch property data (vehicle)!");
 
-		gProperties[i][ID] = readcfgvalue(fileName, token1, "id");
-		gProperties[i][Cost] = readcfgvalue(fileName, token1, "cost");
-		gProperties[i][Occupied] = bool: readcfgvalue(fileName, token1, "occupied");
+			i++;
+			continue;
+		}
 
-		readcfg(fileName, token1, "label", gProperties[i][Label]); 
+		new componentsString[256], components[16];
 
-		//
-		//  Extract the floats.
-		//
-
-		new 
-			Float: locationOffer[Coords], locationOfferString[64], 
-			Float: locationEntrance[Coords], locationEntranceString[64], 
-			Float: locationVehicle[Coords], locationVehicleString[64];
-
-		readcfg(fileName, token1, "locationOffer", locationOfferString); 
-		readcfg(fileName, token1, "locationEntrance", locationEntranceString); 
-		readcfg(fileName, token1, "locationVehicle", locationVehicleString); 
-
-		ExtractCoordsFromString(locationOfferString, locationOffer);
-		ExtractCoordsFromString(locationEntranceString, locationEntrance);
-		ExtractCoordsFromString(locationVehicleString, locationVehicle);
-
-		gProperties[i][LocationOffer] = locationOffer;
-		gProperties[i][LocationEntrance] = locationEntrance;
-		gProperties[i][LocationVehicle] = locationVehicle;
-
-		// VehicleProps
-		new componentsString[256], components[16], token1Copy[256];
-		strcopy(token1Copy, token1);
-		strcat(token1Copy, "_vehicle");
-
-		readcfg(fileName, token1Copy, "components", componentsString);
+		DB_GetFieldString(result_vehicle, FIELD_VEHICLE_COMPONENTS, componentsString, sizeof(componentsString));
 
 		ExtractIntsFromString(componentsString, components);
 		gProperties[i][Vehicle][Components] = components;
 
-		gProperties[i][Vehicle][Model] = readcfgvalue(fileName, token1Copy, "model");
-		gProperties[i][Vehicle][Colours][0] = readcfgvalue(fileName, token1Copy, "colour1"); 
-		gProperties[i][Vehicle][Colours][1] = readcfgvalue(fileName, token1Copy, "colour2"); 
+		gProperties[i][Vehicle][Model] = DB_GetFieldInt(result_vehicle, FIELD_VEHICLE_MODEL);
+		gProperties[i][Vehicle][Colours][0] = DB_GetFieldInt(result_vehicle, FIELD_VEHICLE_COLOR1);
+		gProperties[i][Vehicle][Colours][1] = DB_GetFieldInt(result_vehicle, FIELD_VEHICLE_COLOR2);
 
+		DB_FreeResultSet(result_vehicle);
+
+		i++;
+	}
+
+	DB_FreeResultSet(result);
+
+	/*do {
 		// Drugz.
 		new label[7] = "_drugz";
 		strcat(token1, label);
@@ -298,7 +350,7 @@ stock LoadRealEstateData()
 
 		if (i > MAX_PROPERTIES)
 			break;
-	} while (strcmp(token2, ""));
+	} while (strcmp(token2, ""));*/
 
 	return 1;
 }

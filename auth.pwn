@@ -50,7 +50,7 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 	SHA256_Hash(text, salt, hashedPwd, sizeof(hashedPwd));
 
 	new query[256];
-	format(query, sizeof(query), "INSERT INTO users (nickname, pwdhash, salt, cash, bank, adminlvl, team, class, health, armour, spawn, properties) VALUES ('%s', '%s', '%s', %d, %d, %d, %d, %d, %d, %d, %d, '%s');", gPlayers[playerid][Name], hashedPwd, salt, 1000, 0, 0, 0, 0, 100, 100, 0, "0,0,0,0,0");
+	format(query, sizeof(query), "INSERT INTO users (nickname, pwdhash, salt, cash, bank, adminlvl, team, class, health, armour, spawn, properties) VALUES ('%s', '%s', '%s', %d, %d, %d, %d, %d, %d, %d, %d, '%s');", gPlayers[playerid][Name], hashedPwd, salt, 5000, 0, 0, 0, 0, 100, 100, 0, "0,0,0,0,0");
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {

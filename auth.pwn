@@ -43,18 +43,20 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 {
 	new hashedPwd[65], salt[17];
 
-	if (fexist(gPlayers[playerid][Name]))
-		return 0;
-
 	// 16 random characters from 33 to 126 (in ASCII) for the salt
 	for (new i = 0; i < 16; i++) 
 		salt[i] = random(94) + 33;
 
 	SHA256_Hash(text, salt, hashedPwd, sizeof(hashedPwd));
 
-	writecfg(gPlayers[playerid][Name], "", "pwdhash", hashedPwd);
-	writecfg(gPlayers[playerid][Name], "", "salt", salt);
-	writecfgvalue(gPlayers[playerid][Name], "", "health", 100);
+	new query[256];
+	format(query, sizeof(query), "INSERT INTO users (nickname, pwdhash, salt, cash, bank, adminlvl, team, class, health, armour, spawn, properties) VALUES ('%s', '%s', '%s', %d, %d, %d, %d, %d, %d, %d, %d, '%s');", gPlayers[playerid][Name], hashedPwd, salt, 1000, 0, 0, 0, 0, 100, 100, 0, '0,0,0,0,0');
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) {
+		print("Database error: cannot write (register) user data!");
+		return 0;
+	}
 
 	gPlayers[playerid][IsLogged] = true;
 	LoadPlayerData(playerid);

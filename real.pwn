@@ -158,14 +158,13 @@ stock SaveRealEstateData()
 
 			new DBResult: result_vehicle = DB_ExecuteQuery(gDbConnectionHandle, query);
 			if (!result_vehicle) {
-				print("Database error: cannot write property data (vehicle)!");
-				return 0;
+				printf("Database error: cannot write property data (vehicle, ID: %d)!", gProperties[i][ID]);
 			}
 
 			DB_FreeResultSet(result_vehicle);
 		}
 
-		format(query, sizeof(query), "INSERT INTO properties (id,user_id,vehicle_id,label,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied) VALUES (%d, %d, %d, \"%s\", %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) ON CONFLICT(id) DO UPDATE SET occupied = excluded.occupied",
+		format(query, sizeof(query), "INSERT INTO properties (id,user_id,vehicle_id,label,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied) VALUES (%d, %d, %d, \"%s\", %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) ON CONFLICT(id) DO UPDATE SET occupied = %d",
 				gProperties[i][ID],
 				gProperties[i][UserID],
 				vehicle_id,
@@ -183,13 +182,13 @@ stock SaveRealEstateData()
 				gProperties[i][LocationVehicle][CoordY],
 				gProperties[i][LocationVehicle][CoordZ],
 				gProperties[i][LocationVehicle][CoordR],
+				gProperties[i][Occupied],
 				gProperties[i][Occupied]
 		      );
 
 		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result) {
-			print("Database error: cannot write property data!");
-			return 0;
+			printf("Database error: cannot write property data (ID: %d)!", gProperties[i][ID]);
 		}
 
 		DB_FreeResultSet(result);

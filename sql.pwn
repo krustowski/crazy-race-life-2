@@ -1,8 +1,10 @@
 new DB: gDbConnectionHandle;
 
+new gDbFile[16] = "crl2_data.db";
+
 public InitDB() 
 {
-	gDbConnectionHandle = DB_Open("crl2_data.db");
+	gDbConnectionHandle = DB_Open(gDbFile);
 
 	if (gDbConnectionHandle) 
 	{

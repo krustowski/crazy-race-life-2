@@ -147,8 +147,10 @@ forward SendPlayerSalary();
 forward UpdatePlayerScore();
 forward InitRealEstateProperties();
 forward InitDB();
+forward InitTeams();
 
 #include "player.pwn"
+#include "team.pwn"
 #include "auth.pwn"
 #include "real.pwn"
 #include "sql.pwn"
@@ -287,7 +289,7 @@ public OnGameModeExit()
 
 	if (DB_Close(gDbConnectionHandle))
 	{
-		gDbConnectionHandle = DB:0;
+		gDbConnectionHandle = DB: 0;
 	}
 
 	KillTimer(SetTimer("ShowAdvert", 1000 * 60 * 2, true));

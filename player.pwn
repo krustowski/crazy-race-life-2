@@ -5,6 +5,7 @@
 #define MAX_PLAYER_PROPERTIES	5
 
 #include "sql.pwn"
+#include "team.pwn"
 
 //
 //  Drugz.
@@ -15,8 +16,8 @@ enum
 	ZAZA,
 	TOBACCO,
 	PAPER,
-	LIGHTER,
 	JOINT,
+	LIGHTER,
 	COCAINE,
 	HEROIN,
 	METH,
@@ -28,106 +29,14 @@ enum Drug
 {
 	DrugName[64],
 	DrugIniName[64],
-
 	DrugAmount,
 	DrugPrice
 }
 
 new gDrugz[MAX_DRUGS][Drug];
 
-/*new gDrugZaza[Drug] = 
-{
-	"zaza",
-	"zaza",
-	0,
-	50
-};
-
-new gDrugTobacco[Drug] = 
-{
-	"tabak",
-	"tobacco",
-	0,
-	5
-};
-
-new gDrugPaper[Drug] = 
-{
-	"vazky",
-	"paper",
-	0,
-	5
-};
-
-new gDrugLighter[Drug] = 
-{
-	"zapik",
-	"lighter",
-	0,
-	5
-};
-
-new gDrugJoint[Drug] = 
-{
-	"brko",
-	"joint",
-	0,
-	30
-};
-
-new gDrugCoke[Drug] = 
-{
-	"koks",
-	"cocaine",
-	0,
-	150
-};
-
-new gDrugHeroin[Drug] = 
-{
-	"hero",
-	"heroin",
-	0,
-	200
-};
-
-new gDrugMeth[Drug] = 
-{
-	"pernik",
-	"meth",
-	0,
-	180
-};
-
-new gDrugFent[Drug] = 
-{
-	"fent",
-	"fent",
-	0,
-	400
-};
-
-new gDrugPCP[Drug] = 
-{
-	"andelak",
-	"pcp",
-	0,
-	350
-};*/
-
 stock InitDrugValues()
 {
-	/*gDrugz[0] = gDrugZaza;
-	gDrugz[1] = gDrugTobacco;
-	gDrugz[2] = gDrugPaper;
-	gDrugz[3] = gDrugLighter;
-	gDrugz[4] = gDrugJoint;
-	gDrugz[5] = gDrugCoke;
-	gDrugz[6] = gDrugHeroin;
-	gDrugz[7] = gDrugMeth;
-	gDrugz[8] = gDrugFent;
-	gDrugz[9] = gDrugPCP;*/
-
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, "SELECT name, name_alt, price FROM drug_prices ORDER BY id ASC");
 	if (!result) {
 		print("Database error: cannot fetch drug prices!");
@@ -161,34 +70,6 @@ stock InitDrugValues()
 //  Player's props.
 //
 
-enum 
-{
-	TEAM_NONE,
-	TEAM_LAMES,
-	TEAM_ADMINZ,
-	TEAM_POLICE,
-	TEAM_TRUCKERS,
-	TEAM_DRAGSTERS,
-	TEAM_GARBAGEMEN,
-	TEAM_PIZZAGUYS,
-	TEAM_HACKERS,
-	TEAM_DEALERS
-}
-
-enum Team
-{
-	ID,
-	TeamName[64],
-	Color,
-	Skins[5],
-	Weapons[11],
-	Ammu[11],
-	SalaryBase,
-	SalaryVolatile,
-	PICKUP: Pickups[MAX_TEAM_PICKUPS],
-	Menu: Menus[MAX_TEAM_MENUS]
-}
-
 enum Player
 {
 	ID,
@@ -221,167 +102,7 @@ enum Player
 	Temp
 }
 
-//
-//  Team definitions.
-//
-
-new gTeamNone[Team] = 
-{
-	TEAM_NONE,
-	"Nezarazeno",
-	COLOR_ZLUTA,
-	{0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	100,
-	150
-	//PICKUP: {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	//Menu: {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
-};
-
-new gTeamLames[Team] = 
-{
-	TEAM_LAMES,
-	"Lamky",
-	COLOR_ZLUTA,
-	{200, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	10,
-	20
-	//PICKUP: {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	//Menu: {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
-};
-
-new gTeamAdminz[Team] = 
-{
-	TEAM_ADMINZ,
-	"Admin Borci",
-	COLOR_SVZEL,
-	{29, 0, 0, 0, 0},
-	{32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	1550,
-	2100
-	//PICKUP: {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	//Menu: {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
-};
-
-new gTeamPolice[Team] = 
-{
-	TEAM_POLICE,
-	"Policie",
-	MODRA,
-	{285, 0, 0, 0, 0},
-	{30, 31, 32, 0, 0, 0, 0, 0, 0, 0, 0},
-	{100, 100, 111, 0, 0, 0, 0, 0, 0, 0, 0},
-	1000,
-	1500
-	//PICKUP: {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	//Menu: {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
-};
-
-new gTeamTruckers[Team] = 
-{
-	TEAM_TRUCKERS,
-	"Truckeri",
-	COLOR_CERVENA,
-	{50, 0, 0, 0, 0},
-	{32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	1000,
-	1150
-	//PICKUP: {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	//Menu: {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
-};
-
-new gTeamDragsters[Team] = 
-{
-	TEAM_DRAGSTERS,
-	"Dragsteri",
-	COLOR_ZELENA,
-	{107, 0, 0, 0, 0},
-	{5, 30, 31, 0, 0, 0, 0, 0, 0, 0, 0},
-	{1, 100, 1000, 0, 0, 0, 0, 0, 0, 0, 0},
-	1200,
-	1500
-	//PICKUP: {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	//Menu: {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
-};
-
-new gTeamGarbagemen[Team] = 
-{
-	TEAM_GARBAGEMEN,
-	"Popelari",
-	COLOR_HNEDA,
-	{230, 0, 0, 0, 0},
-	{4, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{1, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	250,
-	500
-	//PICKUP: {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	//Menu: {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
-};
-
-new gTeamPizzaguys[Team] = 
-{
-	TEAM_PIZZAGUYS,
-	"Pizza hosi",
-	COLOR_ZELZLUT,
-	{250, 0, 0, 0, 0},
-	{4, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{1, 111, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	500,
-	1250
-	//{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	//{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
-};
-
-new gTeamHackers[Team] = 
-{
-	TEAM_HACKERS,
-	"Hackeri",
-	COLOR_BILA,
-	{170, 0, 0, 0, 0},
-	{4, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{100, 111, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	1500,
-	900
-	//{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	//{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
-};
-
-new gTeamDealers[Team] = 
-{
-	TEAM_DEALERS,
-	"Dealeri",
-	COLOR_ORANZOVA,
-	{29, 0, 0, 0, 0},
-	{4, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	1800,
-	2100
-	//{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	//{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
-};
-
-
 new gPlayers[MAX_PLAYERS][Player];
-new gTeams[MAX_TEAMS][Team];
-
-stock InitTeams()
-{
-	gTeams[0] = gTeamNone;
-	gTeams[1] = gTeamLames;
-	gTeams[2] = gTeamAdminz;
-	gTeams[3] = gTeamPolice;
-	gTeams[4] = gTeamTruckers;
-	gTeams[5] = gTeamDragsters;
-	gTeams[6] = gTeamGarbagemen;
-	gTeams[7] = gTeamPizzaguys;
-	gTeams[8] = gTeamHackers;
-	gTeams[9] = gTeamDealers;
-}
 
 //
 //
@@ -500,7 +221,7 @@ public SavePlayerData(playerid)
 
 		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result) {
-			print("Database error: cannot write user data!");
+			printf("Database error: cannot write user data (%s)!", gPlayers[playerid][Name]);
 			return 0;
 		}
 

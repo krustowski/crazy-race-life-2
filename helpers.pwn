@@ -227,9 +227,9 @@ stock PrintAsciiLogoToLogs()
 	printf(" *    \\____/_/   \\__,_/ /___/\\__, /_/ |_|\\__,_/\\___/\\___/_____/_/_/  \\___/____/   ");
 	printf(" *                          /____/                                                       ");
 	printf(" ");
-	printf(" *** GameMode CRL2 *** ");
-	printf(" *** Credits: %s *** ", GAMEMODE_CREDITS);
-	printf(" *** Jan 2025 *** ");
+	printf(" * GameMode CRL2 ");
+	printf(" * Credits: %s ", GAMEMODE_CREDITS);
+	printf(" * 2025 ");
 	printf(" ");
 	printf(" *************************************************************************************   ");
 }

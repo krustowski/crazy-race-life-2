@@ -58,6 +58,8 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 		return 0;
 	}
 
+	DB_FreeResultSet(result);
+
 	gPlayers[playerid][IsLogged] = true;
 	LoadPlayerData(playerid);
 

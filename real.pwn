@@ -42,6 +42,7 @@ enum VehicleProps
 enum Property
 {
 	ID,
+	UserID,
 	Label[64],
 	Cost,
 
@@ -122,86 +123,94 @@ stock IsPlayerOwner(playerid, propertyId)
 
 stock SaveRealEstateData()
 {
-	new fileName[64] = "_data_RealEstateProperties", stringName[20], stringNames[256] = "0";
+	new query[512];
 
-	writecfg(fileName, "", "properties", "xxx");
+	new vehicle_id = 0;
 
 	for (new i = 0; i < sizeof(gProperties); i++)
 	{
 		if (!gProperties[i][ID])
 			continue;
 
-		format(stringName, sizeof(stringName), "%d", gProperties[i][ID]);
-		format(stringNames, sizeof(stringNames), "%s,%d", stringNames, gProperties[i][ID]);
+		if (gProperties[i][Vehicle][Model]) {
+			vehicle_id = gPlayers[i][ID];
 
-		writecfgvalue(fileName, stringName, "id", gProperties[i][ID]);
-		writecfg(fileName, stringName, "label", gProperties[i][Label]);
-		writecfgvalue(fileName, stringName, "cost", gProperties[i][Cost]);
+			new componentsString[128];
 
-		new coordStringOffer[256], coordStringEntrance[256], coordStringVehicle[256];
-		//new Float: locationOffer = gProperties[i][LocationOffer];
-
-		for (new j = 0; j < 4; j++)
-		{
-			if (!strcmp(coordStringOffer, ""))
+			for (new j = 0; j < 16; j++)
 			{
-				format(coordStringOffer, sizeof(coordStringOffer), "%.2f", gProperties[i][LocationOffer][Coords: j]);
-				format(coordStringEntrance, sizeof(coordStringEntrance), "%.2f", gProperties[i][LocationEntrance][Coords: j]);
-				format(coordStringVehicle, sizeof(coordStringVehicle), "%.2f", gProperties[i][LocationVehicle][Coords: j]);
-				continue;
+				if (!strcmp(componentsString, ""))
+				{
+					format(componentsString, sizeof(componentsString), "%d", gProperties[i][Vehicle][Components][j]);
+					continue;
+				}
+
+				format(componentsString, sizeof(componentsString), "%s,%d", componentsString, gProperties[i][Vehicle][Components][j]);
 			}
 
-			format(coordStringOffer, sizeof(coordStringOffer), "%s,%.2f", coordStringOffer, gProperties[i][LocationOffer][Coords: j]);
-			format(coordStringEntrance, sizeof(coordStringEntrance), "%s,%.2f", coordStringEntrance, gProperties[i][LocationEntrance][Coords: j]);
-			format(coordStringVehicle, sizeof(coordStringVehicle), "%s,%.2f", coordStringVehicle, gProperties[i][LocationVehicle][Coords: j]);
-		}
+			format(query, sizeof(query), "INSERT INTO vehicles (id, model, color1, color2, components) VALUES (%d, %d, %d, %d, \"%s\") ON CONFLICT(id) DO UPDATE SET model = excluded.model, color1 = excluded.color1, color2 = excluded.color2, components = excluded.components",
+					gProperties[i][ID],
+					gProperties[i][Vehicle][Model],
+					gProperties[i][Vehicle][Colours][0],
+					gProperties[i][Vehicle][Colours][1],
+					componentsString
+			      );
 
-		writecfg(fileName, stringName, "locationOffer", coordStringOffer);
-		writecfg(fileName, stringName, "locationEntrance", coordStringEntrance);
-		writecfg(fileName, stringName, "locationVehicle", coordStringVehicle);
-
-		writecfgvalue(fileName, stringName, "occupied", gProperties[i][Occupied]);
-
-		//
-		// Vehicle props.
-		//
-
-		new componentsString[128], stringCopy[20];
-		strcopy(stringCopy, stringName);
-		strcat(stringCopy, "_vehicle");
-
-		writecfgvalue(fileName, stringCopy, "model", gProperties[i][Vehicle][Model]);
-		writecfgvalue(fileName, stringCopy, "colour1", gProperties[i][Vehicle][Colours][0]);
-		writecfgvalue(fileName, stringCopy, "colour2", gProperties[i][Vehicle][Colours][1]);
-
-		for (new j = 0; j < 16; j++)
-		{
-			if (!strcmp(componentsString, ""))
-			{
-				format(componentsString, sizeof(componentsString), "%d", gProperties[i][Vehicle][Components][j]);
-				continue;
+			new DBResult: result_vehicle = DB_ExecuteQuery(gDbConnectionHandle, query);
+			if (!result_vehicle) {
+				print("Database error: cannot write property data (vehicle)!");
+				return 0;
 			}
 
-			format(componentsString, sizeof(componentsString), "%s,%d", componentsString, gProperties[i][Vehicle][Components][j]);
+			DB_FreeResultSet(result_vehicle);
 		}
 
-		writecfg(fileName, stringCopy, "components", componentsString);
+		format(query, sizeof(query), "INSERT INTO properties (id,user_id,vehicle_id,label,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied) VALUES (%d, %d, %d, \"%s\", %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) ON CONFLICT(id) DO UPDATE SET occupied = excluded.occupied",
+				gProperties[i][ID],
+				gProperties[i][UserID],
+				vehicle_id,
+				gProperties[i][Label],
+				gProperties[i][Cost],
+				gProperties[i][LocationOffer][CoordX],
+				gProperties[i][LocationOffer][CoordY],
+				gProperties[i][LocationOffer][CoordZ],
+				gProperties[i][LocationOffer][CoordR],
+				gProperties[i][LocationEntrance][CoordX],
+				gProperties[i][LocationEntrance][CoordY],
+				gProperties[i][LocationEntrance][CoordZ],
+				gProperties[i][LocationEntrance][CoordR],
+				gProperties[i][LocationVehicle][CoordX],
+				gProperties[i][LocationVehicle][CoordY],
+				gProperties[i][LocationVehicle][CoordZ],
+				gProperties[i][LocationVehicle][CoordR],
+				gProperties[i][Occupied]
+		      );
+
+		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result) {
+			print("Database error: cannot write property data!");
+			return 0;
+		}
+
+		DB_FreeResultSet(result);
+
+		//
+		//
+		//
 
 		//
 		// Drugz.
 		//
 
-		new label[7] = "_drugz";
-		strcopy(stringCopy, stringName);
-		strcat(stringCopy, label);
+		/*new label[7] = "_drugz";
+		  strcopy(stringCopy, stringName);
+		  strcat(stringCopy, label);
 
-		for (new j = 0; j < MAX_DRUGS; j++)
-		{
-			writecfgvalue(fileName, stringCopy, gDrugz[j][DrugIniName], gProperties[i][Drugs][j]);
-		}
+		  for (new j = 0; j < MAX_DRUGS; j++)
+		  {
+		  writecfgvalue(fileName, stringCopy, gDrugz[j][DrugIniName], gProperties[i][Drugs][j]);
+		  }*/
 	}
-
-	writecfg(fileName, "", "properties", stringNames);
 
 	return 1;
 }
@@ -226,6 +235,7 @@ stock ExtractIntsFromString(const input[], ints[16])
 // Helper enum for the real estate data field parsing.
 enum {
 	FIELD_ID,
+	FIELD_USER_ID,
 	FIELD_VEHICLE_ID,
 	FIELD_LABEL,
 	FIELD_COST,
@@ -255,7 +265,7 @@ stock LoadRealEstateData()
 {
 	new i = 0, query[512];
 
-	format(query, sizeof(query), "SELECT id,vehicle_id,label,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied FROM properties");
+	format(query, sizeof(query), "SELECT id,user_id,vehicle_id,label,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied FROM properties");
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
@@ -268,6 +278,7 @@ stock LoadRealEstateData()
 		new label[64];
 
 		gProperties[i][ID] = DB_GetFieldInt(result, FIELD_ID);
+		gProperties[i][UserID] = bool: DB_GetFieldInt(result, FIELD_USER_ID);
 		gProperties[i][Cost] = DB_GetFieldInt(result, FIELD_COST);
 		gProperties[i][Occupied] = bool: DB_GetFieldInt(result, FIELD_OCCUPIED);
 
@@ -335,21 +346,21 @@ stock LoadRealEstateData()
 	DB_FreeResultSet(result);
 
 	/*do {
-		// Drugz.
-		new label[7] = "_drugz";
-		strcat(token1, label);
+	// Drugz.
+	new label[7] = "_drugz";
+	strcat(token1, label);
 
-		for (new j = 0; j < MAX_DRUGS; j++)
-		{
-			gProperties[i][Drugs][j] = readcfgvalue(fileName, token1, gDrugz[j][DrugIniName]);
-		}
+	for (new j = 0; j < MAX_DRUGS; j++)
+	{
+	gProperties[i][Drugs][j] = readcfgvalue(fileName, token1, gDrugz[j][DrugIniName]);
+	}
 
-		// Prepare vars for the next run.
-		strcopy(properties, token2);
-		i++;
+	// Prepare vars for the next run.
+	strcopy(properties, token2);
+	i++;
 
-		if (i > MAX_PROPERTIES)
-			break;
+	if (i > MAX_PROPERTIES)
+	break;
 	} while (strcmp(token2, ""));*/
 
 	return 1;

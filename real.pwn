@@ -164,7 +164,7 @@ stock SaveRealEstateData()
 			DB_FreeResultSet(result_vehicle);
 		}
 
-		format(query, sizeof(query), "INSERT INTO properties (id,user_id,vehicle_id,label,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied) VALUES (%d, %d, %d, \"%s\", %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) ON CONFLICT(id) DO UPDATE SET occupied = %d",
+		format(query, sizeof(query), "INSERT INTO properties (id,user_id,vehicle_id,name,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied) VALUES (%d, %d, %d, \"%s\", %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) ON CONFLICT(id) DO UPDATE SET occupied = %d",
 				gProperties[i][ID],
 				gProperties[i][UserID],
 				vehicle_id,
@@ -236,7 +236,7 @@ enum {
 	FIELD_ID,
 	FIELD_USER_ID,
 	FIELD_VEHICLE_ID,
-	FIELD_LABEL,
+	FIELD_NAME,
 	FIELD_COST,
 	FIELD_LOCATION_OFFER_X,
 	FIELD_LOCATION_OFFER_Y,
@@ -264,7 +264,7 @@ stock LoadRealEstateData()
 {
 	new i = 0, query[512];
 
-	format(query, sizeof(query), "SELECT id,user_id,vehicle_id,label,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied FROM properties");
+	format(query, sizeof(query), "SELECT id,user_id,vehicle_id,name,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied FROM properties");
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
@@ -274,7 +274,7 @@ stock LoadRealEstateData()
 
 	while (DB_SelectNextRow(result))
 	{
-		new label[64];
+		new name[64];
 
 		gProperties[i][ID] = DB_GetFieldInt(result, FIELD_ID);
 		gProperties[i][UserID] = bool: DB_GetFieldInt(result, FIELD_USER_ID);
@@ -299,9 +299,9 @@ stock LoadRealEstateData()
 		gProperties[i][LocationVehicle][CoordZ] = DB_GetFieldInt(result, FIELD_LOCATION_VEHICLE_Z);
 		gProperties[i][LocationVehicle][CoordR] = DB_GetFieldInt(result, FIELD_LOCATION_VEHICLE_ROT);
 
-		DB_GetFieldString(result, FIELD_LABEL, label, sizeof(label));
+		DB_GetFieldString(result, FIELD_NAME, name, sizeof(name));
 
-		gProperties[i][Label] = label;
+		gProperties[i][Label] = name;
 
 		//
 		//  Vehicle props extraction

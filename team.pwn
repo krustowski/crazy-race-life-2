@@ -34,6 +34,18 @@ enum Team
 
 new gTeams[MAX_TEAMS][Team];
 
+new gTeamNone[Team] = 
+{
+	0,
+	"Blank team (stub)",
+	0,
+	{0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	0,
+	0
+};
+
 /*stock InitTeams()
 {
 	gTeams[0] = gTeamNone;
@@ -62,7 +74,9 @@ enum
 
 public InitTeams()
 {
-	new i = 0, query[512];
+	new i = 1, query[512];
+
+	gTeams[0] = gTeamNone;
 
 	format(query, sizeof(query), "SELECT id,name,color,skins,weapons,ammu,salary_base_dollars,salary_volatile_dollars FROM teams");
 
@@ -78,6 +92,7 @@ public InitTeams()
 			name[64],
 		       	ammu[11],	
 			ammuString[128], 
+			colorString[128],
 			skins[5],
 			skinsString[128], 
 			weapons[11],
@@ -87,9 +102,12 @@ public InitTeams()
 		gTeams[i][TeamName] = name;
 
 		gTeams[i][ID] = DB_GetFieldInt(result, FIELD_TEAM_ID);
-		gTeams[i][Color] = DB_GetFieldInt(result, FIELD_TEAM_COLOR);
 		gTeams[i][SalaryBase] = DB_GetFieldInt(result, FIELD_TEAM_SALARY_BASE);
 		gTeams[i][SalaryVolatile] = DB_GetFieldInt(result, FIELD_TEAM_SALARY_VOLATILE);
+
+		// Color
+		DB_GetFieldString(result, FIELD_TEAM_COLOR, colorString, sizeof(colorString));
+		gTeams[i][Color] = HexToInt(colorString);
 
 		// Skins
 		DB_GetFieldString(result, FIELD_TEAM_SKINS, skinsString, sizeof(skinsString));
@@ -106,13 +124,34 @@ public InitTeams()
 		ExtractWeaponsAmmuFromString(ammuString, ammu);
 		gTeams[i][Ammu] = ammu;
 
+		printf("-> Team %s (ID: %d, color: %d) loaded!", gTeams[i][TeamName], gTeams[i][ID], gTeams[i][Color]);
+
 		i++;
 	}
 
-	print("Teams initiated!");
+	print("Teams initialized!");
 	DB_FreeResultSet(result);
 
 	return 1;
+}
+
+stock HexToInt(const string[])
+{
+    if (!string[0])
+    {
+        return 0;
+    }
+
+    new
+        cur = 1,
+        res = 0;
+
+    for (new i = strlen(string); i > 0; i--)
+    {
+        res += cur * (string[i - 1] - ((string[i - 1] < 58) ? (48) : (55)));
+        cur = cur * 16;
+    }
+    return res;
 }
 
 stock ExtractSkinsFromString(const input[], ints[5])

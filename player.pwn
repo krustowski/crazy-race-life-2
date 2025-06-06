@@ -477,15 +477,6 @@ public SavePlayerData(playerid)
 		GetPlayerArmour(playerid, armour);
 		GetPlayerHealth(playerid, health);
 
-		writecfgvalue(gPlayers[playerid][Name], "", "cash", GetPlayerMoney(playerid));
-		writecfgvalue(gPlayers[playerid][Name], "", "bank", gPlayers[playerid][Bank]);
-		writecfgvalue(gPlayers[playerid][Name], "", "adminlvl", gPlayers[playerid][AdminLevel]);
-		writecfgvalue(gPlayers[playerid][Name], "", "team", gPlayers[playerid][TeamID]);
-		writecfgvalue(gPlayers[playerid][Name], "", "class", GetPlayerSkin(playerid));
-		writecfgvalue(gPlayers[playerid][Name], "", "health", floatround(health));
-		writecfgvalue(gPlayers[playerid][Name], "", "armour", floatround(armour));
-		writecfgvalue(gPlayers[playerid][Name], "", "spawn", gPlayers[playerid][SpawnPoint]);
-
 		// Properties, Real Estate elements.
 		new propertiesString[64];
 
@@ -503,11 +494,21 @@ public SavePlayerData(playerid)
 
 		writecfg(gPlayers[playerid][Name], "", "properties", propertiesString);
 
+		new query[256];
+
+		format(query, sizeof(query), "UPDATE users SET cash = %d, bank = %d, adminlvl = %d, team = %d, class = %d, health = %d, armour = %d, spawn = %d, properties = '%s' WHERE nickname = '%s';", GetPlayerMoney(playerid), gPlayers[playerid][Bank], gPlayers[playerid][AdminLevel], gPlayers[playerid][TeamID], GetPlayerSkin(playerid), floatround(health), floatround(armour), gPlayers[playerid][SpawnPoint], propertiesString, gPlayers[playerid][Name]);
+
+		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result) {
+			print("Database error: cannot write user data!");
+			return 0;
+		}
+
 		// Drugz.
-		for (new i = 0; i < MAX_DRUGS; i++)
+		/*for (new i = 0; i < MAX_DRUGS; i++)
 		{
 			writecfgvalue(gPlayers[playerid][Name], "drugz", gDrugz[i][DrugIniName], gPlayers[playerid][Drugs][i]);
-		}
+		}*/
 
 		SendClientMessage(playerid, GREEN, "[ AUTOSAVE ] Data uspesne ulozena! ");
 	}

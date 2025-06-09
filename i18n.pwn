@@ -58,7 +58,19 @@ enum
 	//
 	I18N_NO_SUCH_COMMAND,
 	//
-	I18N_DEATH_MONEY_LOCALITY
+	I18N_DEATH_MONEY_LOCALITY,
+	//
+	I18N_REAL_VEHMOD_SAVED,
+	I18N_REAL_INVALID_CODE,
+	I18N_REAL_SELL_PICKUP_MISLOC,
+	I18N_REAL_SELL_NOT_OCCUPIED,
+	I18N_REAL_SELL_NOT_OWNED,
+	I18N_REAL_PROPERTY_ACQ,
+	I18N_REAL_INTERIOR_GEN_FAIL,
+	I18N_REAL_NO_FREE_SLOT,
+	I18N_REAL_ALREADY_OCCUPIED,
+	I18N_REAL_NO_MONEY,
+	I18N_REAL_SELL_SUCCESS
 }
 
 new gI18nMessageColor[] = 
@@ -88,7 +100,19 @@ new gI18nMessageColor[] =
 	//
 	COLOR_GREY,
 	//
-	COLOR_YELLOW
+	COLOR_YELLOW,
+	// Real estate
+	COLOR_LIGHTGREEN,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_LIGHTGREEN,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_LIGHTGREEN
 };
 
 new gI18nMessageEn[][] = 
@@ -111,8 +135,18 @@ new gI18nMessageEn[][] =
 	"[ RACE ] You haven't got enough moeny to join such race!",
 	"[ DEATHMATCH ] New match just started, join to play!",
 	"[ ! ] No such command! /cmd /help /rules",
-	"[ i ] You dropped your money at the death position!"
-
+	"[ i ] You dropped your money at the death position!",
+	"[ REAL ] Vehicle modifications saved",
+	"[ REAL ] Invalid property code entered!",
+	"[ REAL ] Use the red property pickup to sell such property!",
+	"[ REAL ] Such property is not for sell, or is not occupied at all!",
+	"[ REAL ] Such property is not owned by you!",
+	"[ REAL ] You have just bought such property!",
+	"[ REAL ] Interior generation failed!",
+	"[ REAL ] No free slot to buy such property! You need to sell one to be able to buy another",
+	"[ REAL ] Such property is already occupied! Invalid action",
+	"[ REAL ] You haven't got enough money to buy such property!",
+	"[ REAL ] The property has been sold successfully!"
 };
 
 new gI18nMessageCz[][] = 
@@ -135,7 +169,18 @@ new gI18nMessageCz[][] =
 	"[ ZAVOD ] Nemas dostatek hotovosti pro zaplaceni prihlasky do zavodu!",
 	"[ DEATHMATCH ] Utkani zacalo! 4 minuty do konce",
 	"[ ! ] Tento prikaz neexistuje! /cmd /help /rules",
-	"[ i ] Tve penize zustaly na miste umrti!"
+	"[ i ] Tve penize zustaly na miste umrti!",
+	"[ REAL ] Modifikace auta ulozeny k zaparkovanemu autu",
+	"[ REAL ] Neplatny kod nemovitosti!",
+	"[ REAL ] Je treba byt v okoli puvodniho pickupu (nyni rotujici cerveny domek)!",
+	"[ REAL ] Nelze prodat nemovitost, ktera neni prodana/obsazena.",
+	"[ REAL ] Dana nemovitost ti nepatri!",
+	"[ REAL ] Nemovitost uspesne zakoupena!",
+	"[ REAL ] Nebylo mozne vygenerovat vsechny pickupy v dome!",
+	"[ REAL ] Jiz vlastnis limitni pocet nemocitosti, je treba nejakou prodat, abys mohl nakoupit novou",
+	"[ REAL ] Tato nemovitost je jiz obsazena. Neplatna akce!",
+	"[ REAL ] Na danou transakci nemas dostatek hotovosti!",
+	"[ REAL ] Nemovitost byla uspesne prodana!"
 };
 
 

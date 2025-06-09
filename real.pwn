@@ -415,7 +415,9 @@ stock SpawnPropertyInterior(playerid, arrayID)
 		if (!gPlayerInteriors[playerid][Pickups][i] || gPlayerInteriors[playerid][Pickups][i] == -1)
 		{
 			printf("SpawnPropertyInterior: pickup creation error: pickup no. %d, value: %d", i, gPlayerInteriors[playerid][Pickups][i]);
-			SendClientMessage(playerid, COLOR_CERVENA, "[ ERROR ] Nebylo mozne vygenerovat vsechny pickupy v dome!");
+
+			SendClientMessageLocalized(playerid, I18N_REAL_INTERIOR_GEN_FAIL);
+
 			DestroyPropertyInterior(playerid);
 
 			return 0;
@@ -501,19 +503,20 @@ stock BuyPlayerProperty(playerid, propertyID)
 	//
 
 	if (arrayID == INVALID_PROPERTY_ID || !propertyID)
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Neplatny kod nemovitosti!");
+		return SendClientMessageLocalized(playerid, I18N_REAL_INVALID_CODE);
 
 	if (freeSlot < 0)
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Jiz vlastnis limitni pocet nemocitosti, je treba nejakou prodat, abys mohl nakoupit novou.");
+		return SendClientMessageLocalized(playerid, I18N_REAL_NO_FREE_SLOT);
 
 	if (gProperties[arrayID][Occupied])
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Tato nemovitost je jiz obsazena. Neplatna akce!");
+		return SendClientMessageLocalized(playerid, I18N_REAL_ALREADY_OCCUPIED);
 
 	if (!IsPlayerInSphere(playerid, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ], 15))
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Je treba byt v okoli puvodniho pickupu (rotujici zeleny domek).");
+		return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);
+		//return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Je treba byt v okoli puvodniho pickupu (rotujici zeleny domek).");
 
 	if (GetPlayerMoney(playerid) < gProperties[arrayID][Cost])
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Na danou transakci nemas dostatek hotovosti!");
+		return SendClientMessageLocalized(playerid, I18N_REAL_NO_MONEY);
 
 	//
 	//  Ok, proceed with the transaction.
@@ -530,7 +533,7 @@ stock BuyPlayerProperty(playerid, propertyID)
 
 	GivePlayerMoney(playerid, -gProperties[arrayID][Cost]);
 
-	return SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Nemovitost uspesne zakoupena!");
+	return SendClientMessageLocalized(playerid, I18N_REAL_PROPERTY_ACQ);
 }
 
 stock SellPlayerProperty(playerid, propertyID)
@@ -540,16 +543,16 @@ stock SellPlayerProperty(playerid, propertyID)
 	arrayID = GetPropertyArrayIDfromID(propertyID);
 
 	if (arrayID == INVALID_PROPERTY_ID || !propertyID)
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Neplatny kod nemovitosti!");
+		return SendClientMessageLocalized(playerid, I18N_REAL_INVALID_CODE);
 
 	if (!IsPlayerInSphere(playerid, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ], 15))
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Je treba byt v okoli puvodniho pickupu (nyni rotujici cerveny domek).");
+		return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);
 
 	if (!gProperties[arrayID][Occupied])
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Nelze prodat nemovitost, ktera neni prodana/obsazena.");
+		return SendClientMessageLocalized(playerid, I18N_REAL_SELL_NOT_OCCUPIED);
 
 	if (!IsPlayerOwner(playerid, propertyID))
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Dana nemovitost ti nepatri!");
+		return SendClientMessageLocalized(playerid, I18N_REAL_SELL_NOT_OWNED);
 
 	//
 	//  Ok, sell the property.
@@ -580,7 +583,7 @@ stock SellPlayerProperty(playerid, propertyID)
 
 	GivePlayerMoney(playerid, floatround(float(gProperties[arrayID][Cost]) * 0.9));
 
-	return SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Nemovitost byla uspesne prodana!");
+	return SendClientMessageLocalized(playerid, I18N_REAL_SELL_SUCCESS);
 }
 
 stock UpdatePropertyVehicle(playerid)
@@ -624,7 +627,7 @@ stock UpdatePropertyVehicle(playerid)
 		gProperties[arrayID][Vehicle][Components][i] = GetVehicleComponentInSlot(vehicleID, t_CARMODTYPE: i);
 	}
 
-	SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Modifikace auta ulozeny k zaparkovanemu autu.");
+	SendClientMessageLocalized(playerid, I18N_REAL_VEHMOD_SAVED);
 
 	return 1;
 }

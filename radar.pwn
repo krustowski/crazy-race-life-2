@@ -79,8 +79,16 @@ public OnRadarCheckpoint()
 					GivePlayerMoney(i, -RADAR_FEE);
 					PlayerPlaySound(i, 1147, 0, 0, 0);
 
-					format(stringToPrint, 128, "[ RADAR ] Jel jsi prilis vysokou rychlosti ( %3d km/h )! Pokuta: $%d", floatround(radarValue / 1400), RADAR_FEE);
-					SendClientMessage(i, COLOR_CERVENA, stringToPrint);
+					switch (gPlayers[i][Locale])
+					{
+						case LOCALE_CZ:
+							format(stringToPrint, 128, "[ RADAR ] Jel jsi prilis vysokou rychlosti ( %3d km/h )! Pokuta: $%d", floatround(radarValue / 1400), RADAR_FEE);
+
+						default:
+							format(stringToPrint, 128, "[ SPEED ] Vehicle speed too high ( %3d km/h )! Fee amount: $%d", floatround(radarValue / 1400), RADAR_FEE);
+					}
+
+					SendClientMessage(i, COLOR_RED, stringToPrint);
 
 					SetTimerEx("OffRadarCheckpoint", 5000, false, "i", i);
 

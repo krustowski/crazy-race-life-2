@@ -319,12 +319,12 @@ public OnPlayerConnect(playerid)
 	format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s se prave pripojil(a) ke hre!", playerName);
 
 	gPlayers[playerid][Name] = playerName;
-	SendClientMessageToAll(COLOR_SEDA, stringToPrint);
+	SendClientMessageToAll(COLOR_GREY, stringToPrint);
 
 	// Send a welcome text to the connecting new player.
-	SendClientMessage(playerid, COLOR_NEVIDITEL, "");
-	SendClientMessage(playerid, GREEN, "Vitej v modu CrazyRaceLife2! :) /cmd /help /rules");
-	SendClientMessage(playerid, COLOR_NEVIDITEL, "");
+	SendClientMessage(playerid, COLOR_INVISIBLE, "");
+	SendClientMessage(playerid, COLOR_GREEN, "Vitej v modu CrazyRaceLife2! :) /cmd /help /rules");
+	SendClientMessage(playerid, COLOR_INVISIBLE, "");
 
 	SendDeathMessage(playerid, INVALID_PLAYER_ID, 200);
 
@@ -374,7 +374,7 @@ public OnPlayerDisconnect(playerid, reason)
 			}
 	}
 
-	SendClientMessageToAll(COLOR_SEDA, stringToPrint);
+	SendClientMessageToAll(COLOR_GREY, stringToPrint);
 
 	return 0;
 }
@@ -467,7 +467,7 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 		TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
 		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s [ID: %d] porusil pravidla serveru! [Car kill]", killerName, killerid);
-		SendClientMessageToAll(COLOR_CERVENA, stringToPrint);
+		SendClientMessageToAll(COLOR_RED, stringToPrint);
 
 		SpawnPlayer(killerid);
 		PlayerPlaySound(killerid, 1056, 0, 0, 0);
@@ -511,7 +511,7 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 			break;
 
 		gProperties[i][Vehicle][Components][componentType] = componentid;
-		SendClientMessage(playerid, COLOR_SVZEL, "[ REAL ] Modifikace zaparkovaneho auta byla ulozena.");
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] Modifikace zaparkovaneho auta byla ulozena.");
 	}
 
 	return 1;
@@ -608,7 +608,7 @@ public OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstat
 	{
 		if (!IsPlayerAdmin(playerid))
 		{
-			SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Vozidlo bude zniceno, protoze nemas opravneni ho ridit!");
+			SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Vozidlo bude zniceno, protoze nemas opravneni ho ridit!");
 			GameTextForPlayer(playerid, "~r~Toto auto je jen pro ~b~rcon ~g~adminy", 5000, 5);
 			SetVehicleHealth(GetPlayerVehicleID(playerid), 100.0);
 		}
@@ -683,7 +683,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 
 				if (!strlen(inputtext))
-					return SendClientMessage(playerid, COLOR_CERVENA, "[ DRUGZ ] Neplatna volba.");
+					return SendClientMessage(playerid, COLOR_RED, "[ DRUGZ ] Neplatna volba.");
 
 				// Save to the temporary user's var.
 				gPlayers[playerid][Temp] = listitem;
@@ -707,7 +707,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							gProperties[propertyID][Drugs][drugID] += gPlayers[playerid][Drugs][drugID];
 							gPlayers[playerid][Drugs][drugID] = 0;
 
-							SendClientMessage(playerid, COLOR_ORANZOVA, "[ DRUGZ ] Uspesne ulozeno doma.");
+							SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Uspesne ulozeno doma.");
 						}
 					case 1:
 						{
@@ -715,7 +715,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							gPlayers[playerid][Drugs][drugID] += gProperties[propertyID][Drugs][drugID];
 							gProperties[propertyID][Drugs][drugID] = 0;
 
-							SendClientMessage(playerid, COLOR_ORANZOVA, "[ DRUGZ ] Uspesne ulozeno do kapes.");
+							SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Uspesne ulozeno do kapes.");
 						}
 				}
 
@@ -809,7 +809,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 			} 
 
 			if (!IsPlayerOwner(playerid, gProperties[i][ID]))
-				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Tato nemovitost byla jiz prodana jinemu hraci.");
+				return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Tato nemovitost byla jiz prodana jinemu hraci.");
 
 			if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
 				return 1;
@@ -820,7 +820,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		else if (pickupid == gProperties[i][Pickups][PICKUP_ENTRANCE])
 		{
 			if (!IsPlayerOwner(playerid, gProperties[i][ID]))
-				return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Neni mozne vstoupit na cizi pozemek!");
+				return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Neni mozne vstoupit na cizi pozemek!");
 
 			// Spawn the room.
 			SpawnPropertyInterior(playerid, i);
@@ -853,7 +853,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 				{
 					SetPlayerHealth(playerid, 100.0);
 					SetPlayerArmour(playerid, 100.0);
-					SendClientMessage(playerid, COLOR_SVZEL, "[ HP ] Doplneno zdravi a vesta.");
+					SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ HP ] Doplneno zdravi a vesta.");
 
 					break;
 				}
@@ -918,7 +918,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		gPlayers[playerid][Drugs][COCAINE] += amount;
 
 		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy kokainu.", amount);
-		SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
+		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 	}
 	else if (pickupid == gHeroinPackage[0] || pickupid == gHeroinPackage[1] || pickupid == gHeroinPackage[2] || pickupid == gHeroinPackage[3] || pickupid == gHeroinPackage[4])
 	{
@@ -927,7 +927,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		gPlayers[playerid][Drugs][HEROIN] += amount;
 
 		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy heroinu.", amount);
-		SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
+		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 	}
 	else if (pickupid == gMethPackage[0] || pickupid == gMethPackage[1] || pickupid == gMethPackage[2] || pickupid == gMethPackage[3] || pickupid == gMethPackage[4] || pickupid == gMethPackage[5])
 	{
@@ -936,7 +936,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		gPlayers[playerid][Drugs][METH] += amount;
 
 		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy methamphetaminu.", amount);
-		SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
+		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 	}
 	else if (pickupid == gFentPackage[0] || pickupid == gFentPackage[1])
 	{
@@ -945,7 +945,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		gPlayers[playerid][Drugs][FENT] += amount;
 
 		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy fentanylu.", amount);
-		SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
+		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 	}
 	else if (pickupid == gPCPPackage)
 	{
@@ -954,7 +954,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		gPlayers[playerid][Drugs][PCP] += amount;
 
 		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy PCP.", amount);
-		SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
+		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 	}
 	else if (pickupid == gTHCPackage[0] || pickupid == gTHCPackage[1] || pickupid == gTHCPackage[2] || pickupid == gTHCPackage[3] || pickupid == gTHCPackage[4] || pickupid == gTHCPackage[5] || pickupid == gTHCPackage[6] || pickupid == gTHCPackage[7] || pickupid == gTHCPackage[8] || pickupid == gTHCPackage[9])
 	{
@@ -963,7 +963,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		gPlayers[playerid][Drugs][ZAZA] += amount;
 
 		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy THC.", amount);
-		SendClientMessage(playerid, COLOR_ORANZOVA, stringToPrint);
+		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 	}
 
 
@@ -995,7 +995,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		ResetPlayerWeapons(playerid);
 		gPlayers[playerid][TeamID] = TEAM_NONE;
 
-		SendClientMessage(playerid, COLOR_SEDA, "[ TEAM ] Opustil jsi team: jsi nezarazen/nezamestnan.");
+		SendClientMessage(playerid, COLOR_GREY, "[ TEAM ] Opustil jsi team: jsi nezarazen/nezamestnan.");
 
 		return 1;
 	}
@@ -1011,7 +1011,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 			gPlayers[playerid][TeamID] = gTeams[i][ID];
 
 			format(stringToPrint, sizeof(stringToPrint), "[ TEAM ] Hrac %s se pripojil k tymu %s!", gPlayers[playerid][Name], gTeams[i][TeamName]);
-			SendClientMessageToAll(COLOR_ZLUTA, stringToPrint);
+			SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
 		}
 	}
 

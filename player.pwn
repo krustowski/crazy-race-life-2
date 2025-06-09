@@ -67,7 +67,7 @@ public LoadPlayerData(playerid)
 		SetPlayerColor(playerid, COLOR_INVISIBLE);
 
 		new query[256];
-		format(query, sizeof(query), "SELECT cash, bank, adminlvl, team, class, health, armour, spawn, properties FROM users WHERE nickname = '%s';", gPlayers[playerid][Name]);
+		format(query, sizeof(query), "SELECT id, cash, bank, adminlvl, team, class, health, armour, spawn, properties FROM users WHERE nickname = '%s';", gPlayers[playerid][Name]);
 
 		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result) {
@@ -77,25 +77,45 @@ public LoadPlayerData(playerid)
 
 		new properties[MAX_PLAYER_PROPERTIES], propertiesString[128];
 
-		gPlayers[playerid][Cash] = DB_GetFieldInt(result, 0);
-		gPlayers[playerid][Bank] = DB_GetFieldInt(result, 1);
-		gPlayers[playerid][AdminLevel] = DB_GetFieldInt(result, 2);
-		gPlayers[playerid][TeamID] = DB_GetFieldInt(result, 3);
-		gPlayers[playerid][Skin] = DB_GetFieldInt(result, 4);
-		gPlayers[playerid][Health] = DB_GetFieldInt(result, 5);
-		gPlayers[playerid][Armour] = DB_GetFieldInt(result, 6);
-		gPlayers[playerid][SpawnPoint] = DB_GetFieldInt(result, 7);
-		DB_GetFieldString(result, 8, propertiesString, sizeof(propertiesString));
+		gPlayers[playerid][OrmID] = DB_GetFieldIntByName(result, "id");
+		gPlayers[playerid][Cash] = DB_GetFieldIntByName(result, "cash");
+		gPlayers[playerid][Bank] = DB_GetFieldIntByName(result, "bank");
+		gPlayers[playerid][AdminLevel] = DB_GetFieldIntByName(result, "adminlvl");
+		gPlayers[playerid][TeamID] = DB_GetFieldIntByName(result, "team");
+		gPlayers[playerid][Skin] = DB_GetFieldIntByName(result, "class");
+		gPlayers[playerid][Health] = DB_GetFieldIntByName(result, "health");
+		gPlayers[playerid][Armour] = DB_GetFieldIntByName(result, "armour");
+		gPlayers[playerid][SpawnPoint] = DB_GetFieldIntByName(result, "spawn");
+		DB_GetFieldStringByName(result, "properties", propertiesString, sizeof(propertiesString));
 
 		ExtractPropperties(propertiesString, properties);
 		gPlayers[playerid][Properties] = properties;
 
 		DB_FreeResultSet(result);
 
-		/*for (new i = 0; i < MAX_DRUGS; i++)
-		  {
-		  gPlayers[playerid][Drugs][i] = readcfgvalue(gPlayers[playerid][Name], "drugz", gDrugz[i][DrugIniName]);
-		  }*/
+		//
+		// Drugz
+		//
+
+		format(query, sizeof(query), "SELECT cocaine, heroin, meth, fent, zaza, tobacco, pcp, paper, lighter, joint FROM drugz WHERE owner_id = %d AND owner_type = 1", gPlayers[playerid][OrmID]);
+
+		new DBResult: result_drugz = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result_drugz) {
+			print("Database error: cannot fetch user data (drugz)!");
+		}
+
+		gPlayers[playerid][Drugs][COCAINE] = DB_GetFieldIntByName(result_drugz, "cocaine");
+		gPlayers[playerid][Drugs][HEROIN] = DB_GetFieldIntByName(result_drugz, "heroin");
+		gPlayers[playerid][Drugs][METH] = DB_GetFieldIntByName(result_drugz, "meth");
+		gPlayers[playerid][Drugs][FENT] = DB_GetFieldIntByName(result_drugz, "fent");
+		gPlayers[playerid][Drugs][ZAZA] = DB_GetFieldIntByName(result_drugz, "zaza");
+		gPlayers[playerid][Drugs][TOBACCO] = DB_GetFieldIntByName(result_drugz, "tobacco");
+		gPlayers[playerid][Drugs][PCP] = DB_GetFieldIntByName(result_drugz, "pcp");
+		gPlayers[playerid][Drugs][PAPER] = DB_GetFieldIntByName(result_drugz, "paper");
+		gPlayers[playerid][Drugs][LIGHTER] = DB_GetFieldIntByName(result_drugz, "lighter");
+		gPlayers[playerid][Drugs][JOINT] = DB_GetFieldIntByName(result_drugz, "joint");
+
+		DB_FreeResultSet(result_drugz);
 
 		GivePlayerMoney(playerid, gPlayers[playerid][Cash]);
 		SetPlayerHealth(playerid, gPlayers[playerid][Health]);
@@ -156,7 +176,7 @@ public SavePlayerData(playerid)
 
 		writecfg(gPlayers[playerid][Name], "", "properties", propertiesString);
 
-		new query[256];
+		new query[512];
 
 		format(query, sizeof(query), "UPDATE users SET cash = %d, bank = %d, adminlvl = %d, team = %d, class = %d, health = %d, armour = %d, spawn = %d, properties = '%s' WHERE nickname = '%s';", GetPlayerMoney(playerid), gPlayers[playerid][Bank], gPlayers[playerid][AdminLevel], gPlayers[playerid][TeamID], GetPlayerSkin(playerid), floatround(health), floatround(armour), gPlayers[playerid][SpawnPoint], propertiesString, gPlayers[playerid][Name]);
 
@@ -166,11 +186,31 @@ public SavePlayerData(playerid)
 			return 0;
 		}
 
-		// Drugz.
-		/*for (new i = 0; i < MAX_DRUGS; i++)
-		{
-			writecfgvalue(gPlayers[playerid][Name], "drugz", gDrugz[i][DrugIniName], gPlayers[playerid][Drugs][i]);
-		}*/
+		//
+		//  Drugz
+		//
+
+		format(query, sizeof(query), "INSERT INTO drugz (owner_type, owner_id, cocaine, heroin, meth, fent, zaza, tobacco, pcp, paper, lighter, joint) VALUES (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) ON CONFLICT(owner_id) DO UPDATE SET cocaine = excluded.cocaine, heroin = excluded.heroin, meth = excluded.meth, fent = excluded.fent, zaza = excluded.zaza, tobacco = excluded.tobacco, pcp = excluded.pcp, paper = excluded.paper, lighter = excluded.lighter, joint = excluded.joint",
+				1,
+				gPlayers[playerid][OrmID],
+				gPlayers[playerid][Drugs][COCAINE],
+				gPlayers[playerid][Drugs][HEROIN],
+				gPlayers[playerid][Drugs][METH],
+				gPlayers[playerid][Drugs][FENT],
+				gPlayers[playerid][Drugs][ZAZA],
+				gPlayers[playerid][Drugs][TOBACCO],
+				gPlayers[playerid][Drugs][PCP],
+				gPlayers[playerid][Drugs][PAPER],
+				gPlayers[playerid][Drugs][LIGHTER],
+				gPlayers[playerid][Drugs][JOINT]
+			);
+
+		new DBResult: result_drugz = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result_drugz) {
+			printf("Database error: cannot write user data (drugz, ID: %d)!", gPlayers[playerid][OrmID]);
+		}
+
+		DB_FreeResultSet(result_drugz);
 
 		SendClientMessageLocalized(playerid, I18N_AUTOSAVE_SUCCESS);
 	}

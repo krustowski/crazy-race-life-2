@@ -43,7 +43,7 @@ stock SystemMsg(playerid, const msg[])
 {
 	if (IsPlayerConnected(playerid) && strlen(msg) > 0)
 	{
-		SendClientMessage(playerid, COLOR_SVZEL, msg);
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, msg);
 	}
 
 	return 1;
@@ -75,9 +75,7 @@ stock SendMessageToAdmins(colorId, const messageString[])
 
 stock InvalidCommand(playerid)
 {
-	SendClientMessage(playerid, COLOR_SEDA, "[ ! ] Tento prikaz neexistuje! /cmd /help /rules");
-
-	return 1;
+	return SendClientMessageLocalized(playerid, I18N_NO_SUCH_COMMAND);
 }
 
 stock IsPlayerInSphere(playerid, Float:x, Float:y, Float:z, radius)

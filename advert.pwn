@@ -34,7 +34,7 @@ public ShowAdvert()
 	new advertId = random(sizeof(advertList)), stringToPrint[256];
 
 	format(stringToPrint, sizeof(stringToPrint), "%s", advertList[advertId]);
-	SendClientMessageToAll(COLOR_BILA, stringToPrint);
+	SendClientMessageToAll(COLOR_WHITE, stringToPrint);
 
 	return 1;
 }

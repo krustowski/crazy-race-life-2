@@ -42,18 +42,47 @@ enum
 	I18N_AUTOSAVE_START,
 	I18N_AUTOSAVE_SUCCESS,
 	I18N_PRIV_MSG_MONEY,
-	I18N_PRIV_MSG_NO_PLAYER
+	I18N_PRIV_MSG_NO_PLAYER,
+	//
+	I18N_RACE_WARP_NO_RACE,
+	I18N_RACE_WARP_AFTER_START,
+	I18N_RACE_WARP_NO_VEHIC_DRIVER,
+	I18N_RACE_ENDED_PREMATURELY,
+	I18N_RACE_ENDED_SUCCESSFULLY,
+	I18N_RACE_NO_RACE,
+	//
+	I18N_DEATHMATCH_STARTED,
+	//
+	I18N_NO_SUCH_COMMAND,
+	//
+	I18N_DEATH_MONEY_LOCALITY
 }
 
 new gI18nMessageColor[] = 
 {
 	COLOR_GREEN,
+	// User data load
 	COLOR_YELLOW,
 	COLOR_GREEN,
+	// Autosave
 	COLOR_YELLOW,
 	COLOR_GREEN,
+	// Private messages
 	COLOR_RED,
-	COLOR_RED
+	COLOR_RED,
+	// Racing
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_YELLOW,
+	COLOR_LIGHTGREEN,
+	COLOR_RED,
+	//
+	COLOR_YELLOW,
+	//
+	COLOR_GREY,
+	//
+	COLOR_YELLOW
 };
 
 new gI18nMessageEn[][] = 
@@ -64,7 +93,16 @@ new gI18nMessageEn[][] =
 	"[ AUTOSAVE ] Saving user and system data... ",
 	"[ AUTOSAVE ] Data saved successfully! ",
 	"[ PM ] You need at least $10 to send a private message!",
-	"[ PM ] Such user (ID) not found in the game!"
+	"[ PM ] Such user (ID) not found in the game!",
+	"[ WARP ] You need to join a race to be able to use warp command!",
+	"[ WARP ] The race has already started, no warp allowed anymore!",
+	"[ WARP ] You need drive a vehicle before the warp to the race start!",
+	"[ RACE ] The race ended prematurely!",
+	"[ RACE ] You have just finished the race!",
+	"[ RACE ] You need to join a race to use such feature!",
+	"[ DEATHMATCH ] New match just started, join to play!",
+	"[ ! ] No such command! /cmd /help /rules",
+	"[ i ] You dropped your money at the death position!"
 
 };
 
@@ -76,7 +114,16 @@ new gI18nMessageCz[][] =
 	"[ AUTOSAVE ] Ukladam uzivatelska a systemova data...",
 	"[ AUTOSAVE ] Data uspesne ulozena!",
 	"[ PM ] K odeslani soukrome zpravy potrebujes alespon $10!",
-	"[ PM ] Prijemce soukrome zpravy neni pritomen na serveru!"
+	"[ PM ] Prijemce soukrome zpravy neni pritomen na serveru!",
+	"[ WARP ] Nejsi prihlasen v zadnem zavode, warp se nekona!",
+	"[ WARP ] Zavod jiz zacal, warp na start uz neni mozny!",
+	"[ WARP ] Pro warp je treba byt ve vozidle a byt ridicem!",
+	"[ ZAVOD ] Zavod, ve kterem jsi byl prihlasen, byl predcasne ukoncen!",
+	"[ ZAVOD ] Dokoncil jsi zavod!",
+	"[ ZAVOD ] Nejsi prihlasen v zadnem zavodu!",
+	"[ DEATHMATCH ] Utkani zacalo! 4 minuty do konce",
+	"[ ! ] Tento prikaz neexistuje! /cmd /help /rules",
+	"[ i ] Tve penize zustaly na miste umrti!"
 };
 
 
@@ -95,4 +142,6 @@ public SendClientMessageLocalized(playerid, msg_id)
 		default:
 			SendClientMessage(playerid, gI18nMessageColor[msg_id], gI18nMessageEn[msg_id]);
 	}
+
+	return 1;
 }

@@ -14,7 +14,7 @@ public AntiCheatWeapon()
 
 				GetPlayerName(i, playerName, MAX_PLAYER_NAME);
 				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s byl(a) vyhozen(a) za weapon cheat!", playerName);
-				SendClientMessageToAll(COLOR_CERVENA, stringToPrint);
+				SendClientMessageToAll(COLOR_RED, stringToPrint);
 
 				Kick(i);
 			}
@@ -36,7 +36,7 @@ public AntiJetPack()
 
 				GetPlayerName(i, playerName, MAX_PLAYER_NAME);
 				format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s byl(a) vyhozen(a) za poruseni  pravidel. [JetPack]", playerName);
-				SendClientMessageToAll(COLOR_CERVENA, stringToPrint);
+				SendClientMessageToAll(COLOR_RED, stringToPrint);
 
 				PlayerPlaySound(i, 1056, 0, 0, 0);
 				Kick(i);

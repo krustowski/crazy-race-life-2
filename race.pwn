@@ -499,7 +499,7 @@ stock SetPlayerRaceState(playerid, E_RACE_ID: raceId)
 stock ResetPlayerRaceState(playerid, E_RACE_ID: raceId, finishedSuccessfully)
 {
 	if (!CheckPlayerRaceState(playerid))
-		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Nejsi prihlasen v zadnem zavode.");
+		return SendClientMessageLocalized(playerid, I18N_RACE_NO_RACE);
 
 	DisablePlayerRaceCheckpoint(playerid);
 	TextDrawHideForPlayer(playerid, gRaceInfoText[playerid]);
@@ -510,20 +510,20 @@ stock ResetPlayerRaceState(playerid, E_RACE_ID: raceId, finishedSuccessfully)
 
 	if (finishedSuccessfully)
 	{
-		SendClientMessage(playerid, COLOR_SVZEL, "[ i ] Dokoncil jsi zavod!");
+		SendClientMessageLocalized(playerid, I18N_RACE_ENDED_SUCCESSFULLY);
 
 		new playerName[MAX_PLAYER_NAME], stringToPrint[256];
 
 		GetPlayerName(playerid, playerName, sizeof(playerName));
 		GivePlayerMoney(playerid, gRaceFeePrize[raceId][E_RACE_FEE_PRIZE]);
 
-		format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s prave uspesne dokoncil zavod '%s' a obdrzel vyhru $%d!", playerName, gRaceNames[raceId], gRaceFeePrize[raceId][E_RACE_FEE_PRIZE]);
-		SendClientMessageToAll(COLOR_SVZEL, stringToPrint);
+		format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s just won the '%s' race, and received a price of $%d!", playerName, gRaceNames[raceId], gRaceFeePrize[raceId][E_RACE_FEE_PRIZE]);
+		SendClientMessageToAll(COLOR_LIGHTGREEN, stringToPrint);
 	}
 
 	if (!finishedSuccessfully && CheckPlayerRaceState(playerid))
 	{
-		SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Zavod, ve kterem jsi byl prihlasen, byl predcasne ukoncen!");
+		SendClientMessageLocalized(playerid, I18N_RACE_ENDED_PREMATURELY);
 	}
 
 	// Reset all race states to be sure not to interfere with others.
@@ -557,19 +557,19 @@ stock SetPlayerRaceStartPos(playerid)
 
 	if (!raceId)
 	{
-		 SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Nejsi prihlasen v zadnem zavode, warp se nekona!");
+		 SendClientMessageLocalized(playerid, I18N_RACE_WARP_NO_RACE);
 		 return 0;
 	}
 
 	if (gPlayerRace[playerid][raceId] > 1)
 	{
-		SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Zavod jiz zacal, warp na start uz neni mozny!");
+		SendClientMessageLocalized(playerid, I18N_RACE_WARP_AFTER_START);
 		return 0;
 	}
 
 	if (!IsPlayerInAnyVehicle(playerid) && GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 	{
-		SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Pro warp je treba byt ve vozidle a byt ridicem!");
+		SendClientMessageLocalized(playerid, I18N_RACE_WARP_NO_VEHIC_DRIVER);
 		return 0;
 	}
 
@@ -601,7 +601,14 @@ public UpdateRaceInfoText(playerid)
 
 	gPlayerRaceTime[playerid] += 1000;
 
-	format(stringToPrint, sizeof(stringToPrint), "~w~Zavod:_________~g~%3d~n~~w~Checkpoint:_~r~%2d~y~/~r~%2d~n~~w~Cas:_______~b~%4d~y~:~b~%2d", float:raceId, gPlayerRace[playerid][raceId]-1, cpCount, floatround(floatround(gPlayerRaceTime[playerid] / 1000) / 60), floatround(gPlayerRaceTime[playerid] / 1000) % 60);
+	switch (gPlayers[playerid][Locale]) 
+	{
+		case LOCALE_CZ:
+			format(stringToPrint, sizeof(stringToPrint), "~w~Zavod:_________~g~%3d~n~~w~Checkpoint:_~r~%2d~y~/~r~%2d~n~~w~Cas:_______~b~%4d~y~:~b~%2d", float:raceId, gPlayerRace[playerid][raceId]-1, cpCount, floatround(floatround(gPlayerRaceTime[playerid] / 1000) / 60), floatround(gPlayerRaceTime[playerid] / 1000) % 60);
+
+		default:
+			format(stringToPrint, sizeof(stringToPrint), "~w~Race:__________~g~%3d~n~~w~Checkpoint:_~r~%2d~y~/~r~%2d~n~~w~Time:______~b~%4d~y~:~b~%2d", float:raceId, gPlayerRace[playerid][raceId]-1, cpCount, floatround(floatround(gPlayerRaceTime[playerid] / 1000) / 60), floatround(gPlayerRaceTime[playerid] / 1000) % 60);
+	}
 
 	// Redraw the player's current velocity.
 	TextDrawSetString(gRaceInfoText[playerid], stringToPrint);

@@ -123,7 +123,7 @@ stock IsPlayerOwner(playerid, propertyId)
 
 stock SaveRealEstateData()
 {
-	new query[512];
+	new query[720];
 
 	new vehicle_id = 0;
 
@@ -164,7 +164,7 @@ stock SaveRealEstateData()
 			DB_FreeResultSet(result_vehicle);
 		}
 
-		format(query, sizeof(query), "INSERT INTO properties (id,user_id,vehicle_id,name,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied) VALUES (%d, %d, %d, '%s', %d, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %d) ON CONFLICT(id) DO UPDATE SET occupied = %d",
+		format(query, sizeof(query), "INSERT INTO properties (id,user_id,vehicle_id,name,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied) VALUES (%d, %d, %d, '%s', %d, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %d) ON CONFLICT(id) DO UPDATE SET occupied = excluded.occupied, user_id = excluded.user_id",
 				gProperties[i][ID],
 				gProperties[i][UserID],
 				vehicle_id,
@@ -182,7 +182,6 @@ stock SaveRealEstateData()
 				gProperties[i][LocationVehicle][CoordY],
 				gProperties[i][LocationVehicle][CoordZ],
 				gProperties[i][LocationVehicle][CoordR],
-				gProperties[i][Occupied],
 				gProperties[i][Occupied]
 		      );
 

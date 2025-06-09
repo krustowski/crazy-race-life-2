@@ -238,6 +238,7 @@ public OnGameModeInit()
 	//
 
 	InitRealEstateProperties();
+	InitRaces();
 
 	InitPickups();
 	InitObjects();

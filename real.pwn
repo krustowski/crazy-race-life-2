@@ -276,27 +276,27 @@ stock LoadRealEstateData()
 		new name[64];
 
 		gProperties[i][ID] = DB_GetFieldInt(result, FIELD_ID);
-		gProperties[i][UserID] = bool: DB_GetFieldInt(result, FIELD_USER_ID);
+		gProperties[i][UserID] = DB_GetFieldInt(result, FIELD_USER_ID);
 		gProperties[i][Cost] = DB_GetFieldInt(result, FIELD_COST);
 		gProperties[i][Occupied] = bool: DB_GetFieldInt(result, FIELD_OCCUPIED);
 
 		// Offer/Sell pickup coords
-		gProperties[i][LocationOffer][CoordX] = DB_GetFieldInt(result, FIELD_LOCATION_OFFER_X);
-		gProperties[i][LocationOffer][CoordY] = DB_GetFieldInt(result, FIELD_LOCATION_OFFER_Y);
-		gProperties[i][LocationOffer][CoordZ] = DB_GetFieldInt(result, FIELD_LOCATION_OFFER_Z);
-		gProperties[i][LocationOffer][CoordR] = DB_GetFieldInt(result, FIELD_LOCATION_OFFER_ROT);
+		gProperties[i][LocationOffer][CoordX] = DB_GetFieldFloat(result, FIELD_LOCATION_OFFER_X);
+		gProperties[i][LocationOffer][CoordY] = DB_GetFieldFloat(result, FIELD_LOCATION_OFFER_Y);
+		gProperties[i][LocationOffer][CoordZ] = DB_GetFieldFloat(result, FIELD_LOCATION_OFFER_Z);
+		gProperties[i][LocationOffer][CoordR] = DB_GetFieldFloat(result, FIELD_LOCATION_OFFER_ROT);
 
 		// Entrance pickup coords
-		gProperties[i][LocationEntrance][CoordX] = DB_GetFieldInt(result, FIELD_LOCATION_ENTRANCE_X);
-		gProperties[i][LocationEntrance][CoordY] = DB_GetFieldInt(result, FIELD_LOCATION_ENTRANCE_Y);
-		gProperties[i][LocationEntrance][CoordZ] = DB_GetFieldInt(result, FIELD_LOCATION_ENTRANCE_Z);
-		gProperties[i][LocationEntrance][CoordR] = DB_GetFieldInt(result, FIELD_LOCATION_ENTRANCE_ROT);
+		gProperties[i][LocationEntrance][CoordX] = DB_GetFieldFloat(result, FIELD_LOCATION_ENTRANCE_X);
+		gProperties[i][LocationEntrance][CoordY] = DB_GetFieldFloat(result, FIELD_LOCATION_ENTRANCE_Y);
+		gProperties[i][LocationEntrance][CoordZ] = DB_GetFieldFloat(result, FIELD_LOCATION_ENTRANCE_Z);
+		gProperties[i][LocationEntrance][CoordR] = DB_GetFieldFloat(result, FIELD_LOCATION_ENTRANCE_ROT);
 
 		// Vehicle pickup coords
-		gProperties[i][LocationVehicle][CoordX] = DB_GetFieldInt(result, FIELD_LOCATION_VEHICLE_X);
-		gProperties[i][LocationVehicle][CoordY] = DB_GetFieldInt(result, FIELD_LOCATION_VEHICLE_Y);
-		gProperties[i][LocationVehicle][CoordZ] = DB_GetFieldInt(result, FIELD_LOCATION_VEHICLE_Z);
-		gProperties[i][LocationVehicle][CoordR] = DB_GetFieldInt(result, FIELD_LOCATION_VEHICLE_ROT);
+		gProperties[i][LocationVehicle][CoordX] = DB_GetFieldFloat(result, FIELD_LOCATION_VEHICLE_X);
+		gProperties[i][LocationVehicle][CoordY] = DB_GetFieldFloat(result, FIELD_LOCATION_VEHICLE_Y);
+		gProperties[i][LocationVehicle][CoordZ] = DB_GetFieldFloat(result, FIELD_LOCATION_VEHICLE_Z);
+		gProperties[i][LocationVehicle][CoordR] = DB_GetFieldFloat(result, FIELD_LOCATION_VEHICLE_ROT);
 
 		DB_GetFieldString(result, FIELD_NAME, name, sizeof(name));
 

@@ -715,21 +715,24 @@ dcmd_race(playerid, const params[])
 	{
 		new raceId = strval(token2);
 
-		SetPlayerRaceState(playerid, E_RACE_ID: raceId);
+		SetPlayerRaceState(playerid, raceId);
 	}
 	else if (!strcmp(token1, "exit"))
 	{
-		ResetPlayerRaceState(playerid, E_RACE_ID: 0, false);
+		ResetPlayerRaceState(playerid, 0, false);
 	}
 	else if (!strcmp(token1, "list"))
 	{
 		SendClientMessage(playerid, COLOR_YELLOW, "[ i ] Seznam dostupnych zavodu (prihlaska / odmena):");
 
-		for (new i = 1; i < sizeof(gRaceNames); i++)
+		for (new i = 1; i < MAX_RACE_COUNT; i++)
 		{
 			new stringToPrint[256];
 
-			format(stringToPrint, sizeof(stringToPrint), "ID: %2d: %s ($%d / $%d)", i, gRaceNames[E_RACE_ID: i], gRaceFeePrize[E_RACE_ID: i][E_RACE_FEE_FEE], gRaceFeePrize[E_RACE_ID: i][E_RACE_FEE_PRIZE]);
+			if (gRaces[i][CostDollars] == 0)
+				continue;
+
+			format(stringToPrint, sizeof(stringToPrint), "ID: %2d: %s ($%d / $%d)", i, gRaces[i][Name], gRaces[i][CostDollars], gRaces[i][PrizeDollars]);
 			SendClientMessage(playerid, COLOR_GREY, stringToPrint);
 		}
 	}

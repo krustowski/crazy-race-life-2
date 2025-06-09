@@ -54,31 +54,9 @@
 //  Common colour definitions.
 //
 
-#define GREEN           0x21DD00FF
-#define ORANGE          0xF97804FF
-#define RED             0xE60000FF
-#define MODRA      	0x0000BBAA
-#define MODRA2      	0x4682B4AA
-#define MODRA3      	0x4169FFAA
-#define COLOR_ZELENA 	0x008000AA
-#define COLOR_CYAN 	0x00FFFFAA
-#define COLOR_ZELZLUT	0xADFF2FAA
-#define COLOR_TMAVACYAN	0x008B8BAA
-#define COLOR_BILA	0xFFFFFFAA
-#define COLOR_ZLUTA 	0xFFFF00AA
-#define COLOR_LEMON 	0xFFFF00AA
-#define COLOR_HNEDA 	0xA52A2AAA
-#define COLOR_HNEDA2	0xBC8F8FAA
-#define COLOR_CERVENA	0xFF0000AA
-#define COLOR_SEDA 	0x808080AA
-#define COLOR_RUZOVA	0xFFC0CBAA
-#define COLOR_CHARTR	0x7FFF00AA
-#define COLOR_SYSTEM    0xEFEFF7AA
-#define COLOR_ORANZCERV 0xFF4500AA
-#define COLOR_ORANZOVA	0xFF8C00AA
-#define COLOR_NEVIDITEL 0x4682B400
-#define COLOR_SVZEL     0x29FF06AA
-#define bezova          0xFFF8DC
+forward SendClientMessageLocalized(playerid, msg_id);
+
+#include "i18n.pwn" 
 
 new const GAMEMODE_NAME[] = "CrazyRaceLife2";
 new const GAMEMODE_CREDITS[] = "krusty, kompry, DRaGsTeR, amdulka";

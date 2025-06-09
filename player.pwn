@@ -4,6 +4,7 @@
 #define MAX_TEAM_MENUS		16
 #define MAX_PLAYER_PROPERTIES	5
 
+#include "i18n.pwn"
 #include "sql.pwn"
 #include "team.pwn"
 
@@ -89,6 +90,8 @@ enum Player
 	LoginAttempts,
 	SpawnPoint,
 
+	Locale[PlayerLocale],
+
 	bool: IsLogged,
 	bool: AFK,
 	bool: Hidden,
@@ -122,8 +125,8 @@ public LoadPlayerData(playerid)
 {
 	if (IsPlayerConnected(playerid) && gPlayers[playerid][IsLogged])
 	{
-		SendClientMessage(playerid, COLOR_ZLUTA, "[ DATA ] Nacitam ulozena uzivatelska data...");
-		SetPlayerColor(playerid, COLOR_ZLUTA);
+		SendClientMessageLocalized(playerid, I18N_USER_DATA_LOAD);
+		SetPlayerColor(playerid, COLOR_INVISIBLE);
 
 		new query[256];
 		format(query, sizeof(query), "SELECT cash, bank, adminlvl, team, class, health, armour, spawn, properties FROM users WHERE nickname = '%s';", gPlayers[playerid][Name]);
@@ -162,7 +165,7 @@ public LoadPlayerData(playerid)
 		SetPlayerSkin(playerid, gPlayers[playerid][Skin]);
 		SetPlayerColor(playerid, gTeams[ gPlayers[playerid][TeamID] ][Color]);
 
-		SendClientMessage(playerid, GREEN, "[ DATA ] Data uspesne nactena!");
+		SendClientMessageLocalized(playerid, I18N_USER_DATA_LOAD_SUCCESS);
 
 		return 1;
 	}
@@ -191,7 +194,7 @@ public SavePlayerData(playerid)
 {
 	if (IsPlayerConnected(playerid) && gPlayers[playerid][IsLogged])
 	{
-		SendClientMessage(playerid, COLOR_ZLUTA, "[ AUTOSAVE ] Pripravuje se ulozeni uzivatelskych dat...");
+		SendClientMessageLocalized(playerid, I18N_AUTOSAVE_START);
 
 		new Float:armour, Float:health;
 
@@ -231,7 +234,7 @@ public SavePlayerData(playerid)
 			writecfgvalue(gPlayers[playerid][Name], "drugz", gDrugz[i][DrugIniName], gPlayers[playerid][Drugs][i]);
 		}*/
 
-		SendClientMessage(playerid, GREEN, "[ AUTOSAVE ] Data uspesne ulozena! ");
+		SendClientMessageLocalized(playerid, I18N_AUTOSAVE_SUCCESS);
 	}
 
 	return 1;
@@ -248,12 +251,24 @@ public SendPlayerSalary()
 
 		teamSalary = gTeams[ gPlayers[i][TeamID] ][SalaryBase] + random(gTeams[ gPlayers[i][TeamID] ][SalaryVolatile]);
 
-		format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Tymova vyplata pristala do kapsy: $%d", teamSalary);
-		SendClientMessage(i, COLOR_ZLUTA, stringToPrint);
+		switch (gPlayers[i][Locale]) 
+		{
+			case LOCALE_CZ:
+				{
+				format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Tymova vyplata pristala do kapsy: $%d", teamSalary);
 
-		format(gameText, sizeof(gameText), "~y~V~g~yplata~n~~y~$~g~%d", teamSalary);
+				format(gameText, sizeof(gameText), "~y~V~g~yplata~n~~y~$~g~%d", teamSalary);
+				}
+			default:
+				{
+				format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Team salary just arrived: $%d", teamSalary);
+
+				format(gameText, sizeof(gameText), "~y~S~g~alary~n~~y~$~g~%d", teamSalary);
+				}
+		}
+
 		GameTextForPlayer(i, gameText, 4000, 1);
-
+		SendClientMessage(i, COLOR_YELLOW, stringToPrint);
 		GivePlayerMoney(i, teamSalary);
 	}
 
@@ -273,23 +288,35 @@ stock OnPlayerPrivMsg(playerid, receiverid, text[])
 {
 	if (GetPlayerMoney(playerid) < 10) 
 	{
-		SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] K odeslani soukrome zpravy potrebujes alespon $10!");
+		SendClientMessageLocalized(playerid, I18N_PRIV_MSG_MONEY);
 		return 0;
 	}
 
 	if (!IsPlayerConnected(receiverid))
 	{
-		SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Prijemce soukrome zpravy neni pritomen na serveru!");
+		SendClientMessageLocalized(playerid, I18N_PRIV_MSG_NO_PLAYER);
 		return 0;
 	}
 
 	new stringForReceiver[256], stringForSender[256]; 
 
-	format(stringForReceiver, sizeof(stringForReceiver), "[ PM ] od %s (ID: %d): %s", gPlayers[playerid][Name], playerid, text);
-	format(stringForSender, sizeof(stringForSender), "[ PM ] pro %s (ID: %d): %s", gPlayers[receiverid][Name], receiverid, text);
+	switch (gPlayers[playerid][Locale])
+	{
+		case LOCALE_CZ:
+			{
+				format(stringForReceiver, sizeof(stringForReceiver), "[ PM ] od %s (ID: %d): %s", gPlayers[playerid][Name], playerid, text);
+				format(stringForSender, sizeof(stringForSender), "[ PM ] pro %s (ID: %d): %s", gPlayers[receiverid][Name], receiverid, text);
+			}
 
-	SendClientMessage(receiverid, GREEN, stringForReceiver);
-	SendClientMessage(playerid, GREEN, stringForSender);
+		default:
+			{
+				format(stringForReceiver, sizeof(stringForReceiver), "[ PM ] Received from %s (ID: %d): %s", gPlayers[playerid][Name], playerid, text);
+				format(stringForSender, sizeof(stringForSender), "[ PM ] Sent for %s (ID: %d): %s", gPlayers[receiverid][Name], receiverid, text);
+			}
+	}
+
+	SendClientMessage(receiverid, COLOR_GREEN, stringForReceiver);
+	SendClientMessage(playerid, COLOR_GREEN, stringForSender);
 
 	// Play direct message tones.
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0); 
@@ -299,12 +326,6 @@ stock OnPlayerPrivMsg(playerid, receiverid, text[])
 	GameTextForPlayer(receiverid, "~w~PM ~g~Prijata~w~.", 3000, 3);
 
 	GivePlayerMoney(playerid, -10); 
-
-	/*if (!IsPlayerAdmin(recieverid) && !IsPlayerAdmin(playerid))
-	  {
-	  SendMessageToAdmins(COLOR_BILA, stringForSender);
-	  SendMessageToAdmins(COLOR_BILA, stringForReceiver);
-	  }*/
 
 	return 1;
 }

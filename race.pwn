@@ -138,9 +138,11 @@ stock SetPlayerRace(playerid, raceId)
 		return 0;
 	}
 
-	coords[0][E_RACE_COORD_X] = gRaces[raceId][Start][E_RACE_COORD_X];
-	coords[0][E_RACE_COORD_Y] = gRaces[raceId][Start][E_RACE_COORD_Y];
-	coords[0][E_RACE_COORD_Z] = gRaces[raceId][Start][E_RACE_COORD_Z];
+	coords[0][E_RACE_COORD_X] = DB_GetFieldFloatByName(result, "x");
+	coords[0][E_RACE_COORD_Y] = DB_GetFieldFloatByName(result, "y");
+	coords[0][E_RACE_COORD_Z] = DB_GetFieldFloatByName(result, "z");
+
+	len++;
 
 	while (DB_SelectNextRow(result))
 	{
@@ -152,6 +154,8 @@ stock SetPlayerRace(playerid, raceId)
 
 		len++;
 	}
+
+	gRaces[raceId][CheckPointCount] = len;
 
 	SetPlayerRaceSingle(playerid, raceId, Float: coords, len);
 

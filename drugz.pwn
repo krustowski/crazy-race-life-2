@@ -2,7 +2,7 @@
 //  drugz.pwn
 //
 
-#define MAX_DRUGS		10
+#define MAX_DRUGS	10
 
 enum
 {
@@ -44,9 +44,9 @@ stock InitDrugValues()
 
 	while (DB_SelectNextRow(result))
 	{
-		DB_GetFieldString(result, 0, name, sizeof(name));
-		DB_GetFieldString(result, 1, name_alt, sizeof(name_alt));
-		price = DB_GetFieldInt(result, 2);
+		DB_GetFieldStringByName(result, "name", name, sizeof(name));
+		DB_GetFieldStringByName(result, "name_alt", name_alt, sizeof(name_alt));
+		price = DB_GetFieldIntByName(result, "price");
 
 		gDrugz[i][DrugName] = name_alt;
 		gDrugz[i][DrugIniName] = name;

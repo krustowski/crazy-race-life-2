@@ -68,7 +68,9 @@ public InitRaces()
 		i++;
 	}
 
+	DB_FreeResultSet(result);
 	print("Race props initialized!");
+
 	return 1;
 }
 
@@ -154,6 +156,8 @@ stock SetPlayerRace(playerid, raceId)
 
 		len++;
 	}
+
+	DB_FreeResultSet(result);
 
 	gRaces[raceId][CheckPointCount] = len;
 

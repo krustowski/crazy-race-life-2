@@ -123,7 +123,7 @@ stock IsPlayerOwner(playerid, propertyId)
 
 stock SaveRealEstateData()
 {
-	new query[720];
+	new query[1024];
 
 	new vehicle_id = 0;
 
@@ -196,18 +196,27 @@ stock SaveRealEstateData()
 		//
 		//
 
-		//
-		// Drugz.
-		//
+		format(query, sizeof(query), "INSERT INTO drugz (user_id, property_id, cocaine, heroin, meth, fent, zaza, tobacco, pcp, paper, lighter, joint) VALUES (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) ON CONFLICT(property_id) DO UPDATE SET user_id = excluded.user_id, cocaine = excluded.cocaine, heroin = excluded.heroin, meth = excluded.meth, fent = excluded.fent, zaza = excluded.zaza, tobacco = excluded.tobacco, pcp = excluded.pcp, paper = excluded.paper, lighter = excluded.lighter, joint = excluded.joint",
+				gProperties[i][UserID],
+				gProperties[i][ID],
+				gProperties[i][Drugs][COCAINE],
+				gProperties[i][Drugs][HEROIN],
+				gProperties[i][Drugs][METH],
+				gProperties[i][Drugs][FENT],
+				gProperties[i][Drugs][ZAZA],
+				gProperties[i][Drugs][TOBACCO],
+				gProperties[i][Drugs][PCP],
+				gProperties[i][Drugs][PAPER],
+				gProperties[i][Drugs][LIGHTER],
+				gProperties[i][Drugs][JOINT]
+			);
 
-		/*new label[7] = "_drugz";
-		  strcopy(stringCopy, stringName);
-		  strcat(stringCopy, label);
+		new DBResult: result_drugz = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result_drugz) {
+			printf("Database error: cannot write property data (drugz, ID: %d)!", gProperties[i][ID]);
+		}
 
-		  for (new j = 0; j < MAX_DRUGS; j++)
-		  {
-		  writecfgvalue(fileName, stringCopy, gDrugz[j][DrugIniName], gProperties[i][Drugs][j]);
-		  }*/
+		DB_FreeResultSet(result_drugz);
 	}
 
 	return 1;
@@ -338,28 +347,37 @@ stock LoadRealEstateData()
 
 		DB_FreeResultSet(result_vehicle);
 
+		//
+		//   Drugz
+		//
+
+		format(query, sizeof(query), "SELECT cocaine, heroin, meth, fent, zaza, tobacco, pcp, paper, lighter, joint FROM drugz WHERE property_id = %d", i);
+
+		new DBResult: result_drugz = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result_drugz) {
+			print("Database error: cannot fetch property data (drugz)!");
+
+			i++;
+			continue;
+		}
+
+		gProperties[i][Drugs][COCAINE] = DB_GetFieldIntByName(result_drugz, "cocaine");
+		gProperties[i][Drugs][HEROIN] = DB_GetFieldIntByName(result_drugz, "heroin");
+		gProperties[i][Drugs][METH] = DB_GetFieldIntByName(result_drugz, "meth");
+		gProperties[i][Drugs][FENT] = DB_GetFieldIntByName(result_drugz, "fent");
+		gProperties[i][Drugs][ZAZA] = DB_GetFieldIntByName(result_drugz, "zaza");
+		gProperties[i][Drugs][TOBACCO] = DB_GetFieldIntByName(result_drugz, "tobacco");
+		gProperties[i][Drugs][PCP] = DB_GetFieldIntByName(result_drugz, "pcp");
+		gProperties[i][Drugs][PAPER] = DB_GetFieldIntByName(result_drugz, "paper");
+		gProperties[i][Drugs][LIGHTER] = DB_GetFieldIntByName(result_drugz, "lighter");
+		gProperties[i][Drugs][JOINT] = DB_GetFieldIntByName(result_drugz, "joint");
+
+		DB_FreeResultSet(result_drugz);
+
 		i++;
 	}
 
 	DB_FreeResultSet(result);
-
-	/*do {
-	// Drugz.
-	new label[7] = "_drugz";
-	strcat(token1, label);
-
-	for (new j = 0; j < MAX_DRUGS; j++)
-	{
-	gProperties[i][Drugs][j] = readcfgvalue(fileName, token1, gDrugz[j][DrugIniName]);
-	}
-
-	// Prepare vars for the next run.
-	strcopy(properties, token2);
-	i++;
-
-	if (i > MAX_PROPERTIES)
-	break;
-	} while (strcmp(token2, ""));*/
 
 	return 1;
 }

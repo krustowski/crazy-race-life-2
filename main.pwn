@@ -97,6 +97,7 @@ forward DrawClockText();
 //  Racing subsystem.
 //
 
+forward InitRaces();
 forward CheckRaceCheckpoint(playerid);
 forward SetRaceForUser(playerid, raceId);
 forward StartRace();
@@ -483,6 +484,9 @@ public OnVehicleSpawn(vehicleid)
 		if (gProperties[i][Vehicle][ID] != vehicleid)
 			continue;
 
+		if (gProperties[i][Vehicle][Colours][0])
+			ChangeVehicleColours(gProperties[i][Vehicle][ID], gProperties[i][Vehicle][Colours][0], gProperties[i][Vehicle][Colours][1]);
+
 		for (new j = 0; j < 16; j++)
 		{
 			if (gProperties[i][Vehicle][Components][j])
@@ -571,36 +575,12 @@ public OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstat
 
 	if (newstate == PLAYER_STATE_DRIVER || newstate == PLAYER_STATE_PASSENGER)
 	{
-		gVehicleStatesText[playerid] = TextDrawCreate(256, 410, "~w~Stav:______%3d_%%~n~~w~Rychlost:_%3d");
+		gVehicleStatesText[playerid] = TextDrawCreate(256, 410, "~w~Health:____%3d_%%~n~~w~Velocity:_%3d");
 
 		TextDrawLetterSize(gVehicleStatesText[playerid], 0.5, 1.5);
 		TextDrawFont(Text: gVehicleStatesText[playerid], t_TEXT_DRAW_FONT: 3);
 		TextDrawSetOutline(gVehicleStatesText[playerid], 1);
 
-		/*KPH[playerid] = TextDrawCreate(256, 425, "Rychlost:");
-
-		  TextDrawAlignment(KPH[playerid], 0);
-		//TextDrawBackgroundColor(KPH[playerid], 0x000000ff);
-		TextDrawFont(KPH[playerid], 3);
-		TextDrawLetterSize(KPH[playerid], 0.5, 1.5);
-		//TextDrawColor(KPH[playerid], 0xff0000cc);
-		TextDrawSetOutline(KPH[playerid], 1);
-		//TextDrawSetProportional(KPH[playerid], 1);
-		//TextDrawSetShadow(KPH[playerid], 1);
-
-		KPHR[playerid] = TextDrawCreate(350, 425, "0");
-
-		TextDrawAlignment(KPHR[playerid], 0);
-		//TextDrawBackgroundColor(KPHR[playerid], 0x000000ff);
-		TextDrawFont(KPHR[playerid], 3);
-		TextDrawLetterSize(KPHR[playerid], 0.5, 1.5);
-		//TextDrawColor(KPHR[playerid], 0x00ff00cc);
-		TextDrawSetOutline(KPHR[playerid], 1);
-		//TextDrawSetProportional(KPHR[playerid], 1);
-		//TextDrawSetShadow(KPHR[playerid], 1);
-
-		//TextDrawShowForPlayer(playerid, KPHR[playerid]);
-		//TextDrawShowForPlayer(playerid, KPH[playerid]);*/
 		TextDrawShowForPlayer(playerid, gVehicleStatesText[playerid]);
 	}
 

@@ -376,6 +376,11 @@ new Float: gRaceCoordsDesertAirCircuit[][E_RACE_COORD] =
 //  Race-related functions.
 //
 
+public InitRaces() 
+{
+	//
+}
+
 stock StartRace()
 {
 	return 1;

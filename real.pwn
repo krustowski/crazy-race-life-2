@@ -164,7 +164,7 @@ stock SaveRealEstateData()
 			DB_FreeResultSet(result_vehicle);
 		}
 
-		format(query, sizeof(query), "INSERT INTO properties (id,user_id,vehicle_id,name,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied) VALUES (%d, %d, %d, \"%s\", %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) ON CONFLICT(id) DO UPDATE SET occupied = %d",
+		format(query, sizeof(query), "INSERT INTO properties (id,user_id,vehicle_id,name,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied) VALUES (%d, %d, %d, '%s', %d, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %d) ON CONFLICT(id) DO UPDATE SET occupied = %d",
 				gProperties[i][ID],
 				gProperties[i][UserID],
 				vehicle_id,
@@ -591,7 +591,7 @@ stock UpdatePropertyVehicle(playerid)
 	if (!IsPlayerInAnyVehicle(playerid))
 		return 0;
 
-	new arrayID, colour1, colour2, bool:modelMatch = false, vehicleID;
+	new arrayID, bool: modelMatch = false, vehicleID;
 
 	vehicleID = GetPlayerVehicleID(playerid);
 
@@ -617,7 +617,9 @@ stock UpdatePropertyVehicle(playerid)
 	if (!modelMatch)
 		return 0;
 
-	GetVehicleColours(GetPlayerVehicleID(playerid), colour1, colour2);
+	new colour1, colour2;
+
+	GetVehicleColours(vehicleID, colour1, colour2);
 
 	gProperties[arrayID][Vehicle][Colours][0] = colour1;
 	gProperties[arrayID][Vehicle][Colours][1] = colour2;

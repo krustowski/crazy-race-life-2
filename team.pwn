@@ -2,6 +2,10 @@
 //  team.pwn
 //
 
+#define MAX_TEAMS		10
+#define MAX_TEAM_PICKUPS	16
+#define MAX_TEAM_MENUS		16
+
 #include "sql.pwn"
 
 enum 
@@ -45,20 +49,6 @@ new gTeamNone[Team] =
 	0,
 	0
 };
-
-/*stock InitTeams()
-{
-	gTeams[0] = gTeamNone;
-	gTeams[1] = gTeamLames;
-	gTeams[2] = gTeamAdminz;
-	gTeams[3] = gTeamPolice;
-	gTeams[4] = gTeamTruckers;
-	gTeams[5] = gTeamDragsters;
-	gTeams[6] = gTeamGarbagemen;
-	gTeams[7] = gTeamPizzaguys;
-	gTeams[8] = gTeamHackers;
-	gTeams[9] = gTeamDealers;
-}*/
 
 enum 
 {

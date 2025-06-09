@@ -129,6 +129,7 @@ forward InitDB();
 forward InitTeams();
 
 #include "player.pwn"
+#include "drugz.pwn"
 #include "team.pwn"
 #include "auth.pwn"
 #include "real.pwn"

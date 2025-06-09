@@ -37,10 +37,19 @@ stock InitDrugValues()
 	}
 
 	new 
-		i = 0,
+		i = 1,
 		name[64], 
 		name_alt[64], 
 		price;
+
+	DB_GetFieldStringByName(result, "name", name, sizeof(name));
+	DB_GetFieldStringByName(result, "name_alt", name_alt, sizeof(name_alt));
+	price = DB_GetFieldIntByName(result, "price");
+
+	gDrugz[0][DrugName] = name_alt;
+	gDrugz[0][DrugIniName] = name;
+	gDrugz[0][DrugAmount] = 0;
+	gDrugz[0][DrugPrice] = price;
 
 	while (DB_SelectNextRow(result))
 	{
@@ -52,6 +61,7 @@ stock InitDrugValues()
 		gDrugz[i][DrugIniName] = name;
 		gDrugz[i][DrugAmount] = 0;
 		gDrugz[i][DrugPrice] = price;
+
 		i++;
 	}
 

@@ -50,6 +50,9 @@ enum
 	I18N_RACE_ENDED_PREMATURELY,
 	I18N_RACE_ENDED_SUCCESSFULLY,
 	I18N_RACE_NO_RACE,
+	I18N_RACE_NO_SUCH_RACE,
+	I18N_RACE_ALREADY_JOINED,
+	I18N_RACE_NO_MONEY,
 	//
 	I18N_DEATHMATCH_STARTED,
 	//
@@ -77,6 +80,9 @@ new gI18nMessageColor[] =
 	COLOR_YELLOW,
 	COLOR_LIGHTGREEN,
 	COLOR_RED,
+	COLOR_RED,
+	COLOR_YELLOW,
+	COLOR_RED,
 	//
 	COLOR_YELLOW,
 	//
@@ -100,6 +106,9 @@ new gI18nMessageEn[][] =
 	"[ RACE ] The race ended prematurely!",
 	"[ RACE ] You have just finished the race!",
 	"[ RACE ] You need to join a race to use such feature!",
+	"[ RACE ] No such race prepared to join!",
+	"[ RACE ] You have already joined the race!",
+	"[ RACE ] You haven't got enough moeny to join such race!",
 	"[ DEATHMATCH ] New match just started, join to play!",
 	"[ ! ] No such command! /cmd /help /rules",
 	"[ i ] You dropped your money at the death position!"
@@ -121,6 +130,9 @@ new gI18nMessageCz[][] =
 	"[ ZAVOD ] Zavod, ve kterem jsi byl prihlasen, byl predcasne ukoncen!",
 	"[ ZAVOD ] Dokoncil jsi zavod!",
 	"[ ZAVOD ] Nejsi prihlasen v zadnem zavodu!",
+	"[ ZAVOD ] Dany zavod neni pripraven nebo neexistuje!",
+	"[ ZAVOD ] Do daneho zavodu jsi jiz prihlasen!",
+	"[ ZAVOD ] Nemas dostatek hotovosti pro zaplaceni prihlasky do zavodu!",
 	"[ DEATHMATCH ] Utkani zacalo! 4 minuty do konce",
 	"[ ! ] Tento prikaz neexistuje! /cmd /help /rules",
 	"[ i ] Tve penize zustaly na miste umrti!"

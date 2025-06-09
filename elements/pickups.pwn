@@ -47,7 +47,7 @@ stock AddPlayerDeathPickups(playerid, Float:X, Float:Y, Float:Z)
 		gPlayerMoneyPickup[playerid] = EnsurePickupCreated(1212, 19, Float:X, Float:Y, Float:Z);
 		gPlayerMoneyPickupAmount[playerid] = GetPlayerMoney(playerid);
 
-		SendClientMessageLocalized(playerid, I18N_DEATH_MONEY_LOCALITY)
+		SendClientMessageLocalized(playerid, I18N_DEATH_MONEY_LOCALITY);
 	}
 
 	return 1;

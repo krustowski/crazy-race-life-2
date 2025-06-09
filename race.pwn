@@ -466,20 +466,21 @@ stock SetPlayerRaceState(playerid, E_RACE_ID: raceId)
 	new stringToPrint[256];
 
 	if (!IsPlayerInAnyVehicle(playerid))
-		return SendClientMessage(playerid, COLOR_CERVENA, "[ ! ] Pro prihlaseni do zavodu je treba byt v aute!");
+		return SendClientMessageLocalized(playerid, I18N_RACE_WARP_NO_VEHIC_DRIVER);
 
 	// Check if already joined such race.
 	if (gPlayerRace[playerid][raceId])
-		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Do daneho zavodu jsi jiz prihlasen!");
+		return SendClientMessageLocalized(playerid, I18N_RACE_ALREADY_JOINED);
 
 	if (CheckPlayerRaceState(playerid))
-		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Jiz jsi prihlasen v jinem zavode! Pred prihlasenim je treba predchozi zavod dokoncit!");
+		return SendClientMessageLocalized(playerid, I18N_RACE_ALREADY_JOINED);
+		//return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Jiz jsi prihlasen v jinem zavode! Pred prihlasenim je treba predchozi zavod dokoncit!");
 
 	if (raceId == E_RACE_ID_NONE)
-		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Zavod s danym ID neni pripraven!");
+		return SendClientMessageLocalized(playerid, I18N_RACE_NO_SUCH_RACE);
 
 	if (GetPlayerMoney(playerid) < gRaceFeePrize[raceId][E_RACE_FEE_FEE])
-		return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Nemas dostatek hotovosti pro zaplaceni prihlasky do zavodu!");
+		return SendClientMessageLocalized(playerid, I18N_RACE_NO_MONEY);
 
 	//
 	//  Ok, register the player with given raceId.
@@ -488,9 +489,16 @@ stock SetPlayerRaceState(playerid, E_RACE_ID: raceId)
 	gPlayerRace[playerid][raceId] = 1;
 	GivePlayerMoney(playerid, -gRaceFeePrize[raceId][E_RACE_FEE_FEE]);
 
-	format(stringToPrint, sizeof(stringToPrint), "[ ! ] Uspesne prihlasen do zavodu '%s' (prihlaska $%d). Projed prvnim checkpointem pro spusteni casomiry.", gRaceNames[raceId], gRaceFeePrize[raceId][E_RACE_FEE_FEE]);
-	SendClientMessage(playerid, COLOR_SVZEL, stringToPrint);
+	switch (gPlayers[playerid][Locale])
+	{
+		case LOCALE_CZ:
+			format(stringToPrint, sizeof(stringToPrint), "[ ZAVOD ] Uspesne prihlasen do zavodu '%s' (prihlaska $%d). Projed prvnim checkpointem pro spusteni casomiry.", gRaceNames[raceId], gRaceFeePrize[raceId][E_RACE_FEE_FEE]);
 
+		default:
+			format(stringToPrint, sizeof(stringToPrint), "[ RACE ] Joined the '%s' race (cost $%d). Use the first checkpoint to start the race!", gRaceNames[raceId], gRaceFeePrize[raceId][E_RACE_FEE_FEE]);
+	}
+
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 	SetPlayerRace(playerid, raceId);
 
 	return 1;

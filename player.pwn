@@ -25,6 +25,7 @@ enum Player
 	Float: Health,
 	Float: Armour,
 	AdminLevel,
+	WantedLevel,
 	LoginAttempts,
 	SpawnPoint,
 
@@ -81,6 +82,7 @@ public LoadPlayerData(playerid)
 		gPlayers[playerid][Cash] = DB_GetFieldIntByName(result, "cash");
 		gPlayers[playerid][Bank] = DB_GetFieldIntByName(result, "bank");
 		gPlayers[playerid][AdminLevel] = DB_GetFieldIntByName(result, "adminlvl");
+		gPlayers[playerid][WantedLevel] = DB_GetFieldIntByName(result, "wanted");
 		gPlayers[playerid][TeamID] = DB_GetFieldIntByName(result, "team");
 		gPlayers[playerid][Skin] = DB_GetFieldIntByName(result, "class");
 		gPlayers[playerid][Health] = DB_GetFieldIntByName(result, "health");
@@ -178,7 +180,19 @@ public SavePlayerData(playerid)
 
 		new query[512];
 
-		format(query, sizeof(query), "UPDATE users SET cash = %d, bank = %d, adminlvl = %d, team = %d, class = %d, health = %d, armour = %d, spawn = %d, properties = '%s' WHERE nickname = '%s';", GetPlayerMoney(playerid), gPlayers[playerid][Bank], gPlayers[playerid][AdminLevel], gPlayers[playerid][TeamID], GetPlayerSkin(playerid), floatround(health), floatround(armour), gPlayers[playerid][SpawnPoint], propertiesString, gPlayers[playerid][Name]);
+		format(query, sizeof(query), "UPDATE users SET cash = %d, bank = %d, adminlvl = %d, wanted = %d, team = %d, class = %d, health = %d, armour = %d, spawn = %d, properties = '%s' WHERE nickname = '%s';", 
+				GetPlayerMoney(playerid), 
+				gPlayers[playerid][Bank], 
+				gPlayers[playerid][AdminLevel], 
+				GetPlayerWantedLevel(playerid),
+				gPlayers[playerid][TeamID], 
+				GetPlayerSkin(playerid), 
+				floatround(health), 
+				floatround(armour), 
+				gPlayers[playerid][SpawnPoint], 
+				propertiesString, 
+				gPlayers[playerid][Name]
+		);
 
 		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result) {

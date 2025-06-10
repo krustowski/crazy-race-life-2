@@ -1,6 +1,11 @@
+//
+//  dcmd.pwn
+//
+
 public LoadDcmdAll(playerid, cmdtext[]) {
 	//--------------[ COMMON COMMANDS ]-------------|
 
+	dcmd(acc, 3, cmdtext);            //all
 	dcmd(admins, 6, cmdtext);         //all
 	dcmd(afk, 3, cmdtext);            //all
 	dcmd(bank, 4, cmdtext);		  //all
@@ -18,17 +23,14 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(lay, 3, cmdtext);		  //all
 	dcmd(locate, 6, cmdtext); 	  //all
 	dcmd(lock, 4, cmdtext);           //all
-					  //dcmd(login, 5, cmdtext);          //all
 	dcmd(pm, 2, cmdtext);		  //all
 	dcmd(port, 4, cmdtext); 	  //all
 	dcmd(property, 8, cmdtext);	  //all
 	dcmd(race, 4, cmdtext);		  //all
-					  //dcmd(register, 8, cmdtext);       //all
 	dcmd(rules, 5, cmdtext); 	  //all
 	dcmd(skydive, 7, cmdtext);        //all
-	dcmd(soska, 5, cmdtext); 	  //all
 	dcmd(text, 4, cmdtext);           //all
-	dcmd(ucet, 4, cmdtext);           //all
+	dcmd(tiki, 4, cmdtext); 	  //all
 	dcmd(unlock, 6, cmdtext);         //all
 	dcmd(wanted, 6, cmdtext);	  //all
 
@@ -39,6 +41,8 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(ban, 3, cmdtext);            //rcon + lvl 4
 	dcmd(cam, 3, cmdtext); 		  //rcon + 
 	dcmd(ccmd, 4, cmdtext);           //rcon + lvl 1
+	dcmd(clear, 5, cmdtext);         //rcon +
+	dcmd(countdown, 9, cmdtext);        //rcon + 
 	dcmd(elevator, 8, cmdtext);	  //rcon + lvl 4
 	dcmd(fakechat, 8, cmdtext);       //rcon + lvl 2
 	dcmd(flip, 4, cmdtext);           //rcon + 
@@ -48,13 +52,11 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(kick, 4, cmdtext);           //rcon +
 	dcmd(lvl, 3, cmdtext);            //rcon + lvl 4
 	dcmd(nitro, 5, cmdtext);          //rcon + lvl 3
-	dcmd(odpocet, 7, cmdtext);        //rcon + 
 	dcmd(reset, 5, cmdtext);	  //rcon + lvl 4
 	dcmd(skin, 4, cmdtext); 	  //rcon + lvl 3
-	dcmd(smazat, 6, cmdtext);         //rcon +
 	dcmd(spectate, 8, cmdtext);	  //rcon + lvl 2
 	dcmd(vehicle, 7, cmdtext);	  //rcon + lvl 4
-	dcmd(zbrane, 6, cmdtext); 	  //rcon + lvl 3
+	dcmd(weapons, 7, cmdtext); 	  //rcon + lvl 3
 
 	return InvalidCommand(playerid);
 }
@@ -64,757 +66,17 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 //  DCMDs --- COMMON COMMANDS
 //
 
-dcmd_admins(playerid, const params[])
-#pragma unused params
-{
-	SendClientMessage(playerid, COLOR_YELLOW, "[ i ] Administratori online:");
-
-	new adminCount;
-
-	for (new i = 0; i < GetMaxPlayers(); i++) 
-	{
-		// IsPlayerAdmin(i) == RCON admin
-		if (IsPlayerConnected(i) && (gPlayers[i][AdminLevel] > 0 || IsPlayerAdmin(i)))
-		{
-			adminCount++;
-
-			new adminName[MAX_PLAYER_NAME], stringToPrint[128];
-
-			// Omit RCON admin(s) in the output for now...
-			if (gPlayers[i][AdminLevel] > 0) 
-			{
-				GetPlayerName(i, adminName, sizeof(adminName));
-				format(stringToPrint, sizeof(stringToPrint), "[ %s [ID: %2d] LVL: %d]", adminName, i, gPlayers[i][AdminLevel]);
-				SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
-			}
-		}
-	}
-
-	if (!adminCount) 
-	{
-		SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Zadny admin neni pritomen na serveru!");
-		return 0;
-	}
-
-	return 1;
-}
-
-dcmd_afk(playerid, const params[])
-{
-#pragma unused params
-	new playerName[MAX_PLAYER_NAME], stringToPrint[256];
-
-	GetPlayerName(playerid, playerName, sizeof(playerName));
-
-	if (!gPlayers[playerid][AFK])
-	{
-		format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s (ID: %d) na chvili odesel od PC (/afk)!", playerName, playerid);
-		SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
-
-		// Lock the player's animations.
-		TogglePlayerControllable(playerid, false);
-
-		gPlayers[playerid][AFK] = true;
-	}
-	else
-	{
-		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s (ID: %d) se vratil do hry (/afk)!", playerName, playerid);
-		SendClientMessageToAll(COLOR_LIGHTGREEN, stringToPrint);
-
-		// Re-enable player's animations.
-		TogglePlayerControllable(playerid, true);
-
-		gPlayers[playerid][AFK] = false;
-	}
-
-	return 1;
-}
-
-dcmd_bank(playerid, const params[])
-{
-	new token1[32], token2[32];
-	SplitIntoTwo(params, token1, token2, sizeof(token1));
-
-	if (!strlen(params) || (strcmp(token1, "vlozit") && strcmp(token1, "vybrat") && strcmp(token1, "stav")) || (!strcmp(token1, "vlozit") && !IsNumeric(token2)) || (!strcmp(token1, "vybrat") && !IsNumeric(token2)))
-	{
-		SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /bank vlozit [castka]");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /bank vybrat [castka]");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /bank stav");
-		return 1;
-	}
-
-	if (!CheckPlayerBankLocation(playerid))
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nejsi v dosahu bankomatu!");
-
-
-	if (!strcmp(token1, "vlozit"))
-	{
-		new targetAmount = strval(token2);
-
-		if (targetAmount > GetPlayerMoney(playerid))
-			return SendClientMessage(playerid, COLOR_RED, "[ ! ] Neplatna castka!");
-
-		gPlayers[playerid][Bank] += targetAmount;
-		GivePlayerMoney(playerid, -targetAmount);
-
-		new stringToPrint[256];
-
-		format(stringToPrint, sizeof(stringToPrint), "[ i ] Ulozil jsi castku: $%d! Zustatek na uctu: $%d!", targetAmount, gPlayers[playerid][Bank]);
-		SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
-	}
-	else if (!strcmp(token1, "vybrat"))
-	{
-		new targetAmount = strval(token2);
-
-		if (targetAmount > gPlayers[playerid][Bank])
-			return SendClientMessage(playerid, COLOR_RED, "[ ! ] Neplatna castka!");
-
-		gPlayers[playerid][Bank] -= targetAmount;
-		GivePlayerMoney(playerid, targetAmount);
-
-		new stringToPrint[256];
-
-		format(stringToPrint, sizeof(stringToPrint), "[ i ] Vybral jsi castku: $%d! Zustatek na uctu: $%d!", targetAmount, gPlayers[playerid][Bank]);
-		SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
-	}
-	else if (!strcmp(token1, "stav"))
-	{
-		new stringToPrint[256];
-
-		format(stringToPrint, sizeof(stringToPrint), "[ i ] Bezny zustatek na bankovnim uctu: $%d!", gPlayers[playerid][Bank]);
-		SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
-	}
-
-	return 1;
-}
-
-dcmd_cmd(playerid, const params[])
-{
-#pragma unused params
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ CMD ] Zakladni CMD set");
-	SendClientMessage(playerid, COLOR_YELLOW, "/admins /afk /bank /cmd /dance /deathmatch /drugz /dwarp /fix");
-	SendClientMessage(playerid, COLOR_YELLOW, "/givecash /help /lay /locate /lock /property /race");
-	SendClientMessage(playerid, COLOR_YELLOW, "/rules /skydive /soska /text /ucet /unlock");
-	SendClientMessage(playerid, COLOR_INVISIBLE, "");
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ CMD ] Specificky CMD set (vazano na team)");
-	SendClientMessage(playerid, COLOR_YELLOW, "/deal /hide /wanted");
-
-	return 1;
-}
-
-dcmd_dance(playerid, const params[])
-{
-	if (IsPlayerInAnyVehicle(playerid))
-	{
-		SendClientMessage(playerid, COLOR_RED, "[ ! ] Nelze byt v aute pro zapnuti animace!");
-		return 1;
-	}
-
-	switch (strval(params)) 
-	{
-		case 1:
-			{
-				SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DANCE1);
-			}
-		case 2:
-			{
-				SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DANCE2);
-			}
-		case 3:
-			{
-				SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DANCE3);
-			}
-		case 4:
-			{
-				SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DANCE4);
-			}
-		default:
-			{
-				SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /dance [1-4]");
-			}
-	}
-
-	return 1;
-}
-
-dcmd_deal(playerid, const params[])
-{
-	new token1[32], token2[32];
-	SplitIntoTwo(params, token1, token2, sizeof(token1));
-
-	if (gPlayers[playerid][TeamID] != TEAM_DEALERS)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Tento prikaz je urcen pouze pro tym Dealeru!");
-
-	if (!strlen(params) || (!IsNumeric(token1) && !IsNumeric(token2) && !strcmp(token1, "list")) || (strcmp(token1, "list") && IsNumeric(token2)))
-	{
-		SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti /deal [playerID] [drugID]");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti /deal list");
-		return 1;
-	}
-
-	if (IsNumeric(token1) && IsNumeric(token2))
-	{
-		new targetId = strval(token1);// targetAmount = strval(token2);
-
-		if (targetId == playerid)
-			return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Nelze dealovat sobe samemu!");
-
-		if (!IsPlayerConnected(targetId))
-			return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
-
-		//
-		//
-		//
-
-	}
-	else if (!strcmp(token1, "list"))
-	{
-		new stringToPrint[128];
-
-		SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Seznam drog a propriet k dealovani:");
-
-		for (new i = 0; i < MAX_DRUGS; i++)
-		{
-			format(stringToPrint, sizeof(stringToPrint), "* [ID %2d]: %s (mas %d g nebo ks)", i, gDrugz[i][DrugName], gPlayers[playerid][Drugs][i]);
-			SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
-		}
-	}
-
-	return 1;
-}
-
-dcmd_deathmatch(playerid, const params[])
-{
-	if (!strcmp(params, "join"))
-	{
-		SendClientMessageToAll(COLOR_YELLOW, "[ ! ] Deathmatch zacne za 45 sekund! Pripojte se pomoci /deathmatch join");
-		SetPlayerPos(playerid, -1365.1, -2307.0, 39.1);
-
-		SetTimer("StartPaintball", 45000, false);
-
-		gPaintball[playerid][E_PAINTBALL_INGAME] = 1;
-	}
-	else if (!strcmp(params, "exit"))
-	{
-		new playerName[MAX_PLAYER_NAME], stringToPrint[128];
-
-		GetPlayerName(playerid, playerName, sizeof(playerName));
-
-		if (gPaintball[playerid][E_PAINTBALL_INGAME])
-		{
-			format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s opousti deathmatch (/deathmatch exit)!", playerName);
-			SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
-
-			SetPlayerHealth(playerid, 0.0);
-			gPaintball[playerid][E_PAINTBALL_INGAME] = 0;
-		}
-	}
-	else
-	{
-		SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /deathmatch [join/exit]");
-	}
-
-	return 1;
-}
-
-dcmd_drugz(playerid, const params[])
-{
-#pragma unused params
-	new stringToPrint[128];
-
-	SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Seznam drog a propriet, ktere mas u sebe:");
-
-	for (new i = 0; i < MAX_DRUGS; i++)
-	{
-		format(stringToPrint, sizeof(stringToPrint), "* %s (mas %d g nebo ks)", gDrugz[i][DrugName], gPlayers[playerid][Drugs][i]);
-		SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
-	}
-
-	return 1;
-}
-
-dcmd_dwarp(playerid, const params[])
-{
-#pragma unused params
-	if (gPlayers[playerid][InsideProperty])
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Nelze pouzit warp, pokud jsi uvnitr nemovitosti!");
-
-	new t_PLAYER_STATE: playerState = GetPlayerState(playerid), senderName[MAX_PLAYER_NAME], stringToPrint[256], vehicleId = GetPlayerVehicleID(playerid);
-
-	SetPlayerInterior(playerid, 0);
-	GetPlayerName(playerid, senderName, sizeof(senderName));
-
-	format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s hodil warp na drag [ /dwarp ]", senderName);
-	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
-
-	if (IsPlayerInVehicle(playerid, vehicleId) && playerState == PLAYER_STATE_DRIVER) 
-	{
-		SetVehiclePos(vehicleId, 2635.67, 1171.51, 10.37);
-	}
-	else
-	{
-		SetPlayerPos(playerid, 2635.67, 1171.51, 10.37);
-	}
-
-	return 1;
-}
-
-dcmd_fix(playerid, const params[])
-{
-#pragma unused params
-	//if(GetPlayerVehicleID(playerid) == gAdminAuto && !IsPlayerAdmin(playerid)) return SendClientMessage(playerid, COLOR_RED, "Nelze opravit");
-
-	if (!IsPlayerInAnyVehicle(playerid)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nejsi v aute!");
-
-	if (CheckPlayerRaceState(playerid))
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Pri zavodu neni mozne si opravit auto.");
-
-	SetVehicleHealth(GetPlayerVehicleID(playerid), 1000.0);
-	RepairVehicle(GetPlayerVehicleID(playerid));
-
-	SendClientMessage(playerid, COLOR_YELLOW, "[ i ] Opravil sis auto!");
-
-	return 1;
-}
-
-dcmd_givecash(playerid, const params[])
-{
-	new token1[32], token2[32];
-	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
-
-	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Pouziti /givecash [playerID] [castka]");
-
-	new targetId = strval(token1), targetAmount = strval(token2);
-
-	if (targetId == playerid)
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Takovy financni prevod je bezpredmetny!");
-
-	if (targetAmount > GetPlayerMoney(playerid) || targetAmount < 0)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Neplatna castka!");
-
-	if (!IsPlayerConnected(targetId))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
-
-	new playerName[MAX_PLAYER_NAME], stringToPrint[128], targetName[MAX_PLAYER_NAME];
-
-	// Fetch players' names.
-	GetPlayerName(playerid, playerName, sizeof(playerName));
-	GetPlayerName(targetId, targetName, sizeof(targetName));
-
-	// Send an informative statement to the receiving player.
-	format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Hrac %s [ID: %d] ti poslal castku $%d!", playerName, playerid, targetAmount);
-	SendClientMessage(targetId, COLOR_LIGHTGREEN, stringToPrint);
-
-	// Transfer money.
-	GivePlayerMoney(targetId, targetAmount);
-	GivePlayerMoney(playerid, -targetAmount);
-
-	// Send an informative statement to the sending player.
-	format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Castka $%s uspesne zaslana hraci %s [ID: %d]!", targetAmount, targetName, targetId);
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
-
-	return 1;
-}
-
-dcmd_help(playerid, const params[])
-{
-#pragma unused params
-	SendClientMessage(playerid, COLOR_YELLOWGREEN, "[ i ] NAPOVEDA/POMOC");
-	SendClientMessage(playerid, COLOR_YELLOW, "* Prikazy:  /cmd");
-	SendClientMessage(playerid, COLOR_YELLOW, "* Admin prikazy:  /acmd");
-	SendClientMessage(playerid, COLOR_YELLOW, "* Pravidla: /rules");
-
-	return 1;
-}
-
-dcmd_hide(playerid, const params[]) 
-{
-#pragma unused params
-	if (gPlayers[playerid][TeamID] != TEAM_ADMINZ)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Tento prikaz je urcen pouze pro tym Admin-borcu!");
-
-	if (!gPlayers[playerid][Hidden])
-	{
-		SetPlayerColor(playerid, COLOR_INVISIBLE);
-		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ HIDE ] Nyni jsi na herni mape neviditelny!");
-	} else {
-		SetPlayerColor(playerid, COLOR_LIGHTGREEN);
-		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ HIDE ] Nyni jsi na opet viditelny na herni mape!");
-	}
-
-	gPlayers[playerid][Hidden] = !gPlayers[playerid][Hidden];
-
-	return 1;
-}
-
-dcmd_kill(playerid, const params[])
-{
-#pragma unused params
-	new playerName[MAX_PLAYER_NAME], stringToPrint[256];
-
-	GetPlayerName(playerid, playerName, sizeof(playerName));
-
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrace %s uz to nebavilo a spachal sebevrazdu (/kill)!", playerName);
-	SendClientMessageToAll(COLOR_BROWN, stringToPrint);
-
-	SetPlayerHealth(playerid, 0);
-
-	return 1;
-}
-
-dcmd_lay(playerid, const params[])
-{
-#pragma unused params
-	if (IsPlayerInAnyVehicle(playerid))
-	{
-		SendClientMessage(playerid, COLOR_RED, "[ ! ] Nelze byt v aute pro zapnuti animace!");
-		return 1;
-	}
-
-	ApplyAnimation(playerid, "BEACH", "Lay_Bac_Loop", 4.1, false, true, true, true, true);
-
-	return 1;
-}
-
-dcmd_locate(playerid, const params[])
-{
-#pragma unused params
-	new stringToPrint[256], interiorNo = GetPlayerInterior(playerid), Float:X, Float:Y, Float:Z, Float:Angle;
-
-	GetPlayerPos(playerid, X, Y, Z);
-	GetPlayerFacingAngle(playerid, Angle);
-
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Nachazite se se v interieru No. %d na souradnicich: X[%.2f], Y[%.2f], Z[%.2f], Rotace[%.2f].", interiorNo, X, Y, Z, Angle);
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
-
-	return 1;
-}
-
-dcmd_lock(playerid, const params[])
-{
-#pragma unused params
-	if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
-	{
-		SendClientMessage(playerid, COLOR_RED, "[ ! ] Nejsi v aute, nebo nejsi ridicem!");
-		return 1;
-	}
-
-	for (new i = 0; i < MAX_PLAYERS; i++)
-	{
-		if (i != playerid)
-		{
-			SetVehicleParamsForPlayer(GetPlayerVehicleID(playerid), i, 0, 1);
-		}
-	}
-
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ i ] Vozidlo zamceno! :)");
-
-	new Float:pX, Float:pY, Float:pZ;
-	GetPlayerPos(playerid, pX, pY, pZ);
-
-	PlayerPlaySound(playerid, 1056, pX, pY, pZ);
-
-	return 1;
-}
-
-/*dcmd_login(playerid, params[])
-{
-	new playerName[MAX_PLAYER_NAME];
-	GetPlayerName(playerid, playerName, sizeof(playerName));
-
-	if (gPlayers[playerid][IsLogged]) 
-		return SystemMsg(playerid, "[ AUTH ] Uz jsi prihlasen.");
-
-	if (!fexist(playerName)) 
-		return SystemMsg(playerid, "[ AUTH ] Data pro dany nickname nenalezena --> /register *heslo*");
-
-	if (strlen(params) == 0) 
-		return SystemMsg(playerid, "[ AUTH ] Je treba se prihlasit --> /login *heslo*");
-
-	if (SetPlayerAccountLogin(playerid, params))
-		return SystemMsg(playerid, "[ AUTH ] Prihlaseni uspesne.");
-}*/
-
-dcmd_pm(playerid, const params[])
-{
-	new token1[32], token2[32];
-	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
-
-	if (!strlen(params) || count != 2 || !IsNumeric(token1))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti /pm [playerID] [text]");
-
-	new targetId = strval(token1);
-
-	if (!IsPlayerConnected(targetId))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
-
-	OnPlayerPrivMsg(playerid, targetId, token2);
-
-	return 1;
-}
-
-dcmd_port(playerid, const params[])
-{
-	if (gPlayers[playerid][InsideProperty])
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Nelze pouzit port, pokud jsi uvnitr nemovitosti!");
-
-	if (IsPlayerInAnyVehicle(playerid))
-		RemovePlayerFromVehicle(playerid);
-
-	if (!strlen(params) || !IsNumeric(params))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /port [ID lokace]");
-
-	switch (strval(params))
-	{
-		case 0:
-			{
-				SetPlayerPos(playerid, 1958.3783, 1343.1572, 15.3746);
-				SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Portl ses do LV nad schodiste.");
-			}
-		case 1:
-			{
-				SetPlayerPos(playerid, -1951.58, 296.77, 41.04);
-				SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Portl ses do SF k WangCars,");
-			}
-	}
-
-	return 1;
-}
-
-dcmd_property(playerid, const params[])
-{
-	new token1[32], token2[32];
-	SplitIntoTwo(params, token1, token2, sizeof(token1));
-
-	if (!strlen(params) || (strcmp(token1, "buy") && strcmp(token1, "sell") && strcmp(token1, "list") && strcmp(token1, "spawn") && strcmp(token1, "vehicle")) || (strcmp(token1, "list") && !IsNumeric(token2)))
-	{
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Pouziti: /property buy [property ID]");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Pouziti: /property sell [property ID]");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Pouziti: /property list");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Pouziti: /property spawn [property ID]");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Pouziti: /property vehicle [property ID]");
-
-		return 1;
-	}
-
-	if (!strval(token2) && strcmp(token1, "list"))
-		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Neplatne cislo nemovistosti.");
-
-	if (!strcmp(token1, "buy"))
-	{
-		BuyPlayerProperty(playerid, strval(token2));
-	}
-	else if (!strcmp(token1, "sell"))
-	{
-		SellPlayerProperty(playerid, strval(token2));
-	}
-	else if (!strcmp(token1, "list"))
-	{
-		new stringToPrint[128];
-
-		SendClientMessage(playerid, COLOR_ORANGE, "[ REAL ] Tve sloty pro nemovitosti:");
-
-		for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
-		{
-			format(stringToPrint, sizeof(stringToPrint), "%d: ID %5d", i, gPlayers[playerid][Properties][i]);
-			SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
-		}
-	}
-	else if (!strcmp(token1, "spawn"))
-	{
-		new propertyID = strval(token2);
-
-		if (!IsPlayerOwner(playerid, propertyID))
-			return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Dana nemovitost ti nepatri!");
-
-		for (new i = 0; i < sizeof(gProperties); i++)
-		{
-			if (gProperties[i][ID] != propertyID || !gProperties[i][Occupied])
-				continue;
-			
-			gPlayers[playerid][SpawnPoint] = propertyID;
-
-			SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] Spawn point byl zmenen na lokaci u tve nemovitosti.");
-
-			break;
-		}
-	}
-	else if (!strcmp(token1, "vehicle"))
-	{
-		new propertyID = strval(token2);
-
-		if (!IsPlayerOwner(playerid, propertyID))
-			return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Dana nemovitost ti nepatri!");
-
-		for (new i = 0; i < sizeof(gProperties); i++)
-		{
-			if (gProperties[i][ID] != propertyID || !gProperties[i][Occupied])
-				continue;
-			
-			if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
-				return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Nejsi v aute, nebo nejsi ridicem auta!");
-
-			new vehicleId = GetPlayerVehicleID(playerid);
-			new modelId = GetVehicleModel(vehicleId);
-
-			if (gProperties[i][Vehicle][Model] == modelId)
-				return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Tento model auta jiz byl k nemovitosti prirazen.");
-
-			gProperties[i][Vehicle][Model] = modelId;
-
-			new colour1, colour2;
-
-			GetVehicleColours(vehicleId, colour1, colour2);
-
-			gProperties[i][Vehicle][Colours][0] = colour1;
-			gProperties[i][Vehicle][Colours][1] = colour2;
-
-			for (new j = 0; j < 16; j++)
-			{
-				gProperties[i][Vehicle][Components][j] = GetVehicleComponentInSlot(vehicleId, t_CARMODTYPE: j);
-			}
-
-			if (gProperties[i][Vehicle][ID])
-				DestroyVehicle(gProperties[i][Vehicle]);
-
-			gProperties[i][Vehicle][ID] = CreateVehicle(gProperties[i][Vehicle][Model], Float:gProperties[i][LocationVehicle][CoordX], Float:gProperties[i][LocationVehicle][CoordY], Float:gProperties[i][LocationVehicle][CoordZ], Float:gProperties[i][LocationVehicle][CoordR], colour1, colour2, -1);
-
-			for (new j = 0; j < 16; j++)
-			{
-				if (gProperties[i][Vehicle][Components][j])
-					AddVehicleComponent(gProperties[i][Vehicle][ID], gProperties[i][Vehicle][Components][j]);
-			}
-
-			SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] Toto auto bylo prirazeno k tve nemovitosti.");
-
-			break;
-		}
-	}
-
-	return 1;
-}
-
-dcmd_race(playerid, const params[])
-{
-	new token1[32], token2[32];
-	SplitIntoTwo(params, token1, token2, sizeof(token1));
-
-	if (!strlen(params) || (strcmp(token1, "join") && strcmp(token1, "exit") && strcmp(token1, "list") && strcmp(token1, "warp")) || (!strcmp(token1, "join") && !IsNumeric(token2)))
-	{
-		SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /race join [ID zavodu]");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /race exit");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /race list");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /race warp");
-
-		return 1;
-	}
-
-	if (!strcmp(token1, "join"))
-	{
-		new raceId = strval(token2);
-
-		SetPlayerRaceState(playerid, raceId);
-	}
-	else if (!strcmp(token1, "exit"))
-	{
-		ResetPlayerRaceState(playerid, 0, false);
-	}
-	else if (!strcmp(token1, "list"))
-	{
-		SendClientMessage(playerid, COLOR_YELLOW, "[ i ] Seznam dostupnych zavodu (prihlaska / odmena):");
-
-		for (new i = 1; i < MAX_RACE_COUNT; i++)
-		{
-			new stringToPrint[256];
-
-			if (gRaces[i][CostDollars] == 0)
-				continue;
-
-			format(stringToPrint, sizeof(stringToPrint), "ID: %2d: %s ($%d / $%d)", i, gRaces[i][Name], gRaces[i][CostDollars], gRaces[i][PrizeDollars]);
-			SendClientMessage(playerid, COLOR_GREY, stringToPrint);
-		}
-	}
-	else if (!strcmp(token1, "warp"))
-	{
-		if (gPlayers[playerid][InsideProperty])
-			return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Nelze pouzit warp, pokud jsi uvnitr nemovitosti!");
-
-		if (SetPlayerRaceStartPos(playerid))
-			return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ i ] Warp ke startu zavodu probehl uspesne!");
-	}
-
-	return 1;
-}
-
-/*dcmd_register(playerid, params[])
-{
-	new playerName[MAX_PLAYER_NAME];
-	GetPlayerName(playerid, playerName, sizeof(playerName));
-
-	if (gPlayers[playerid][IsLogged])
-		return SystemMsg(playerid, "[ AUTH ] Registrace herniho uctu probehla uspesne! --> /login *heslo*");
-
-	if (fexist(playerName))
-		return SystemMsg(playerid, "[ AUTH ] Neni treba se znovu registrovat --> /login *heslo*.");
-
-	if (strlen(params) == 0)
-		return SystemMsg(playerid, "[ AUTH ] Registrace je povinna --> /register *heslo*");
-
-	if (SetPlayerAccountRegistration(playerid, params))
-		return SystemMsg(playerid, "[ AUTH ] Herni ucet uspesne vytvoren. Automaticky prihlasen.");
-
-	return SystemMsg(playerid, "[ AUTH ] REgistrace se nezdarila, zkuste prosim znovu.");
-}*/
-
-dcmd_rules(playerid, const params[])
-{
-#pragma unused params
-	SendClientMessage(playerid, COLOR_ORANGERED, "[ -- PRAVIDLA SERVER/MODU -- ]");
-	SendClientMessage(playerid, COLOR_ORANGERED, "[ JE ZAKAZANY CARKILL,HELKILL, BIKEKILL, JETPACK, CHEATY ! ]");
-	SendClientMessage(playerid, COLOR_ORANGERED, "[ NA HRACE KTERI BUDOU IGNOROVAT TYTO PRAVIDLA CEKA /KICK POZDEJI /BAN ! ]");
-	SendClientMessage(playerid, COLOR_ORANGERED, "[ V MODU JE ZABUDOVAN ANTI-JETPACK I ANTI-CHEAT !]");
-
-	return 1;
-}
-
-dcmd_skydive(playerid, const params[])
-{
-#pragma unused params
-	// Give such user a parachute.
-	GivePlayerWeapon(playerid, t_WEAPON: 46, 1);
-
-	// Set their position high above the LV pyramide.
-	SetPlayerPos(playerid, 2247.61, 1260.14, 1313.40);
-
-	SendClientMessage(playerid, COLOR_CYAN, "[ i ] Skocil jsi z letadla! Uzij si skydive!");
-
-	return 1;
-}
-
-dcmd_soska(playerid, const params[])
-{
-#pragma unused params
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ INFO ] Sosky");
-	SendClientMessage(playerid, COLOR_YELLOW, "* Sosky se nachazeji v LS a jeho okoli");
-	SendClientMessage(playerid, COLOR_YELLOW, "* Sosek je zatim celkem 5");
-	SendClientMessage(playerid, COLOR_YELLOW, "* Odmenou je $10M v hotovosti a zvyseni moznosti ziskani admin levelu");
-
-	return 1;
-}
-
-dcmd_ucet(playerid, const params[])
+dcmd_acc(playerid, const params[])
 {
 #pragma unused params
 	new accountPropsText[][] =
 	{
-		"* Penize: hotovost $%d, banka $%d",
-		"* Tym: %d, Skin: %d",
+		"* Money: cash $%d, bank $%d",
+		"* TeamID: %d, SkinID: %d",
 		"* Admin level: %d, Wanted level: %d"
 	};
 
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ ACCOUNT ] Vypis herniho uctu");
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ ACCOUNT ] Game account stats");
 
 	for (new i = 0; i < sizeof(accountPropsText); i++)
 	{
@@ -842,14 +104,731 @@ dcmd_ucet(playerid, const params[])
 	return 1;
 }
 
-dcmd_unlock(playerid, const params[])
+dcmd_admins(playerid, const params[])
+#pragma unused params
+{
+	SendClientMessage(playerid, COLOR_YELLOW, "[ i ] Admins online:");
+
+	new adminCount;
+
+	for (new i = 0; i < GetMaxPlayers(); i++) 
+	{
+		// IsPlayerAdmin(i) == RCON admin
+		if (IsPlayerConnected(i) && (gPlayers[i][AdminLevel] > 0 || IsPlayerAdmin(i)))
+		{
+			adminCount++;
+
+			new adminName[MAX_PLAYER_NAME], stringToPrint[128];
+
+			// Omit RCON admin(s) in the output for now...
+			if (gPlayers[i][AdminLevel] > 0) 
+			{
+				GetPlayerName(i, adminName, sizeof(adminName));
+				format(stringToPrint, sizeof(stringToPrint), "[ %s [ID: %2d] LVL: %d]", adminName, i, gPlayers[i][AdminLevel]);
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
+			}
+		}
+	}
+
+	if (!adminCount) 
+	{
+		SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] No admin online!");
+		return 0;
+	}
+
+	return 1;
+}
+
+dcmd_afk(playerid, const params[])
+{
+#pragma unused params
+	new playerName[MAX_PLAYER_NAME], stringToPrint[256];
+
+	GetPlayerName(playerid, playerName, sizeof(playerName));
+
+	if (!gPlayers[playerid][AFK])
+	{
+		format(stringToPrint, sizeof(stringToPrint), "[ AFK ] Player %s (ID: %d) has just gone away from the keyboard (/afk)!", playerName, playerid);
+		SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+
+		// Lock the player's animations.
+		TogglePlayerControllable(playerid, false);
+
+		gPlayers[playerid][AFK] = true;
+	}
+	else
+	{
+		format(stringToPrint, sizeof(stringToPrint), "[ AFK ] Player %s (ID: %d) is back in game (/afk)!", playerName, playerid);
+		SendClientMessageToAll(COLOR_LIGHTGREEN, stringToPrint);
+
+		// Re-enable player's animations.
+		TogglePlayerControllable(playerid, true);
+
+		gPlayers[playerid][AFK] = false;
+	}
+
+	return 1;
+}
+
+dcmd_bank(playerid, const params[])
+{
+	new token1[32], token2[32];
+	SplitIntoTwo(params, token1, token2, sizeof(token1));
+
+	if (!strlen(params) || (strcmp(token1, "depo") && strcmp(token1, "draw") && strcmp(token1, "balance")) || (!strcmp(token1, "depo") && !IsNumeric(token2)) || (!strcmp(token1, "draw") && !IsNumeric(token2)))
+	{
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /bank depo [amount]");
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /bank draw [amount]");
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /bank balance");
+		return 1;
+	}
+
+	if (!CheckPlayerBankLocation(playerid))
+		return SendClientMessage(playerid, COLOR_RED, "[ ATM ] You must be near the ATM ($) pickup!");
+
+
+	if (!strcmp(token1, "depo"))
+	{
+		new targetAmount = strval(token2);
+
+		if (targetAmount > GetPlayerMoney(playerid))
+			return SendClientMessage(playerid, COLOR_RED, "[ ATM ] Invalid amount!");
+
+		gPlayers[playerid][Bank] += targetAmount;
+		GivePlayerMoney(playerid, -targetAmount);
+
+		new stringToPrint[256];
+
+		format(stringToPrint, sizeof(stringToPrint), "[ ATM ] Cash deposit: $%d! Account balance: $%d!", targetAmount, gPlayers[playerid][Bank]);
+		SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
+	}
+	else if (!strcmp(token1, "draw"))
+	{
+		new targetAmount = strval(token2);
+
+		if (targetAmount > gPlayers[playerid][Bank])
+			return SendClientMessage(playerid, COLOR_RED, "[ ATM ] Invalid amount!");
+
+		gPlayers[playerid][Bank] -= targetAmount;
+		GivePlayerMoney(playerid, targetAmount);
+
+		new stringToPrint[256];
+
+		format(stringToPrint, sizeof(stringToPrint), "[ ATM ] Cash withdrawal: $%d! Account balance: $%d!", targetAmount, gPlayers[playerid][Bank]);
+		SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
+	}
+	else if (!strcmp(token1, "balance"))
+	{
+		new stringToPrint[256];
+
+		format(stringToPrint, sizeof(stringToPrint), "[ ATM ] Account balance: $%d!", gPlayers[playerid][Bank]);
+		SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
+	}
+
+	return 1;
+}
+
+dcmd_cmd(playerid, const params[])
+{
+#pragma unused params
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ CMD ] Basic CMD set");
+	SendClientMessage(playerid, COLOR_YELLOW, "/acc /admins /afk /bank /cmd /dance /deathmatch /drugz /dwarp");
+	SendClientMessage(playerid, COLOR_YELLOW, "/fix /givecash /help /lay /locate /lock /property /race");
+	SendClientMessage(playerid, COLOR_YELLOW, "/rules /skydive /text /tiki /unlock");
+	SendClientMessage(playerid, COLOR_INVISIBLE, "");
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ CMD ] Specific CMD set (team-related)");
+	SendClientMessage(playerid, COLOR_YELLOW, "/deal /hide /wanted");
+
+	return 1;
+}
+
+dcmd_dance(playerid, const params[])
+{
+	if (IsPlayerInAnyVehicle(playerid))
+	{
+		SendClientMessage(playerid, COLOR_RED, "[ ! ] Animation allowed outside the vehicle only!");
+		return 1;
+	}
+
+	switch (strval(params)) 
+	{
+		case 1:
+			{
+				SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DANCE1);
+			}
+		case 2:
+			{
+				SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DANCE2);
+			}
+		case 3:
+			{
+				SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DANCE3);
+			}
+		case 4:
+			{
+				SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DANCE4);
+			}
+		default:
+			{
+				SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /dance [1-4]");
+			}
+	}
+
+	return 1;
+}
+
+dcmd_deal(playerid, const params[])
+{
+	new token1[32], token2[32];
+	SplitIntoTwo(params, token1, token2, sizeof(token1));
+
+	if (gPlayers[playerid][TeamID] != TEAM_DEALERS)
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Dealerz-only reserved command!");
+
+	if (!strlen(params) || (!IsNumeric(token1) && !IsNumeric(token2) && !strcmp(token1, "list")) || (strcmp(token1, "list") && IsNumeric(token2)))
+	{
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /deal [playerID] [drugID]");
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /deal list");
+		return 1;
+	}
+
+	if (IsNumeric(token1) && IsNumeric(token2))
+	{
+		new targetId = strval(token1);// targetAmount = strval(token2);
+
+		if (targetId == playerid)
+			return SendClientMessage(playerid, COLOR_RED, "[ ! ] Cannot deal to such player!");
+
+		if (!IsPlayerConnected(targetId))
+			return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] No such player online!");
+
+		//
+		//
+		//
+
+	}
+	else if (!strcmp(token1, "list"))
+	{
+		new stringToPrint[128];
+
+		SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Drug and stuff list:");
+
+		for (new i = 0; i < MAX_DRUGS; i++)
+		{
+			format(stringToPrint, sizeof(stringToPrint), "-> [ID %2d]: %s (got %d g/pcs)", i, gDrugz[i][DrugName], gPlayers[playerid][Drugs][i]);
+			SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
+		}
+	}
+
+	return 1;
+}
+
+dcmd_deathmatch(playerid, const params[])
+{
+	if (!strcmp(params, "join"))
+	{
+		SendClientMessageToAll(COLOR_YELLOW, "[ DEATHMATCH ] Deathmatch starts in 45 seconds! /deathmatch join");
+		SetPlayerPos(playerid, -1365.1, -2307.0, 39.1);
+
+		SetTimer("StartPaintball", 45000, false);
+
+		gPaintball[playerid][E_PAINTBALL_INGAME] = 1;
+	}
+	else if (!strcmp(params, "exit"))
+	{
+		new playerName[MAX_PLAYER_NAME], stringToPrint[128];
+
+		GetPlayerName(playerid, playerName, sizeof(playerName));
+
+		if (gPaintball[playerid][E_PAINTBALL_INGAME])
+		{
+			format(stringToPrint, sizeof(stringToPrint), "[ DEATHMATCH ] Player %s left the deathmatch (/deathmatch exit)!", playerName);
+			SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+
+			SetPlayerHealth(playerid, 0.0);
+			gPaintball[playerid][E_PAINTBALL_INGAME] = 0;
+		}
+	}
+	else
+	{
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /deathmatch [join/exit]");
+	}
+
+	return 1;
+}
+
+dcmd_drugz(playerid, const params[])
+{
+#pragma unused params
+	new stringToPrint[128];
+
+	SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Drug and stuff list:");
+
+	for (new i = 0; i < MAX_DRUGS; i++)
+	{
+		format(stringToPrint, sizeof(stringToPrint), "-> %s (got %d g/pcs)", gDrugz[i][DrugName], gPlayers[playerid][Drugs][i]);
+		SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
+	}
+
+	return 1;
+}
+
+dcmd_dwarp(playerid, const params[])
+{
+#pragma unused params
+	if (gPlayers[playerid][InsideProperty])
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ WARP ] Leave the property to be able to use this warp command!");
+
+	new t_PLAYER_STATE: playerState = GetPlayerState(playerid), senderName[MAX_PLAYER_NAME], stringToPrint[256], vehicleId = GetPlayerVehicleID(playerid);
+
+	SetPlayerInterior(playerid, 0);
+	GetPlayerName(playerid, senderName, sizeof(senderName));
+
+	format(stringToPrint, sizeof(stringToPrint), "[ WARP ] Player %s used warp to a drag spot [ /dwarp ]", senderName);
+	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+
+	if (IsPlayerInVehicle(playerid, vehicleId) && playerState == PLAYER_STATE_DRIVER) 
+		SetVehiclePos(vehicleId, 2635.67, 1171.51, 10.37);
+	else
+		SetPlayerPos(playerid, 2635.67, 1171.51, 10.37);
+
+	return 1;
+}
+
+dcmd_fix(playerid, const params[])
+{
+#pragma unused params
+	if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER) 
+		return SendClientMessage(playerid, COLOR_RED, "[ FIX ] Must be riding/driving a vehicle!");
+
+	if (CheckPlayerRaceState(playerid))
+		return SendClientMessage(playerid, COLOR_RED, "[ FIX ] Cannot fix your vehicle during a race!");
+
+	SetVehicleHealth(GetPlayerVehicleID(playerid), 1000.0);
+	RepairVehicle(GetPlayerVehicleID(playerid));
+
+	SendClientMessage(playerid, COLOR_YELLOW, "[ FIX ] Vehicle fixed!");
+
+	return 1;
+}
+
+dcmd_givecash(playerid, const params[])
+{
+	new token1[32], token2[32];
+	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
+
+	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /givecash [playerID] [amount]");
+
+	new targetId = strval(token1), targetAmount = strval(token2);
+
+	if (targetId == playerid)
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Invalid transaction amount!");
+
+	if (targetAmount > GetPlayerMoney(playerid) || targetAmount < 0)
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Invalid amount!");
+
+	if (!IsPlayerConnected(targetId))
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] No such player online!");
+
+	new playerName[MAX_PLAYER_NAME], stringToPrint[128], targetName[MAX_PLAYER_NAME];
+
+	// Fetch players' names.
+	GetPlayerName(playerid, playerName, sizeof(playerName));
+	GetPlayerName(targetId, targetName, sizeof(targetName));
+
+	// Send an informative statement to the receiving player.
+	format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Received money ($%d) from player %s [ID: %d]!", targetAmount, playerName, playerid);
+	SendClientMessage(targetId, COLOR_LIGHTGREEN, stringToPrint);
+
+	// Transfer money.
+	GivePlayerMoney(targetId, targetAmount);
+	GivePlayerMoney(playerid, -targetAmount);
+
+	// Send an informative statement to the sending player.
+	format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Sent money ($%d) to player %s [ID: %d]!", targetAmount, targetName, targetId);
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
+
+	return 1;
+}
+
+dcmd_help(playerid, const params[])
+{
+#pragma unused params
+	SendClientMessage(playerid, COLOR_YELLOWGREEN, "[ HELP ]");
+	SendClientMessage(playerid, COLOR_YELLOW, "-> Command list:        /cmd");
+	SendClientMessage(playerid, COLOR_YELLOW, "-> Admin command list:  /acmd");
+	SendClientMessage(playerid, COLOR_YELLOW, "-> Server rules:        /rules");
+
+	return 1;
+}
+
+dcmd_hide(playerid, const params[]) 
+{
+#pragma unused params
+	if (gPlayers[playerid][TeamID] != TEAM_ADMINZ)
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Adminz-only team-related command!");
+
+	if (!gPlayers[playerid][Hidden])
+	{
+		SetPlayerColor(playerid, COLOR_INVISIBLE);
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ HIDE ] Player color set to invisible!");
+	} else {
+		SetPlayerColor(playerid, COLOR_LIGHTGREEN);
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ HIDE ] Player color set to light green!");
+	}
+
+	gPlayers[playerid][Hidden] = !gPlayers[playerid][Hidden];
+
+	return 1;
+}
+
+dcmd_kill(playerid, const params[])
+{
+#pragma unused params
+	new playerName[MAX_PLAYER_NAME], stringToPrint[256];
+
+	GetPlayerName(playerid, playerName, sizeof(playerName));
+
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s has just committed a suicide [ /kill ]!", playerName);
+	SendClientMessageToAll(COLOR_BROWN, stringToPrint);
+
+	SetPlayerHealth(playerid, 0);
+
+	return 1;
+}
+
+dcmd_lay(playerid, const params[])
+{
+#pragma unused params
+	if (IsPlayerInAnyVehicle(playerid))
+	{
+		SendClientMessage(playerid, COLOR_RED, "[ ! ] Animation allowed outside the vehicle only!");
+		return 1;
+	}
+
+	ApplyAnimation(playerid, "BEACH", "Lay_Bac_Loop", 4.1, false, true, true, true, true);
+
+	return 1;
+}
+
+dcmd_locate(playerid, const params[])
+{
+#pragma unused params
+	new stringToPrint[256], interiorNo = GetPlayerInterior(playerid), Float:X, Float:Y, Float:Z, Float:Angle;
+
+	GetPlayerPos(playerid, X, Y, Z);
+	GetPlayerFacingAngle(playerid, Angle);
+
+	format(stringToPrint, sizeof(stringToPrint), "[ COORDS ] Current location coordinates: Interior No. %d, X[%.2f], Y[%.2f], Z[%.2f], Rotation/Angle[%.2f].", interiorNo, X, Y, Z, Angle);
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
+
+	return 1;
+}
+
+dcmd_lock(playerid, const params[])
 {
 #pragma unused params
 	if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 	{
-		SendClientMessage(playerid, COLOR_RED, "[ ! ] Nejsi v aute, nebo nejsi ridicem!");
+		SendClientMessage(playerid, COLOR_RED, "[ LOCK ] You must be driving/riding a vehicle!");
 		return 1;
 	}
+
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (i != playerid)
+		{
+			SetVehicleParamsForPlayer(GetPlayerVehicleID(playerid), i, 0, 1);
+		}
+	}
+
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ LOCK ] Vehicle locked!");
+
+	new Float:pX, Float:pY, Float:pZ;
+	GetPlayerPos(playerid, pX, pY, pZ);
+
+	PlayerPlaySound(playerid, 1056, pX, pY, pZ);
+
+	return 1;
+}
+
+dcmd_pm(playerid, const params[])
+{
+	new token1[32], token2[32];
+	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
+
+	if (!strlen(params) || count != 2 || !IsNumeric(token1))
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /pm [playerID] [text]");
+
+	new targetId = strval(token1);
+
+	if (!IsPlayerConnected(targetId))
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] No such player online!");
+
+	OnPlayerPrivMsg(playerid, targetId, token2);
+
+	return 1;
+}
+
+dcmd_port(playerid, const params[])
+{
+	if (gPlayers[playerid][InsideProperty])
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Leave the property to be able to use such command!");
+
+	if (IsPlayerInAnyVehicle(playerid))
+		RemovePlayerFromVehicle(playerid);
+
+	if (!strlen(params) || !IsNumeric(params))
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /port [location ID]");
+
+	switch (strval(params))
+	{
+		case 0:
+			{
+				SetPlayerPos(playerid, 1958.3783, 1343.1572, 15.3746);
+				SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] Las Venturas Escalators");
+			}
+		case 1:
+			{
+				SetPlayerPos(playerid, -1951.58, 296.77, 41.04);
+				SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] San Fierro WangCars");
+			}
+	}
+
+	return 1;
+}
+
+dcmd_property(playerid, const params[])
+{
+	new token1[32], token2[32];
+	SplitIntoTwo(params, token1, token2, sizeof(token1));
+
+	if (!strlen(params) || (strcmp(token1, "buy") && strcmp(token1, "sell") && strcmp(token1, "list") && strcmp(token1, "spawn") && strcmp(token1, "vehicle")) || (strcmp(token1, "list") && !IsNumeric(token2)))
+	{
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /property buy [property ID]");
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /property sell [property ID]");
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /property list");
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /property spawn [property ID]");
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /property vehicle [property ID]");
+
+		return 1;
+	}
+
+	if (!strval(token2) && strcmp(token1, "list"))
+		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Invalid property ID");
+
+	if (!strcmp(token1, "buy"))
+	{
+		BuyPlayerProperty(playerid, strval(token2));
+	}
+	else if (!strcmp(token1, "sell"))
+	{
+		SellPlayerProperty(playerid, strval(token2));
+	}
+	else if (!strcmp(token1, "list"))
+	{
+		new stringToPrint[128];
+
+		SendClientMessage(playerid, COLOR_ORANGE, "[ REAL ] Property slots:");
+
+		for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
+		{
+			format(stringToPrint, sizeof(stringToPrint), "-> %d: property ID %5d", i, gPlayers[playerid][Properties][i]);
+			SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
+		}
+	}
+	else if (!strcmp(token1, "spawn"))
+	{
+		new propertyID = strval(token2);
+
+		if (!IsPlayerOwner(playerid, propertyID))
+			return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Such property must be owned first!");
+
+		for (new i = 0; i < sizeof(gProperties); i++)
+		{
+			if (gProperties[i][ID] != propertyID || !gProperties[i][Occupied])
+				continue;
+			
+			gPlayers[playerid][SpawnPoint] = propertyID;
+
+			SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] Spawn point changed successfully");
+
+			break;
+		}
+	}
+	else if (!strcmp(token1, "vehicle"))
+	{
+		new propertyID = strval(token2);
+
+		if (!IsPlayerOwner(playerid, propertyID))
+			return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Dana nemovitost ti nepatri!");
+
+		for (new i = 0; i < sizeof(gProperties); i++)
+		{
+			if (gProperties[i][ID] != propertyID || !gProperties[i][Occupied])
+				continue;
+			
+			if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
+				return SendClientMessage(playerid, COLOR_RED, "[ REAL ] You must be driving/riding a vehicle!");
+
+			new vehicleId = GetPlayerVehicleID(playerid);
+			new modelId = GetVehicleModel(vehicleId);
+
+			if (gProperties[i][Vehicle][Model] == modelId)
+				return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Such vehicle model has been already attached to such property!");
+
+			gProperties[i][Vehicle][Model] = modelId;
+
+			new colour1, colour2;
+
+			GetVehicleColours(vehicleId, colour1, colour2);
+
+			gProperties[i][Vehicle][Colours][0] = colour1;
+			gProperties[i][Vehicle][Colours][1] = colour2;
+
+			for (new j = 0; j < 16; j++)
+			{
+				gProperties[i][Vehicle][Components][j] = GetVehicleComponentInSlot(vehicleId, t_CARMODTYPE: j);
+			}
+
+			if (gProperties[i][Vehicle][ID])
+				DestroyVehicle(gProperties[i][Vehicle]);
+
+			gProperties[i][Vehicle][ID] = CreateVehicle(gProperties[i][Vehicle][Model], Float:gProperties[i][LocationVehicle][CoordX], Float:gProperties[i][LocationVehicle][CoordY], Float:gProperties[i][LocationVehicle][CoordZ], Float:gProperties[i][LocationVehicle][CoordR], colour1, colour2, -1);
+
+			for (new j = 0; j < 16; j++)
+			{
+				if (gProperties[i][Vehicle][Components][j])
+					AddVehicleComponent(gProperties[i][Vehicle][ID], gProperties[i][Vehicle][Components][j]);
+			}
+
+			SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] This vehicle has been attached to your property successfully");
+
+			break;
+		}
+	}
+
+	return 1;
+}
+
+dcmd_race(playerid, const params[])
+{
+	new token1[32], token2[32];
+	SplitIntoTwo(params, token1, token2, sizeof(token1));
+
+	if (!strlen(params) || (strcmp(token1, "join") && strcmp(token1, "exit") && strcmp(token1, "list") && strcmp(token1, "warp")) || (!strcmp(token1, "join") && !IsNumeric(token2)))
+	{
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /race join [ID zavodu]");
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /race exit");
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /race list");
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /race warp");
+
+		return 1;
+	}
+
+	if (!strcmp(token1, "join"))
+	{
+		new raceId = strval(token2);
+
+		SetPlayerRaceState(playerid, raceId);
+	}
+	else if (!strcmp(token1, "exit"))
+	{
+		ResetPlayerRaceState(playerid, 0, false);
+	}
+	else if (!strcmp(token1, "list"))
+	{
+		SendClientMessage(playerid, COLOR_YELLOW, "[ RACE ] List of currently loaded races (cost / prize):");
+
+		for (new i = 1; i < MAX_RACE_COUNT; i++)
+		{
+			new stringToPrint[256];
+
+			if (gRaces[i][CostDollars] == 0)
+				continue;
+
+			format(stringToPrint, sizeof(stringToPrint), "-> ID: %2d: %s ($%d / $%d)", i, gRaces[i][Name], gRaces[i][CostDollars], gRaces[i][PrizeDollars]);
+			SendClientMessage(playerid, COLOR_GREY, stringToPrint);
+		}
+	}
+	else if (!strcmp(token1, "warp"))
+	{
+		if (gPlayers[playerid][InsideProperty])
+			return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Leave the property to be able to use such command!");
+
+		if (SetPlayerRaceStartPos(playerid))
+			return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ RACE ] Warp near the race start used successfully");
+	}
+
+	return 1;
+}
+
+dcmd_rules(playerid, const params[])
+{
+#pragma unused params
+	SendClientMessage(playerid, COLOR_ORANGERED, "[ GAME RULES ]");
+	SendClientMessage(playerid, COLOR_ORANGERED, "-> CARKILL, HELIKILL, or BIKEKILL is forbidden");
+	SendClientMessage(playerid, COLOR_ORANGERED, "-> No MINIGUN, or JETPACK usage, No cheating");
+	SendClientMessage(playerid, COLOR_ORANGERED, "-> Anti-Cheat filterscript enabled (cheating => kick/ban)");
+
+	return 1;
+}
+
+dcmd_skydive(playerid, const params[])
+{
+#pragma unused params
+	// Give such user a parachute.
+	GivePlayerWeapon(playerid, t_WEAPON: 46, 1);
+
+	// Set their position high above the LV pyramide.
+	SetPlayerPos(playerid, 2247.61, 1260.14, 1313.40);
+
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ SKYDIVE ] Enjoy the skydive");
+
+	return 1;
+}
+
+dcmd_text(playerid, const params[])
+{
+	new token1[32], token2[32];
+	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
+
+	if (!strlen(params) || count != 2)
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /text [ID] [text]");
+
+	new targetId = strval(token1);
+
+	if (!IsPlayerConnected(targetId)) 
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+
+	new playerName[MAX_PLAYER_NAME], stringToPrint[256], targetName[MAX_PLAYER_NAME];
+
+	GetPlayerName(playerid, playerName, sizeof(playerName));
+	GetPlayerName(targetId, targetName, sizeof(targetName));
+
+	format(stringToPrint, sizeof(stringToPrint), "Player %s says to player %s: %s", playerName, targetName, token2);
+
+	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+
+	return 1;
+}
+
+dcmd_tiki(playerid, const params[])
+{
+#pragma unused params
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TIKI ] Tiki pickups");
+	SendClientMessage(playerid, COLOR_YELLOW, "-> Located in Los Santos area");
+	SendClientMessage(playerid, COLOR_YELLOW, "-> Prize $10M in cash + a potential Admin level");
+
+	return 1;
+}
+
+dcmd_unlock(playerid, const params[])
+{
+#pragma unused params
+	if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] You must be driving/riding a vehicle!");
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -859,7 +838,7 @@ dcmd_unlock(playerid, const params[])
 		}
 	}
 
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ i ] Vozidlo odemceno! :)");
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ LOCK ] Vehicle unlocked");
 
 	new Float:pX, Float:pY, Float:pZ;
 	GetPlayerPos(playerid, pX, pY, pZ);
@@ -873,7 +852,7 @@ dcmd_wanted(playerid, const params[])
 {
 #pragma unused params
 	if (gPlayers[playerid][TeamID] != TEAM_POLICE && !IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Tuhle pravomoc maji pouze clenove tymu Policajtu!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Police team-related command!");
 
 	new playerName[MAX_PLAYER_NAME], stringToPrint[128];
 
@@ -884,7 +863,7 @@ dcmd_wanted(playerid, const params[])
 
 		GetPlayerName(i, playerName, sizeof(playerName));
 
-		format(stringToPrint, sizeof(stringToPrint), "%s [ID: %d] --- WANTED level %d", playerName, i, GetPlayerWantedLevel(i));
+		format(stringToPrint, sizeof(stringToPrint), "-> %s [ID: %d] => WANTED level %d", playerName, i, GetPlayerWantedLevel(i));
 		SendClientMessage(playerid, COLOR_WHITE, stringToPrint);
 	}
 
@@ -899,11 +878,11 @@ dcmd_acmd(playerid, const params[])
 {
 #pragma unused params
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
-	SendClientMessage(playerid, COLOR_YELLOWGREEN, "[ i ] ADMIN CMD SET");
-	SendClientMessage(playerid, COLOR_YELLOW, "/acmd /admincol /ban /cam /ccmd /elevator /fakechat /get /goto");
-	SendClientMessage(playerid, COLOR_YELLOW, "/kick /lvl /nitro /reset /skin /smazat /spectate /vehicle /zbrane ");
+	SendClientMessage(playerid, COLOR_YELLOWGREEN, "[ CMD ] Admin Command Set");
+	SendClientMessage(playerid, COLOR_YELLOW, "-> /acmd /admincol /ban /cam /ccmd /clear /elevator /fakechat /get /goto");
+	SendClientMessage(playerid, COLOR_YELLOW, "-> /kick /lvl /nitro /reset /skin /spectate /vehicle /weapons ");
 
 	return 1;
 }
@@ -911,10 +890,10 @@ dcmd_acmd(playerid, const params[])
 dcmd_admincol(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	if (!strlen(params) || !IsNumeric(params)) 
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouzití: /admincol [1-5]");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /admincol [1-5]");
 
 	new adminColToSet = strval(params);
 
@@ -923,31 +902,31 @@ dcmd_admincol(playerid, const params[])
 		case 1:
 			{
 				SetPlayerColor(playerid, COLOR_LIGHTGREEN);
-				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ ! ] Barva nicku nastavena na svetle zelenou!");
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ COL ] Player color set to light green!");
 			}
 		case 2:
 			{
 				SetPlayerColor(playerid, COLOR_BLUE);
-				SendClientMessage(playerid, COLOR_BLUE, "[ i ] Barva nicku nastavena na modrou!");
+				SendClientMessage(playerid, COLOR_BLUE, "[ COL ] Player color set to blue!");
 			}
 		case 3:
 			{
 				SetPlayerColor(playerid, COLOR_RED);
-				SendClientMessage(playerid, COLOR_RED, "[ i ] Barva nicku nastavena na cervenou!");
+				SendClientMessage(playerid, COLOR_RED, "[ COL ] Player color set to red!");
 			}
 		case 4:
 			{
 				SetPlayerColor(playerid, COLOR_ORANGE);
-				SendClientMessage(playerid, COLOR_ORANGE, "[ i ] Barva nicku nastavena na oranzovou!");
+				SendClientMessage(playerid, COLOR_ORANGE, "[ COL ] Player color set to orange!");
 			}
 		case 5:
 			{
 				SetPlayerColor(playerid, COLOR_WHITE);
-				SendClientMessage(playerid, COLOR_WHITE, "[ i ] Barva nicku nastavena na bilou!");
+				SendClientMessage(playerid, COLOR_WHITE, "[ COL ] Player color set to white!");
 			}
 		default:
 			{
-				return SendClientMessage(playerid, COLOR_RED, "[ ! ] Barvy pouze 1-5!");
+				return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Usage: /admincol [1-5]");
 			}
 	}
 
@@ -957,21 +936,21 @@ dcmd_admincol(playerid, const params[])
 dcmd_ban(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	if (!strlen(params) || !IsNumeric(params)) 
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /ban [ID]");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /ban [ID]");
 
 	new adminName[MAX_PLAYER_NAME], playerIdToBan = strval(params), playerName[MAX_PLAYER_NAME], stringToPrint[256];
 
 	if (!IsPlayerConnected(playerIdToBan))
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Hrac s danym ID neni na serveru!");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
 
 	// Get participated nicknames.
 	GetPlayerName(playerid, adminName, sizeof(adminName));
 	GetPlayerName(playerIdToBan, playerName, sizeof(playerName));
 
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s [ID: %d] zabanoval hrace %s [ID: %d] !!!", adminName, playerid, playerName, playerIdToBan);
+	format(stringToPrint, sizeof(stringToPrint), "[ BAN ] Admin %s [ID: %d] banned player %s [ID: %d] from server!", adminName, playerid, playerName, playerIdToBan);
 	SendClientMessageToAll(COLOR_CYAN, stringToPrint);
 
 	Ban(playerIdToBan);
@@ -982,7 +961,7 @@ dcmd_ban(playerid, const params[])
 dcmd_cam(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 2) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	switch (strval(params))
 	{
@@ -991,27 +970,27 @@ dcmd_cam(playerid, const params[])
 				SetPlayerCameraPos(playerid, 2219.87, 1266.13, 12.53);
 				SetPlayerCameraLookAt(playerid, 2219.89, 1266.13, 12.53);
 
-				SendClientMessage(playerid, COLOR_BLUE, "[CAM] Kamera 1 zap. [/ccmd][/camoff]");
+				SendClientMessage(playerid, COLOR_BLUE, "[ CAM ] Camera No. 1 attached [/ccmd][/camoff]");
 			}
 		case 2:
 			{
 				SetPlayerCameraPos(playerid, 2035.62, 1303.53, 10.41);
 				SetPlayerCameraLookAt(playerid, 2056.07, 1318.53, 10.41);
 
-				SendClientMessage(playerid, COLOR_BLUE, "[CAM] Kamera 2 zap. [/ccmd][/camoff]");
+				SendClientMessage(playerid, COLOR_BLUE, "[ CAM ] Camera No. 2 attached [/ccmd][/camoff]");
 			}
 		case 3: 
 			{
 				SetPlayerCameraPos(playerid, 2254.22, 1207.01, 10.38);
 				SetPlayerCameraLookAt(playerid, 2254.22, 1207.01, 10.38);
 
-				SendClientMessage(playerid, COLOR_BLUE, "[CAM] Kamera 3 zap. [/ccmd][/camoff]");
+				SendClientMessage(playerid, COLOR_BLUE, "[ CAM ] Camera No. 3 attached [/ccmd][/camoff]");
 			}
 		default:
 			{
 				SetCameraBehindPlayer(playerid);
 
-				SendClientMessage(playerid, COLOR_BLUE, "[CAM] Kamera vypnuta [/ccmd]");
+				SendClientMessage(playerid, COLOR_BLUE, "[ CAM ] Camera dettached [/ccmd]");
 			}
 	}
 
@@ -1022,9 +1001,45 @@ dcmd_ccmd(playerid, const params[])
 {
 #pragma unused params
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
-	SendClientMessage(playerid, COLOR_YELLOWGREEN, "[ CAM ] KAMERY: /cam 1 (pyramida dole), /cam 2 (banka atd), /camoff");
+	SendClientMessage(playerid, COLOR_YELLOWGREEN, "[ CAM ] Cameras:");
+	SendClientMessage(playerid, COLOR_YELLOW, "-> /cam 1 (LV Pyramid Entrance)");
+	SendClientMessage(playerid, COLOR_YELLOW, "-> /cam 2 (Bank)");
+	SendClientMessage(playerid, COLOR_YELLOW, "-> /cam 3");
+	SendClientMessage(playerid, COLOR_YELLOW, "-> /camoff");
+
+	return 1;
+}
+
+dcmd_countdown(playerid, const params[])
+{
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3) 
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+
+	if (!strlen(params) || !IsNumeric(params) || !strval(params))
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /countdown [seconds]");
+
+	GameTextForPlayer(playerid, "~n~~n~~n~~n~~n~~n~odpocet", strval(params) * 1000, 4);
+
+	return 1;
+}
+
+dcmd_clear(playerid, const params[])
+{
+#pragma unused params
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+
+	for (new c = 0; c < 60; c++) 
+		SendClientMessageToAll(COLOR_INVISIBLE, " ");
+
+	new adminName[MAX_PLAYER_NAME], stringToPrint[256];
+
+	GetPlayerName(playerid, adminName, sizeof(adminName));
+	format(stringToPrint, sizeof(stringToPrint), "[ CLEAR ] Chat history flushed");
+
+	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
 
 	return 1;
 }
@@ -1032,7 +1047,7 @@ dcmd_ccmd(playerid, const params[])
 dcmd_elevator(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	new adminName[MAX_PLAYER_NAME], stringToPrint[128];
 
@@ -1041,14 +1056,14 @@ dcmd_elevator(playerid, const params[])
 		MoveObject(gAdminElevator, 2303.207, 1174.944, 80.285, 3.0, 0.0, 0.0, 142.812);
 		GetPlayerName(playerid, adminName, sizeof(adminName));
 
-		format(stringToPrint, sizeof(stringToPrint), "[ AV ] Admin %s rozjel vytah nahoru!", adminName);
+		format(stringToPrint, sizeof(stringToPrint), "[ AE ] Admin elevator goes up!");
 		SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
 	}
 	else if (!strcmp(params, "stop"))
 	{
 		StopObject(gAdminElevator);
 
-		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Vytah se zasekl! Kontaktujte technika!");
+		format(stringToPrint, sizeof(stringToPrint), "[ AE ] Admin elevator malfunction!");
 		SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
 	}
 	else if (!strcmp(params, "down"))
@@ -1056,12 +1071,12 @@ dcmd_elevator(playerid, const params[])
 		MoveObject(gAdminElevator, 2303.207, 1174.944, 11.260, 3.0, 0.0, 0.0, 0.0);
 		GetPlayerName(playerid, adminName, sizeof(adminName));
 
-		format(stringToPrint, sizeof(stringToPrint), "[ AV ] Admin %s poslal vytah dolu", adminName);
+		format(stringToPrint, sizeof(stringToPrint), "[ AE ] Admin elevator goes down!");
 		SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
 	}
 	else
 	{
-		SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /elevator [up/down/stop]");
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /elevator [up/down/stop]");
 	}
 
 	return 1;
@@ -1070,22 +1085,22 @@ dcmd_elevator(playerid, const params[])
 dcmd_fakechat(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	new token1[32], token2[32];
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || count != 2 || !IsNumeric(token1))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti /fakechat [playerID] [text]");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /fakechat [playerID] [text]");
 
 	new targetId = strval(token1);
 
 	if (!IsPlayerConnected(targetId)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Hrac se zadanym ID neni pritomen na serveru!.");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
 
 	SendPlayerMessageToAll(targetId, token2);
 
-	SendClientMessage(playerid, COLOR_WHITE, "[ i ] Falesna zprava byla uspesne odeslana!");
+	SendClientMessage(playerid, COLOR_WHITE, "[ FAKE ] Fake client message sent!");
 
 	return 1;
 }
@@ -1093,21 +1108,21 @@ dcmd_fakechat(playerid, const params[])
 dcmd_flip(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	if (!strlen(params) || !IsNumeric(params)) 
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /flip [ID]!");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /flip [ID]!");
 
 	new targetId = strval(params), Float:z;
 
 	if (!IsPlayerConnected(targetId)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
 
 	if (!IsPlayerInAnyVehicle(targetId)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Hrac s danym ID se nenachazi v aute!");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Such player not in a vehicle!");
 
 	if (GetPlayerState(targetId) != PLAYER_STATE_DRIVER) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Hrac s danym ID se sice nachazi v aute, ale neni ridicem!");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Such player not driving/riding a vehicle!");
 
 	// Flip player's vehicle.
 	GetVehicleZAngle(GetPlayerVehicleID(targetId), z);
@@ -1119,18 +1134,18 @@ dcmd_flip(playerid, const params[])
 dcmd_get(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 2) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	if (!strlen(params) || !IsNumeric(params)) 
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /get [ID]!");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /get [ID]!");
 
 	new targetId = strval(params), Float:x, Float:y, Float:z;
 
 	if (!IsPlayerConnected(targetId)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
 
 	if (targetId == playerid)
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Neni mozne teleportovat sebe sama!");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Cannot get such player!");
 
 	GetPlayerPos(playerid, x, y, z);
 
@@ -1156,18 +1171,18 @@ dcmd_get(playerid, const params[])
 dcmd_goto(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 2) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	if (!strlen(params) || !IsNumeric(params)) 
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /goto [ID]!");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usagei: /goto [ID]!");
 
 	new targetId = strval(params), Float:x, Float:y, Float:z;
 
 	if (!IsPlayerConnected(targetId)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
 
 	if (targetId == playerid)
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Neni mozne teleportovat se k sobe samemu!");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Cannot go to such player!");
 
 	// Fetch the coordinates of the targetId player.
 	GetPlayerPos(targetId, x, y, z);
@@ -1195,20 +1210,20 @@ dcmd_goto(playerid, const params[])
 dcmd_hp(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	if (!strlen(params) || !IsNumeric(params))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /hp [playerID]");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /hp [playerID]");
 
 	new targetId = strval(params);
 
 	if (!IsPlayerConnected(targetId))
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
 
 	SetPlayerHealth(targetId, 100.0);
 	SetPlayerArmour(targetId, 100.0);
 
-	SendClientMessage(targetId, COLOR_GREY, "[ ! ] Zdravi: 100.0, Vesta: 100.0");
+	SendClientMessage(targetId, COLOR_LIGHTGREEN, "[ HP ] Health: 100.0, Armour: 100.0");
 
 	return 1;
 }
@@ -1216,20 +1231,20 @@ dcmd_hp(playerid, const params[])
 dcmd_kick(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	if (!strlen(params) || !IsNumeric(params)) 
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /kick [ID]");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /kick [ID]");
 
 	new adminName[MAX_PLAYER_NAME], playerIdToKick = strval(params), playerName[MAX_PLAYER_NAME], stringToPrint[128];
 
 	if (!IsPlayerConnected(playerIdToKick)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
 
 	GetPlayerName(playerid, adminName, sizeof(adminName));
 	GetPlayerName(playerIdToKick, playerName, sizeof(playerName));
 
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s vyhodil(a) hrace %s ze serveru !!! ", adminName, playerName);
+	format(stringToPrint, sizeof(stringToPrint), "[ KICK ] Admin %s [ID: %d] kicked player %s [ID: %d] from server! ", adminName, playerid, playerName, playerIdToKick);
 
 	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
 	Kick(playerIdToKick);
@@ -1240,37 +1255,37 @@ dcmd_kick(playerid, const params[])
 dcmd_lvl(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	new token1[32], token2[32];
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti /lvl [playerID] [adminLvl]");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /lvl [playerID] [0-5]");
 
 	new targetId = strval(token1), targetLvl = strval(token2);
 
 	if (!IsPlayerConnected(targetId)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
 
 	if (gPlayers[playerid][AdminLevel] <= gPlayers[targetId][AdminLevel])
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nemuzes menit level adminum stejneho nebo vyssiho levelu nez mas sam!");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] You can only set the same or lower level that you have got yourself!");
 
 	if (targetId == playerid) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nemuzes menit level sam sobe!");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Invalid player!");
 
-	if (targetLvl < 0 || targetLvl > 4)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Rozsah levelu je pouze 0-4!");
+	if (targetLvl < 0 || targetLvl > 5)
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Usage: /lvl [playerID] [0-5]");
 
 	if (targetLvl == gPlayers[targetId][AdminLevel])
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Dany hrac jiz vlastni dany admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No need to change such admin level!");
 
 	new adminName[MAX_PLAYER_NAME], playerName[MAX_PLAYER_NAME], stringToPrint[128];
 
 	GetPlayerName(playerid, adminName, sizeof(adminName));
 	GetPlayerName(targetId, playerName, sizeof(playerName));
 
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s nastavil hraci %s [ ID: %d ] Admin-Level %d!", adminName, playerName, targetId, targetLvl);
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s set player %s [ ID: %d ] an Admin (level %d)!", adminName, playerName, targetId, targetLvl);
 
 	gPlayers[targetId][AdminLevel] = targetLvl;
 	SavePlayerData(targetId);
@@ -1283,26 +1298,26 @@ dcmd_lvl(playerid, const params[])
 dcmd_nitro(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	if (!strlen(params) || !IsNumeric(params))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /nitro [ID]");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /nitro [ID]");
 
 	new targetId = strval(params);
 
 	if (!IsPlayerConnected(targetId))
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
 
 	if (!IsPlayerInAnyVehicle(targetId))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Hrac se nenachazi ve vozidle!");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Such player must be driving a vehicle!");
 
 	new t_PLAYER_STATE: targetPlayerState = GetPlayerState(targetId), targetVehicleId = GetPlayerVehicleID(targetId);
 
 	if (targetPlayerState != PLAYER_STATE_DRIVER)
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Hrac je sice v aute, ale neni ridicem!");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Such player must be driving a vehicle!");
 
 	if (!IsPlayerInValidNosVehicle(targetId, targetVehicleId)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Do auta hrace nejde nainstalovat nitro !");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Cannot mod such vehicle!");
 
 	new adminName[MAX_PLAYER_NAME], stringToPrint[128];
 
@@ -1311,28 +1326,10 @@ dcmd_nitro(playerid, const params[])
 	// Add the NoS component to such vehicleId.
 	AddVehicleComponent(targetVehicleId, 1010);
 
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s ti do auta nainstaloval nitro!", adminName);
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s installed the Nitrous component to your vehicle!", adminName);
 
-	SendClientMessage(playerid, COLOR_GREY, "[ i ] Nitro nainstalováno do auta hrace s danym ID!");
+	SendClientMessage(playerid, COLOR_GREY, "[ i ] The Nitrous component installed for such player!");
 	SendClientMessage(targetId, COLOR_LIGHTGREEN, stringToPrint);
-
-	return 1;
-}
-
-dcmd_odpocet(playerid, const params[])
-{
-	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
-
-	if (!strlen(params) || !IsNumeric(params) || !strval(params))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti /odpocet [sekundy]");
-
-	//new stringToPrint[256];
-
-	GameTextForPlayer(playerid, "~n~~n~~n~~n~~n~~n~odpocet", strval(params) * 1000, 4);
-
-	//format(stringToPrint, sizeof(stringToPrint), "~n~~n~~n~~n~~n~~n~%d", strval(params));
-	//GameTextForPlayer(playerid, stringToPrint, 2000, 3);
 
 	return 1;
 }
@@ -1341,11 +1338,11 @@ dcmd_reset(playerid, const params[])
 {
 #pragma unused params
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	new stringToPrint[128];
 
-	format(stringToPrint, sizeof(stringToPrint), "[ ! ][ SERVER ] Za 60 sekund dojde k automatickemu restartu serveru!");
+	format(stringToPrint, sizeof(stringToPrint), "[ RESTART ] Server restarts in 60 seconds!");
 	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
 
 	SetTimer("StartServerReset", 60000, true);
@@ -1356,42 +1353,23 @@ dcmd_reset(playerid, const params[])
 dcmd_skin(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	new token1[32], token2[32];
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti /skin [playerID] [skinID]");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /skin [playerID] [skinID]");
 
 	new targetId = strval(token1), targetSkin = strval(token2);
 
 	if (targetSkin < 0 || targetSkin > 311)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Neplatne ID skinu!");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Invalid skin ID!");
 
 	if (!IsPlayerConnected(targetId))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] No such player online!");
 
 	SetPlayerSkin(targetId, targetSkin);
-
-	return 1;
-}
-
-dcmd_smazat(playerid, const params[])
-{
-#pragma unused params
-	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
-
-	for (new c = 0; c < 45; c++) 
-		SendClientMessageToAll(COLOR_INVISIBLE, " ");
-
-	new adminName[MAX_PLAYER_NAME], stringToPrint[256];
-
-	GetPlayerName(playerid, adminName, sizeof(adminName));
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s promazal(a) chat.", adminName);
-
-	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
 
 	return 1;
 }
@@ -1399,57 +1377,32 @@ dcmd_smazat(playerid, const params[])
 dcmd_spectate(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 2) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	if ((!strlen(params) || !IsNumeric(params)) && !gPlayers[playerid][Spectating])
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Pouziti: /spectate [playerID]");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /spectate [playerID]");
 
 	if (gPlayers[playerid][Spectating])
 	{
 		TogglePlayerSpectating(playerid, false);
 
 		gPlayers[playerid][Spectating] = false;
-		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ i ] Sledovani hrace vypnuto!");
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ SPECTATE ] Mode disabled!");
 	}
 
 	new targetId = strval(params);
 
 	if (!IsPlayerConnected(targetId))
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
 
 	if (playerid == targetId)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nemuzes sledovat sam sebe!");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Invalid player!");
 
 	TogglePlayerSpectating(playerid, true);
 	PlayerSpectatePlayer(playerid, targetId);
 
 	gPlayers[playerid][Spectating] = true;
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ i ] Sledovani daneho hrace zapnuto! Pouzij /spectate znovu pro vypnuti sledovani.");
-
-	return 1;
-}
-
-dcmd_text(playerid, const params[])
-{
-	new token1[32], token2[32];
-	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
-
-	if (!strlen(params) || count != 2)
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti /text [ID] [text]");
-
-	new targetId = strval(token1);
-
-	if (!IsPlayerConnected(targetId)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
-
-	new playerName[MAX_PLAYER_NAME], stringToPrint[256], targetName[MAX_PLAYER_NAME];
-
-	GetPlayerName(playerid, playerName, sizeof(playerName));
-	GetPlayerName(targetId, targetName, sizeof(targetName));
-
-	format(stringToPrint, sizeof(stringToPrint), "Hrac %s rika hraci %s, ze: %s", playerName, targetName, token2);
-
-	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ SPECTATE ] Mode enabled (hit /spectate again to disable)");
 
 	return 1;
 }
@@ -1457,15 +1410,15 @@ dcmd_text(playerid, const params[])
 dcmd_vehicle(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	if (!strlen(params) || !IsNumeric(params))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti /vehicle [vehicleID]");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /vehicle [vehicleID]");
 
 	new vehicleId = strval(params);
 
 	if (vehicleId < 400 || vehicleId > 611)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Neplatne ID vozidla! (IDs 400-611)");
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Invalid ID! (IDs 400-611)");
 
 	new Float:X, Float:Y, Float:Z;
 
@@ -1475,18 +1428,18 @@ dcmd_vehicle(playerid, const params[])
 	return 1;
 }
 
-dcmd_zbrane(playerid, const params[])
+dcmd_weapons(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Nedostatecny Admin level!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	if (!strlen(params) || !IsNumeric(params)) 
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Pouziti: /zbrane [playerID]!");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /weapons [playerID]!");
 
 	new targetId = strval(params);
 
 	if (!IsPlayerConnected(targetId))
-		//return SendClientMessage(playerid, COLOR_RED, "[ ! ] Hrac s danym ID neni pritomen na serveru!");
+		//return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
 		targetId = playerid;
 
 	GivePlayerWeapon(targetId, t_WEAPON: 26, 400);

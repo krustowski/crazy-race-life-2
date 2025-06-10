@@ -319,14 +319,14 @@ public OnPlayerConnect(playerid)
 
 	// Fetch player's name and print it out to outhers online.
 	GetPlayerName(playerid, playerName, sizeof(playerName));
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s se prave pripojil(a) ke hre!", playerName);
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s joined the game!", playerName);
 
 	gPlayers[playerid][Name] = playerName;
 	SendClientMessageToAll(COLOR_GREY, stringToPrint);
 
 	// Send a welcome text to the connecting new player.
 	SendClientMessage(playerid, COLOR_INVISIBLE, "");
-	SendClientMessage(playerid, COLOR_GREEN, "Vitej v modu CrazyRaceLife2! :) /cmd /help /rules");
+	SendClientMessageLocalized(playerid, I18N_WELCOME_MESSAGE);
 	SendClientMessage(playerid, COLOR_INVISIBLE, "");
 
 	SendDeathMessage(playerid, INVALID_PLAYER_ID, 200);
@@ -361,19 +361,19 @@ public OnPlayerDisconnect(playerid, reason)
 	{
 		case 0: 
 			{
-				format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s odpojen(a) [spadla hra].", gPlayers[playerid][Name]);
+				format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s disconnected [crash].", gPlayers[playerid][Name]);
 			}
 		case 1: 
 			{
-				format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s odpojen(a) [odchod].", gPlayers[playerid][Name]); 
+				format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s disconnected [left].", gPlayers[playerid][Name]); 
 			}
 		case 2: 
 			{
-				format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s odpojen(a) [kick/ban].", gPlayers[playerid][Name]);
+				format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s disconnected [kick/ban].", gPlayers[playerid][Name]);
 			}
 		default: 
 			{
-				format(stringToPrint, sizeof(stringToPrint), "[ i ] Hrac %s odpojen(a) [neznamy duvod].", gPlayers[playerid][Name]);
+				format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s disconnected [unknown].", gPlayers[playerid][Name]);
 			}
 	}
 
@@ -469,7 +469,7 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 		//TextDrawHideForPlayer(playerid, KPHR[playerid]);
 		TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
-		format(stringToPrint, sizeof(stringToPrint), "[ ! ] Hrac %s [ID: %d] porusil pravidla serveru! [Car kill]", killerName, killerid);
+		format(stringToPrint, sizeof(stringToPrint), "[ CARKILL ] Player %s [ID: %d] has just broken the server rules", killerName, killerid);
 		SendClientMessageToAll(COLOR_RED, stringToPrint);
 
 		SpawnPlayer(killerid);
@@ -517,7 +517,7 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 			break;
 
 		gProperties[i][Vehicle][Components][componentType] = componentid;
-		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] Modifikace zaparkovaneho auta byla ulozena.");
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] Vehicle mod saved");
 	}
 
 	return 1;
@@ -590,13 +590,13 @@ public OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstat
 	{
 		if (!IsPlayerAdmin(playerid))
 		{
-			SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Vozidlo bude zniceno, protoze nemas opravneni ho ridit!");
-			GameTextForPlayer(playerid, "~r~Toto auto je jen pro ~b~rcon ~g~adminy", 5000, 5);
+			SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] This vehicle is reserved and will be destroyed!");
+			GameTextForPlayer(playerid, "~r~Only for ~b~RCON ~g~admins", 5000, 5);
 			SetVehicleHealth(GetPlayerVehicleID(playerid), 100.0);
 		}
 		else
 		{
-			SendClientMessage(playerid, COLOR_CYAN, "[ AA ] Jsi admin, auto bylo opancerovano");
+			SendClientMessage(playerid, COLOR_CYAN, "[ ADMIN CAR ] Armoured mode enabled");
 			SetVehicleHealth(GetPlayerVehicleID(playerid), 99999 * 1000);
 		}
 	}
@@ -618,17 +618,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				if (SetPlayerAccountLogin(playerid, inputtext))
 					return 1;
-				//return ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Uspesne prihlasen!", "Ok", "");
+				//return ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Logged in successfully!", "Ok", "");
 
 				gPlayers[playerid][LoginAttempts]++;
 
 				if (gPlayers[playerid][LoginAttempts] >= 3)
 				{
-					ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Opakovane zadano spatne heslo (3x).", "Ok", "");
+					ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Failed to enter the password (3 times).", "Ok", "");
 					Kick(playerid);
 				}
 				else 
-					ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", "Spatne heslo!\nProsim zadej sve heslo!", "Login", "Zrusit");
+					ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", "Wrong password!\nEnter a valid password please!", "Login", "Cancel");
 			}
 		case DIALOG_REGISTER:
 			{
@@ -636,7 +636,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return Kick(playerid);
 
 				if (strlen(inputtext) <= 5) 
-					return ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registrace", "Heslo musi byt delsi jak 5 znaku!\nProsim zadej sve heslo!", "Registrovat", "Zrusit");
+					return ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Register", "Enter a password longer than 5 characters!", "Register", "Cancel");
 
 				if (SetPlayerAccountRegistration(playerid, inputtext))
 					return 1;
@@ -665,12 +665,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 
 				if (!strlen(inputtext))
-					return SendClientMessage(playerid, COLOR_RED, "[ DRUGZ ] Neplatna volba.");
+					return SendClientMessage(playerid, COLOR_RED, "[ DRUGZ ] Invalid option.");
 
 				// Save to the temporary user's var.
 				gPlayers[playerid][Temp] = listitem;
 
-				ShowPlayerDialog(playerid, DIALOG_PROPERTY_DRUGZ_TRANS, DIALOG_STYLE_LIST, "Drugz", "Ulozit doma vsechno\nVybrat z domu vsechno", "Potvrdit", "Zrusit");
+				ShowPlayerDialog(playerid, DIALOG_PROPERTY_DRUGZ_TRANS, DIALOG_STYLE_LIST, "Drugz", "Deposit at home\nWithdraw the whole amount", "Confirm", "Cancel");
 
 				return 1;
 			}
@@ -689,7 +689,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							gProperties[propertyID][Drugs][drugID] += gPlayers[playerid][Drugs][drugID];
 							gPlayers[playerid][Drugs][drugID] = 0;
 
-							SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Uspesne ulozeno doma.");
+							SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Saved at home");
 						}
 					case 1:
 						{
@@ -697,7 +697,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							gPlayers[playerid][Drugs][drugID] += gProperties[propertyID][Drugs][drugID];
 							gProperties[propertyID][Drugs][drugID] = 0;
 
-							SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Uspesne ulozeno do kapes.");
+							SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Save to your pockets");
 						}
 				}
 
@@ -786,23 +786,23 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 				if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
 					return 1;
 
-				format(stringToPrint, sizeof(stringToPrint), "Nemovitost '%s' je na prodej.\n\n\tCena: $%d (%.2f mil)\n\n\tKod nemovitosti: %d\n\nPro zakoupeni nemovitosti zadej jeji kod nize:", gProperties[i][Label], gProperties[i][Cost], float(gProperties[i][Cost]) / 1000000, gProperties[i][ID]);
-				return ShowPlayerDialog(playerid, DIALOG_PROPERTY_BUY, DIALOG_STYLE_INPUT, "Real Estate", stringToPrint, "Koupit", "Zrusit");
+				format(stringToPrint, sizeof(stringToPrint), "Property '%s' for sell.\n\n\tCost: $%d (%.2f mio)\n\n\nProperty code: %d\n\nTo buy this property, enter its code below:", gProperties[i][Label], gProperties[i][Cost], float(gProperties[i][Cost]) / 1000000, gProperties[i][ID]);
+				return ShowPlayerDialog(playerid, DIALOG_PROPERTY_BUY, DIALOG_STYLE_INPUT, "Real Estate", stringToPrint, "Buy", "Cancel");
 			} 
 
 			if (!IsPlayerOwner(playerid, gProperties[i][ID]))
-				return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Tato nemovitost byla jiz prodana jinemu hraci.");
+				return SendClientMessage(playerid, COLOR_RED, "[ REAL ] This property has been already sold.");
 
 			if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
 				return 1;
 
-			format(stringToPrint, sizeof(stringToPrint), "Nemovitost '%s' je tvoje.\n\nHodnota: $%d (%.2f mil)\n\nKod nemovitosti: %d\n\nPri prodeji bude strzena provize realitni kancelari ve vysi 10 procent ceny nemovitosti.\nNapis jeji kod nize pro prodej:", gProperties[i][Label], gProperties[i][Cost], float(gProperties[i][Cost]) / 1000000, gProperties[i][ID]);
-			return ShowPlayerDialog(playerid, DIALOG_PROPERTY_SELL, DIALOG_STYLE_INPUT, "Real Estate", stringToPrint, "Prodat", "Zrusit");
+			format(stringToPrint, sizeof(stringToPrint), "Property '%s' is owned by you.\n\nCurrent value: $%d (%.2f mio)\n\n\nProperty code: %d\n\nThe selling fee is set to 10% of the property value.\nEnter its code to sell this property:", gProperties[i][Label], gProperties[i][Cost], float(gProperties[i][Cost]) / 1000000, gProperties[i][ID]);
+			return ShowPlayerDialog(playerid, DIALOG_PROPERTY_SELL, DIALOG_STYLE_INPUT, "Real Estate", stringToPrint, "Sell", "Cancel");
 		}
 		else if (pickupid == gProperties[i][Pickups][PICKUP_ENTRANCE])
 		{
 			if (!IsPlayerOwner(playerid, gProperties[i][ID]))
-				return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Neni mozne vstoupit na cizi pozemek!");
+				return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Cannot enter the private property!");
 
 			// Spawn the room.
 			SpawnPropertyInterior(playerid, i);
@@ -835,7 +835,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 				{
 					SetPlayerHealth(playerid, 100.0);
 					SetPlayerArmour(playerid, 100.0);
-					SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ HP ] Doplneno zdravi a vesta.");
+					SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ HP ] Health: 100.0, Armour: 100.0");
 
 					break;
 				}
@@ -899,7 +899,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 		gPlayers[playerid][Drugs][COCAINE] += amount;
 
-		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy kokainu.", amount);
+		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Just found %d g of cocaine.", amount);
 		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 	}
 	else if (pickupid == gHeroinPackage[0] || pickupid == gHeroinPackage[1] || pickupid == gHeroinPackage[2] || pickupid == gHeroinPackage[3] || pickupid == gHeroinPackage[4])
@@ -908,7 +908,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 		gPlayers[playerid][Drugs][HEROIN] += amount;
 
-		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy heroinu.", amount);
+		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Just found %d g of heroin.", amount);
 		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 	}
 	else if (pickupid == gMethPackage[0] || pickupid == gMethPackage[1] || pickupid == gMethPackage[2] || pickupid == gMethPackage[3] || pickupid == gMethPackage[4] || pickupid == gMethPackage[5])
@@ -917,7 +917,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 		gPlayers[playerid][Drugs][METH] += amount;
 
-		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy methamphetaminu.", amount);
+		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Just found %d g of methamphetamine.", amount);
 		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 	}
 	else if (pickupid == gFentPackage[0] || pickupid == gFentPackage[1])
@@ -926,7 +926,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 		gPlayers[playerid][Drugs][FENT] += amount;
 
-		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy fentanylu.", amount);
+		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Just found %d g of fentanyl.", amount);
 		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 	}
 	else if (pickupid == gPCPPackage)
@@ -935,7 +935,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 		gPlayers[playerid][Drugs][PCP] += amount;
 
-		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy PCP.", amount);
+		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Just found %d g of PCP.", amount);
 		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 	}
 	else if (pickupid == gTHCPackage[0] || pickupid == gTHCPackage[1] || pickupid == gTHCPackage[2] || pickupid == gTHCPackage[3] || pickupid == gTHCPackage[4] || pickupid == gTHCPackage[5] || pickupid == gTHCPackage[6] || pickupid == gTHCPackage[7] || pickupid == gTHCPackage[8] || pickupid == gTHCPackage[9])
@@ -944,7 +944,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 		gPlayers[playerid][Drugs][ZAZA] += amount;
 
-		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Nasel jsi balicek s %d gramy THC.", amount);
+		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Just found %d g of THC.", amount);
 		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 	}
 
@@ -977,7 +977,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		ResetPlayerWeapons(playerid);
 		gPlayers[playerid][TeamID] = TEAM_NONE;
 
-		SendClientMessage(playerid, COLOR_GREY, "[ TEAM ] Opustil jsi team: jsi nezarazen/nezamestnan.");
+		SendClientMessage(playerid, COLOR_GREY, "[ TEAM ] You left the team!");
 
 		return 1;
 	}
@@ -992,7 +992,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 
 			gPlayers[playerid][TeamID] = gTeams[i][ID];
 
-			format(stringToPrint, sizeof(stringToPrint), "[ TEAM ] Hrac %s se pripojil k tymu %s!", gPlayers[playerid][Name], gTeams[i][TeamName]);
+			format(stringToPrint, sizeof(stringToPrint), "[ TEAM ] Player %s joined the %s team!", gPlayers[playerid][Name], gTeams[i][TeamName]);
 			SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
 		}
 	}

@@ -3,32 +3,32 @@ public ShowAdvert()
 	new advertList[][] =
 	{
 		// General tips and info.
-		"[ TIP ] Pro zobrazeni zakladniho seznamu prikazu pouzij /cmd",
-		"[ TIP ] Pro okamzitou sebevrazdu napis /kill",
-		"[ TIP ] Po mape se lze volne premistovat pomoci /port [ID lokace], nelze vsak takto cestovat ve vozidle",
-		"[ TIP ] Malo penez? Sezen motorku a delej stunty, ktere jsou kdekoliv financne ohodnoceny!",
-		"[ TIP ] Ve meste LS a jeho okoli byly ukryty tajne predmety (male zelene sosky), pro vice informaci /soska",
-		"[ INFO ] Hostovano a sponzorovano organizaci vxn.dev",
-		"[ TIP ] Zahrej si deathmatch spolu s kamarady ve specialni arene: /deathmatch [join/exit]",
-		"[ TIP ] Hotovost nevydrzi vecne (smrtelny uraz, prestrelka), sver sve finance bance! /bank",
-		"[ GAME ] Policiste muzou kohokoliv ve sve blizkosti zastavit a prohledat na ilegalni latky!",
-		"[ GAME ] Substance ci propriety zakoupene u clena tymu Dealeru lze ulozit pouze ve vlastnim dome, jinak je treba je mit u sebe!",
+		"[ TIP ] Use /cmd to print the basic command set",
+		"[ TIP ] To commit a suicide, use /kill",
+		"[ TIP ] You can use /port [location ID] to warp throughout the map. No vehicles though",
+		"[ TIP ] No money? Use a motorcycle to do stunts!",
+		"[ TIP ] In Los Santos, little green Tiki pickups have been placed. Type /tiki for more",
+		"[ INFO ] Server hosted by the vxn.dev organization",
+		"[ TIP ] Play the /deathmatch with your friends!",
+		"[ TIP ] Cash doesn't last forever. Go deposit your money to bank ($)!",
+		"[ GAME ] Beware the policemen, they can stop and search anybody!",
+		"[ GAME ] Any substance or stuff can be saved at your propriety. Go buy one!",
 		// Racing. 
-		"[ TIP ] Nevahej a vyuzij pestre nabidky zavodu! Pro vice informaci pouzij /race list",
-		"[ TIP ] Pokud jsi uvizl v zavodu, muzes ho opustit pomoci /race exit",
-		"[ TIP ] Po prihlaseni do jakehokoliv zavodu lze hodit warp ke startu pomoci /race warp",
-		"[ GAME ] Po prihlaseni do zavodu neni mozne si opravit vozidlo, funkcionalita se obnovi s dokoncenim zavodu nebo jeho prerusenim",
+		"[ TIP ] Bored? Try any of the loaded races from the /race list",
+		"[ TIP ] Stuck in the race? Try /race exit",
+		"[ TIP ] Joined the race, but the start is too far? Use /race warp",
+		"[ GAME ] You cannot use the /fix command to repair your vehicle during a race",
 		// Drugz.
-		"[ GAME ] Ve meste SF a na venkove byly ukryty balicky s ilegalnim obsahem. Pritomnost tahoveho obsahu u hrace muze byt potrestan clenem tymu Policistu!",
-		"[ GAME ] Distribuovat (i)legalni substance muze pouze clen tymu Dealeru pomoci /deal",
-		"[ GAME ] Ilegalni substance lze obchodovat i na cernem trhu. Existuje vsak sance, ze na sebe privolas pozornost zvysenim Wanted levelu!",
+		"[ GAME ] In San Fierro there have been some random substances placed. But beware the policemen, they can stop and search anybody!",
+		"[ GAME ] To deal any substance or stuff, one has to join the Dealerz team",
+		"[ GAME ] Some substances or stuff can be found at the black market too",
 		// Housing.
-		"[ GAME ] Muzes vlastnit az 3 nemovitosti v lokalitach oznacenych na mape zelenym domkem",
-		"[ GAME ] Cervene domky na mape znaci oblasti, kde se v budoucnu budou vyskytovat nemovitosti ke koupi",
-		"[ TIP ] Pridej si oblibene auto (pokud je dostupne) ke sve nemovitosti pomoci /property vehicle [property ID]",
-		"[ TIP ] Nebavi te vychozi spawn point v LV? Sezen si nemovitost a svuj (re)spawn point muzes mit jednoduse tam!",
+		"[ GAME ] Locations of Green House mapicon host some properties for sell",
+		"[ GAME ] Locations of Red House mapicon host some properties for sell in the near future!",
+		"[ TIP ] You can attach a vehicle to your property using /property vehicle [property ID]",
+		"[ TIP ] Bored of Las Venturas Pyramid spawn point? Buy a property and respawn there instead!",
 		// Endtip.
-		"[ TIP ] Skoc si skydive pomoci /skydive!"
+		"[ TIP ] Go skydiving using /skydive!"
 	};
 
 	new advertId = random(sizeof(advertList)), stringToPrint[256];

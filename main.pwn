@@ -57,6 +57,7 @@
 forward SendClientMessageLocalized(playerid, msg_id);
 
 #include "i18n.pwn" 
+#include "net.pwn" 
 
 new const GAMEMODE_NAME[] = "CrazyRaceLife2";
 new const GAMEMODE_CREDITS[] = "krusty, kompry, DRaGsTeR, amdulka";

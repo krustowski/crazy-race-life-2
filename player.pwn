@@ -1,3 +1,7 @@
+//
+//  player.pwn
+//
+
 #define MAX_PLAYER_PROPERTIES	5
 
 #include "i18n.pwn"
@@ -54,6 +58,12 @@ public BatchSavePlayerData()
 {
 	for (new i = 0; i < GetMaxPlayers(); i++)
 	{
+		// Ensure only online and logged-in players are subject for autosave
+		if (!IsPlayerConnected(i) || !gPlayers[i][IsLogged])
+		{
+			continue;
+		}
+
 		SavePlayerData(i);
 	}
 

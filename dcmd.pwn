@@ -41,8 +41,8 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(ban, 3, cmdtext);            //rcon + lvl 4
 	dcmd(cam, 3, cmdtext); 		  //rcon + 
 	dcmd(ccmd, 4, cmdtext);           //rcon + lvl 1
-	dcmd(clear, 5, cmdtext);         //rcon +
-	dcmd(countdown, 9, cmdtext);        //rcon + 
+	dcmd(clear, 5, cmdtext);          //rcon +
+	dcmd(countdown, 9, cmdtext);      //rcon + 
 	dcmd(elevator, 8, cmdtext);	  //rcon + lvl 4
 	dcmd(fakechat, 8, cmdtext);       //rcon + lvl 2
 	dcmd(flip, 4, cmdtext);           //rcon + 
@@ -52,6 +52,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(kick, 4, cmdtext);           //rcon +
 	dcmd(lvl, 3, cmdtext);            //rcon + lvl 4
 	dcmd(nitro, 5, cmdtext);          //rcon + lvl 3
+	dcmd(packet, 6, cmdtext);         //rcon + lvl 3
 	dcmd(reset, 5, cmdtext);	  //rcon + lvl 4
 	dcmd(skin, 4, cmdtext); 	  //rcon + lvl 3
 	dcmd(spectate, 8, cmdtext);	  //rcon + lvl 2
@@ -71,9 +72,9 @@ dcmd_acc(playerid, const params[])
 #pragma unused params
 	new accountPropsText[][] =
 	{
-		"* Money: cash $%d, bank $%d",
-		"* TeamID: %d, SkinID: %d",
-		"* Admin level: %d, Wanted level: %d"
+		"=> Money: cash $%d, bank $%d",
+		"=> TeamID: %d, SkinID: %d",
+		"=> Admin level: %d, Wanted level: %d"
 	};
 
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ ACCOUNT ] Game account stats");
@@ -109,7 +110,7 @@ dcmd_admins(playerid, const params[])
 {
 	SendClientMessage(playerid, COLOR_YELLOW, "[ i ] Admins online:");
 
-	new adminCount;
+	new adminCount = 0;
 
 	for (new i = 0; i < GetMaxPlayers(); i++) 
 	{
@@ -124,7 +125,7 @@ dcmd_admins(playerid, const params[])
 			if (gPlayers[i][AdminLevel] > 0) 
 			{
 				GetPlayerName(i, adminName, sizeof(adminName));
-				format(stringToPrint, sizeof(stringToPrint), "[ %s [ID: %2d] LVL: %d]", adminName, i, gPlayers[i][AdminLevel]);
+				format(stringToPrint, sizeof(stringToPrint), "=> %s [ID: %2d] Level: %d", adminName, i, gPlayers[i][AdminLevel]);
 				SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 			}
 		}
@@ -1330,6 +1331,29 @@ dcmd_nitro(playerid, const params[])
 
 	SendClientMessage(playerid, COLOR_GREY, "[ i ] The Nitrous component installed for such player!");
 	SendClientMessage(targetId, COLOR_LIGHTGREEN, stringToPrint);
+
+	return 1;
+}
+
+dcmd_packet(playerid, const params[])
+{
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4)
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+
+	if (!strlen(params) || !IsNumeric(params))
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /packet [ID]");
+
+	new targetId = strval(params);
+
+	if (!IsPlayerConnected(targetId))
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+
+	new Float: loss = 0.0, stringToPrint[128];
+
+	GetPlayerPacketLoss(targetId, loss);
+
+	format(stringToPrint, sizeof(stringToPrint), "[ NET ] Player ID: %d, packet loss: %.2f %%", targetId, loss);
+	SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
 
 	return 1;
 }

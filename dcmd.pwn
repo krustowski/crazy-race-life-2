@@ -384,7 +384,7 @@ dcmd_dwarp(playerid, const params[])
 	SetPlayerInterior(playerid, 0);
 	GetPlayerName(playerid, senderName, sizeof(senderName));
 
-	format(stringToPrint, sizeof(stringToPrint), "[ WARP ] Player %s used warp to a drag spot [ /dwarp ]", senderName);
+	format(stringToPrint, sizeof(stringToPrint), "[ WARP ] Player %s used warp to the drag race spot [ /dwarp ]", senderName);
 	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
 
 	if (IsPlayerInVehicle(playerid, vehicleId) && playerState == PLAYER_STATE_DRIVER) 

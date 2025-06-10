@@ -77,7 +77,7 @@ public InitRaces()
 stock SetPlayerRaceSingle(playerid, raceId, const Float:coords[][E_RACE_COORD], len)
 {
 	// Fetch the relative position in such race (position of checkpoints).
-	new lastCpNo = len, raceCpPosition = gPlayerRace[playerid][raceId] - 1, raceType = gRaces[raceId][Type];
+	new lastCpNo = len - 1, raceCpPosition = gPlayerRace[playerid][raceId] - 1, raceType = gRaces[raceId][Type];
 
 	// Prepare the coords to show a race checkpoint.
 	new Float: x0, Float: y0, Float: z0, Float: x1, Float: y1, Float: z1, t_CP_TYPE: cpType;

@@ -245,7 +245,7 @@ public SendPlayerSalary()
 				}
 		}
 
-		GameTextForPlayer(i, gameText, 5000, 1);
+		GameTextForPlayer(i, gameText, 4000, 1);
 		SendClientMessage(i, COLOR_YELLOW, stringToPrint);
 		GivePlayerMoney(i, teamSalary);
 	}

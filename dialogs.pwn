@@ -17,7 +17,7 @@ enum
 
 stock ShowPlayerDrugzDialog(playerid)
 {
-	new stringToPrint[512] = "Substance/proprieta\tV kapse\tUlozeno doma";
+	new stringToPrint[512] = "Substance/stuff\tIn pockets\tAt home";
 
 	for (new i = 0; i < MAX_DRUGS; i++)
 	{
@@ -27,6 +27,6 @@ stock ShowPlayerDrugzDialog(playerid)
 		strcat(stringToPrint, partial, sizeof(stringToPrint));
 	}
 
-	ShowPlayerDialog(playerid, DIALOG_PROPERTY_DRUGZ, DIALOG_STYLE_TABLIST_HEADERS, "Drugz", stringToPrint, "Prevest", "Zrusit");
+	ShowPlayerDialog(playerid, DIALOG_PROPERTY_DRUGZ, DIALOG_STYLE_TABLIST_HEADERS, "Drugz", stringToPrint, "Transfer", "Cancel");
 }
 

@@ -53,11 +53,11 @@ public OnRadarCheckpoint()
 
 		if (floatround(radarValue / 1400) > 65)
 		{
-			format(stringToPrint, sizeof(stringToPrint), "~w~Stav:______%3d_%%~n~~w~Rychlost:_~r~~h~%3d", floatround(vehicleHelth / 10), floatround(radarValue / 1400));
+			format(stringToPrint, sizeof(stringToPrint), "~w~Health:____%3d_%%~n~~w~Velocity:_~r~~h~%3d", floatround(vehicleHelth / 10), floatround(radarValue / 1400));
 		}
 		else
 		{
-			format(stringToPrint, sizeof(stringToPrint), "~w~Stav:______%3d_%%~n~~w~Rychlost:_~g~~h~%3d", floatround(vehicleHelth / 10), floatround(radarValue / 1400));
+			format(stringToPrint, sizeof(stringToPrint), "~w~Health:____%3d_%%~n~~w~Velocity:_~g~~h~%3d", floatround(vehicleHelth / 10), floatround(radarValue / 1400));
 		}
 
 		// Redraw the player's current velocity.

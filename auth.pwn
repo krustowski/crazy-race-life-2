@@ -27,7 +27,7 @@ stock SetPlayerAccountLogin(playerid, const text[])
 
 	if (strcmp(hashedPwd, hashedPwdDb))
 	{
-		SystemMsg(playerid, "[ AUTH ] Spatne heslo! Zkuste znovu!");
+		SystemMsg(playerid, "[ AUTH ] Wrong password, try again!");
 		return 0;
 	}
 
@@ -79,9 +79,9 @@ stock ShowAuthDialog(playerid)
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (result) {
 		DB_FreeResultSet(result);
-		format(stringToPrint, sizeof(stringToPrint), "Ucet hrace (%s) je jiz registrovan. Prihlas se zadanim sveho hesla nize:", gPlayers[playerid][Name]);
+		format(stringToPrint, sizeof(stringToPrint), "Player (%s) has already registered their account. Log-in using your password:", gPlayers[playerid][Name]);
 
-		ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", stringToPrint, "Login", "Zrusit");
+		ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", stringToPrint, "Log-in", "Cancel");
 
 		// from now on, the player has 30 seconds to login
 	 	//Player[playerid][LoginTimer] = SetTimerEx("OnLoginTimeout", SECONDS_TO_LOGIN * 1000, false, "d", playerid);
@@ -89,9 +89,9 @@ stock ShowAuthDialog(playerid)
 	else 
 	{
 		DB_FreeResultSet(result);
-		format(stringToPrint, sizeof(stringToPrint), "Vitej %s! Zaregistruj svuj ucet zadanim sveho hesla nize:", gPlayers[playerid][Name]);
+		format(stringToPrint, sizeof(stringToPrint), "Welcome %s! Register your account by netering a password:", gPlayers[playerid][Name]);
 
-		ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registrace", stringToPrint, "Registrovat", "Zrusit");
+		ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registeration", stringToPrint, "Register", "Cacnel");
 	}
 
 	return 1;

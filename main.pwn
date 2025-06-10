@@ -230,7 +230,7 @@ public OnGameModeInit()
 	SetTimer("UpdatePlayerScore", 1 * SECOND_MS, true);
 	SetTimer("SendPlayerSalary", 300 * SECOND_MS, true);
 
-	SetTimer("DrawClockText", 30 * SECOND_MS, true);
+	SetTimer("DrawClockText", 10 * SECOND_MS, true);
 
 	SetTimer("ShowAdvert", 120 * SECOND_MS, true);
 

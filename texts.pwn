@@ -16,7 +16,7 @@ public InitTexts()
 	TextDrawFont(gGameModeText, t_TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gGameModeText, 1);
 
-	gClockText = TextDrawCreate(547.0, 24.0, "nacitani");
+	gClockText = TextDrawCreate(547.0, 24.0, "loading");
 
 	TextDrawLetterSize(gClockText, 0.6, 1.8);
 	TextDrawFont(gClockText, t_TEXT_DRAW_FONT: 3);

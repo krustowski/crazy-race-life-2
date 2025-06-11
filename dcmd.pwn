@@ -43,6 +43,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(ccmd, 4, cmdtext);           //rcon + lvl 1
 	dcmd(clear, 5, cmdtext);          //rcon +
 	dcmd(countdown, 9, cmdtext);      //rcon + 
+	dcmd(drunk, 5, cmdtext);          //rcon +
 	dcmd(elevator, 8, cmdtext);	  //rcon + lvl 4
 	dcmd(fakechat, 8, cmdtext);       //rcon + lvl 2
 	dcmd(flip, 4, cmdtext);           //rcon + 
@@ -1042,6 +1043,31 @@ dcmd_clear(playerid, const params[])
 	format(stringToPrint, sizeof(stringToPrint), "[ CLEAR ] Chat history flushed");
 
 	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+
+	return 1;
+}
+
+dcmd_drunk(playerid, const params[])
+{
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3) 
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+
+	new token1[32], token2[32];
+	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
+
+	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /drunk [playerID] [0-50000]");
+
+	new targetId = strval(token1), level = strval(token2);
+
+	if (!IsPlayerConnected(targetId)) 
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+
+	if (level < 0 || level > 50000)
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Invalid level, use a number from range 0-50000");
+
+	SetPlayerDrunkLevel(targetId, level);
+	SendClientMessage(targetId, COLOR_ORANGE, "[ DRUGZ ] Your drunk level changed");
 
 	return 1;
 }

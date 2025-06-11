@@ -9,8 +9,40 @@ new gAdminElevator;
 //
 //
 
+stock InitTikiPrizes()
+{
+	new query[256];
+
+	format(query, sizeof(query), "SELECT coord_x, coord_y, coord_z FROM tiki_prizes WHERE hidden = 0");
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) {
+		print("Database error: cannot load tiki coords!");
+		return 0;
+	}
+
+	new Float:X, Float:Y, Float:Z;
+
+	do
+	{
+		X = DB_GetFieldFloatByName(result, "coord_x");
+		Y = DB_GetFieldFloatByName(result, "coord_y");
+		Z = DB_GetFieldFloatByName(result, "coord_z");
+
+		CreateObject(1276, X, Y, Z, 0.0, 0.0, 0.0);
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+	print("Tiki prizes initialized!");
+
+	return 1;
+}
+
 public InitObjects()
 {
+	InitTikiPrizes();
+
 	//------------------------admin house
 	gAdminElevator = CreateObject(5837, 2303.207, 1174.944, 80.285, 0.0, 0.0, 142.812);
 
@@ -40,14 +72,6 @@ public InitObjects()
 	CreateObject(1219, 2303.03, 1163.85, 79.94, 0, 0, 0);
 
 	//------------------MADE BY KOMPRY - MTA -----------------//
-
-	// sosky
-	CreateObject(1276, 2254.107, -2261.670, 13.929, 0.0, 0.0, 0.0); // object
-	CreateObject(1276, 2130.374, -2275.248, 14.338, 0.0, 0.0, 0.0); // object (2)
-	CreateObject(1276, 1082.610, -73.319, 54.258, 0.0, 0.0, 0.0); // object (3)
-	CreateObject(1276, 2803.757, -1245.871, 49.152, 0.0, 0.0, 0.0); // object (4)
-	CreateObject(1276, 153.958, -1951.624, 47.204, 0.0, 0.0, 0.0); // object (6)
-
 	CreateObject(18056, 1482.323, -1193.001, 24.861, 0.0, 0.0, 135.000); // object (8)
 	CreateObject(14467, 1696.456, -1331.903, 19.186, 0.0, 0.0, 0.0); // object (7)
 	CreateObject(18018, 1750.176, -2034.804, 12.251, 0.0, 0.0, 180.000); // object (8)

@@ -1,7 +1,7 @@
 {
 	"user": "vxn",
 	"repo": "crazy-and-race-life-2",
-	"tag": "0.3.0",
+	"tag": "0.4.0",
 	"entry": "main.pwn",
 	"output": "gamemodes/crl2.amx",
 	"dependencies": [

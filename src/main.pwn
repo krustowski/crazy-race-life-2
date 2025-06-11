@@ -190,13 +190,6 @@ public OnGameModeInit()
 	InitVehicles();
 	InitTexts();
 
-	/*AddPlayerClass(155, 2323.74, 1283.19, 97.60, 0, 0, 0, 0, 0, 0, 0);
-	AddPlayerClass(230, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 0, 0);
-	AddPlayerClass(121, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
-	AddPlayerClass(29, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
-	AddPlayerClass(45, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);
-	AddPlayerClass(169, 2323.74, 1283.19, 97.60, 0, 0, 0, 24, 300, 4, 0);*/
-
 	// Set the unique Vehlicle Plate for all vehicles possible.
 	for (new i = 0; i < MAX_VEHICLES; i++)
 	{
@@ -365,12 +358,15 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 
 	SendDeathMessage(killerid, playerid, reason);
 
-	new Float: X, Float: Y, Float: Z;
+	if (GetPlayerMoney(playerid) > 0)
+	{
+		new Float: X, Float: Y, Float: Z;
 
-	GetPlayerPos(playerid, X, Y, Z);
-	AddPlayerDeathPickups(playerid, Float:X, Float:Y, Float:Z);
+		GetPlayerPos(playerid, X, Y, Z);
+		AddPlayerDeathPickups(playerid, Float:X, Float:Y, Float:Z);
 
-	ResetPlayerMoney(playerid);
+		ResetPlayerMoney(playerid);
+	}
 
 	// Hide velocity meters.
 	//TextDrawHideForPlayer(playerid, KPH[playerid]);
@@ -454,7 +450,7 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 	{
 		if (gProperties[i][Vehicle][ID] != vehicleid)
 			continue;
-		
+
 		new t_CARMODTYPE: componentType = GetVehicleComponentType(componentid);
 
 		if (componentType == CARMODTYPE_NONE)
@@ -664,27 +660,27 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							ShowPropertyEditDialogName(playerid);
 						}
-					// Cost
+						// Cost
 					case 1:
 						{
 							ShowPropertyEditDialogCost(playerid);
 						}
-					// Entrance pickup coords
+						// Entrance pickup coords
 					case 2:
 						{
 							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Go to a spot to record the Entrance pickup coords and type /predit entrance");
 						}
-					// Offer pickup coords
+						// Offer pickup coords
 					case 3:
 						{
 							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Go to a spot to record the Offer pickup coords and type /predit offer");
 						}
-					// Vehicle coords
+						// Vehicle coords
 					case 4:
 						{
 							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Go to a spot to record the Vehicle coords and type /predit vehicle");
 						}
-					// Occupied state
+						// Occupied state
 					case 5:
 						{
 							gPropertyEdit[playerid][Occupied] = !gPropertyEdit[playerid][Occupied];
@@ -692,7 +688,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 							ShowPropertyEditDialogMain(playerid);
 						}
-					// Save property
+						// Save property
 					case 6:
 						{
 							EditProperty(playerid);

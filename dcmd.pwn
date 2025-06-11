@@ -241,7 +241,7 @@ dcmd_cmd(playerid, const params[])
 	SendClientMessage(playerid, COLOR_YELLOW, "/rules /skydive /text /tiki /unlock");
 	SendClientMessage(playerid, COLOR_INVISIBLE, "");
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ CMD ] Specific CMD set (team-related)");
-	SendClientMessage(playerid, COLOR_YELLOW, "/deal /hide /wanted");
+	SendClientMessage(playerid, COLOR_YELLOW, "/deal /hide /search /wanted");
 
 	return 1;
 }

@@ -2,7 +2,7 @@
 //  Everything dialogs.
 //
 
-#include "real.pwn"
+#include "modules/real.pwn"
 
 enum
 {

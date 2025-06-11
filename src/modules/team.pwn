@@ -6,7 +6,7 @@
 #define MAX_TEAM_PICKUPS	16
 #define MAX_TEAM_MENUS		16
 
-#include "sql.pwn"
+#include "db/sql.pwn"
 
 enum 
 {

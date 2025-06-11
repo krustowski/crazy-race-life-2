@@ -8,7 +8,7 @@
 #define SPAWN_PICKUP_COUNT	4
 #define INVALID_PROPERTY_ID	-1
 
-#include "sql.pwn"
+#include "db/sql.pwn"
 
 // Exterior pickups
 enum 

@@ -2,7 +2,7 @@
 //  auth.pwn
 //
 
-#include "dialogs.pwn"
+#include "support/dialogs.pwn"
 
 stock SetPlayerAccountLogin(playerid, const text[])
 {

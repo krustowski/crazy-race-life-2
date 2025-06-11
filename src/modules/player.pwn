@@ -4,10 +4,10 @@
 
 #define MAX_PLAYER_PROPERTIES	5
 
-#include "i18n.pwn"
-#include "sql.pwn"
-#include "team.pwn"
-#include "drugz.pwn"
+#include "support/i18n.pwn"
+#include "db/sql.pwn"
+#include "modules/team.pwn"
+#include "modules/drugz.pwn"
 
 //
 //  Player's props.

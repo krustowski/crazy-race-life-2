@@ -188,7 +188,7 @@ new gI18nMessageCz[][] =
 //
 //
 
-#include "player.pwn"
+#include "modules/player.pwn"
 
 public SendClientMessageLocalized(playerid, msg_id)
 {

@@ -39,8 +39,6 @@
 //  Basic definitions.
 //
 
-#define dcmd(%1,%2,%3) if ((strcmp((%3)[1], #%1, true, (%2)) == 0) && ((((%3)[(%2) + 1] == 0) && (dcmd_%1(playerid, "")))||(((%3)[(%2) + 1] == 32) && (dcmd_%1(playerid, (%3)[(%2) + 2]))))) return 1
-
 #define STATS_FILE 	"stats.cfg"
 
 #define BUG_SYSTEM 	true
@@ -56,8 +54,8 @@
 
 forward SendClientMessageLocalized(playerid, msg_id);
 
-#include "i18n.pwn" 
-#include "net.pwn" 
+#include "support/i18n.pwn" 
+#include "support/net.pwn" 
 
 new const GAMEMODE_NAME[] = "CrazyRaceLife2";
 new const GAMEMODE_CREDITS[] = "krusty, kompry, DRaGsTeR, amdulka";
@@ -74,7 +72,7 @@ forward StartServerReset();
 
 forward ShowAdvert();
 
-#include "advert.pwn"
+#include "support/advert.pwn"
 
 //
 //  Anticheating.
@@ -84,7 +82,7 @@ forward AntiCheatWeapon();
 forward AntiFlood();
 forward AntiJetPack();
 
-#include "anticheat.pwn"
+#include "modules/anticheat.pwn"
 
 //
 //  Clock text (re)drawing.
@@ -92,7 +90,7 @@ forward AntiJetPack();
 
 forward DrawClockText();
 
-#include "clock.pwn"
+#include "support/clock.pwn"
 
 //
 //  Racing subsystem.
@@ -104,7 +102,7 @@ forward SetRaceForUser(playerid, raceId);
 forward StartRace();
 forward UpdateRaceInfoText(playerid);
 
-#include "race.pwn"
+#include "modules/race.pwn"
 
 //
 //  Deathmatch minigame.
@@ -114,7 +112,7 @@ forward StartPaintball();
 forward GetPaintballScoreboard();
 forward EndPaintball();
 
-#include "paintball.pwn"
+#include "modules/paintball.pwn"
 
 //
 //  Player data management + team management.
@@ -129,12 +127,12 @@ forward InitRealEstateProperties();
 forward InitDB();
 forward InitTeams();
 
-#include "player.pwn"
-#include "drugz.pwn"
-#include "team.pwn"
-#include "auth.pwn"
-#include "real.pwn"
-#include "sql.pwn"
+#include "modules/player.pwn"
+#include "modules/drugz.pwn"
+#include "modules/team.pwn"
+#include "modules/auth.pwn"
+#include "modules/real.pwn"
+#include "db/sql.pwn"
 
 //
 //  Radar + Vehicle velocity/props.
@@ -144,9 +142,9 @@ forward AutosaveData();
 forward OnRadarCheckpoint();
 forward OffRadarCheckpoint(playerid);
 
-#include "radar.pwn"
+#include "modules/radar.pwn"
 
-#include "helpers.pwn"
+#include "support/helpers.pwn"
 
 //
 //  Banking.
@@ -154,7 +152,7 @@ forward OffRadarCheckpoint(playerid);
 
 forward CheckPlayerBankLocation(playerid);
 
-#include "bank.pwn"
+#include "modules/bank.pwn"
 
 //
 //  Pickups, Objects, Vehicles, Texts, Mapicons.
@@ -167,12 +165,12 @@ forward InitTexts();
 forward AddTexts(playerid);
 forward AddMapicons(playerid);
 
-#include "elements/pickups.pwn"
-#include "elements/objects.pwn"
-#include "elements/vehicles.pwn"
-#include "texts.pwn"
-#include "mapicons.pwn"
-#include "dialogs.pwn"
+#include "support/pickups.pwn"
+#include "support/objects.pwn"
+#include "support/vehicles.pwn"
+#include "support/texts.pwn"
+#include "support/mapicons.pwn"
+#include "support/dialogs.pwn"
 
 //
 //  DCMDs = command set definitions.
@@ -180,7 +178,7 @@ forward AddMapicons(playerid);
 
 forward LoadDcmdAll(playerid, cmdtext[]);
 
-#include "dcmd.pwn"
+#include "support/dcmd.pwn"
 
 /*************************************************************************************
  *

@@ -800,6 +800,9 @@ dcmd_search(playerid, const params[])
 	if (!IsPlayerConnected(targetId)) 
 		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
 
+	if (targetId == playerid)
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Cannot use the test against yourself");
+
 	new Float:X, Float:Y, Float:Z;
 	GetPlayerPos(targetId, X, Y, Z);
 
@@ -809,7 +812,7 @@ dcmd_search(playerid, const params[])
 	// Check drunk driving
 	if (GetPlayerDrunkLevel(targetId) > 1999 && IsPlayerInAnyVehicle(targetId) && GetPlayerState(targetId) == PLAYER_STATE_DRIVER)
 	{
-		SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Player is drunk driving! The fine for player is $25000");
+		SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Player is drunk driving! The player is fined $25000");
 
 		// Lock the car for the player and remove them from such vehicle
 		SetVehicleParamsForPlayer(GetPlayerVehicleID(targetId), targetId, 0, 1);
@@ -832,7 +835,12 @@ dcmd_search(playerid, const params[])
 
 		format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Received a &%d bonus", bonus);
 		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
+
+		return 1;
 	}
+
+	SendClientMessage(playerid, COLOR_YELLOW, "[ DRUGZ ] You have used a breathalyzer, the player is sober.");
+	SendClientMessage(targetId, COLOR_YELLOW, "[ DRUGZ ] You have just been tested for intoxication and you passed");
 
 	return 1;
 }
@@ -1082,9 +1090,22 @@ dcmd_countdown(playerid, const params[])
 	if (!strlen(params) || !IsNumeric(params) || !strval(params))
 		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /countdown [seconds]");
 
-	GameTextForPlayer(playerid, "~n~~n~~n~~n~~n~~n~odpocet", strval(params) * 1000, 4);
+	new remaining = strval(params);
+
+	CountDownHelper(remaining);
 
 	return 1;
+}
+
+forward CountDownHelper(remaining);
+
+public CountDownHelper(remaining)
+{
+	if (remaining >= 0)
+	{
+		GameTextForAll("~n~~n~~n~~n~~n~~n~%d", 1000, 4, remaining);
+		SetTimerEx("CountDownHelper", 1000, false, "i", --remaining);
+	}
 }
 
 dcmd_clear(playerid, const params[])
@@ -1466,6 +1487,7 @@ dcmd_predit(playerid, const params[])
 	{
 		new propertyid = strval(token1);
 
+		gPlayers[playerid][EditingMode] = true;
 		gPropertyEdit[playerid][ID] = propertyid;
 
 		ShowPropertyEditDialogMain(playerid);
@@ -1523,6 +1545,7 @@ dcmd_reset(playerid, const params[])
 	format(stringToPrint, sizeof(stringToPrint), "[ RESTART ] Server restarts in 60 seconds!");
 	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
 
+	CountDownHelper(60);
 	SetTimer("StartServerReset", 60 * SECOND_MS, true);
 
 	return 1;

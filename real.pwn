@@ -680,5 +680,46 @@ stock UpdatePropertyVehicle(playerid)
 //
 //
 
-stock EditProperty(playerid, propertyid)
-{}
+stock EditProperty(playerid)
+{
+	new propertyid = gPropertyEdit[playerid][ID];
+	new arrayid = GetPropertyArrayIDfromID(propertyid);
+
+	if (arrayid >= 0) 
+	{
+		gProperties[arrayid] = gPropertyEdit[playerid];
+	}
+
+	new query[2048];
+
+	format(query, sizeof(query), "INSERT INTO properties (id, name, cost, location_offer_x, location_offer_y, location_offer_z, location_offer_rot, location_entrance_x, location_entrance_y, location_entrance_z, location_entrance_rot, location_vehicle_x, location_vehicle_y, location_vehicle_z, location_vehicle_rot, occupied) VALUES (%d, '%s', %d, %.2f, %.2f, %.2f, 0.0, %.2f, %.2f, %.2f, 0.0, %.2f, %.2f, %.2f, %.2f, %d) ON CONFLICT(id) DO UPDATE SET name = excluded.name, cost = excluded.cost, location_offer_x = excluded.location_offer_x, location_offer_y = excluded.location_offer_y, location_offer_z = excluded.location_offer_z, location_entrance_x = excluded.location_entrance_x, location_entrance_y = excluded.location_entrance_y, location_entrance_z = excluded.location_entrance_z, location_vehicle_x = excluded.location_vehicle_x, location_vehicle_y = excluded.location_vehicle_y, location_vehicle_z = excluded.location_vehicle_z, location_vehicle_rot = excluded.location_vehicle_rot, occupied = excluded.occupied",
+			gPropertyEdit[playerid][ID],
+			gPropertyEdit[playerid][Label],
+			gPropertyEdit[playerid][Cost],
+			gPropertyEdit[playerid][LocationOffer][CoordX],
+			gPropertyEdit[playerid][LocationOffer][CoordY],
+			gPropertyEdit[playerid][LocationOffer][CoordZ],
+			gPropertyEdit[playerid][LocationEntrance][CoordX],
+			gPropertyEdit[playerid][LocationEntrance][CoordY],
+			gPropertyEdit[playerid][LocationEntrance][CoordZ],
+			gPropertyEdit[playerid][LocationVehicle][CoordX],
+			gPropertyEdit[playerid][LocationVehicle][CoordY],
+			gPropertyEdit[playerid][LocationVehicle][CoordZ],
+			gPropertyEdit[playerid][LocationVehicle][CoordR],
+			gPropertyEdit[playerid][Occupied]
+	);
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) {
+		printf("Database error: cannot write property data (ID: %d)!", propertyid);
+		return 0;
+	}
+
+	DB_FreeResultSet(result);
+
+	gPropertyEdit[playerid] = gNullProperty;
+
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Property saved successfully!");
+
+	return 1;
+}

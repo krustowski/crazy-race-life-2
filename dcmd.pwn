@@ -1412,12 +1412,14 @@ dcmd_predit(playerid, const params[])
 	}
 	else if (!strcmp(token1, "vehicle"))
 	{
-		new Float:X, Float:Y, Float:Z;
+		new Float:X, Float:Y, Float:Z, Float:R;
 		GetPlayerPos(playerid, X, Y, Z);
+		GetPlayerFacingAngle(playerid, R);
 
 		gPropertyEdit[playerid][LocationVehicle][CoordX] = X;
 		gPropertyEdit[playerid][LocationVehicle][CoordY] = Y;
 		gPropertyEdit[playerid][LocationVehicle][CoordZ] = Z;
+		gPropertyEdit[playerid][LocationVehicle][CoordR] = R;
 
 		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Vehicle coords recorded!");
 		ShowPropertyEditDialogMain(playerid);

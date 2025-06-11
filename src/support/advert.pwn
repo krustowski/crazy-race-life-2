@@ -1,3 +1,5 @@
+forward ShowAdvert();
+
 public ShowAdvert()
 {
 	new advertList[][] =

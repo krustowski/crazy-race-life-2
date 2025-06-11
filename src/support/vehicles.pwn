@@ -1,3 +1,5 @@
+forward InitVehicles();
+
 public InitVehicles()
 {
 	// MTA by kompry

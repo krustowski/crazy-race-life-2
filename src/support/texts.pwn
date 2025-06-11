@@ -4,6 +4,9 @@
 
 new Text:gGameModeText;
 
+forward AddTexts(playerid);
+forward InitTexts();
+
 public InitTexts()
 {
 	//

@@ -6,6 +6,26 @@
 #define RC_TANK    	564
 #define RC_CAM      	594
 
+forward AutosaveData();
+forward StartServerReset();
+
+public AutosaveData()
+{
+	BatchSavePlayerData();
+	SaveRealEstateData();
+}
+
+public StartServerReset()
+{
+	SendRconCommand("gmx");
+
+	return 1;
+}
+
+//
+//
+//
+
 stock chrfind(n, h[], s = 0)
 {
 	new l = strlen(h);
@@ -207,13 +227,6 @@ stock TestPrint(print[])
 #endif
 }
 
-public StartServerReset()
-{
-	SendRconCommand("gmx");
-
-	return 1;
-}
-
 stock PrintAsciiLogoToLogs()
 {
 	printf(" *************************************************************************************   ");
@@ -232,8 +245,3 @@ stock PrintAsciiLogoToLogs()
 	printf(" *************************************************************************************   ");
 }
 
-public AutosaveData()
-{
-	BatchSavePlayerData();
-	SaveRealEstateData();
-}

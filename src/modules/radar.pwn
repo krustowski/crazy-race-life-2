@@ -33,6 +33,8 @@ new Float: gRadarPositions[][4] =
 	{1691.7292, 2173.2539, 10.6719, 15.0}
 };
 
+forward OnRadarCheckpoint();
+forward OffRadarCheckpoint(playerid);
 
 public OnRadarCheckpoint()
 {

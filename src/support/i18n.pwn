@@ -134,8 +134,8 @@ new gI18nMessageEn[][] =
 	"[ RACE ] You have already joined the race!",
 	"[ RACE ] You haven't got enough moeny to join such race!",
 	"[ DEATHMATCH ] New match just started, join to play!",
-	"[ ! ] No such command! /cmd /help /rules",
-	"[ i ] You dropped your money at the death position!",
+	"[ CMD ] No such command! /cmd /help /rules",
+	"[ CASH ] You dropped your money at the death position!",
 	"[ REAL ] Vehicle modifications saved",
 	"[ REAL ] Invalid property code entered!",
 	"[ REAL ] Use the red property pickup to sell such property!",
@@ -168,8 +168,8 @@ new gI18nMessageCz[][] =
 	"[ ZAVOD ] Do daneho zavodu jsi jiz prihlasen!",
 	"[ ZAVOD ] Nemas dostatek hotovosti pro zaplaceni prihlasky do zavodu!",
 	"[ DEATHMATCH ] Utkani zacalo! 4 minuty do konce",
-	"[ ! ] Tento prikaz neexistuje! /cmd /help /rules",
-	"[ i ] Tve penize zustaly na miste umrti!",
+	"[ CMD ] Tento prikaz neexistuje! /cmd /help /rules",
+	"[ CASH ] Tve penize zustaly na miste umrti!",
 	"[ REAL ] Modifikace auta ulozeny k zaparkovanemu autu",
 	"[ REAL ] Neplatny kod nemovitosti!",
 	"[ REAL ] Je treba byt v okoli puvodniho pickupu (nyni rotujici cerveny domek)!",
@@ -189,6 +189,8 @@ new gI18nMessageCz[][] =
 //
 
 #include "modules/player.pwn"
+
+forward SendClientMessageLocalized(playerid, msg_id);
 
 public SendClientMessageLocalized(playerid, msg_id)
 {

@@ -39,21 +39,13 @@
 //  Basic definitions.
 //
 
-#define STATS_FILE 	"stats.cfg"
-
 #define BUG_SYSTEM 	true
+#define SECOND_MS	1000
 
 #define SOUND_MUSIC10
 #define SOUND_OFF
 
-#define SECOND_MS	1000
-
-//
-//  Common colour definitions.
-//
-
-forward SendClientMessageLocalized(playerid, msg_id);
-
+#include "db/sql.pwn"
 #include "support/i18n.pwn" 
 #include "support/net.pwn" 
 
@@ -63,14 +55,9 @@ new const GAMEMODE_CREDITS[] = "krusty, kompry, DRaGsTeR, amdulka";
 new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 new const VEHICLE_PLATE[] = "-CRL-2-";
 
-//forward SplitIntoTwo(input[], token1[], token2[], tokenSize, delimiter);
-forward StartServerReset();
-
 //
 //  Advertisement.
 //
-
-forward ShowAdvert();
 
 #include "support/advert.pwn"
 
@@ -78,17 +65,11 @@ forward ShowAdvert();
 //  Anticheating.
 //
 
-forward AntiCheatWeapon();
-forward AntiFlood();
-forward AntiJetPack();
-
 #include "modules/anticheat.pwn"
 
 //
 //  Clock text (re)drawing.
 //
-
-forward DrawClockText();
 
 #include "support/clock.pwn"
 
@@ -96,21 +77,11 @@ forward DrawClockText();
 //  Racing subsystem.
 //
 
-forward InitRaces();
-forward CheckRaceCheckpoint(playerid);
-forward SetRaceForUser(playerid, raceId);
-forward StartRace();
-forward UpdateRaceInfoText(playerid);
-
 #include "modules/race.pwn"
 
 //
 //  Deathmatch minigame.
 //
-
-forward StartPaintball();
-forward GetPaintballScoreboard();
-forward EndPaintball();
 
 #include "modules/paintball.pwn"
 
@@ -118,52 +89,28 @@ forward EndPaintball();
 //  Player data management + team management.
 //
 
-forward BatchSavePlayerData();
-forward LoadPlayerData(playerid);
-forward SavePlayerData(playerid);
-forward SendPlayerSalary();
-forward UpdatePlayerScore();
-forward InitRealEstateProperties();
-forward InitDB();
-forward InitTeams();
-
 #include "modules/player.pwn"
 #include "modules/drugz.pwn"
 #include "modules/team.pwn"
 #include "modules/auth.pwn"
 #include "modules/real.pwn"
-#include "db/sql.pwn"
 
 //
 //  Radar + Vehicle velocity/props.
 //
 
-forward AutosaveData();
-forward OnRadarCheckpoint();
-forward OffRadarCheckpoint(playerid);
-
 #include "modules/radar.pwn"
-
 #include "support/helpers.pwn"
 
 //
 //  Banking.
 //
 
-forward CheckPlayerBankLocation(playerid);
-
 #include "modules/bank.pwn"
 
 //
-//  Pickups, Objects, Vehicles, Texts, Mapicons.
+//  Pickups, Objects, Vehicles, Texts, Mapicons...
 //
-
-forward InitPickups();
-forward InitObjects();
-forward InitVehicles();
-forward InitTexts();
-forward AddTexts(playerid);
-forward AddMapicons(playerid);
 
 #include "support/pickups.pwn"
 #include "support/objects.pwn"
@@ -175,8 +122,6 @@ forward AddMapicons(playerid);
 //
 //  DCMDs = command set definitions.
 //
-
-forward LoadDcmdAll(playerid, cmdtext[]);
 
 #include "support/dcmd.pwn"
 

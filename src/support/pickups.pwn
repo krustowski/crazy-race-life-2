@@ -50,6 +50,8 @@ new gTikiPrizes[MAX_TIKI_PRIZES][Tiki];
 //
 //
 
+forward InitPickups();
+
 public InitPickups()
 {
 	InitTikiPrizes();

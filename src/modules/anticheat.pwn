@@ -1,3 +1,7 @@
+forward AntiCheatWeapon();
+forward AntiFlood();
+forward AntiJetPack();
+
 public AntiCheatWeapon()
 {
 	for (new i = 0; i <= GetMaxPlayers(); i++)

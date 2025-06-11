@@ -102,6 +102,8 @@ new gNullProperty[Property] =
 //
 //
 
+forward InitRealEstateProperties();
+
 public InitRealEstateProperties()
 {
 	LoadRealEstateData();

@@ -66,6 +66,8 @@ enum
 	E_MAPICON_ID_PAY_N_SPRAY
 }
 
+forward AddMapicons(playerid);
+
 public AddMapicons(playerid)
 {
 	// The very global spawn point in LV.

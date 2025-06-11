@@ -55,6 +55,12 @@ new gPlayers[MAX_PLAYERS][Player];
 //
 //
 
+forward BatchSavePlayerData();
+forward LoadPlayerData(playerid);
+forward SavePlayerData(playerid);
+forward SendPlayerSalary();
+forward UpdatePlayerScore();
+
 public BatchSavePlayerData()
 {
 	for (new i = 0; i < GetMaxPlayers(); i++)

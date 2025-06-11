@@ -62,6 +62,8 @@ enum
 	FIELD_TEAM_SALARY_VOLATILE,
 }
 
+forward InitTeams();
+
 public InitTeams()
 {
 	new i = 1, query[512];

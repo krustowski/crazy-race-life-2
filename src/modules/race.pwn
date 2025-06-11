@@ -38,6 +38,12 @@ new gPlayerRaceTime[MAX_PLAYERS];
 //  Race-related functions.
 //
 
+forward InitRaces();
+forward CheckRaceCheckpoint(playerid);
+forward SetRaceForUser(playerid, raceId);
+forward StartRace();
+forward UpdateRaceInfoText(playerid);
+
 public InitRaces() 
 {
 	new i = 1, query[512];

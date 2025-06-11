@@ -40,6 +40,8 @@ new Float: gBankLocation[][4] =
 	{2302.73, -20.05, 26.25, 15.0}
 };
 
+forward CheckPlayerBankLocation(playerid);
+
 public CheckPlayerBankLocation(playerid)
 {
 	for (new i = 0; i < sizeof(gBankLocation); i++)

@@ -9,6 +9,8 @@ new gAdminElevator;
 //
 //
 
+forward InitObjects();
+
 public InitObjects()
 {
 	//------------------------admin house

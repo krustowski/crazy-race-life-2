@@ -6,6 +6,10 @@ enum E_PAINTBALL
 
 new gPaintball[MAX_PLAYERS][E_PAINTBALL];
 
+forward StartPaintball();
+forward GetPaintballScoreboard();
+forward EndPaintball();
+
 public StartPaintball()
 {
 	for (new i = 0; i < MAX_PLAYERS; i++)

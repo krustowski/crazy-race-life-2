@@ -1,5 +1,6 @@
 // 
-//  Real Estate stuff.
+//  real.pwn
+//  Real Estate stuff
 //
 
 #define MAX_PROPERTIES		128
@@ -9,12 +10,14 @@
 
 #include "sql.pwn"
 
+// Exterior pickups
 enum 
 {
 	PICKUP_OFFER,
 	PICKUP_ENTRANCE
 }
 
+// Interior pickups
 enum
 {
 	PICKUP_INFO,
@@ -73,6 +76,28 @@ enum PlayerPropertyObject
 new gPlayerInteriors[MAX_PLAYERS][PlayerPropertyObject];
 
 new gProperties[MAX_PROPERTIES][Property];
+
+// Utilized by lvl5 admins when editing a property.
+new gPropertyEdit[MAX_PLAYERS][Property];
+
+// Used to flush gPropertyEdit entry when editing is done.
+new gNullProperty[Property] = 
+{
+	0,
+	0,
+	"",
+	0,
+	{0.0, 0.0, 0.0, 0.0},
+	{0.0, 0.0, 0.0, 0.0},
+	{0.0, 0.0, 0.0, 0.0},
+	0,
+	//{0, 0, {0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
+	false,
+	{0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+};
 
 //
 //
@@ -651,3 +676,9 @@ stock UpdatePropertyVehicle(playerid)
 	return 1;
 }
 
+//
+//
+//
+
+stock EditProperty(playerid, propertyid)
+{}

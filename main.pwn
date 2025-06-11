@@ -704,6 +704,99 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				return 1;
 			}
+		case DIALOG_PROPERTY_EDIT_MAIN:
+			{
+				if (!response)
+				{
+					gPropertyEdit[playerid] = gNullProperty;
+
+					SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Property edit cancelled.");
+					return 1;
+				}
+
+				switch (listitem)
+				{
+					// Name
+					case 0:
+						{
+							ShowPropertyEditDialogName(playerid);
+						}
+					// Cost
+					case 1:
+						{
+							ShowPropertyEditDialogCost(playerid);
+						}
+					// Entrance pickup coords
+					case 2:
+						{
+							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Go to a spot to record the Entrance pickup coords and type /predit entrance");
+						}
+					// Offer pickup coords
+					case 3:
+						{
+							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Go to a spot to record the Offer pickup coords and type /predit offer");
+						}
+					// Vehicle coords
+					case 4:
+						{
+							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Go to a spot to record the Vehicle coords and type /predit vehicle");
+						}
+					// Occupied state
+					case 5:
+						{
+							gPropertyEdit[playerid][Occupied] = !gPropertyEdit[playerid][Occupied];
+							SendClientMessage(playerid, COLOR_GREEN, "[ EDIT ] Occupied state of the property toggled");
+
+							ShowPropertyEditDialogMain(playerid);
+						}
+					// Save property
+					case 6:
+						{
+							EditProperty(playerid);
+						}
+				}
+
+				return 1;
+			}
+		case DIALOG_PROPERTY_EDIT_NAME:
+			{
+				if (!response)
+				{
+					ShowPropertyEditDialogMain(playerid);
+					return 1;
+				}
+
+				new label[64];
+				format(label, sizeof(label), "%s", inputtext);
+
+				gPropertyEdit[playerid][Label] = label;
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Property name changed!");
+
+				ShowPropertyEditDialogMain(playerid);
+				return 1;
+			}
+		case DIALOG_PROPERTY_EDIT_COST:
+			{
+				if (!response)
+				{
+					ShowPropertyEditDialogMain(playerid);
+					return 1;
+				}
+
+				if (!IsNumeric(inputtext))
+				{
+					SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Invalid value!");
+
+					ShowPropertyEditDialogMain(playerid);
+					return 1;
+				}
+
+				gPropertyEdit[playerid][Cost] = strval(inputtext);
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Property cost changed!");
+
+				ShowPropertyEditDialogMain(playerid);
+				return 1;
+			}
 
 		default: 
 			return 0; // dialog ID was not found, search in other scripts

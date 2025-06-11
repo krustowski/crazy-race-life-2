@@ -41,6 +41,7 @@ enum Player
 	bool: Spectating,
 	bool: Jailed,
 	bool: InsideProperty,
+	bool: EditingMode,
 
 	Drugs[MAX_DRUGS],
 	Properties[MAX_PLAYER_PROPERTIES],

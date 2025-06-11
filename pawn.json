@@ -2,7 +2,7 @@
 	"user": "vxn",
 	"repo": "crazy-and-race-life-2",
 	"tag": "0.4.0",
-	"entry": "main.pwn",
+	"entry": "src/main.pwn",
 	"output": "gamemodes/crl2.amx",
 	"dependencies": [
 		"openmultiplayer/omp-stdlib",

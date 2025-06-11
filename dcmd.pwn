@@ -1367,7 +1367,6 @@ dcmd_predit(playerid, const params[])
 	new token1[32], token2[32];
 	SplitIntoTwo(params, token1, token2, sizeof(token1));
 
-	if (!strlen(params) || (!IsNumeric(token1) && !IsNumeric(token2) && !strcmp(token1, "list")) || (strcmp(token1, "list") && IsNumeric(token2)))
 	if (!strlen(params) || (strcmp(token1, "entrance") && strcmp(token1, "offer") && strcmp(token1, "vehicle") && !IsNumeric(token1)))
 	{
 		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /predit [ID]");

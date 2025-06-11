@@ -91,7 +91,6 @@ new gNullProperty[Property] =
 	{0.0, 0.0, 0.0, 0.0},
 	{0.0, 0.0, 0.0, 0.0},
 	0,
-	//{0, 0, {0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
 	false,
 	{0, 0, 0, 0, 0},
 	{0, 0, 0, 0, 0},
@@ -426,6 +425,9 @@ stock ExtractCoordsFromString(const input[], Float: coords[Coords])
 
 stock SpawnPropertyInterior(playerid, arrayID)
 {
+	if (gPlayers[playerid][InsideProperty])
+		return 0;
+
 	gPlayerInteriors[playerid][PropertyArrayID] = arrayID;
 
 	new Float:X, Float:Y, Float:Z;
@@ -683,6 +685,13 @@ stock UpdatePropertyVehicle(playerid)
 stock EditProperty(playerid)
 {
 	new propertyid = gPropertyEdit[playerid][ID];
+
+	if (!propertyid || propertyid < 10101)
+	{
+		SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Invalid property number");
+		return 0;
+	}	
+
 	new arrayid = GetPropertyArrayIDfromID(propertyid);
 
 	if (arrayid >= 0) 
@@ -712,6 +721,7 @@ stock EditProperty(playerid)
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
+		SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error!");
 		printf("Database error: cannot write property data (ID: %d)!", propertyid);
 		return 0;
 	}
@@ -719,6 +729,7 @@ stock EditProperty(playerid)
 	DB_FreeResultSet(result);
 
 	gPropertyEdit[playerid] = gNullProperty;
+	gPlayers[playerid][EditingMode] = false;
 
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Property saved successfully!");
 

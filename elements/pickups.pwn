@@ -5,6 +5,8 @@
 #define PICKUP_TYPE_RESPAWN_AFTER_DEATH		3
 #define PICKUP_TYPE_NO_RESPAWN			19 
 
+#define MAX_TIKI_PRIZES 			5
+
 //
 //  Global static team objects.
 //
@@ -36,25 +38,22 @@ new gPlayerMoneyPickupAmount[MAX_PLAYERS];
 
 //new gPlayerWeaponPickup[MAX_PLAYERS];
 
-//
-//
-//
-
-stock AddPlayerDeathPickups(playerid, Float:X, Float:Y, Float:Z)
+enum Tiki
 {
-	if (GetPlayerMoney(playerid) > 0)
-	{
-		gPlayerMoneyPickup[playerid] = EnsurePickupCreated(1212, 19, Float:X, Float:Y, Float:Z);
-		gPlayerMoneyPickupAmount[playerid] = GetPlayerMoney(playerid);
-
-		SendClientMessageLocalized(playerid, I18N_DEATH_MONEY_LOCALITY);
-	}
-
-	return 1;
+	ID,
+	PICKUP: Pickup
 }
+
+new gTikiPrizes[MAX_TIKI_PRIZES][Tiki];
+
+//
+//
+//
 
 public InitPickups()
 {
+	InitTikiPrizes();
+
 	gAdminRoomHealth = EnsurePickupCreated(1240, 1, 2302.85, 1155.93, 85.94);
 
 	gHackerzInteriorEntrance = EnsurePickupCreated(1318, 1, 2866.62, -2125.24, 5.72);
@@ -156,6 +155,57 @@ public InitPickups()
 		format(menuItem, sizeof(menuItem), "%s", gTeams[i][TeamName]);
 
 		AddMenuItem(gTeams[i][Menus][0], 0, menuItem);
-		AddMenuItem(gTeams[i][Menus][0], 0, "Opustit team");
+		AddMenuItem(gTeams[i][Menus][0], 0, "Leave team");
 	}
 }
+
+//
+//
+//
+
+stock InitTikiPrizes()
+{
+	new i = 0, query[256];
+
+	format(query, sizeof(query), "SELECT id, coord_x, coord_y, coord_z FROM tiki_prizes WHERE hidden = 0");
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) {
+		print("Database error: cannot load tiki coords!");
+		return 0;
+	}
+
+	new Float:X, Float:Y, Float:Z;
+
+	do
+	{
+		X = DB_GetFieldFloatByName(result, "coord_x");
+		Y = DB_GetFieldFloatByName(result, "coord_y");
+		Z = DB_GetFieldFloatByName(result, "coord_z");
+
+		gTikiPrizes[i][ID] = DB_GetFieldIntByName(result, "id");
+		gTikiPrizes[i][Pickup] = PICKUP: EnsurePickupCreated(1276, PICKUP_TYPE_NO_RESPAWN, X, Y, Z);
+
+		i++;
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+	print("Tiki prizes initialized!");
+
+	return 1;
+}
+
+stock AddPlayerDeathPickups(playerid, Float:X, Float:Y, Float:Z)
+{
+	if (GetPlayerMoney(playerid) > 0)
+	{
+		gPlayerMoneyPickup[playerid] = EnsurePickupCreated(1212, 19, Float:X, Float:Y, Float:Z);
+		gPlayerMoneyPickupAmount[playerid] = GetPlayerMoney(playerid);
+
+		SendClientMessageLocalized(playerid, I18N_DEATH_MONEY_LOCALITY);
+	}
+
+	return 1;
+}
+

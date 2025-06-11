@@ -9,40 +9,8 @@ new gAdminElevator;
 //
 //
 
-stock InitTikiPrizes()
-{
-	new query[256];
-
-	format(query, sizeof(query), "SELECT coord_x, coord_y, coord_z FROM tiki_prizes WHERE hidden = 0");
-
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) {
-		print("Database error: cannot load tiki coords!");
-		return 0;
-	}
-
-	new Float:X, Float:Y, Float:Z;
-
-	do
-	{
-		X = DB_GetFieldFloatByName(result, "coord_x");
-		Y = DB_GetFieldFloatByName(result, "coord_y");
-		Z = DB_GetFieldFloatByName(result, "coord_z");
-
-		CreateObject(1276, X, Y, Z, 0.0, 0.0, 0.0);
-	}
-	while (DB_SelectNextRow(result));
-
-	DB_FreeResultSet(result);
-	print("Tiki prizes initialized!");
-
-	return 1;
-}
-
 public InitObjects()
 {
-	InitTikiPrizes();
-
 	//------------------------admin house
 	gAdminElevator = CreateObject(5837, 2303.207, 1174.944, 80.285, 0.0, 0.0, 142.812);
 

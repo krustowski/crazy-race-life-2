@@ -956,6 +956,15 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	//  Other pickups --- entries,  baggies etc.
 	//
 
+	for (new i = 0; i < MAX_TIKI_PRIZES; i++)
+	{
+		if (PICKUP: pickupid == gTikiPrizes[i][Pickup])
+		{
+			UpdateTikiPrize(playerid, i);
+			break;
+		}
+	}
+
 	if (pickupid == gAdminRoomHealth)
 	{
 		SetPlayerHealth(playerid, 100.0);

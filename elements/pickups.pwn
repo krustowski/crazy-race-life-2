@@ -196,6 +196,26 @@ stock InitTikiPrizes()
 	return 1;
 }
 
+stock UpdateTikiPrize(playerid, tikiid)
+{
+	new query[128];
+	
+	format(query, sizeof(query), "UPDATE tiki_prizes SET hidden = 1 WHERE id = %d", gTikiPrizes[tikiid][ID]);
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) {
+		print("Database error: cannot write tiki update!");
+		return 0;
+	}
+
+	DB_FreeResultSet(result);
+
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TIKI ] You have found a tiki prize!");
+	GivePlayerMoney(playerid, 10000000);
+
+	return 1;
+}
+
 stock AddPlayerDeathPickups(playerid, Float:X, Float:Y, Float:Z)
 {
 	if (GetPlayerMoney(playerid) > 0)

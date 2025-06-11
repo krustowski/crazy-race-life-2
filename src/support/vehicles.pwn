@@ -1,3 +1,5 @@
+new const VEHICLE_PLATE[] = "--CRL2--";
+
 forward InitVehicles();
 
 public InitVehicles()
@@ -198,6 +200,12 @@ public InitVehicles()
 	AddStaticVehicle(596, 1587.5128, -1711.0092, 5.6127, 357.8445, 0, 1); //
 	AddStaticVehicle(596, 1590.9025, -1711.3728, 5.5903, 176.9570, 0, 1); //
 	AddStaticVehicle(528, 1578.7892, -1710.7571, 5.9352, 177.5343, 0, 0); //
+
+	// Set the unique Vehlicle Plate for all vehicles possible.
+	for (new i = 0; i < MAX_VEHICLES; i++)
+	{
+		SetVehicleNumberPlate(i, VEHICLE_PLATE);
+	}
 }
 
 new gVehicleName[][] = {
@@ -414,6 +422,4 @@ new gVehicleName[][] = {
 	"Farm Plow",
 	"Utility Trailer"
 };
-
-//new gVehStats[200];
 

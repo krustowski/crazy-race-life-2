@@ -53,7 +53,6 @@ new const GAMEMODE_NAME[] = "CrazyRaceLife2";
 new const GAMEMODE_CREDITS[] = "krusty, kompry, DRaGsTeR, amdulka";
 
 new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
-new const VEHICLE_PLATE[] = "-CRL-2-";
 
 //
 //  Advertisement.
@@ -148,6 +147,8 @@ main()
 public OnGameModeInit()
 {
 	InitDB();
+	InitDrugValues();
+	InitTeams();
 
 	SetGameModeText(GAMEMODE_NAME);
 
@@ -157,9 +158,6 @@ public OnGameModeInit()
 	AllowInteriorWeapons(false);
 	EnableStuntBonusForAll(true);  
 	DisableInteriorEnterExits();
-
-	InitDrugValues();
-	InitTeams();
 
 	//
 	// Start various timers.
@@ -189,12 +187,6 @@ public OnGameModeInit()
 	InitObjects();
 	InitVehicles();
 	InitTexts();
-
-	// Set the unique Vehlicle Plate for all vehicles possible.
-	for (new i = 0; i < MAX_VEHICLES; i++)
-	{
-		SetVehicleNumberPlate(i, VEHICLE_PLATE);
-	}
 
 	return 1;
 }

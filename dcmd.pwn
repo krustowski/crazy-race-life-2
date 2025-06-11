@@ -28,6 +28,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(property, 8, cmdtext);	  //all
 	dcmd(race, 4, cmdtext);		  //all
 	dcmd(rules, 5, cmdtext); 	  //all
+	dcmd(search, 6, cmdtext); 	  //all
 	dcmd(skydive, 7, cmdtext);        //all
 	dcmd(text, 4, cmdtext);           //all
 	dcmd(tiki, 4, cmdtext); 	  //all
@@ -771,9 +772,67 @@ dcmd_rules(playerid, const params[])
 {
 #pragma unused params
 	SendClientMessage(playerid, COLOR_ORANGERED, "[ GAME RULES ]");
-	SendClientMessage(playerid, COLOR_ORANGERED, "-> CARKILL, HELIKILL, or BIKEKILL is forbidden");
-	SendClientMessage(playerid, COLOR_ORANGERED, "-> No MINIGUN, or JETPACK usage, No cheating");
-	SendClientMessage(playerid, COLOR_ORANGERED, "-> Anti-Cheat filterscript enabled (cheating => kick/ban)");
+	SendClientMessage(playerid, COLOR_ORANGERED, "=> No CARKILL, HELIKILL, or BIKEKILL");
+	SendClientMessage(playerid, COLOR_ORANGERED, "=> No MINIGUN, or JETPACK usage, No cheating");
+	SendClientMessage(playerid, COLOR_ORANGERED, "=> Anti-Cheat filterscript enabled (cheating => kick, or ban)");
+
+	return 1;
+}
+
+dcmd_search(playerid, const params[]) 
+{
+	if (gPlayers[playerid][TeamID] != TEAM_POLICE)
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Police team-related command!");
+
+	new token1[32], token2[32];
+	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
+
+	if (!strlen(params) || count != 2)
+	{
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /search [playerID] drugz");
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /search [playerID] drunk");
+
+		return 1;
+	}
+
+	new targetId = strval(token1);
+
+	if (!IsPlayerConnected(targetId)) 
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+
+	new Float:X, Float:Y, Float:Z;
+	GetPlayerPos(targetId, X, Y, Z);
+
+	if (!IsPlayerInSphere(playerid, X, Y, Z, _: 15.0)) 
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] You need to be closer to the player to search them");
+
+	// Check drunk driving
+	if (GetPlayerDrunkLevel(targetId) > 1999 && IsPlayerInAnyVehicle(targetId) && GetPlayerState(targetId) == PLAYER_STATE_DRIVER)
+	{
+		SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Player is drunk driving! The fine for player is $25000");
+
+		// Lock the car for the player and remove them from such vehicle
+		SetVehicleParamsForPlayer(GetPlayerVehicleID(targetId), targetId, 0, 1);
+		RemovePlayerFromVehicle(targetId);
+
+		// Play the locker sound
+		new Float:pX, Float:pY, Float:pZ;
+		GetPlayerPos(targetId, pX, pY, pZ);
+
+		PlayerPlaySound(targetId, 1056, pX, pY, pZ);
+
+		// Fine them
+		GivePlayerMoney(targetId, -25000);
+
+		SendClientMessage(targetId, COLOR_ORANGE, "[ DRUGZ ] You have been fined $25000 for drunk driving, your vehicle has been confiscated");
+
+		// Generate a bonus for the policeman
+		new bonus = random(10000), stringToPrint[128];
+		GivePlayerMoney(playerid, bonus);
+
+		format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Received a &%d bonus", bonus);
+		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
+	}
 
 	return 1;
 }

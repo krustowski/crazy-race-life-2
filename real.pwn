@@ -557,7 +557,6 @@ stock BuyPlayerProperty(playerid, propertyID)
 
 	if (!IsPlayerInSphere(playerid, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ], 15))
 		return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);
-		//return SendClientMessage(playerid, COLOR_CERVENA, "[ REAL ] Je treba byt v okoli puvodniho pickupu (rotujici zeleny domek).");
 
 	if (GetPlayerMoney(playerid) < gProperties[arrayID][Cost])
 		return SendClientMessageLocalized(playerid, I18N_REAL_NO_MONEY);
@@ -576,6 +575,9 @@ stock BuyPlayerProperty(playerid, propertyID)
 	gProperties[arrayID][Pickups][PICKUP_ENTRANCE] = EnsurePickupCreated(1318, 1, Float:gProperties[arrayID][LocationEntrance][CoordX], Float:gProperties[arrayID][LocationEntrance][CoordY], Float:gProperties[arrayID][LocationEntrance][CoordZ]);
 
 	GivePlayerMoney(playerid, -gProperties[arrayID][Cost]);
+
+	// Play property bought theme sound
+	PlayerPlaySound(playerid, 182, 0.0, 0.0, 0.0);
 
 	return SendClientMessageLocalized(playerid, I18N_REAL_PROPERTY_ACQ);
 }

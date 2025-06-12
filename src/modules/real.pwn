@@ -756,11 +756,27 @@ stock EditProperty(playerid)
 		return 0;
 	}	
 
-	new arrayid = GetPropertyArrayIDfromID(propertyid);
+	new arrayid = GetPropertyArrayIDfromID(propertyid), bool: existingRecord = false;
 
 	if (arrayid >= 0) 
 	{
-		gProperties[arrayid] = gPropertyEdit[playerid];
+		//gProperties[arrayid] = gPropertyEdit[playerid];
+		existingRecord = true;
+	}
+
+	new propertyPoolSize = 0;
+
+	for (new i = 0; i < MAX_PROPERTIES; i++)
+	{
+		if (gProperties[i][ID])
+			propertyPoolSize++;
+	}
+
+	if (propertyPoolSize == MAX_PROPERTIES)
+	{
+		SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Max properties limit reached, cancelling the transaction");
+
+		return 1;
 	}
 
 	new query[2048];
@@ -791,6 +807,16 @@ stock EditProperty(playerid)
 	}
 
 	DB_FreeResultSet(result);
+
+	// Update the server memory
+	if (existingRecord)
+	{
+		gProperties[arrayid] = gPropertyEdit[playerid];
+	} 
+	else
+	{
+		gProperties[propertyPoolSize] = gPropertyEdit[playerid];
+	}
 
 	SpawnProperty(gPropertyEdit[playerid]);
 

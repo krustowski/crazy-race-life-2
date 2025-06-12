@@ -170,7 +170,7 @@ public OnGameModeInit()
 
 	SetTimer("AutosaveData", 200 * SECOND_MS, true);
 	SetTimer("UpdatePlayerScore", 1 * SECOND_MS, true);
-	SetTimer("SendPlayerSalary", 300 * SECOND_MS, true);
+	SetTimer("SendPlayerSalary", 5 * 60 * SECOND_MS, true);
 
 	SetTimer("DrawClockText", 10 * SECOND_MS, true);
 

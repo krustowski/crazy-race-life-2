@@ -141,8 +141,62 @@ stock SpawnProperty(property[Property])
 	}
 }
 
+stock LoadPlayerProperties(playerid)
+{
+	new query[256];
+
+	format(query, sizeof(query), "SELECT id FROM properties WHERE user_id = %d AND occupied = 1", 
+			gPlayers[playerid][OrmID]
+	);
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) 
+	{
+		printf("Database error: cannot list player's properties (ID: %d)!", playerid);
+		print(query);
+
+		return 0;
+	}
+
+	new i = 0;
+
+	do
+	{
+		gPlayers[playerid][Properties][i] = DB_GetFieldIntByName(result, "id");
+
+		i++;
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	return 1;
+}
+
 stock IsPlayerOwner(playerid, propertyId)
 {
+	/*new query[256];
+
+	format(query, sizeof(query), "SELECT vehicle_id FROM properties WHERE user_id = %d AND occupied = 1 AND id = %d", 
+			gPlayers[playerid][OrmID], 
+			propertyId
+	);
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) 
+	{
+		printf("Database error: cannot verify property ownership (ID: %d)!", propertyId);
+		return false;
+	}
+
+	if (DB_GetRowCount(result))
+	{
+		DB_FreeResultSet(result);
+		return true;
+	}
+
+	DB_FreeResultSet(result);*/
+
 	for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
 	{
 		if (gPlayers[playerid][Properties][i] == propertyId)

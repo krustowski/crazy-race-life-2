@@ -38,6 +38,8 @@ stock SetPlayerAccountLogin(playerid, const text[])
 	gPlayers[playerid][IsLogged] = true;
 
 	LoadPlayerData(playerid);
+	LoadPlayerProperties(playerid);
+
 	SpawnPlayer(playerid);
 
 	return 1;

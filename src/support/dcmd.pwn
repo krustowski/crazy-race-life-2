@@ -643,7 +643,13 @@ dcmd_property(playerid, const params[])
 
 		for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
 		{
-			format(stringToPrint, sizeof(stringToPrint), "-> %d: property ID %5d", i, gPlayers[playerid][Properties][i]);
+			new arrayId = GetPropertyArrayIDfromID(gPlayers[playerid][Properties][i]);
+
+			format(stringToPrint, sizeof(stringToPrint), "=> %s: (property ID %5d)", 
+					gProperties[arrayId][Label], 
+					gPlayers[playerid][Properties][i]
+			);
+
 			SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
 		}
 	}

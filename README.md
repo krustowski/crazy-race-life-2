@@ -49,4 +49,22 @@ gamemode crl2
 
 The examples above are shown respectively to the config file names mentioned.
 
+## Vademecum
 
+### Real Estate
+
+Each property ID has to be unique server-wide. It is recommended to use 5-digit format like `40605`, where:
+
++ `4` stands for the greater zone ID 
++ `06` stands for a district/block ID (incremented)
++ `05` stands for a property ID within the same district/block
+
+Greater zone IDs:
+
+```
+1 - San Fierro
+2 - Desert
+3 - Las Venturas
+4 - Countryside, Farms
+5 - Los Santos
+```

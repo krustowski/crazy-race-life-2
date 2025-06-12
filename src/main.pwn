@@ -347,16 +347,6 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 
 	SendDeathMessage(killerid, playerid, reason);
 
-	if (GetPlayerMoney(playerid) > 0)
-	{
-		new Float: X, Float: Y, Float: Z;
-
-		GetPlayerPos(playerid, X, Y, Z);
-		AddPlayerDeathPickups(playerid, Float:X, Float:Y, Float:Z);
-
-		ResetPlayerMoney(playerid);
-	}
-
 	// Hide velocity meters.
 	//TextDrawHideForPlayer(playerid, KPH[playerid]);
 	//TextDrawHideForPlayer(playerid, KPHR[playerid]);
@@ -383,6 +373,17 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 		  }
 		  }*/
 		return 1;
+	}
+
+	// Drop all money at the spot of death
+	if (GetPlayerMoney(playerid) > 0)
+	{
+		new Float: X, Float: Y, Float: Z;
+
+		GetPlayerPos(playerid, X, Y, Z);
+		AddPlayerDeathPickups(playerid, Float:X, Float:Y, Float:Z);
+
+		ResetPlayerMoney(playerid);
 	}
 
 	new t_PLAYER_STATE:killerState = GetPlayerState(killerid);
@@ -978,7 +979,6 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Just found %d g of THC.", amount);
 		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 	}
-
 
 	//
 	//  Death pickups.

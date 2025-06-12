@@ -112,28 +112,33 @@ public InitRealEstateProperties()
 	{
 		if (!gProperties[i][ID])
 			continue;
-
-		if (!gProperties[i][Occupied])
-			gProperties[i][Pickups][0] = EnsurePickupCreated(1273, 1, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ]);
-		else
-		{
-			gProperties[i][Pickups][0] = EnsurePickupCreated(19522, 1, Float:gProperties[i][LocationOffer][CoordX], Float:gProperties[i][LocationOffer][CoordY], Float:gProperties[i][LocationOffer][CoordZ]);
-			gProperties[i][Pickups][1] = EnsurePickupCreated(1318, 1, Float:gProperties[i][LocationEntrance][CoordX], Float:gProperties[i][LocationEntrance][CoordY], Float:gProperties[i][LocationEntrance][CoordZ]);
-		}
-
-		if (gProperties[i][Vehicle][Model] && gProperties[i][Vehicle][Model] >= 400 && gProperties[i][Vehicle][Model] <= 611)
-		{
-			gProperties[i][Vehicle][ID] = CreateVehicle(gProperties[i][Vehicle][Model], Float:gProperties[i][LocationVehicle][CoordX], Float:gProperties[i][LocationVehicle][CoordY], Float:gProperties[i][LocationVehicle][CoordZ], Float:gProperties[i][LocationVehicle][CoordR], gProperties[i][Vehicle][Colours][0], gProperties[i][Vehicle][Colours][1], -1);
-
-			for (new j = 0; j < 16; j++)
-			{
-				if (gProperties[i][Vehicle][Components][j])
-					AddVehicleComponent(gProperties[i][Vehicle][ID], gProperties[i][Vehicle][Components][j]);
-			}
-		}
+		
+		SpawnProperty(gProperties[i]);
 	}
 
 	return 1;
+}
+
+stock SpawnProperty(property[Property])
+{
+	if (!property[Occupied])
+		property[Pickups][0] = EnsurePickupCreated(1273, 1, Float:property[LocationOffer][CoordX], Float:property[LocationOffer][CoordY], Float:property[LocationOffer][CoordZ]);
+	else
+	{
+		property[Pickups][0] = EnsurePickupCreated(19522, 1, Float:property[LocationOffer][CoordX], Float:property[LocationOffer][CoordY], Float:property[LocationOffer][CoordZ]);
+		property[Pickups][1] = EnsurePickupCreated(1318, 1, Float:property[LocationEntrance][CoordX], Float:property[LocationEntrance][CoordY], Float:property[LocationEntrance][CoordZ]);
+	}
+
+	if (property[Vehicle][Model] && property[Vehicle][Model] >= 400 && property[Vehicle][Model] <= 611)
+	{
+		property[Vehicle][ID] = CreateVehicle(property[Vehicle][Model], Float:property[LocationVehicle][CoordX], Float:property[LocationVehicle][CoordY], Float:property[LocationVehicle][CoordZ], Float:property[LocationVehicle][CoordR], property[Vehicle][Colours][0], property[Vehicle][Colours][1], -1);
+
+		for (new j = 0; j < 16; j++)
+		{
+			if (property[Vehicle][Components][j])
+				AddVehicleComponent(property[Vehicle][ID], property[Vehicle][Components][j]);
+		}
+	}
 }
 
 stock IsPlayerOwner(playerid, propertyId)
@@ -235,7 +240,7 @@ stock SaveRealEstateData()
 				gProperties[i][Drugs][PAPER],
 				gProperties[i][Drugs][LIGHTER],
 				gProperties[i][Drugs][JOINT]
-			);
+		      );
 
 		new DBResult: result_drugz = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result_drugz) {
@@ -568,6 +573,7 @@ stock BuyPlayerProperty(playerid, propertyID)
 	//
 
 	gProperties[arrayID][Occupied] = true;
+	gProperties[arrayID][UserID] = gPlayers[playerid][OrmID];
 	gPlayers[playerid][Properties][freeSlot] = propertyID;
 
 	DestroyPickup(gProperties[arrayID][Pickups][PICKUP_OFFER]);
@@ -721,7 +727,7 @@ stock EditProperty(playerid)
 			gPropertyEdit[playerid][LocationVehicle][CoordZ],
 			gPropertyEdit[playerid][LocationVehicle][CoordR],
 			gPropertyEdit[playerid][Occupied]
-	);
+	      );
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
@@ -731,6 +737,8 @@ stock EditProperty(playerid)
 	}
 
 	DB_FreeResultSet(result);
+
+	SpawnProperty(gPropertyEdit[playerid]);
 
 	gPropertyEdit[playerid] = gNullProperty;
 	gPlayers[playerid][EditingMode] = false;

@@ -49,8 +49,22 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 
 	SHA256_Hash(text, salt, hashedPwd, sizeof(hashedPwd));
 
-	new query[256];
-	format(query, sizeof(query), "INSERT INTO users (nickname, pwdhash, salt, cash, bank, adminlvl, team, class, health, armour, spawn, properties) VALUES ('%s', '%s', '%s', %d, %d, %d, %d, %d, %d, %d, %d, '%s');", gPlayers[playerid][Name], hashedPwd, salt, 5000, 0, 0, 0, 0, 100, 100, 0, "0,0,0,0,0");
+	new query[512];
+	format(query, sizeof(query), "INSERT INTO users (nickname, pwdhash, salt, cash, bank, adminlvl, wanted, team, class, health, armour, spawn, properties) VALUES ('%s', '%s', '%s', %d, %d, %d, %d, %d, %d, %.2f, %.2f, %d, '%s');", 
+			gPlayers[playerid][Name], 
+			hashedPwd, 
+			salt, 
+			5000, 
+			0, 
+			0, 
+			0, 
+			0, 
+			0, 
+			100.0, 
+			100.0, 
+			0, 
+			"0,0,0,0,0"
+	);
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
@@ -77,7 +91,8 @@ stock ShowAuthDialog(playerid)
 	format(query, sizeof(query), "SELECT pwdhash, salt FROM users WHERE nickname = '%s'", gPlayers[playerid][Name]);
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (result) {
+
+	if (DB_GetRowCount(result)) {
 		DB_FreeResultSet(result);
 		format(stringToPrint, sizeof(stringToPrint), "Player (%s) has already registered their account. Log-in using your password:", gPlayers[playerid][Name]);
 
@@ -89,7 +104,7 @@ stock ShowAuthDialog(playerid)
 	else 
 	{
 		DB_FreeResultSet(result);
-		format(stringToPrint, sizeof(stringToPrint), "Welcome %s! Register your account by netering a password:", gPlayers[playerid][Name]);
+		format(stringToPrint, sizeof(stringToPrint), "Welcome %s! Register your account by entering a password:", gPlayers[playerid][Name]);
 
 		ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registeration", stringToPrint, "Register", "Cacnel");
 	}

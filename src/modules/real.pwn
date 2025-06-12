@@ -119,6 +119,30 @@ public InitRealEstateProperties()
 	return 1;
 }
 
+stock SpawnPlayerEntrancePickups(playerid)
+{
+	for (new i = 0; i < sizeof(gProperties); i++)
+	{
+		if (gProperties[i][UserID] == gPlayers[playerid][OrmID])
+		{
+			// Create entrance pickups exclusive to the player
+			new
+				Float: X = gProperties[i][LocationEntrance][CoordX],
+				Float: Y = gProperties[i][LocationEntrance][CoordY],
+				Float: Z = gProperties[i][LocationEntrance][CoordZ];
+				
+			gProperties[i][Pickups][1] = EnsurePickupCreated(1318, 1, X, Y, Z);
+
+			continue;
+		}
+
+		// Hide other entrance pickups
+		HidePickupForPlayer(playerid, gProperties[i][Pickups][1]);
+	}
+
+	return 1;
+}
+
 stock SpawnProperty(property[Property])
 {
 	if (!property[Occupied])
@@ -126,7 +150,6 @@ stock SpawnProperty(property[Property])
 	else
 	{
 		property[Pickups][0] = EnsurePickupCreated(19522, 1, Float:property[LocationOffer][CoordX], Float:property[LocationOffer][CoordY], Float:property[LocationOffer][CoordZ]);
-		property[Pickups][1] = EnsurePickupCreated(1318, 1, Float:property[LocationEntrance][CoordX], Float:property[LocationEntrance][CoordY], Float:property[LocationEntrance][CoordZ]);
 	}
 
 	if (property[Vehicle][Model] && property[Vehicle][Model] >= 400 && property[Vehicle][Model] <= 611)
@@ -169,6 +192,8 @@ stock LoadPlayerProperties(playerid)
 	while (DB_SelectNextRow(result));
 
 	DB_FreeResultSet(result);
+
+	SpawnPlayerEntrancePickups(playerid);
 
 	return 1;
 }

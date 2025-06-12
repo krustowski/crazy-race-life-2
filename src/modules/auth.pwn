@@ -4,13 +4,13 @@
 
 #include "support/dialogs.pwn"
 
+// SetPlayerAccountLogin sets the IsLogged Player value to 'true' if the <text> input, hashed, is equal to the hash stored in database.
 stock SetPlayerAccountLogin(playerid, const text[])
 {
-	new hashedPwd[65], hashedPwdDb[65], saltDb[17];
+	new hashedPwd[65], hashedPwdDb[65], saltDb[17], query[256];
 
-	new query[256];
-
-	format(query, sizeof(query), "SELECT pwdhash, salt FROM users WHERE nickname = '%s'", gPlayers[playerid][Name]);
+	// Fetch the sha256 hash and salt from DB
+	format(query, sizeof(query), "SELECT id, pwdhash, salt FROM users WHERE nickname = '%s'", gPlayers[playerid][Name]);
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
@@ -18,11 +18,15 @@ stock SetPlayerAccountLogin(playerid, const text[])
 		return 0;
 	}
 
-	DB_GetFieldString(result, 0, hashedPwdDb, sizeof(hashedPwdDb));
-	DB_GetFieldString(result, 1, saltDb, sizeof(saltDb));
+	DB_GetFieldStringByName(result, "pwdhash", hashedPwdDb, sizeof(hashedPwdDb));
+	DB_GetFieldStringByName(result, "salt", saltDb, sizeof(saltDb));
+
+	// Keep the ORM ID for further transactions
+	gPlayers[playerid][OrmID] = DB_GetFieldIntByName(result, "id");
 
 	DB_FreeResultSet(result);
 
+	// Hash the input and compare it with the saved pwd fingerprint
 	SHA256_Hash(text, saltDb, hashedPwd, sizeof(hashedPwd));
 
 	if (strcmp(hashedPwd, hashedPwdDb))
@@ -32,8 +36,8 @@ stock SetPlayerAccountLogin(playerid, const text[])
 	}
 
 	gPlayers[playerid][IsLogged] = true;
-	LoadPlayerData(playerid);
 
+	LoadPlayerData(playerid);
 	SpawnPlayer(playerid);
 
 	return 1;
@@ -71,6 +75,18 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 		print("Database error: cannot write (register) user data!");
 		return 0;
 	}
+
+	DB_FreeResultSet(result);
+
+	format(query, sizeof(query), "SELECT id FROM users WHERE nickname = '%s'", gPlayers[playerid][Name]);
+
+	result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) {
+		print("Database error: cannot read (register) user data!");
+		return 0;
+	}
+
+	gPlayers[playerid][OrmID] = DB_GetFieldIntByName(result, "id");
 
 	DB_FreeResultSet(result);
 

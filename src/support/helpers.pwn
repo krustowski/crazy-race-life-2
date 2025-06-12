@@ -98,7 +98,7 @@ stock InvalidCommand(playerid)
 	return SendClientMessageLocalized(playerid, I18N_NO_SUCH_COMMAND);
 }
 
-stock IsPlayerInSphere(playerid, Float:x, Float:y, Float:z, radius)
+stock IsPlayerInSphere(playerid, Float:x, Float:y, Float:z, Float:radius)
 {
 	if (GetPlayerDistanceToPointEx(playerid, x, y, z) < radius)
 	{

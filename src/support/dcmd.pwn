@@ -64,6 +64,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(skin, 4, cmdtext); 	  //rcon + lvl 3
 	dcmd(spectate, 8, cmdtext);	  //rcon + lvl 2
 	dcmd(vehicle, 7, cmdtext);	  //rcon + lvl 4
+	dcmd(weapon, 6, cmdtext); 	  //rcon + lvl 3
 	dcmd(weapons, 7, cmdtext); 	  //rcon + lvl 3
 
 	return InvalidCommand(playerid);
@@ -193,7 +194,6 @@ dcmd_bank(playerid, const params[])
 
 	if (!CheckPlayerBankLocation(playerid))
 		return SendClientMessage(playerid, COLOR_RED, "[ ATM ] You must be near the ATM ($) pickup!");
-
 
 	if (!strcmp(token1, "depo"))
 	{
@@ -1629,6 +1629,27 @@ dcmd_vehicle(playerid, const params[])
 
 	GetPlayerPos(playerid, X, Y, Z);
 	CreateVehicle(vehicleId, Float:X, Float:Y, Float:Z, 0.0, -1, -1, -1);
+
+	return 1;
+}
+
+dcmd_weapon(playerid, const params[])
+{
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+
+	new token1[32], token2[32];
+	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
+
+	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /weapon [playerID] [weaponID]");
+
+	new targetId = strval(token1), targetWeapon = strval(token2);
+
+	if (!IsPlayerConnected(targetId))
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] No such player online!");
+
+	GivePlayerWeapon(targetId, t_WEAPON: targetWeapon, 1000);
 
 	return 1;
 }

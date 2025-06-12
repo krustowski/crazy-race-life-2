@@ -268,8 +268,6 @@ public OnPlayerConnect(playerid)
 
 public OnPlayerDisconnect(playerid, reason)
 {
-	//Object_OnPlayerDisconnect(playerid, reason);
-
 	// Hide the vehicle velocity game text.
 	//TextDrawHideForPlayer(playerid, KPH[playerid]);
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
@@ -278,7 +276,6 @@ public OnPlayerDisconnect(playerid, reason)
 	if (reason == 1)
 		SavePlayerData(playerid);
 
-	//orm_destroy(gPlayerData[playerid][E_PLAYER_DATA_ORM]);
 	gPlayers[playerid][IsLogged] = false;
 
 	SendDeathMessage(playerid, INVALID_PLAYER_ID, 201);

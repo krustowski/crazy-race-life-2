@@ -46,11 +46,11 @@ public CheckPlayerBankLocation(playerid)
 {
 	for (new i = 0; i < sizeof(gBankLocation); i++)
 	{
-		if (IsPlayerInSphere(playerid, gBankLocation[i][0], gBankLocation[i][1], gBankLocation[i][2], _: gBankLocation[i][3]))
+		if (IsPlayerInSphere(playerid, gBankLocation[i][0], gBankLocation[i][1], gBankLocation[i][2], gBankLocation[i][3]))
 		{
-			return true;
+			return 1;
 		}
 	}
 
-	return false;
+	return 0;
 }

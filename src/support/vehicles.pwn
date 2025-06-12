@@ -208,6 +208,7 @@ public InitVehicles()
 	}
 }
 
+#pragma unused gVehicleName
 new gVehicleName[][] = {
 	"Landstalker",
 	"Bravura",

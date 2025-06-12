@@ -31,6 +31,7 @@ new gFentPackage[2];
 new gPCPPackage;
 new gTHCPackage[10];
 
+#pragma unused gDruggeryEntrance
 new gDruggeryEntrance;
 
 new gPlayerMoneyPickup[MAX_PLAYERS];

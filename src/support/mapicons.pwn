@@ -76,7 +76,7 @@ public AddMapicons(playerid)
 	// ATMs.
 	for (new i = 0; i < sizeof(gBankLocation); i++)
 	{
-		SetPlayerMapIcon(playerid, i+1, Float:gBankLocation[i][0], Float:gBankLocation[i][1], Float:gBankLocation[i][2], E_MAPICON_ID_ROBBERY, 0, MAPICON_LOCAL);
+		SetPlayerMapIcon(playerid, i+1, Float:gBankLocation[i][0], Float:gBankLocation[i][1], Float:gBankLocation[i][2], E_MAPICON_ID_ROBBERY, 0, MAPICON_GLOBAL);
 	}
 
 	// Housing.

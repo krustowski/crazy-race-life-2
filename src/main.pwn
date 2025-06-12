@@ -95,6 +95,12 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 #include "modules/real.pwn"
 
 //
+//  Trucking subsystem.
+//
+
+#include "modules/trucking.pwn"
+
+//
 //  Radar + Vehicle velocity/props.
 //
 

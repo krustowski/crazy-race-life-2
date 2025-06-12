@@ -2,23 +2,34 @@
 //  trucking.pwn
 //
 
-#define MAX_TRUCKING_POINTS	128
+#define MAX_TRUCKING_POINTS		128
+#define MAX_VEHICLES_PER_FACILITY	10
 
-enum TruckType
+enum VehicleType
 {
-	Goods,
+	Truck,
+	Freight,
 	Gas
 }
 
-enum TruckPoint
+enum TruckingVehicle
+{
+	Location[Coords],
+	Type[VehicleType]
+}
+
+enum TruckingkPoint
 {
 	ID,
 	Name[64],
-	Type[TruckType],
-	Destination[Coords]
+	Destination[Coords],
 }
 
 new gTrucking[MAX_TRUCKING_POINTS];
+
+// Those are used for the trucking editor
+new gTruckingEdit[MAX_PLAYERS][TruckingkPoint];
+new gTruckingVehicles[MAX_PLAYERS][VehicleType];
 
 stock InitTrucking()
 {

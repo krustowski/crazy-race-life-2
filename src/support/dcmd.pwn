@@ -61,6 +61,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(packet, 6, cmdtext);         //rcon +
 	dcmd(predit, 6, cmdtext);         //rcon +
 	dcmd(reset, 5, cmdtext);	  //rcon + lvl 4
+	dcmd(restart, 7, cmdtext);	  //rcon + lvl 4
 	dcmd(skin, 4, cmdtext); 	  //rcon + lvl 3
 	dcmd(spectate, 8, cmdtext);	  //rcon + lvl 2
 	dcmd(vehicle, 7, cmdtext);	  //rcon + lvl 4
@@ -1539,6 +1540,24 @@ dcmd_predit(playerid, const params[])
 }
 
 dcmd_reset(playerid, const params[])
+{
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+
+	if (!strlen(params) || !IsNumeric(params)) 
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /reset [playerID]!");
+
+	new targetId = strval(params);
+
+	if (!IsPlayerConnected(targetId))
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+
+	ResetPlayerMoney(targetId);
+
+	return 1;
+}
+
+dcmd_restart(playerid, const params[])
 {
 #pragma unused params
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4)

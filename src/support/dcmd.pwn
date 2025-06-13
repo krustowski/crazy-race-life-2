@@ -1646,7 +1646,7 @@ dcmd_tredit(playerid, const params[])
 	new token1[32], token2[32];
 	SplitIntoTwo(params, token1, token2, sizeof(token1));
 
-	if ((strcmp(token1, "checkpoint") && strcmp(token1, "truck") && strcmp(token1, "freight") && strcmp(token1, "gas") && strcmp(token1, "info")) && !IsNumeric(token1))
+	if (!strlen(params) || (strcmp(token1, "save") && strcmp(token1, "checkpoint") && strcmp(token1, "truck") && strcmp(token1, "freight") && strcmp(token1, "gas") && strcmp(token1, "info") && !IsNumeric(token1)))
 	{
 		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /tredit [ID]");
 		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /tredit checkpoint");
@@ -1665,7 +1665,7 @@ dcmd_tredit(playerid, const params[])
 		gPlayers[playerid][EditingMode] = true;
 		gTruckingEdit[playerid][ID] = facilityId;
 
-		//ShowPropertyEditDialogMain(playerid);
+		SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] New trucking point editing initialized");
 	}
 	else if (!strcmp(token1, "checkpoint"))
 	{
@@ -1677,7 +1677,17 @@ dcmd_tredit(playerid, const params[])
 		gTruckingEdit[playerid][LocationCheckpoint][CoordZ] = Z;
 
 		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Checkpoint coords recorded!");
-		//ShowPropertyEditDialogMain(playerid);
+	}
+	else if (!strcmp(token1, "info"))
+	{
+		new Float:X, Float:Y, Float:Z;
+		GetPlayerPos(playerid, X, Y, Z);
+
+		gTruckingEdit[playerid][LocationInfoPickup][CoordX] = X;
+		gTruckingEdit[playerid][LocationInfoPickup][CoordY] = Y;
+		gTruckingEdit[playerid][LocationInfoPickup][CoordZ] = Z;
+
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Info pickup coords recorded!");
 	}
 	else if (!strcmp(token1, "truck"))
 	{
@@ -1701,7 +1711,6 @@ dcmd_tredit(playerid, const params[])
 		gTruckingVehiclesIndex++;
 
 		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Vehicle coords recorded!");
-		//ShowPropertyEditDialogMain(playerid);
 	}
 	else if (!strcmp(token1, "freight"))
 	{
@@ -1725,7 +1734,6 @@ dcmd_tredit(playerid, const params[])
 		gTruckingVehiclesIndex++;
 
 		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Vehicle coords recorded!");
-		//ShowPropertyEditDialogMain(playerid);
 	}
 	else if (!strcmp(token1, "gas"))
 	{
@@ -1749,11 +1757,13 @@ dcmd_tredit(playerid, const params[])
 		gTruckingVehiclesIndex++;
 
 		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Vehicle coords recorded!");
-		//ShowPropertyEditDialogMain(playerid);
 	}
 	else if (!strcmp(token1, "save"))
 	{
-		SetTruckingPoint(playerid);
+		if (SetTruckingPoint(playerid))
+			return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Trucking point and vehicles saved successfully");
+
+		SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error occured while saving trucking data");
 	}
 
 	return 1;

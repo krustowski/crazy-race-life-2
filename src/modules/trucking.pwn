@@ -36,6 +36,7 @@ enum TruckingVehicle
 {
 	ID,
 	Location[Coords],
+
 	VehicleType: Type[VehicleType]
 }
 
@@ -200,16 +201,15 @@ stock SetTruckingPoint(playerid)
 
 	if (pointId)
 	{
-		format(query, sizeof(query), "INSERT INTO trucking_points (id, name, type) VALUES (%s, '%s', %d) ON CONFLICT(id) DO UPDATE SET name = excluded.name, type = excluded.type", 
-				pointId,
+		format(query, sizeof(query), "UPDATE trucking_points SET name = '%s', type = %d WHERE id = %d", 
 				gTruckingEdit[playerid][Name],
-				FT_GAS_STATION
-				//gTruckingEdit[playerid][Type]
+				FT_GAS_STATION,
+				pointId
 		      );
 	}
 	else
 	{
-		format(query, sizeof(query), "INSERT INTO trucking_points (name, type) VALUES ('%s', %d) ON CONFLICT(id) DO UPDATE SET name = excluded.name, type = excluded.type", 
+		format(query, sizeof(query), "INSERT INTO trucking_points (name, type) VALUES ('%s', %d)", 
 				gTruckingEdit[playerid][Name],
 				FT_GAS_STATION
 				//gTruckingEdit[playerid][Type]

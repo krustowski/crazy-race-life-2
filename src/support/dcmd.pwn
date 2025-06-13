@@ -1633,7 +1633,7 @@ dcmd_spectate(playerid, const params[])
 	PlayerSpectatePlayer(playerid, targetId);
 
 	gPlayers[playerid][Spectating] = true;
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ SPECTATE ] Mode enabled (hit /spectate again to disable)");
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ SPECTATE ] Mode enabled (type /spectate again to disable)");
 
 	return 1;
 }
@@ -1646,10 +1646,11 @@ dcmd_tredit(playerid, const params[])
 	new token1[32], token2[32];
 	SplitIntoTwo(params, token1, token2, sizeof(token1));
 
-	if ((strcmp(token1, "checkpoint") && strcmp(token1, "truck") && strcmp(token1, "freight") && strcmp(token1, "gas")) && !IsNumeric(token1))
+	if ((strcmp(token1, "checkpoint") && strcmp(token1, "truck") && strcmp(token1, "freight") && strcmp(token1, "gas") && strcmp(token1, "info")) && !IsNumeric(token1))
 	{
 		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /tredit [ID]");
 		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /tredit checkpoint");
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /tredit info");
 		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /tredit truck");
 		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /tredit freight");
 		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /tredit gas");
@@ -1665,6 +1666,94 @@ dcmd_tredit(playerid, const params[])
 		gTruckingEdit[playerid][ID] = facilityId;
 
 		//ShowPropertyEditDialogMain(playerid);
+	}
+	else if (!strcmp(token1, "checkpoint"))
+	{
+		new Float:X, Float:Y, Float:Z;
+		GetPlayerPos(playerid, X, Y, Z);
+
+		gTruckingEdit[playerid][LocationCheckpoint][CoordX] = X;
+		gTruckingEdit[playerid][LocationCheckpoint][CoordY] = Y;
+		gTruckingEdit[playerid][LocationCheckpoint][CoordZ] = Z;
+
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Checkpoint coords recorded!");
+		//ShowPropertyEditDialogMain(playerid);
+	}
+	else if (!strcmp(token1, "truck"))
+	{
+		if (gTruckingVehiclesIndex == MAX_VEHICLES_PER_FACILITY)
+		{
+			SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Vehicle limit reached");
+			return 1;
+		}
+
+		new Float:X, Float:Y, Float:Z, Float:R;
+		GetPlayerPos(playerid, X, Y, Z);
+		GetPlayerFacingAngle(playerid, R);
+
+		gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordX] = X;
+		gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordY] = Y;
+		gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordZ] = Z;
+		gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordR] = R;
+
+		gTruckingVehicles[playerid][gTruckingVehiclesIndex][Type] = Truck;
+
+		gTruckingVehiclesIndex++;
+
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Vehicle coords recorded!");
+		//ShowPropertyEditDialogMain(playerid);
+	}
+	else if (!strcmp(token1, "freight"))
+	{
+		if (gTruckingVehiclesIndex == MAX_VEHICLES_PER_FACILITY)
+		{
+			SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Vehicle limit reached");
+			return 1;
+		}
+
+		new Float:X, Float:Y, Float:Z, Float:R;
+		GetPlayerPos(playerid, X, Y, Z);
+		GetPlayerFacingAngle(playerid, R);
+
+		gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordX] = X;
+		gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordY] = Y;
+		gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordZ] = Z;
+		gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordR] = R;
+
+		gTruckingVehicles[playerid][gTruckingVehiclesIndex][Type] = Freight;
+
+		gTruckingVehiclesIndex++;
+
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Vehicle coords recorded!");
+		//ShowPropertyEditDialogMain(playerid);
+	}
+	else if (!strcmp(token1, "gas"))
+	{
+		if (gTruckingVehiclesIndex == MAX_VEHICLES_PER_FACILITY)
+		{
+			SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Vehicle limit reached");
+			return 1;
+		}
+
+		new Float:X, Float:Y, Float:Z, Float:R;
+		GetPlayerPos(playerid, X, Y, Z);
+		GetPlayerFacingAngle(playerid, R);
+
+		gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordX] = X;
+		gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordY] = Y;
+		gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordZ] = Z;
+		gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordR] = R;
+
+		gTruckingVehicles[playerid][gTruckingVehiclesIndex][Type] = Gas;
+
+		gTruckingVehiclesIndex++;
+
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Vehicle coords recorded!");
+		//ShowPropertyEditDialogMain(playerid);
+	}
+	else if (!strcmp(token1, "save"))
+	{
+		SetTruckingPoint(playerid);
 	}
 
 	return 1;

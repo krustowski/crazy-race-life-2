@@ -164,6 +164,7 @@ public OnGameModeInit()
 	AllowInteriorWeapons(false);
 	EnableStuntBonusForAll(true);  
 	DisableInteriorEnterExits();
+	EnableZoneNames(true);
 
 	//
 	// Start various timers.

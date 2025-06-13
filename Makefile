@@ -3,7 +3,10 @@ run:
 	@docker restart samp-server
 
 build:
-	@sampctl build
+	@sampctl build --verbose --relativePaths
 
 push:
 	@git push origin master --follow-tags
+
+watch:
+	@sampctl build --watch

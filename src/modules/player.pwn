@@ -22,7 +22,7 @@ enum Player
 	PasswordHash[65],
 	PasswordSalt[17],
 
-	TeamID[Team],
+	TeamID,
 	Skin,
 	Cash,
 	Bank,
@@ -141,6 +141,8 @@ public LoadPlayerData(playerid)
 		SetPlayerArmour(playerid, gPlayers[playerid][Armour]);
 		SetPlayerSkin(playerid, gPlayers[playerid][Skin]);
 		SetPlayerColor(playerid, gTeams[ gPlayers[playerid][TeamID] ][Color]);
+		SetPlayerTeam(playerid, gPlayers[playerid][TeamID]);
+		SetPlayerWantedLevel(playerid, gPlayers[playerid][WantedLevel]);
 
 		SendClientMessageLocalized(playerid, I18N_USER_DATA_LOAD_SUCCESS);
 

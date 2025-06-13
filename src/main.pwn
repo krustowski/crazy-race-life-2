@@ -1018,6 +1018,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		gPlayers[playerid][TeamID] = TEAM_NONE;
 
 		SendClientMessage(playerid, COLOR_GREY, "[ TEAM ] You left the team!");
+		SetPlayerTeam(playerid, 0);
 
 		return 1;
 	}
@@ -1029,6 +1030,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 			GivePlayerWeapon(playerid, t_WEAPON: gTeams[i][Weapons][0], gTeams[i][Ammu][0]);
 			SetPlayerColor(playerid, gTeams[i][Color]);
 			SetPlayerSkin(playerid, gTeams[i][Skins][0]);
+			SetPlayerTeam(playerid, gTeams[i][ID]);
 
 			gPlayers[playerid][TeamID] = gTeams[i][ID];
 

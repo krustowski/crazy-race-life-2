@@ -213,7 +213,7 @@ stock UpdateTikiPrize(playerid, tikiid)
 
 	DB_FreeResultSet(result);
 
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TIKI ] You have found a tiki prize!");
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TIKI ] You have found the tiki prize ($10M)! Cg");
 	GivePlayerMoney(playerid, 10000000);
 
 	return 1;

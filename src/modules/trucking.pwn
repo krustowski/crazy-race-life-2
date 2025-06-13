@@ -94,7 +94,9 @@ stock InitTrucking()
 			case CT_CHECKPOINT:
 				{}
 			case CT_INFO_PICKUP:
-				{}
+				{
+					EnsurePickupCreated(1239, 1, X, Y, Z);
+				}
 			case CT_JOB_PICKUP:
 				{}
 			case CT_TRUCK_CAB:

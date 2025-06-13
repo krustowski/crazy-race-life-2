@@ -36,6 +36,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(skydive, 7, cmdtext);        //all
 	dcmd(text, 4, cmdtext);           //all
 	dcmd(tiki, 4, cmdtext); 	  //all
+	dcmd(truck, 5, cmdtext); 	  //all
 	dcmd(unlock, 6, cmdtext);         //all
 	dcmd(wanted, 6, cmdtext);	  //all
 
@@ -902,6 +903,25 @@ dcmd_tiki(playerid, const params[])
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TIKI ] Tiki pickups");
 	SendClientMessage(playerid, COLOR_YELLOW, "-> Located in Los Santos area");
 	SendClientMessage(playerid, COLOR_YELLOW, "-> Prize $10M in cash + a potential Admin level");
+
+	return 1;
+}
+
+dcmd_truck(playerid, const params[])
+{
+#pragma unused params
+	if (!gTrucking[playerid])
+	{
+		gTrucking[playerid] = 1;
+		SetPlayerTruckingMission(playerid);
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TRUCK ] Mission started! Happy trucking");
+	}
+	else
+	{
+		gTrucking[playerid] = 0;
+		DisablePlayerRaceCheckpoint(playerid);
+		SendClientMessage(playerid, COLOR_YELLOW, "[ TRUCK ] Mission aborted");
+	}
 
 	return 1;
 }

@@ -326,13 +326,15 @@ public UpdateRaceInfoText(playerid)
 
 stock CheckRaceCheckpoint(playerid)
 {
+	if (!CheckPlayerRaceState(playerid))
+		return 0;
+
 	if (!gPlayerRaceTimer[playerid])
 	{
 		gPlayerRaceTimer[playerid] = Timer: SetTimerEx("UpdateRaceInfoText", 1 * SECOND_MS, true, "i", playerid);
 		TextDrawShowForPlayer(playerid, gRaceInfoText[playerid]);
 	}
 
-	//SendClientMessage(playerid, COLOR_ZLUTA, "[ i ] Jsi v zavodnim checkpointu!");
 	DisablePlayerRaceCheckpoint(playerid);
 
 	for (new i = 0; i < MAX_RACE_COUNT; i++)

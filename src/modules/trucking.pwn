@@ -50,8 +50,8 @@ enum TruckingkPoint
 	LocationJobPickup[Coords]
 }
 
-#pragma unused gTrucking
-new gTrucking[MAX_TRUCKING_POINTS];
+new gTrucking[MAX_PLAYERS];
+new gTruckingPoints[MAX_TRUCKING_POINTS][TruckingkPoint];
 
 // Those are used for the trucking editor
 new gTruckingEdit[MAX_PLAYERS][TruckingkPoint];
@@ -62,12 +62,47 @@ new gTruckingVehiclesIndex = 0;
 //
 //
 
-// To be implemented
-stock GetRandomDestination();
+stock CheckTruckingCheckpoint(playerid)
+{
+	if (!gTrucking[playerid])
+		return 0;
+
+	DisablePlayerRaceCheckpoint(playerid);
+
+	SetPlayerTruckingMission(playerid);
+
+	return 1;
+}
+
+stock SetPlayerTruckingMission(playerid)
+{
+	new Float: x0, Float: y0, Float: z0, pointId = GetRandomDestination();
+
+	x0 = gTruckingPoints[pointId][LocationCheckpoint][CoordX];
+	y0 = gTruckingPoints[pointId][LocationCheckpoint][CoordY];
+	z0 = gTruckingPoints[pointId][LocationCheckpoint][CoordZ];
+
+	SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, Float:x0, Float:y0, Float:z0, Float:x0, Float:y0, Float:z0, 10.0);
+
+	return 1;
+}
+
+stock GetRandomDestination()
+{
+	new pointIndex = 0;
+
+	for (new i = 0; i < MAX_TRUCKING_POINTS; i++)
+	{
+		if (gTruckingPoints[i][Type])
+			pointIndex++;
+	}
+
+	return random(pointIndex);
+}
 
 stock InitTrucking()
 {
-	new query[512];
+	new i = 0, query[512];
 
 	format(query, sizeof(query), "SELECT type, x, y, z, rot FROM trucking_coords"); 
 
@@ -93,7 +128,13 @@ stock InitTrucking()
 		switch (type)
 		{
 			case CT_CHECKPOINT:
-				{}
+				{
+					gTruckingPoints[i][LocationCheckpoint][CoordX] = X;
+					gTruckingPoints[i][LocationCheckpoint][CoordY] = Y;
+					gTruckingPoints[i][LocationCheckpoint][CoordZ] = Z;
+					gTruckingPoints[i][Type] = type;
+					i++;
+				}
 			case CT_INFO_PICKUP:
 				{
 					EnsurePickupCreated(1239, 1, X, Y, Z);
@@ -118,6 +159,7 @@ stock InitTrucking()
 	while (DB_SelectNextRow(result));
 
 	DB_FreeResultSet(result);
+	print("Trucking initialized!");
 
 	return 1;
 }

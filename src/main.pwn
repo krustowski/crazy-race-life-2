@@ -757,6 +757,7 @@ public OnPlayerLeaveCheckpoint(playerid)
 public OnPlayerEnterRaceCheckpoint(playerid)
 {
 	CheckRaceCheckpoint(playerid);
+	CheckTruckingCheckpoint(playerid);
 
 	return 1;
 }

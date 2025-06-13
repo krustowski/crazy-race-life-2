@@ -914,12 +914,18 @@ dcmd_truck(playerid, const params[])
 	{
 		gTrucking[playerid] = 1;
 		SetPlayerTruckingMission(playerid);
+
+		gPlayerMissions[playerid][Timer] = SetTimerEx("UpdateMissionInfoText", 1000, true, "i", playerid);
+
 		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TRUCK ] Mission started! Happy trucking");
 	}
 	else
 	{
 		gTrucking[playerid] = 0;
 		DisablePlayerRaceCheckpoint(playerid);
+		TextDrawHideForPlayer(playerid, gMissionInfoText[playerid]);
+		KillTimer(_: gPlayerMissions[playerid][Timer]);
+
 		SendClientMessage(playerid, COLOR_YELLOW, "[ TRUCK ] Mission aborted");
 	}
 

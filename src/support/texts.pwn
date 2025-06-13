@@ -29,10 +29,15 @@ public InitTexts()
 public AddTexts(playerid)
 {
 	gRaceInfoText[playerid] = TextDrawCreate(460.0, 400.0, "");
+	gMissionInfoText[playerid] = TextDrawCreate(460.0, 400.0, "");
 
 	TextDrawLetterSize(gRaceInfoText[playerid], 0.5, 1.5);
 	TextDrawFont(gRaceInfoText[playerid], t_TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gRaceInfoText[playerid], 1);
+
+	TextDrawLetterSize(gMissionInfoText[playerid], 0.5, 1.5);
+	TextDrawFont(gMissionInfoText[playerid], t_TEXT_DRAW_FONT: 3);
+	TextDrawSetOutline(gMissionInfoText[playerid], 1);
 
 	// Show the game clock.
 	TextDrawShowForPlayer(playerid, gClockText);

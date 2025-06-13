@@ -50,6 +50,17 @@ enum TruckingkPoint
 	LocationJobPickup[Coords]
 }
 
+enum MissionStats
+{
+	DoneCount,
+	TimeElapsed,
+	Earned,
+	Timer
+}
+
+new gPlayerMissions[MAX_PLAYERS][MissionStats];
+new Text: gMissionInfoText[MAX_PLAYERS];
+
 new gTrucking[MAX_PLAYERS];
 new gTruckingPoints[MAX_TRUCKING_POINTS][TruckingkPoint];
 
@@ -62,12 +73,46 @@ new gTruckingVehiclesIndex = 0;
 //
 //
 
+forward UpdateMissionInfoText(playerid);
+
+public UpdateMissionInfoText(playerid)
+{
+	new stringToPrint[256];
+
+	gPlayerMissions[playerid][TimeElapsed] += 1000;
+
+	switch (gPlayers[playerid][Locale]) 
+	{
+		case LOCALE_CZ:
+			//
+			{}
+
+		default:
+			format(stringToPrint, sizeof(stringToPrint), "~w~Done:___________~g~%3d~n~~w~Earned:__~g~$~y~%7d~n~~w~Time:______~b~%4d~y~:~b~%2d", gPlayerMissions[playerid][DoneCount], gPlayerMissions[playerid][Earned], floatround(floatround(gPlayerMissions[playerid][TimeElapsed] / 1000) / 60), floatround(gPlayerMissions[playerid][TimeElapsed] / 1000) % 60);
+	}
+
+	TextDrawSetString(gMissionInfoText[playerid], stringToPrint);
+	TextDrawShowForPlayer(playerid, gMissionInfoText[playerid]);
+
+	return 1;
+}
+
 stock CheckTruckingCheckpoint(playerid)
 {
 	if (!gTrucking[playerid])
 		return 0;
 
 	DisablePlayerRaceCheckpoint(playerid);
+
+	new provision = 5000 + random(100) + 100 * random(450) - 100, stringToPrint[128];
+
+	GivePlayerMoney(playerid, provision);
+	gPlayerMissions[playerid][Earned] += provision;
+	gPlayerMissions[playerid][TimeElapsed] = 0;
+	gPlayerMissions[playerid][DoneCount] += 1;
+
+	format(stringToPrint, sizeof(stringToPrint), "[ TRUCK ] Mission completed! Provision earned: $%d", provision);
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 
 	SetPlayerTruckingMission(playerid);
 

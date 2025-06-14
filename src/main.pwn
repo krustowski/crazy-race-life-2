@@ -248,6 +248,24 @@ public OnPlayerConnect(playerid)
 	gPaintball[playerid][E_PAINTBALL_INGAME] = 0;
 	gPaintball[playerid][E_PAINTBALL_SCORE] = 0;
 
+	// Reset trucking
+	gTrucking[playerid] = false;
+	gPlayerMissions[playerid][TimeElapsed] = 0;
+	gPlayerMissions[playerid][Earned] = 0;
+	gPlayerMissions[playerid][DoneCount] = 0;
+	TextDrawHideForPlayer(playerid, gMissionInfoText[playerid]);
+
+	// Reset racing
+	gPlayerRaceTimer[playerid] = Timer: 0;
+	gPlayerRaceTime[playerid] = 0;
+	KillTimer(_: gPlayerRaceTimer[playerid]);
+	TextDrawHideForPlayer(playerid, gRaceInfoText[playerid]);
+
+	for (new i = 0; i < MAX_RACE_COUNT; i++)
+	{
+		gPlayerRace[playerid][i] = 0;
+	}
+
 	// Draw mapicons for the user.
 	AddMapicons(playerid);
 
@@ -496,9 +514,10 @@ public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 public OnPlayerExitVehicle(playerid, vehicleid)
 {
 	// Hide velocity meters.
-	//TextDrawHideForPlayer(playerid, KPH[playerid]);
-	//TextDrawHideForPlayer(playerid, KPHR[playerid]);
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
+
+	if (gTrucking[playerid])
+		return SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] You cannot complete the mission on foot, go back into the truck");
 
 	return 1;
 }

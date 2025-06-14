@@ -910,6 +910,34 @@ dcmd_tiki(playerid, const params[])
 dcmd_truck(playerid, const params[])
 {
 #pragma unused params
+	if (!IsPlayerInAnyVehicle(playerid) && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] You have to be in a truck as driver");
+	}
+
+	new vehicleId = GetPlayerVehicleID(playerid), truckModels[3] = {403, 514, 515}, trailerModels[4] = {435, 450, 584, 591},
+	    bool:isTruck = false;
+
+	for (new i = 0; i < sizeof(truckModels); i++)
+	{
+		if (GetVehicleModel(vehicleId) == truckModels[i])
+		{
+			isTruck = true;
+			break;
+		}
+	}
+
+	if (!isTruck)
+		return SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] You are not driving a truck");
+
+	if (!IsTrailerAttachedToVehicle(vehicleId))
+		return SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] No trailer attached!");
+
+	new trailerId = GetVehicleTrailer(vehicleId);
+
+	if (GetVehicleModel(trailerId) != 584)
+		return SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] Petrol trailer is not attached!");
+
 	if (!gTrucking[playerid])
 	{
 		gTrucking[playerid] = 1;

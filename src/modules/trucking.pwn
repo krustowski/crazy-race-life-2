@@ -104,7 +104,7 @@ stock CheckTruckingCheckpoint(playerid)
 
 	DisablePlayerRaceCheckpoint(playerid);
 
-	new provision = 5000 + random(100) + 100 * random(450) - 100, stringToPrint[128];
+	new provision = 1500 + random(100) + 100 * random(45) - 100, stringToPrint[128];
 
 	GivePlayerMoney(playerid, provision);
 	gPlayerMissions[playerid][Earned] += provision;

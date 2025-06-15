@@ -301,7 +301,8 @@ public OnPlayerDisconnect(playerid, reason)
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
 	KillTimer(_: gPlayerRaceTimer[playerid]);
-	KillTimer(_: gPlayerMissions[playerid][Timer]);
+	KillTimer(_: gPlayerMissions[playerid][TimerElapsed]);
+	KillTimer(_: gPlayerMissions[playerid][TimerAttachedCheck]);
 
 	// Save player's data and set such player to unauthorized.
 	if (reason == 1)
@@ -515,6 +516,11 @@ public OnPlayerCommandText(playerid, cmdtext[])
 
 public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 {
+	if (gTrucking[playerid] && vehicleid == gPlayerMissions[playerid][VehicleID])
+	{
+		SetVehicleParamsForPlayer(vehicleid, playerid, false, false);
+	}
+
 	return 1;
 }
 
@@ -524,7 +530,11 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
 	if (gTrucking[playerid])
-		return SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] You cannot complete the mission on foot, go back into the truck");
+	{
+		SetVehicleParamsForPlayer(vehicleid, playerid, true, false);
+		SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] You cannot complete the mission on foot, go back into the truck");
+		return 1;
+	}
 
 	return 1;
 }
@@ -1109,6 +1119,31 @@ public OnEnterExitModShop(playerid, enterexit, interiorid)
 	{
 		UpdatePropertyVehicle(playerid);
 	}
+
+	return 1;
+}
+
+// TODO: This does not work properly in game: deattached trailer is not recognized or this playback is not called at all..
+public OnTrailerUpdate(playerid, vehicleid)
+{
+	if (!gTrucking[playerid])
+	{
+		return 1;
+	}
+
+	/*if (vehicleid != gPlayerMissions[playerid][TrailerID])
+	{
+		return 1;
+	}*/
+
+	/*if (IsTrailerAttachedToVehicle(gPlayerMissions[playerid][VehicleID]))
+	{
+		SetVehicleParamsForPlayer(vehicleid, playerid, false, false);
+		return 1;
+	}
+
+	SetVehicleParamsForPlayer(vehicleid, playerid, true, false);
+	SendClientMessage(playerid, COLOR_ORANGE, "[ TRUCK ] The trailer has just detached from the cab, reatach it to continue the mission");*/
 
 	return 1;
 }

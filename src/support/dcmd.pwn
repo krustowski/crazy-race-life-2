@@ -910,6 +910,23 @@ dcmd_tiki(playerid, const params[])
 dcmd_truck(playerid, const params[])
 {
 #pragma unused params
+	if (gTrucking[playerid])
+	{
+		gTrucking[playerid] = false;
+		DisablePlayerRaceCheckpoint(playerid);
+		TextDrawHideForPlayer(playerid, gMissionInfoText[playerid]);
+
+		KillTimer(_: gPlayerMissions[playerid][TimerElapsed]);
+		KillTimer(_: gPlayerMissions[playerid][TimerAttachedCheck]);
+
+		SetVehicleParamsForPlayer(gPlayerMissions[playerid][VehicleID], playerid, false, false);
+		SetVehicleParamsForPlayer(gPlayerMissions[playerid][TrailerID], playerid, false, false);
+
+		SendClientMessage(playerid, COLOR_YELLOW, "[ TRUCK ] Mission aborted");
+
+		return 1;
+	}
+
 	if (!IsPlayerInAnyVehicle(playerid) && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 	{
 		return SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] You have to be in a truck as driver");
@@ -961,22 +978,17 @@ dcmd_truck(playerid, const params[])
 
 		gTrucking[playerid] = true;
 
+		gPlayerMissions[playerid][VehicleID] = GetPlayerVehicleID(playerid);
+		gPlayerMissions[playerid][TrailerID] = trailerId;
 		gPlayerMissions[playerid][Type] = truckingMissionType;
 		gPlayerMissions[playerid][DoneCount] = 0;
 		gPlayerMissions[playerid][Earned] = 0;
 		gPlayerMissions[playerid][TimeElapsed] = 0;
-		gPlayerMissions[playerid][Timer] = SetTimerEx("UpdateMissionInfoText", 1000, true, "i", playerid);
+		gPlayerMissions[playerid][TimerElapsed] = SetTimerEx("UpdateMissionInfoText", 1000, true, "i", playerid);
+		gPlayerMissions[playerid][TimerAttachedCheck] = SetTimerEx("CheckPlayerTrailerAttached", 1500, true, "i", playerid);
+
 
 		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TRUCK ] Mission started! Happy trucking");
-	}
-	else
-	{
-		gTrucking[playerid] = false;
-		DisablePlayerRaceCheckpoint(playerid);
-		TextDrawHideForPlayer(playerid, gMissionInfoText[playerid]);
-		KillTimer(_: gPlayerMissions[playerid][Timer]);
-
-		SendClientMessage(playerid, COLOR_YELLOW, "[ TRUCK ] Mission aborted");
 	}
 
 	return 1;

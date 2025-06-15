@@ -59,11 +59,14 @@ enum TruckingkPoint
 
 enum MissionStats
 {
-MissionType: Type,
-	     DoneCount,
-	     TimeElapsed,
-	     Earned,
-	     Timer
+	VehicleID,
+	TrailerID,
+	MissionType: Type,
+	DoneCount,
+	TimeElapsed,
+	Earned,
+	TimerElapsed,
+	TimerAttachedCheck
 }
 
 new gPlayerMissions[MAX_PLAYERS][MissionStats];
@@ -82,6 +85,7 @@ new gTruckingVehiclesIndex = 0;
 //
 
 forward UpdateMissionInfoText(playerid);
+forward CheckPlayerTrailerAttached(playerid);
 
 public UpdateMissionInfoText(playerid)
 {
@@ -132,6 +136,28 @@ stock CheckTruckingCheckpoint(playerid)
 	return 1;
 }
 
+public CheckPlayerTrailerAttached(playerid)
+{
+	new 
+		trailerid = gPlayerMissions[playerid][TrailerID],
+		vehicleid = gPlayerMissions[playerid][VehicleID];
+
+	if (IsTrailerAttachedToVehicle(vehicleid))
+	{
+		SetVehicleParamsForPlayer(trailerid, playerid, false, false);
+		return 1;
+	}
+
+	SetVehicleParamsForPlayer(trailerid, playerid, true, false);
+	SendClientMessage(playerid, COLOR_ORANGE, "[ TRUCK ] The trailer has just detached from the cab, reatach it to continue the mission");
+
+	return 1;
+}
+
+//
+//
+//
+
 stock SetPlayerTruckingMission(playerid, MissionType: missionType)
 {
 	new Float: x0, Float: y0, Float: z0, pointId = -1, iter;
@@ -142,7 +168,7 @@ stock SetPlayerTruckingMission(playerid, MissionType: missionType)
 		pointId = GetRandomDestination();
 
 		// Prevent generating the same checkpoint twice for current position
-		if (IsPlayerInSphere(playerid, gTruckingPoints[pointId][LocationCheckpoint][CoordX], gTruckingPoints[pointId][LocationCheckpoint][CoordY], gTruckingPoints[pointId][LocationCheckpoint][CoordZ], 30.0))
+		if (IsPlayerInSphere(playerid, gTruckingPoints[pointId][LocationCheckpoint][CoordX], gTruckingPoints[pointId][LocationCheckpoint][CoordY], gTruckingPoints[pointId][LocationCheckpoint][CoordZ], 50.0))
 		{
 			pointId = -1;
 			continue;

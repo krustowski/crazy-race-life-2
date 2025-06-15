@@ -112,6 +112,7 @@ stock CheckTruckingCheckpoint(playerid)
 
 	DisablePlayerRaceCheckpoint(playerid);
 
+	// TODO: Improve the calculation with distance and done missions count 
 	new provision = 1500 + random(100) + 100 * random(45) - 100, stringToPrint[128];
 
 	GivePlayerMoney(playerid, provision);
@@ -139,6 +140,13 @@ stock SetPlayerTruckingMission(playerid, MissionType: missionType)
 	while (pointId < 0)
 	{
 		pointId = GetRandomDestination();
+
+		// Prevent generating the same checkpoint twice for current position
+		if (IsPlayerInSphere(playerid, gTruckingPoints[pointId][LocationCheckpoint][CoordX], gTruckingPoints[pointId][LocationCheckpoint][CoordY], gTruckingPoints[pointId][LocationCheckpoint][CoordZ], 30.0))
+		{
+			continue;
+		}
+
 		if (MissionType: gTruckingPoints[pointId][Type] == missionType)
 		{
 			break;

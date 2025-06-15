@@ -144,6 +144,7 @@ stock SetPlayerTruckingMission(playerid, MissionType: missionType)
 		// Prevent generating the same checkpoint twice for current position
 		if (IsPlayerInSphere(playerid, gTruckingPoints[pointId][LocationCheckpoint][CoordX], gTruckingPoints[pointId][LocationCheckpoint][CoordY], gTruckingPoints[pointId][LocationCheckpoint][CoordZ], 30.0))
 		{
+			pointId = -1;
 			continue;
 		}
 

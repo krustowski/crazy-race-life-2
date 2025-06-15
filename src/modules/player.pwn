@@ -140,9 +140,13 @@ public LoadPlayerData(playerid)
 		SetPlayerHealth(playerid, gPlayers[playerid][Health]);
 		SetPlayerArmour(playerid, gPlayers[playerid][Armour]);
 		SetPlayerSkin(playerid, gPlayers[playerid][Skin]);
-		SetPlayerColor(playerid, gTeams[ gPlayers[playerid][TeamID] ][Color]);
 		SetPlayerTeam(playerid, gPlayers[playerid][TeamID]);
 		SetPlayerWantedLevel(playerid, gPlayers[playerid][WantedLevel]);
+
+		if (gPlayers[playerid][TeamID])
+			SetPlayerColor(playerid, gTeams[ gPlayers[playerid][TeamID] ][Color]);
+		else
+			SetPlayerColor(playerid, COLOR_WHITE);
 
 		SendClientMessageLocalized(playerid, I18N_USER_DATA_LOAD_SUCCESS);
 

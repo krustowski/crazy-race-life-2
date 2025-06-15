@@ -48,6 +48,7 @@
 #include "db/sql.pwn"
 #include "support/i18n.pwn" 
 #include "support/net.pwn" 
+#include "support/http.pwn" 
 
 new const GAMEMODE_NAME[] = "CrazyRaceLife2";
 new const GAMEMODE_CREDITS[] = "krusty, kompry, DRaGsTeR, amdulka";
@@ -258,7 +259,6 @@ public OnPlayerConnect(playerid)
 	// Reset racing
 	gPlayerRaceTimer[playerid] = Timer: 0;
 	gPlayerRaceTime[playerid] = 0;
-	KillTimer(_: gPlayerRaceTimer[playerid]);
 	TextDrawHideForPlayer(playerid, gRaceInfoText[playerid]);
 
 	for (new i = 0; i < MAX_RACE_COUNT; i++)
@@ -279,12 +279,14 @@ public OnPlayerConnect(playerid)
 	gPlayers[playerid][Name] = playerName;
 	SendClientMessageToAll(COLOR_GREY, stringToPrint);
 
+	SendMessageToWebhook(playerid, "connected");
+
 	// Send a welcome text to the connecting new player.
 	SendClientMessage(playerid, COLOR_INVISIBLE, "");
 	SendClientMessageLocalized(playerid, I18N_WELCOME_MESSAGE);
 	SendClientMessage(playerid, COLOR_INVISIBLE, "");
 
-	SendDeathMessage(playerid, INVALID_PLAYER_ID, 200);
+	//SendDeathMessage(playerid, INVALID_PLAYER_ID, 200);
 
 	// Ask the user to login/register.
 	ShowAuthDialog(playerid);
@@ -298,6 +300,9 @@ public OnPlayerDisconnect(playerid, reason)
 	//TextDrawHideForPlayer(playerid, KPH[playerid]);
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
+	KillTimer(_: gPlayerRaceTimer[playerid]);
+	KillTimer(_: gPlayerMissions[playerid][Timer]);
+
 	// Save player's data and set such player to unauthorized.
 	if (reason == 1)
 		SavePlayerData(playerid);
@@ -305,6 +310,8 @@ public OnPlayerDisconnect(playerid, reason)
 	gPlayers[playerid][IsLogged] = false;
 
 	SendDeathMessage(playerid, INVALID_PLAYER_ID, 201);
+
+	SendMessageToWebhook(playerid, "disconnected");
 
 	new stringToPrint[128];
 

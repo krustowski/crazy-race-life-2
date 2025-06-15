@@ -60,7 +60,7 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 			gPlayers[playerid][Name], 
 			hashedPwd, 
 			salt, 
-			5000, 
+			10000, 
 			0, 
 			0, 
 			0, 

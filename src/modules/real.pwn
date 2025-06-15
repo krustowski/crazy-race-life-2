@@ -664,7 +664,7 @@ stock BuyPlayerProperty(playerid, propertyID)
 	GivePlayerMoney(playerid, -gProperties[arrayID][Cost]);
 
 	// Play property bought theme sound
-	PlayerPlaySound(playerid, 182, 0.0, 0.0, 0.0);
+	PlayerPlaySound(playerid, 183, 0.0, 0.0, 0.0);
 
 	return SendClientMessageLocalized(playerid, I18N_REAL_PROPERTY_ACQ);
 }

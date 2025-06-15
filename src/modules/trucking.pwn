@@ -25,6 +25,13 @@ enum
 	FT_GAS_STATION
 }
 
+// Mission types
+enum MissionType
+{
+	MT_FREIGHT,
+	MT_PETROL
+}
+
 enum VehicleType
 {
 	Truck,
@@ -52,10 +59,11 @@ enum TruckingkPoint
 
 enum MissionStats
 {
-	DoneCount,
-	TimeElapsed,
-	Earned,
-	Timer
+MissionType: Type,
+	     DoneCount,
+	     TimeElapsed,
+	     Earned,
+	     Timer
 }
 
 new gPlayerMissions[MAX_PLAYERS][MissionStats];
@@ -114,14 +122,35 @@ stock CheckTruckingCheckpoint(playerid)
 	format(stringToPrint, sizeof(stringToPrint), "[ TRUCK ] Mission completed! Provision earned: $%d", provision);
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 
-	SetPlayerTruckingMission(playerid);
+	if (!SetPlayerTruckingMission(playerid, gPlayerMissions[playerid][Type]))
+	{
+		SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] Error setting new mission");
+		return 0;
+	}
 
 	return 1;
 }
 
-stock SetPlayerTruckingMission(playerid)
+stock SetPlayerTruckingMission(playerid, MissionType: missionType)
 {
-	new Float: x0, Float: y0, Float: z0, pointId = GetRandomDestination();
+	new Float: x0, Float: y0, Float: z0, pointId = -1, iter;
+	const MAX_ITERATIONS = 50;
+
+	while (pointId < 0)
+	{
+		pointId = GetRandomDestination();
+		if (MissionType: gTruckingPoints[pointId][Type] == missionType)
+		{
+			break;
+		}
+
+		if (++iter == MAX_ITERATIONS)
+		{
+			return 0;
+		}
+
+		pointId = -1;
+	}
 
 	x0 = gTruckingPoints[pointId][LocationCheckpoint][CoordX];
 	y0 = gTruckingPoints[pointId][LocationCheckpoint][CoordY];

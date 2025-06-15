@@ -915,8 +915,7 @@ dcmd_truck(playerid, const params[])
 		return SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] You have to be in a truck as driver");
 	}
 
-	new vehicleId = GetPlayerVehicleID(playerid), truckModels[3] = {403, 514, 515}, trailerModels[4] = {435, 450, 584, 591},
-	    bool:isTruck = false;
+	new vehicleId = GetPlayerVehicleID(playerid), truckModels[3] = {403, 514, 515}, bool:isTruck = false;
 
 	for (new i = 0; i < sizeof(truckModels); i++)
 	{
@@ -933,23 +932,46 @@ dcmd_truck(playerid, const params[])
 	if (!IsTrailerAttachedToVehicle(vehicleId))
 		return SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] No trailer attached!");
 
-	new trailerId = GetVehicleTrailer(vehicleId);
+	new trailerId = GetVehicleTrailer(vehicleId), MissionType: truckingMissionType;
 
-	if (GetVehicleModel(trailerId) != 584)
-		return SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] Petrol trailer is not attached!");
+	switch (GetVehicleModel(trailerId))
+	{
+		case 584:
+			{
+				truckingMissionType = MT_PETROL;
+			}
+		case 435, 450, 591:
+			{
+				truckingMissionType = MT_FREIGHT;
+			}
+		default: 
+			{
+				SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] Unknown trailer model");
+				return 1;
+			}
+	}
 
 	if (!gTrucking[playerid])
 	{
-		gTrucking[playerid] = 1;
-		SetPlayerTruckingMission(playerid);
+		if (!SetPlayerTruckingMission(playerid, truckingMissionType))
+		{
+			SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] Error setting new mission");
+			return 1;
+		}
 
+		gTrucking[playerid] = true;
+
+		gPlayerMissions[playerid][Type] = truckingMissionType;
+		gPlayerMissions[playerid][DoneCount] = 0;
+		gPlayerMissions[playerid][Earned] = 0;
+		gPlayerMissions[playerid][TimeElapsed] = 0;
 		gPlayerMissions[playerid][Timer] = SetTimerEx("UpdateMissionInfoText", 1000, true, "i", playerid);
 
 		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TRUCK ] Mission started! Happy trucking");
 	}
 	else
 	{
-		gTrucking[playerid] = 0;
+		gTrucking[playerid] = false;
 		DisablePlayerRaceCheckpoint(playerid);
 		TextDrawHideForPlayer(playerid, gMissionInfoText[playerid]);
 		KillTimer(_: gPlayerMissions[playerid][Timer]);

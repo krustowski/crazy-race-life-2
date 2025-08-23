@@ -345,7 +345,11 @@ public OnPlayerDisconnect(playerid, reason)
 public OnPlayerSpawn(playerid)
 {
 	SetPlayerSkin(playerid, gPlayers[playerid][Skin]);
-	SetPlayerColor(playerid, gTeams[ gPlayers[playerid][TeamID] ][Color]);
+
+	if (gPlayers[playerid][TeamID])
+	{
+		SetPlayerColor(playerid, gTeams[ gPlayers[playerid][TeamID] ][Color]);
+	}
 
 	if (gPlayers[playerid][InsideProperty])
 	{

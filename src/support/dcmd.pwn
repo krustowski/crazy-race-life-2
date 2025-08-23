@@ -988,7 +988,7 @@ dcmd_truck(playerid, const params[])
 		gPlayerMissions[playerid][TimerAttachedCheck] = SetTimerEx("CheckPlayerTrailerAttached", 1500, true, "i", playerid);
 
 
-		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TRUCK ] Mission started! Happy trucking");
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TRUCK ] Vehicle and trailer registered successfully");
 	}
 
 	return 1;

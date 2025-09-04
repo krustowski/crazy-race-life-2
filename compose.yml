@@ -18,10 +18,10 @@ services:
     networks:
       - samp-net
     environment:
-      MARIADB_ROOT_PASSWORD: fd445dpKY0SNEd533dVFsAQqL3
-      MARIADB_USER: samp_gg_vxn_dev
-      MARIADB_DATABASE: samp_gg_vxn_dev
-      MARIADB_PASSWORD: sd4f4a65f4sa65f4as8f7as9f7as9df7
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
 
   server:
     restart: always

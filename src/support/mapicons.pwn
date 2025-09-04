@@ -1,3 +1,5 @@
+#include "modules/race.pwn"
+
 enum
 {
 	E_MAPICON_ID_SQUARE_DYNAMIC,
@@ -79,6 +81,15 @@ public AddMapicons(playerid)
 		SetPlayerMapIcon(playerid, i+1, Float:gBankLocation[i][0], Float:gBankLocation[i][1], Float:gBankLocation[i][2], E_MAPICON_ID_ROBBERY, 0, MAPICON_LOCAL);
 	}
 
+	// Race start points.
+	for (new i = 1; i < MAX_RACE_COUNT; i++)
+	{
+		if (!strcmp(gRaces[i][Name], ""))
+			continue;
+
+		SetPlayerMapIcon(playerid, 50 + i - 1, gRaces[i][Start][E_RACE_COORD_X], gRaces[i][Start][E_RACE_COORD_Y], gRaces[i][Start][E_RACE_COORD_Z], E_MAPICON_ID_RACE_TOURNAMENT, 0, MAPICON_LOCAL);
+	}
+
 	// Housing.
 	SetPlayerMapIcon(playerid, 20, 1442.6, -637.3, 95.1, E_MAPICON_ID_PROP_NOT_FOR_SALE, 0, MAPICON_LOCAL);
 	SetPlayerMapIcon(playerid, 21, 541.0, 2364.8, 31.2, E_MAPICON_ID_PROP_NOT_FOR_SALE, 0, MAPICON_LOCAL);
@@ -99,10 +110,6 @@ public AddMapicons(playerid)
 	SetPlayerMapIcon(playerid, 41, 2287.1, 2426.7, 10.8, E_MAPICON_ID_POLICE, 0, MAPICON_LOCAL);
 	SetPlayerMapIcon(playerid, 42, -91.76, -305.44, 1.42, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
 	SetPlayerMapIcon(playerid, 43, -81.32, -1135.79, 0.91, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
-
-	// Oznaceni zavodist + stanovist tymu Dragsteru.
-	SetPlayerMapIcon(playerid, 50, 2620.14, 1195.76, 10.81, E_MAPICON_ID_RACE_TOURNAMENT, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, 51, 1882.48, -2419.96, 13.11, E_MAPICON_ID_RACE_TOURNAMENT, 0, MAPICON_LOCAL);
 
 	// Airports.
 	SetPlayerMapIcon(playerid, 60, 414.3, 2528.1, 16.6, E_MAPICON_ID_AIRYARD, 0, MAPICON_LOCAL);

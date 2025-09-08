@@ -4,6 +4,11 @@ forward InitVehicles();
 
 public InitVehicles()
 {
+	// El Quebrados desert cart race
+	AddStaticVehicle(568, -1498.64, 1972.45, 48.42, 273.59, -1, -1);
+	AddStaticVehicle(568, -1498.40, 1975.67, 48.42, 271.60, -1, -1);
+	AddStaticVehicle(568, -1498.07, 1980.42, 48.37, 271.60, -1, -1);
+
 	// MTA by kompry
 	AddStaticVehicle(522, 199.328, -1790.488, 3.655, 0.0, -1, -1); // spawnpoint (1)
 	AddStaticVehicle(522, 1888.236, -2399.764, 13.199, 182.0, -1, -1); // spawnpoint (2)

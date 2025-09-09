@@ -9,7 +9,7 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
     + At least one ATM per city/town/village
 + Racing
     + Custom races all across the map
-    + Ground vs. Air-flown races 
+    + Air and ground
     + Stunts
 + Real Estate
     + Custom spawn point

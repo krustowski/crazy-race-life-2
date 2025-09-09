@@ -49,6 +49,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(ccmd, 4, cmdtext);           //rcon + lvl 1
 	dcmd(clear, 5, cmdtext);          //rcon +
 	dcmd(countdown, 9, cmdtext);      //rcon + 
+	dcmd(crime, 5, cmdtext);	  //rcon
 	dcmd(drunk, 5, cmdtext);          //rcon +
 	dcmd(elevator, 8, cmdtext);	  //rcon + lvl 4
 	dcmd(fakechat, 8, cmdtext);       //rcon + lvl 2
@@ -61,6 +62,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(nitro, 5, cmdtext);          //rcon + lvl 3
 	dcmd(packet, 6, cmdtext);         //rcon +
 	dcmd(predit, 6, cmdtext);         //rcon +
+	dcmd(redit, 5, cmdtext);          //rcon +
 	dcmd(reset, 5, cmdtext);	  //rcon + lvl 4
 	dcmd(restart, 7, cmdtext);	  //rcon + lvl 4
 	dcmd(skin, 4, cmdtext); 	  //rcon + lvl 3
@@ -1227,6 +1229,23 @@ dcmd_clear(playerid, const params[])
 	return 1;
 }
 
+dcmd_crime(playerid, const params[])
+{
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3) 
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+
+	new crimeId = strval(params);
+
+	if (crimeId < 3 || crimeId > 22)
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Invalid input");
+	}
+
+	PlayCrimeReportForPlayer(playerid, 0, crimeId);
+
+	return 1;
+}
+
 dcmd_drunk(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3) 
@@ -1629,6 +1648,39 @@ dcmd_predit(playerid, const params[])
 
 		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Vehicle coords recorded!");
 		ShowPropertyEditDialogMain(playerid);
+	}
+
+	return 1;
+}
+
+dcmd_redit(playerid, const params[])
+{
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4)
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+
+	new token1[32], token2[32];
+	SplitIntoTwo(params, token1, token2, sizeof(token1));
+
+	if (!strlen(params) || (strcmp(token1, "save") && strcmp(token1, "checkpoint") && strcmp(token1, "truck") && strcmp(token1, "freight") && strcmp(token1, "gas") && strcmp(token1, "info") && !IsNumeric(token1)))
+	{
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /redit [ID]");
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /redit checkpoint");
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /redit info");
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /redit truck");
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /redit freight");
+		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /redit gas");
+
+		return 1;
+	}
+
+	new facilityId = strval(token1);
+
+	if (IsNumeric(params))
+	{
+		gPlayers[playerid][EditingMode] = true;
+		gTruckingEdit[playerid][ID] = facilityId;
+
+		SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] New trucking point editing initialized");
 	}
 
 	return 1;

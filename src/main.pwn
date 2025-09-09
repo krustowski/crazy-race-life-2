@@ -512,6 +512,17 @@ public OnPlayerText(playerid, text[])
 	return 1;
 }
 
+public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
+{
+	if (gPlayers[playerid][AdminLevel] < 3)
+	{
+		return 1;
+	}
+
+	SetPlayerPosFindZ(playerid, fX, fY, fZ);
+	return 1;
+}
+
 public OnPlayerCommandText(playerid, cmdtext[])
 {
 	// See dcmd.pwn
@@ -843,7 +854,20 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	}
 
 	//
-	//  Real Estate Pickups.
+	//  Trucking pickups.
+	//
+
+	for (new i = 0; i < MAX_TRUCKING_POINTS; i++)
+	{
+		if (pickupid == gTruckingPoints[i][InfoPickup])
+		{
+			format(stringToPrint, sizeof(stringToPrint), "Info Point\n\n%s\n", gTruckingPoints[i][Name]);
+			return ShowPlayerDialog(playerid, DIALOG_TRUCKING_INFO, DIALOG_STYLE_MSGBOX, "Trucking Point", stringToPrint, "Close", "");
+		}
+	}
+
+	//
+	//  Real Estate pickups.
 	//
 
 	for (new i = 0; i < sizeof(gProperties); i++)
@@ -933,6 +957,13 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	//
 	//  Other pickups --- entries,  baggies etc.
 	//
+
+	if (pickupid == gDruggeryEntrance)
+	{
+		new Float: dX, Float: dY, Float: dZ;
+		GetObjectPos(gDruggery, dX, dY, dZ);
+		SetPlayerPos(playerid, dX, dY, dZ);
+	}
 
 	for (new i = 0; i < MAX_TIKI_PRIZES; i++)
 	{
@@ -1136,18 +1167,18 @@ public OnTrailerUpdate(playerid, vehicleid)
 	}
 
 	/*if (vehicleid != gPlayerMissions[playerid][TrailerID])
-	{
-		return 1;
-	}*/
+	  {
+	  return 1;
+	  }*/
 
 	/*if (IsTrailerAttachedToVehicle(gPlayerMissions[playerid][VehicleID]))
-	{
-		SetVehicleParamsForPlayer(vehicleid, playerid, false, false);
-		return 1;
-	}
+	  {
+	  SetVehicleParamsForPlayer(vehicleid, playerid, false, false);
+	  return 1;
+	  }
 
-	SetVehicleParamsForPlayer(vehicleid, playerid, true, false);
-	SendClientMessage(playerid, COLOR_ORANGE, "[ TRUCK ] The trailer has just detached from the cab, reatach it to continue the mission");*/
+	  SetVehicleParamsForPlayer(vehicleid, playerid, true, false);
+	  SendClientMessage(playerid, COLOR_ORANGE, "[ TRUCK ] The trailer has just detached from the cab, reatach it to continue the mission");*/
 
 	return 1;
 }

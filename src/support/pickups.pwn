@@ -20,9 +20,6 @@ new gHackerzMoneyBag;
 new gAdminDoorDown;
 new gAdminDoorUp;
 
-// ????
-//new picktunel;
-
 // Drugz
 new gHeroinPackage[5];
 new gCocainePackage[5];
@@ -31,8 +28,9 @@ new gFentPackage[2];
 new gPCPPackage;
 new gTHCPackage[10];
 
-#pragma unused gDruggeryEntrance
+new gDruggery;
 new gDruggeryEntrance;
+new gDruggeryExit;
 
 new gPlayerMoneyPickup[MAX_PLAYERS];
 new gPlayerMoneyPickupAmount[MAX_PLAYERS];
@@ -112,7 +110,7 @@ public InitPickups()
 	gTHCPackage[2] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, -80.83, -1212.65, 2.70);
 	// Blueberry
 	gTHCPackage[3] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, 203.83, 36.10, 2.57);
-	// ... Creeks 
+	// Palomino Creeks 
 	gTHCPackage[4] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, 2317.25, -68.27, 26.48);
 	gTHCPackage[5] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, 2243.21, -86.33, 26.49);
 	gTHCPackage[6] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, 1355.74, 489.17, 20.21);
@@ -120,14 +118,22 @@ public InitPickups()
 	gTHCPackage[8] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, -2186.08, -2321.65, 30.62);
 	gTHCPackage[9] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, -253.64, -2187.54, 28.91);
 
-	// Dillimore vs Montgomery (varna)
-	//CreatePlayerObject(playerid, 18056, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0,0); // varna
 	switch (random(2))
 	{
 		case 0:
-			gDruggeryEntrance = EnsurePickupCreated(1318, 1, 645.68, -510.51, 16.33);
+			{
+				// Dillimore
+				gDruggeryEntrance = EnsurePickupCreated(1318, 1, 645.68, -510.51, 16.33);
+				gDruggery = CreateObject(18056, 645.68, -510.51, 1500.00, 0.0, 0.0, 0.0, 0.0);
+				gDruggeryExit = EnsurePickupCreated(1318, 1, 658.45, -507.50, 1500.00);
+			}
 		case 1:
-			gDruggeryEntrance = EnsurePickupCreated(1318, 1, 1280.85, 304.07, 19.55);
+			{
+				// Montgomery
+				gDruggeryEntrance = EnsurePickupCreated(1318, 1, 1280.85, 304.07, 19.55);
+				gDruggery = CreateObject(18056, 1280.85, 304.07, 1500.00, 0.0, 0.0, 0.0, 0.0);
+				gDruggeryExit = EnsurePickupCreated(1318, 1, 1293.66, 301.10, 1500.00);
+			}
 	}
 
 	//
@@ -139,7 +145,7 @@ public InitPickups()
 		{0.0, 0.0, 0.0},
 		{2252.11, 1285.30, 19.17},
 		{2304.43, 1151.95, 85.94},
-		{229.4, 167.4, 1003.0},
+		{2290.73, 2429.61, 10.82},
 		{2637.36, 1127.04, 11.18},
 		{2620.14, 1195.76, 10.81},
 		{2892.8, -2127.9, 3.2},
@@ -147,7 +153,7 @@ public InitPickups()
 		{2838.10, -2130.26, 0.19},
 		{2582.10, -956.28, 81.02}
 	};
- 
+
 	for (new i = 0; i < MAX_TEAMS; i++)
 	{
 		gTeams[i][Pickups][0] = PICKUP: EnsurePickupCreated(1581, 1, Float:teamPickups[i][0], Float:teamPickups[i][1], Float:teamPickups[i][2]);
@@ -202,7 +208,7 @@ stock InitTikiPrizes()
 stock UpdateTikiPrize(playerid, tikiid)
 {
 	new query[128];
-	
+
 	format(query, sizeof(query), "UPDATE tiki_prizes SET hidden = 1 WHERE id = %d", gTikiPrizes[tikiid][ID]);
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);

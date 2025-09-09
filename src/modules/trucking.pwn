@@ -54,7 +54,8 @@ enum TruckingkPoint
 	Type,
 	LocationCheckpoint[Coords],
 	LocationInfoPickup[Coords],
-	LocationJobPickup[Coords]
+	LocationJobPickup[Coords],
+	InfoPickup
 }
 
 enum MissionStats
@@ -246,7 +247,7 @@ stock InitTrucking()
 				}
 			case CT_INFO_PICKUP:
 				{
-					EnsurePickupCreated(1239, 1, X, Y, Z);
+					gTruckingPoints[i][InfoPickup] = EnsurePickupCreated(1239, 1, X, Y, Z);
 				}
 			case CT_JOB_PICKUP:
 				{}
@@ -268,6 +269,34 @@ stock InitTrucking()
 	while (DB_SelectNextRow(result));
 
 	DB_FreeResultSet(result);
+
+	format(query, sizeof(query), "SELECT id, name, type FROM trucking_points"); 
+
+	result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) 
+	{
+		printf("Database error: cannot read trucking points data");
+		print(query);
+
+		return 0;
+	}
+
+	do 
+	{
+		new id = DB_GetFieldIntByName(result, "id");
+		new name[64];
+
+		if (!id)
+		{
+			continue;
+		}
+
+		DB_GetFieldString(result, 1, name, sizeof(name));
+
+		gTruckingPoints[id][Name] = name;
+	}
+	while (DB_SelectNextRow(result));
+
 	print("Trucking initialized!");
 
 	return 1;

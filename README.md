@@ -1,16 +1,28 @@
 # CrazyRaceLife2 (CRL2)
 
-A GTA SA:MP gamemode scripted in the pawn lang.
+A GTA SA:MP/openMP gamemode scripted in the pawn lang.
 
 
 ## Features
 
 + ATM for banking services
     + At least one ATM per city/town/village
++ Racing
+    + Custom races all across the map
+    + Ground vs. Air-flown races 
+    + Stunts
 + Real Estate
     + Custom spawn point
-    + Custom vehicle attached
+    + Custom vehicle attached (including the modifitaions)
     + Custom safehouse
+    + Up to 5 properties per player
++ Teams
+    + Custom salary per team 
+    + Special commands available
+    + Custom weapons
++ Trucking
+    + 15+ trucking points (petrol stations etc)
+    + Custom missions
 
 
 ## How to build
@@ -21,11 +33,14 @@ Fetch the `sampctl` tool for the `pawn` package management.
 dnf install sampctl
 ```
 
-Clone this repo and try to build it using the `build` command (warnings are omitted to see the possible errors clearly):
+Clone this repo and try to build it using the `build` command:
 
 ```
 sampctl ensure
 sampctl build
+
+# or Simply
+make build
 ```
 
 The compiled `.amx` gamemode file should then pop up in the `gamemodes` directory.

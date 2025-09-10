@@ -190,6 +190,7 @@ public OnGameModeInit()
 
 	InitRealEstateProperties();
 	InitRaces();
+	InitHighScores();
 	InitTrucking();
 
 	InitPickups();

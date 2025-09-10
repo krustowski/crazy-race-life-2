@@ -8,8 +8,6 @@
 		"openmultiplayer/omp-stdlib",
 		"pawn-lang/samp-stdlib@open.mp",
 		"pawn-lang/pawn-stdlib@open.mp",
-		"BigETI/Dini",
-		"pawn-lang/YSI-Includes",
 		"pBlueG/SA-MP-MySQL"
 	],
 	"local": true

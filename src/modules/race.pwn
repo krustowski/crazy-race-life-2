@@ -1,13 +1,13 @@
 #define MAX_RACE_NAME		64
-#define MAX_RACE_CP		128
+#define MAX_RACE_CP		99
 #define MAX_RACE_COORD		3
 #define MAX_RACE_COUNT		64
 
 enum E_RACE_COORD
 {
-	Float: E_RACE_COORD_X,
-	Float: E_RACE_COORD_Y,
-	Float: E_RACE_COORD_Z
+Float: E_RACE_COORD_X,
+       Float: E_RACE_COORD_Y,
+       Float: E_RACE_COORD_Z
 }
 
 enum Race 
@@ -185,7 +185,7 @@ stock SetPlayerRaceState(playerid, raceId)
 
 	if (CheckPlayerRaceState(playerid))
 		return SendClientMessageLocalized(playerid, I18N_RACE_ALREADY_JOINED);
-		//return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Jiz jsi prihlasen v jinem zavode! Pred prihlasenim je treba predchozi zavod dokoncit!");
+	//return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Jiz jsi prihlasen v jinem zavode! Pred prihlasenim je treba predchozi zavod dokoncit!");
 
 	if (raceId == 0)
 		return SendClientMessageLocalized(playerid, I18N_RACE_NO_SUCH_RACE);
@@ -223,9 +223,7 @@ stock ResetPlayerRaceState(playerid, raceId, finishedSuccessfully)
 	DisablePlayerRaceCheckpoint(playerid);
 	TextDrawHideForPlayer(playerid, gRaceInfoText[playerid]);
 	KillTimer(_: gPlayerRaceTimer[playerid]);
-
 	gPlayerRaceTimer[playerid] = Timer: 0;
-	gPlayerRaceTime[playerid] = 0;
 
 	if (finishedSuccessfully)
 	{
@@ -238,7 +236,11 @@ stock ResetPlayerRaceState(playerid, raceId, finishedSuccessfully)
 
 		format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s just won the '%s' race, and received a price of $%d!", playerName, gRaces[raceId][Name], gRaces[raceId][PrizeDollars]);
 		SendClientMessageToAll(COLOR_LIGHTGREEN, stringToPrint);
+
+		SaveNewScore(raceId, playerid, gPlayerRaceTime[playerid], GetVehicleModel(GetPlayerVehicleID(playerid)));
 	}
+
+	gPlayerRaceTime[playerid] = 0;
 
 	if (!finishedSuccessfully && CheckPlayerRaceState(playerid))
 	{
@@ -276,8 +278,8 @@ stock SetPlayerRaceStartPos(playerid)
 
 	if (!raceId)
 	{
-		 SendClientMessageLocalized(playerid, I18N_RACE_WARP_NO_RACE);
-		 return 0;
+		SendClientMessageLocalized(playerid, I18N_RACE_WARP_NO_RACE);
+		return 0;
 	}
 
 	if (gPlayerRace[playerid][raceId] > 1)
@@ -346,6 +348,100 @@ stock CheckRaceCheckpoint(playerid)
 			break;
 		}
 	}
+
+	return 1;
+}
+
+enum HighScore
+{
+	Nickname[64],
+	Time,
+	VehicleModel
+};
+
+new gHighScores[MAX_RACE_COUNT][4][HighScore];
+
+stock InitHighScores()
+{
+	new query[512];
+
+	format(query, sizeof(query), "SELECT id, race_id, nickname, time, car_model FROM high_scores");
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) {
+		print("Database error: cannot fetch high scores data!");
+		return 0;
+	}
+
+	do
+	{
+		new raceId = DB_GetFieldIntByName(result, "race_id");
+
+		new name[64];
+		DB_GetFieldStringByName(result, "nickname", name, sizeof(name));
+		gHighScores[raceId][3][Nickname] = name;
+
+		gHighScores[raceId][3][Time] = DB_GetFieldIntByName(result, "time");
+		gHighScores[raceId][3][VehicleModel] = DB_GetFieldIntByName(result, "car_model");
+
+		SortScores(gHighScores, raceId);
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+	print("High scores initialized!");
+
+	return 1;
+}
+
+stock SortScores(fullScores[MAX_RACE_COUNT][4][HighScore], raceId)
+{
+	new scores[4][HighScore];
+	scores = fullScores[raceId];
+
+	new sorted = 0;
+	while (sorted != 3) 
+	{
+		sorted = 0;
+
+		for (new i = 0; i < 3; i++)
+		{
+			if (scores[i][Time] > scores[i + 1][Time])
+			{
+				new metaval[HighScore];
+			       	metaval	= scores[i];
+				scores[i] = scores[i + 1];
+				scores[i + 1] = metaval;
+
+				continue;
+			}
+
+			sorted++;
+		}
+	}
+
+	fullScores[raceId] = scores;
+
+	return 1;
+}
+
+stock SaveNewScore(raceId, playerid, time, vehicleModel)
+{
+	new nickname[MAX_PLAYER_NAME];
+	GetPlayerName(playerid, nickname);
+
+	new query[256];
+	format(query, sizeof(query), "INSERT INTO high_scores (race_id, nickname, time, car_model) VALUES (%d, '%s', %d, %d)", raceId, nickname, time, vehicleModel);
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) {
+		SendClientMessage(playerid, COLOR_RED, "[ RACE ] Database error!");
+		printf("Database error: cannot write high score data (race_id: %d, nickname: %s)!", raceId, nickname);
+
+		return 0;
+	}
+
+	DB_FreeResultSet(result);
 
 	return 1;
 }

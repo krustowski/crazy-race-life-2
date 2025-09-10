@@ -264,6 +264,9 @@ public SendPlayerSalary()
 		if (!IsPlayerConnected(i)) 
 			continue;
 
+		if (gPlayers[i][TeamID] == 0)
+			continue;
+
 		teamSalary = gTeams[ gPlayers[i][TeamID] ][SalaryBase] + random(gTeams[ gPlayers[i][TeamID] ][SalaryVolatile]);
 
 		switch (gPlayers[i][Locale]) 

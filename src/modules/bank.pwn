@@ -36,6 +36,9 @@ new Float: gBankLocation[][4] =
 	// Angel Pine
 	{-2164.11, -2419.21, 30.62, 15.0},
 
+	// Las Barrancas
+	{-827.84, 1503.30, 19.68, 15.0},
+
 	// Palomino Creek
 	{2302.73, -20.05, 26.25, 15.0}
 };

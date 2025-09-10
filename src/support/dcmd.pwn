@@ -32,6 +32,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(property, 8, cmdtext);	  //all
 	dcmd(race, 4, cmdtext);		  //all
 	dcmd(rules, 5, cmdtext); 	  //all
+	dcmd(scores, 6, cmdtext);	  //all
 	dcmd(search, 6, cmdtext); 	  //all
 	dcmd(skydive, 7, cmdtext);        //all
 	dcmd(text, 4, cmdtext);           //all
@@ -790,6 +791,24 @@ dcmd_rules(playerid, const params[])
 	SendClientMessage(playerid, COLOR_ORANGERED, "=> No CARKILL, HELIKILL, or BIKEKILL");
 	SendClientMessage(playerid, COLOR_ORANGERED, "=> No MINIGUN, or JETPACK usage, No cheating");
 	SendClientMessage(playerid, COLOR_ORANGERED, "=> Anti-Cheat filterscript enabled (cheating => kick, or ban)");
+
+	return 1;
+}
+
+dcmd_scores(playerid, const params[])
+{
+#pragma unused params
+	for (new i = 0; i < MAX_RACE_COUNT; i++)
+	{
+		if (!strcmp(gRaces[i][Name], ""))
+		{
+			continue;
+		}
+
+		SortScores(gHighScores, i);
+	}
+
+	ShowHighScoresDialog(playerid);
 
 	return 1;
 }

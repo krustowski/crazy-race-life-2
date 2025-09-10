@@ -354,15 +354,23 @@ stock CheckRaceCheckpoint(playerid)
 
 enum HighScore
 {
-	Nickname[64],
-	Time,
-	VehicleModel
+	Nickname0[64],
+	Nickname1[64],
+	Nickname2[64],
+	Nickname3[64],
+	Time[4],
+	VehicleModel[4]
 };
 
-new gHighScores[MAX_RACE_COUNT][4][HighScore];
+new gHighScores[MAX_RACE_COUNT][HighScore];
 
 stock InitHighScores()
 {
+	/*for (new i = 0; i < MAX_RACE_COUNT; i++)
+	{
+		gHighScores[i][0][Time] = 0;
+	}*/
+
 	new query[512];
 
 	format(query, sizeof(query), "SELECT id, race_id, nickname, time, car_model FROM high_scores");
@@ -379,10 +387,10 @@ stock InitHighScores()
 
 		new name[64];
 		DB_GetFieldStringByName(result, "nickname", name, sizeof(name));
-		gHighScores[raceId][3][Nickname] = name;
+		gHighScores[raceId][Nickname0] = name;
 
-		gHighScores[raceId][3][Time] = DB_GetFieldIntByName(result, "time");
-		gHighScores[raceId][3][VehicleModel] = DB_GetFieldIntByName(result, "car_model");
+		gHighScores[raceId][Time][3] = DB_GetFieldIntByName(result, "time");
+		gHighScores[raceId][VehicleModel][3] = DB_GetFieldIntByName(result, "car_model");
 
 		SortScores(gHighScores, raceId);
 	}
@@ -394,9 +402,9 @@ stock InitHighScores()
 	return 1;
 }
 
-stock SortScores(fullScores[MAX_RACE_COUNT][4][HighScore], raceId)
+stock SortScores(fullScores[MAX_RACE_COUNT][HighScore], raceId)
 {
-	new scores[4][HighScore];
+	new scores[HighScore];
 	scores = fullScores[raceId];
 
 	new sorted = 0;
@@ -406,12 +414,13 @@ stock SortScores(fullScores[MAX_RACE_COUNT][4][HighScore], raceId)
 
 		for (new i = 0; i < 3; i++)
 		{
-			if (scores[i][Time] > scores[i + 1][Time])
+			if ((scores[Time][i] == 0 && scores[Time][i + 1] != 0) || (scores[Time][i] > scores[Time][i + 1] && scores[Time][i + 1] != 0))
 			{
-				new metaval[HighScore];
-			       	metaval	= scores[i];
-				scores[i] = scores[i + 1];
-				scores[i + 1] = metaval;
+				new metaTime;
+				metaTime = scores[Time][i];
+
+				scores[Time][i] = scores[Time][i + 1];
+				scores[Time][i + 1] = metaTime;
 
 				continue;
 			}
@@ -442,6 +451,8 @@ stock SaveNewScore(raceId, playerid, time, vehicleModel)
 	}
 
 	DB_FreeResultSet(result);
+
+	InitHighScores();
 
 	return 1;
 }

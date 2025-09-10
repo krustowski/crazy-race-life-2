@@ -16,7 +16,8 @@ enum
 	DIALOG_PROPERTY_EDIT_MAIN,
 	DIALOG_PROPERTY_EDIT_NAME,
 	DIALOG_PROPERTY_EDIT_COST,
-	DIALOG_TRUCKING_INFO
+	DIALOG_TRUCKING_INFO,
+	DIALOG_HIGH_SCORES_MAIN
 };
 
 stock ShowPlayerDrugzDialog(playerid)
@@ -67,4 +68,32 @@ stock ShowPropertyEditDialogCost(playerid)
 	format(title, sizeof(title), "Edit property ID: %d", propertyid);
 
 	ShowPlayerDialog(playerid, DIALOG_PROPERTY_EDIT_COST, DIALOG_STYLE_INPUT, title, "Enter a new property cost in dollars:", "Enter", "Cancel");
+}
+
+stock ShowHighScoresDialog(playerid)
+{
+	new stringToPrint[512];
+	format(stringToPrint, sizeof(stringToPrint), "");
+	
+	for (new i = 0; i < MAX_RACE_COUNT; i++)
+	{
+		if (gHighScores[i][Time][0] == 0)
+		{
+			continue;
+		}
+
+		//format(stringToPrint, sizeof(stringToPrint), "%sRace No. %d\n\n1st\t%s\t%d\n2nd\t%s\t%d\n3rd\t%s\t%d\n\n", 
+		format(stringToPrint, sizeof(stringToPrint), "%sRace No. %d\n\n1st\t%d sec\n\n", 
+				stringToPrint, 
+				i, 
+				//gHighScores[i][Nickname][0], 
+				gHighScores[i][Time][0] / 1000
+				//gHighScores[i][1][Nickname], 
+				//gHighScores[i][1][Time],
+				//gHighScores[i][2][Nickname], 
+				//gHighScores[i][2][Time]
+		      );
+	}
+
+	ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_MAIN, DIALOG_STYLE_MSGBOX, "High Scores", stringToPrint, "Close", "");
 }

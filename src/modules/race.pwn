@@ -352,28 +352,22 @@ stock CheckRaceCheckpoint(playerid)
 	return 1;
 }
 
-enum HighScore
+enum HighScores
 {
-	Nickname0[64],
 	Nickname1[64],
 	Nickname2[64],
 	Nickname3[64],
-	Time[4],
-	VehicleModel[4]
+	Time[3],
+	VehicleModel[3]
 };
 
-new gHighScores[MAX_RACE_COUNT][HighScore];
+new gHighScores[MAX_RACE_COUNT][HighScores];
 
 stock InitHighScores()
 {
-	/*for (new i = 0; i < MAX_RACE_COUNT; i++)
-	{
-		gHighScores[i][0][Time] = 0;
-	}*/
-
 	new query[512];
 
-	format(query, sizeof(query), "SELECT id, race_id, nickname, time, car_model FROM high_scores");
+	format(query, sizeof(query), "select race_id, nickname, time, car_model from ( select race_id, nickname, time, car_model, row_number() over ( PARTITION by race_id ORDER by time ASC ) as rank from high_scores ) ranked where rank <= 3 order by race_id, rank;");
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
@@ -381,55 +375,37 @@ stock InitHighScores()
 		return 0;
 	}
 
+	new raceIds[MAX_RACE_COUNT];
+
 	do
 	{
 		new raceId = DB_GetFieldIntByName(result, "race_id");
 
+		new i = raceIds[raceId];
+
 		new name[64];
 		DB_GetFieldStringByName(result, "nickname", name, sizeof(name));
-		gHighScores[raceId][Nickname0] = name;
 
-		gHighScores[raceId][Time][3] = DB_GetFieldIntByName(result, "time");
-		gHighScores[raceId][VehicleModel][3] = DB_GetFieldIntByName(result, "car_model");
+		switch (i)
+		{
+			case 0:
+				gHighScores[raceId][Nickname1] = name;
+			case 1:
+				gHighScores[raceId][Nickname2] = name;
+			case 2:
+				gHighScores[raceId][Nickname3] = name;
+		}
 
-		SortScores(gHighScores, raceId);
+		gHighScores[raceId][Time][i] = DB_GetFieldIntByName(result, "time");
+		gHighScores[raceId][VehicleModel][i] = DB_GetFieldIntByName(result, "car_model");
+
+		raceIds[raceId]++;
 	}
 	while (DB_SelectNextRow(result));
 
 	DB_FreeResultSet(result);
+
 	print("High scores initialized!");
-
-	return 1;
-}
-
-stock SortScores(fullScores[MAX_RACE_COUNT][HighScore], raceId)
-{
-	new scores[HighScore];
-	scores = fullScores[raceId];
-
-	new sorted = 0;
-	while (sorted != 3) 
-	{
-		sorted = 0;
-
-		for (new i = 0; i < 3; i++)
-		{
-			if ((scores[Time][i] == 0 && scores[Time][i + 1] != 0) || (scores[Time][i] > scores[Time][i + 1] && scores[Time][i + 1] != 0))
-			{
-				new metaTime;
-				metaTime = scores[Time][i];
-
-				scores[Time][i] = scores[Time][i + 1];
-				scores[Time][i + 1] = metaTime;
-
-				continue;
-			}
-
-			sorted++;
-		}
-	}
-
-	fullScores[raceId] = scores;
 
 	return 1;
 }

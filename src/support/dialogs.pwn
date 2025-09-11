@@ -77,22 +77,38 @@ stock ShowHighScoresDialog(playerid)
 	
 	for (new i = 0; i < MAX_RACE_COUNT; i++)
 	{
-		if (gHighScores[i][Time][0] == 0)
+		if (gHighScores[i][Time][0] == 0 || !strcmp(gRaces[i][Name], ""))
 		{
 			continue;
 		}
 
-		//format(stringToPrint, sizeof(stringToPrint), "%sRace No. %d\n\n1st\t%s\t%d\n2nd\t%s\t%d\n3rd\t%s\t%d\n\n", 
-		format(stringToPrint, sizeof(stringToPrint), "%sRace No. %d\n\n1st\t%d sec\n\n", 
+		format(stringToPrint, sizeof(stringToPrint), "%s\nRace No. %d\n\n1st\t%s\t%d sec\t(model %d)\n", 
 				stringToPrint, 
 				i, 
-				//gHighScores[i][Nickname][0], 
-				gHighScores[i][Time][0] / 1000
-				//gHighScores[i][1][Nickname], 
-				//gHighScores[i][1][Time],
-				//gHighScores[i][2][Nickname], 
-				//gHighScores[i][2][Time]
+				gHighScores[i][Nickname1], 
+				gHighScores[i][Time][0] / 1000,
+				gHighScores[i][VehicleModel][0]
 		      );
+
+		if (gHighScores[i][Time][1] != 0)
+		{
+			format(stringToPrint, sizeof(stringToPrint), "%s2nd\t%s\t%d sec\t(model %d)\n", 
+					stringToPrint,
+					gHighScores[i][Nickname2], 
+					gHighScores[i][Time][1] / 1000,
+					gHighScores[i][VehicleModel][1]
+			      );
+		}
+
+		if (gHighScores[i][Time][2] != 0)
+		{
+			format(stringToPrint, sizeof(stringToPrint), "%s3rd\t%s\t%d sec\t(model %d)\n", 
+					stringToPrint,
+					gHighScores[i][Nickname3], 
+					gHighScores[i][Time][2] / 1000,
+					gHighScores[i][VehicleModel][2]
+			      );
+		}
 	}
 
 	ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_MAIN, DIALOG_STYLE_MSGBOX, "High Scores", stringToPrint, "Close", "");

@@ -798,7 +798,7 @@ dcmd_rules(playerid, const params[])
 dcmd_scores(playerid, const params[])
 {
 #pragma unused params
-	for (new i = 0; i < MAX_RACE_COUNT; i++)
+	/*for (new i = 0; i < MAX_RACE_COUNT; i++)
 	{
 		if (!strcmp(gRaces[i][Name], ""))
 		{
@@ -806,7 +806,7 @@ dcmd_scores(playerid, const params[])
 		}
 
 		SortScores(gHighScores, i);
-	}
+	}*/
 
 	ShowHighScoresDialog(playerid);
 

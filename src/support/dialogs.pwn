@@ -82,30 +82,33 @@ stock ShowHighScoresDialog(playerid)
 			continue;
 		}
 
-		format(stringToPrint, sizeof(stringToPrint), "%s\nRace No. %d\n\n1st\t%s\t%d sec\t(model %d)\n", 
+		format(stringToPrint, sizeof(stringToPrint), "%s\nRace No. %d\n\n1st\t%d:%2d min\t%s\t(model %d)\n", 
 				stringToPrint, 
 				i, 
+				(gHighScores[i][Time][0] / 1000) / 60,
+				(gHighScores[i][Time][0] / 1000) % 60,
 				gHighScores[i][Nickname1], 
-				gHighScores[i][Time][0] / 1000,
 				gHighScores[i][VehicleModel][0]
 		      );
 
 		if (gHighScores[i][Time][1] != 0)
 		{
-			format(stringToPrint, sizeof(stringToPrint), "%s2nd\t%s\t%d sec\t(model %d)\n", 
+			format(stringToPrint, sizeof(stringToPrint), "%s2nd\t%d:%2d min\t%s\t(model %d)\n", 
 					stringToPrint,
+					(gHighScores[i][Time][1] / 1000) / 60,
+					(gHighScores[i][Time][1] / 1000) % 60,
 					gHighScores[i][Nickname2], 
-					gHighScores[i][Time][1] / 1000,
 					gHighScores[i][VehicleModel][1]
 			      );
 		}
 
 		if (gHighScores[i][Time][2] != 0)
 		{
-			format(stringToPrint, sizeof(stringToPrint), "%s3rd\t%s\t%d sec\t(model %d)\n", 
+			format(stringToPrint, sizeof(stringToPrint), "%s3rd\t%d:%2d min\t%s\t(model %d)\n", 
 					stringToPrint,
+					(gHighScores[i][Time][2] / 1000) / 60,
+					(gHighScores[i][Time][2] / 1000) % 60,
 					gHighScores[i][Nickname3], 
-					gHighScores[i][Time][2] / 1000,
 					gHighScores[i][VehicleModel][2]
 			      );
 		}

@@ -83,7 +83,7 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 //  Deathmatch minigame.
 //
 
-#include "modules/paintball.pwn"
+#include "modules/deathmatch.pwn"
 
 //
 //  Player data management + team management.

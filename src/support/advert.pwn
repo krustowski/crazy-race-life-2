@@ -10,10 +10,10 @@ public ShowAdvert()
 		"[ TIP ] You can use /port [location ID] to warp throughout the map. No vehicles though",
 		"[ TIP ] No money? Use a motorcycle to do stunts!",
 		"[ TIP ] In Los Santos, little green Tiki pickups have been placed. Type /tiki for more",
-		"[ INFO ] Server hosted by the vxn.dev organization",
+		"[ INFO ] Server hosted and supported by the vxn.dev organization",
 		"[ TIP ] Play the /deathmatch with your friends!",
-		"[ TIP ] Cash doesn't last forever. Go deposit your money to bank ($)!",
-		"[ GAME ] Beware the policemen, they can stop and search anybody!",
+		"[ TIP ] Cash doesn't last forever. Go deposit your money to /bank ($)!",
+		"[ GAME ] Beware the policemen, they can stop and /search anybody!",
 		"[ GAME ] Any substance or stuff can be saved at your propriety. Go buy one!",
 		// Racing. 
 		"[ TIP ] Bored? Try any of the loaded races from the /race list",

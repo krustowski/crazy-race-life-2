@@ -82,21 +82,41 @@ stock ShowHighScoresDialog(playerid)
 			continue;
 		}
 
-		format(stringToPrint, sizeof(stringToPrint), "%s\nRace No. %d\n\n1st\t%d:%2d min\t%s\t(model %d)\n", 
+		new highScoreTimeSec[8];
+
+		if ((gHighScores[i][Time][0] / 1000) % 60 < 10)
+		{
+			format(highScoreTimeSec, sizeof(highScoreTimeSec), "%d%d", 0, (gHighScores[i][Time][0] / 1000) % 60);
+		}
+		else
+		{
+			format(highScoreTimeSec, sizeof(highScoreTimeSec), "%2d", (gHighScores[i][Time][0] / 1000) % 60);
+		}
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\nRace No. %d\n\n1st\t%d:%s min\t%s\t(model %d)\n", 
 				stringToPrint, 
 				i, 
 				(gHighScores[i][Time][0] / 1000) / 60,
-				(gHighScores[i][Time][0] / 1000) % 60,
+				highScoreTimeSec,
 				gHighScores[i][Nickname1], 
 				gHighScores[i][VehicleModel][0]
 		      );
 
 		if (gHighScores[i][Time][1] != 0)
 		{
-			format(stringToPrint, sizeof(stringToPrint), "%s2nd\t%d:%2d min\t%s\t(model %d)\n", 
+			if ((gHighScores[i][Time][1] / 1000) % 60 < 10)
+			{
+				format(highScoreTimeSec, sizeof(highScoreTimeSec), "%d%d", 0, (gHighScores[i][Time][1] / 1000) % 60);
+			}
+			else
+			{
+				format(highScoreTimeSec, sizeof(highScoreTimeSec), "%d", (gHighScores[i][Time][1] / 1000) % 60);
+			}
+
+			format(stringToPrint, sizeof(stringToPrint), "%s2nd\t%d:%s min\t%s\t(model %d)\n", 
 					stringToPrint,
 					(gHighScores[i][Time][1] / 1000) / 60,
-					(gHighScores[i][Time][1] / 1000) % 60,
+					highScoreTimeSec,
 					gHighScores[i][Nickname2], 
 					gHighScores[i][VehicleModel][1]
 			      );
@@ -104,10 +124,19 @@ stock ShowHighScoresDialog(playerid)
 
 		if (gHighScores[i][Time][2] != 0)
 		{
-			format(stringToPrint, sizeof(stringToPrint), "%s3rd\t%d:%2d min\t%s\t(model %d)\n", 
+			if ((gHighScores[i][Time][2] / 1000) % 60 < 10)
+			{
+				format(highScoreTimeSec, sizeof(highScoreTimeSec), "%d%d", 0, (gHighScores[i][Time][2] / 1000) % 60);
+			}
+			else
+			{
+				format(highScoreTimeSec, sizeof(highScoreTimeSec), "%d", (gHighScores[i][Time][2] / 1000) % 60);
+			}
+
+			format(stringToPrint, sizeof(stringToPrint), "%s3rd\t%d:%s min\t%s\t(model %d)\n", 
 					stringToPrint,
 					(gHighScores[i][Time][2] / 1000) / 60,
-					(gHighScores[i][Time][2] / 1000) % 60,
+					highScoreTimeSec,
 					gHighScores[i][Nickname3], 
 					gHighScores[i][VehicleModel][2]
 			      );

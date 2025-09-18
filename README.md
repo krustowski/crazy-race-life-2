@@ -66,6 +66,42 @@ The examples above are shown respectively to the config file names mentioned.
 
 ## Vademecum
 
+### Command List
+
+```
+    /acc        --- game account info dump
+	/admins     --- lists admins online
+	/afk        --- (un)sets the Away-From-Keyboard state
+	/bank       --- lists banking subcommands
+	/cmd        --- lists available commands for player
+	/dance      --- enables special animations (dancing)
+	/deal       --- lists subcommands for dealerz 
+	/deathmatch --- lists subcommands for the deathmatch module
+	/drugz      --- lists substances in pockets
+	/dwarp      --- teleports the player in vehicle to racing the common location
+	/fix        --- repairs the player's vehicle
+	/givecash   --- sends cash to other player
+	/help       --- lists helper information
+	/hide       --- (un)hides the player on map
+	/kill       --- to commit suicide
+	/lay        --- enables special animations (laying)
+	/locate     --- dumps the actual player's coordinates 
+	/lock       --- locks the player's vehicle
+	/pm         --- sends the private message to other player
+	/port       --- enables to warp to special locations on map
+	/property   --- lists subcommands for property handling
+	/race       --- lists subcommands for racing module
+	/rules      --- dumps the server rules information
+	/scores     --- shows the High Scores table
+	/search     --- special command for Policemen
+	/skydive    --- enables to skydive from random locations
+	/text       --- sends a public message to other player
+	/tiki       --- dumps the information about Tiki prizes
+	/truck      --- enables/disables the Trucking missions
+	/unlock     --- unlocks the player's vehicle
+	/wanted     --- shows the wanted list of online players
+```
+
 ### Real Estate
 
 Each property ID has to be unique server-wide. It is recommended to use 5-digit format like `40605`, where:

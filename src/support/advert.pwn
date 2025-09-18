@@ -19,6 +19,7 @@ public ShowAdvert()
 		"[ TIP ] Bored? Try any of the loaded races from the /race list",
 		"[ TIP ] Stuck in the race? Try /race exit",
 		"[ TIP ] Joined the race, but the start is too far? Use /race warp",
+		"[ TIP ] List High Scores using /scores",
 		"[ GAME ] You cannot use the /fix command to repair your vehicle during a race",
 		// Drugz.
 		"[ GAME ] In San Fierro there have been some random substances placed. But beware the policemen, they can stop and search anybody!",

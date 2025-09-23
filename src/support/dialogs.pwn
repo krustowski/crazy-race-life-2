@@ -72,7 +72,7 @@ stock ShowPropertyEditDialogCost(playerid)
 
 stock ShowHighScoresDialog(playerid)
 {
-	new stringToPrint[512];
+	new stringToPrint[1024];
 	format(stringToPrint, sizeof(stringToPrint), "");
 	
 	for (new i = 0; i < MAX_RACE_COUNT; i++)

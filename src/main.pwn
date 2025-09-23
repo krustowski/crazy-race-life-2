@@ -159,13 +159,14 @@ public OnGameModeInit()
 
 	SetGameModeText(GAMEMODE_NAME);
 
+	AllowAdminTeleport(true);
+	AllowInteriorWeapons(false);
+	DisableInteriorEnterExits();
+	EnableStuntBonusForAll(true);  
+	EnableZoneNames(true);
 	ShowNameTags(true);
 	ShowPlayerMarkers(t_PLAYER_MARKERS_MODE: true); 
 	UsePlayerPedAnims();
-	AllowInteriorWeapons(false);
-	EnableStuntBonusForAll(true);  
-	DisableInteriorEnterExits();
-	EnableZoneNames(true);
 
 	//
 	// Start various timers.

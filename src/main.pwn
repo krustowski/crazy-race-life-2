@@ -288,9 +288,8 @@ public OnPlayerConnect(playerid)
 	SendClientMessageLocalized(playerid, I18N_WELCOME_MESSAGE);
 	SendClientMessage(playerid, COLOR_INVISIBLE, "");
 
-	//SendDeathMessage(playerid, INVALID_PLAYER_ID, 200);
-
 	// Ask the user to login/register.
+	gPlayers[playerid][LoginAttempts] = 0;
 	ShowAuthDialog(playerid);
 
 	return 0;

@@ -102,6 +102,42 @@ The examples above are shown respectively to the config file names mentioned.
 	/wanted     --- shows the wanted list of online players
 ```
 
+### Admin Command List
+
+```
+	/acmd       --- (lvl 1) lists admin commands per level
+	/admincol   --- (lvl 1) changes the player color according 
+	/clear      --- (lvl 1) flushes the chat
+	/flip       --- (lvl 1) flips the player's car
+	/hp         --- (lvl 1) sets the 100 HP + armour to player
+	/nitro      --- (lvl 1) sets the nitrous level to player
+
+	/cam        --- (lvl 2) lists subcommands for camera view
+	/countdown  --- (lvl 2) sets the seconds to start the countdown
+	/get        --- (lvl 2) warps the player to admin   
+	/goto       --- (lvl 2) warps the admin to player
+	/skin       --- (lvl 2) sets the skin for player
+
+	/crime      --- (lvl 3) plays the crime sound (Police T-Code), experimental
+	/drunk      --- (lvl 3) sets the drunk level to a player
+	/elevator   --- (lvl 3) operates the Admin elevator
+	/kick       --- (lvl 3) kicks the player from server
+	/packet     --- (lvl 3) prints the packet loss per player
+	/reset      --- (lvl 3) resets cash for a player
+	/spectate   --- (lvl 3) sets the spectate mode on a player
+	/vehicle    --- (lvl 3) spawns a vehicle by ID
+	/weapon     --- (lvl 3) sets a vehicle to a player
+	/weapons    --- (lvl 3) sets the weapons pack to player
+
+	/ban        --- (lvl 4) bans the player (via IP)
+	/fakechat   --- (lvl 4) sends the fake chat as a player
+	/lvl        --- (lvl 4) sets the Admin level to player
+	/predit     --- (lvl 4) starts the property editor
+	/redit      --- (lvl 4) starts the race editor
+	/restart    --- (lvl 4) sets the countdown for 60 seconds to restart the server
+	/tredit     --- (lvl 4) starts the Trucking editor
+```
+
 ### Real Estate
 
 Each property ID has to be unique server-wide. It is recommended to use 5-digit format like `40605`, where:

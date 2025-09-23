@@ -470,9 +470,9 @@ dcmd_help(playerid, const params[])
 {
 #pragma unused params
 	SendClientMessage(playerid, COLOR_YELLOWGREEN, "[ HELP ]");
-	SendClientMessage(playerid, COLOR_YELLOW, "-> Command list:        /cmd");
-	SendClientMessage(playerid, COLOR_YELLOW, "-> Admin command list:  /acmd");
-	SendClientMessage(playerid, COLOR_YELLOW, "-> Server rules:        /rules");
+	SendClientMessage(playerid, COLOR_YELLOW, "=> Command list:        /cmd");
+	SendClientMessage(playerid, COLOR_YELLOW, "=> Admin command list:  /acmd");
+	SendClientMessage(playerid, COLOR_YELLOW, "=> Server rules:        /rules");
 
 	return 1;
 }
@@ -1071,11 +1071,7 @@ dcmd_acmd(playerid, const params[])
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
-	SendClientMessage(playerid, COLOR_YELLOWGREEN, "[ CMD ] Admin Command Set");
-	SendClientMessage(playerid, COLOR_YELLOW, "-> /acmd /admincol /ban /cam /ccmd /clear /elevator /fakechat /get /goto");
-	SendClientMessage(playerid, COLOR_YELLOW, "-> /kick /lvl /nitro /reset /skin /spectate /vehicle /weapons ");
-
-	return 1;
+	return ShowAdminCommandsDialog(playerid);
 }
 
 dcmd_admincol(playerid, const params[])
@@ -1203,9 +1199,28 @@ dcmd_ccmd(playerid, const params[])
 	return 1;
 }
 
+dcmd_clear(playerid, const params[])
+{
+#pragma unused params
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+
+	for (new c = 0; c < 60; c++) 
+		SendClientMessageToAll(COLOR_INVISIBLE, " ");
+
+	new adminName[MAX_PLAYER_NAME], stringToPrint[256];
+
+	GetPlayerName(playerid, adminName, sizeof(adminName));
+	format(stringToPrint, sizeof(stringToPrint), "[ CLEAR ] Chat history flushed");
+
+	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+
+	return 1;
+}
+
 dcmd_countdown(playerid, const params[])
 {
-	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3) 
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 2) 
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	if (!strlen(params) || !IsNumeric(params) || !strval(params))
@@ -1227,25 +1242,6 @@ public CountDownHelper(remaining)
 		GameTextForAll("~n~~n~~n~~n~~n~~n~%d", 1000, 4, remaining);
 		SetTimerEx("CountDownHelper", 1000, false, "i", --remaining);
 	}
-}
-
-dcmd_clear(playerid, const params[])
-{
-#pragma unused params
-	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
-
-	for (new c = 0; c < 60; c++) 
-		SendClientMessageToAll(COLOR_INVISIBLE, " ");
-
-	new adminName[MAX_PLAYER_NAME], stringToPrint[256];
-
-	GetPlayerName(playerid, adminName, sizeof(adminName));
-	format(stringToPrint, sizeof(stringToPrint), "[ CLEAR ] Chat history flushed");
-
-	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
-
-	return 1;
 }
 
 dcmd_crime(playerid, const params[])
@@ -1543,7 +1539,7 @@ dcmd_lvl(playerid, const params[])
 
 dcmd_nitro(playerid, const params[])
 {
-	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3) 
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	if (!strlen(params) || !IsNumeric(params))
@@ -1582,7 +1578,7 @@ dcmd_nitro(playerid, const params[])
 
 dcmd_packet(playerid, const params[])
 {
-	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4)
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	if (!strlen(params) || !IsNumeric(params))
@@ -1742,7 +1738,7 @@ dcmd_restart(playerid, const params[])
 
 dcmd_skin(playerid, const params[])
 {
-	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 2)
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	new token1[32], token2[32];
@@ -1766,7 +1762,7 @@ dcmd_skin(playerid, const params[])
 
 dcmd_spectate(playerid, const params[])
 {
-	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 2) 
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3) 
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	if ((!strlen(params) || !IsNumeric(params)) && !gPlayers[playerid][Spectating])

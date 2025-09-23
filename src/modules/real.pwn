@@ -56,6 +56,7 @@ enum Property
 	Vehicle[VehicleProps],
 
 	bool: Occupied,
+	bool: CustomInterior,
 
 	Objects[5],
 	Menu[5],
@@ -91,6 +92,7 @@ new gNullProperty[Property] =
 	{0.0, 0.0, 0.0, 0.0},
 	{0.0, 0.0, 0.0, 0.0},
 	0,
+	false,
 	false,
 	{0, 0, 0, 0, 0},
 	{0, 0, 0, 0, 0},
@@ -274,7 +276,7 @@ stock SaveRealEstateData()
 			DB_FreeResultSet(result_vehicle);
 		}
 
-		format(query, sizeof(query), "INSERT INTO properties (id,user_id,vehicle_id,name,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied) VALUES (%d, %d, %d, '%s', %d, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %d) ON CONFLICT(id) DO UPDATE SET occupied = excluded.occupied, user_id = excluded.user_id",
+		format(query, sizeof(query), "INSERT INTO properties (id,user_id,vehicle_id,name,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied,custom_interior) VALUES (%d, %d, %d, '%s', %d, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %d, %d) ON CONFLICT(id) DO UPDATE SET occupied = excluded.occupied, user_id = excluded.user_id, custom_interior = excluded.custom_interior",
 				gProperties[i][ID],
 				gProperties[i][UserID],
 				vehicle_id,
@@ -292,7 +294,8 @@ stock SaveRealEstateData()
 				gProperties[i][LocationVehicle][CoordY],
 				gProperties[i][LocationVehicle][CoordZ],
 				gProperties[i][LocationVehicle][CoordR],
-				gProperties[i][Occupied]
+				gProperties[i][Occupied],
+				gProperties[i][CustomInterior]
 		      );
 
 		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
@@ -368,7 +371,8 @@ enum {
 	FIELD_LOCATION_VEHICLE_Y,
 	FIELD_LOCATION_VEHICLE_Z,
 	FIELD_LOCATION_VEHICLE_ROT,
-	FIELD_OCCUPIED
+	FIELD_OCCUPIED,
+	FIELD_CUSTOM_INTERIOR
 }
 
 enum {
@@ -382,7 +386,7 @@ stock LoadRealEstateData()
 {
 	new i = 0, query[512];
 
-	format(query, sizeof(query), "SELECT id,user_id,vehicle_id,name,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied FROM properties");
+	format(query, sizeof(query), "SELECT id,user_id,vehicle_id,name,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied,custom_interior FROM properties");
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
@@ -398,6 +402,7 @@ stock LoadRealEstateData()
 		gProperties[i][UserID] = DB_GetFieldInt(result, FIELD_USER_ID);
 		gProperties[i][Cost] = DB_GetFieldInt(result, FIELD_COST);
 		gProperties[i][Occupied] = bool: DB_GetFieldInt(result, FIELD_OCCUPIED);
+		gProperties[i][CustomInterior] = bool: DB_GetFieldInt(result, FIELD_CUSTOM_INTERIOR);
 
 		// Offer/Sell pickup coords
 		gProperties[i][LocationOffer][CoordX] = DB_GetFieldFloat(result, FIELD_LOCATION_OFFER_X);
@@ -509,10 +514,70 @@ stock ExtractCoordsFromString(const input[], Float: coords[Coords])
 	return 1;
 }
 
+stock SpawnCustomInterior(playerid, arrayID)
+{
+	if (gPlayers[playerid][InsideProperty])
+		return 0;
+
+	new query[512];
+
+	format(query, sizeof(query), "SELECT id,property_id,spawn_x,spawn_y,spawn_z,health_x,health_y,health_z,exit_x,exit_y,exit_z FROM property_coords WHERE property_id = %d", gProperties[arrayID][ID]);
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) {
+		print("Database error: cannot fetch custom property coords data!");
+		return 0;
+	}
+
+	new 
+		Float: spawnX, 
+		Float: spawnY, 
+		Float: spawnZ, 
+		Float: healthX,
+		Float: healthY,
+		Float: healthZ,
+		Float: exitX,
+		Float: exitY,
+		Float: exitZ;
+
+	do 
+	{
+		spawnX = DB_GetFieldFloatByName(result, "spawn_x");
+		spawnY = DB_GetFieldFloatByName(result, "spawn_y");
+		spawnZ = DB_GetFieldFloatByName(result, "spawn_z");
+		healthX = DB_GetFieldFloatByName(result, "health_x");
+		healthY = DB_GetFieldFloatByName(result, "health_y");
+		healthZ = DB_GetFieldFloatByName(result, "health_z");
+		exitX = DB_GetFieldFloatByName(result, "exit_x");
+		exitY = DB_GetFieldFloatByName(result, "exit_y");
+		exitZ = DB_GetFieldFloatByName(result, "exit_z");
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	//
+
+	gPlayerInteriors[playerid][PropertyArrayID] = arrayID;
+
+	new pickupIds[4] = {1239, 1240, 1241, 1318};
+	gPlayerInteriors[playerid][Pickups][0] = EnsurePickupCreated(pickupIds[0], 1, exitX, exitY, exitZ);
+	gPlayerInteriors[playerid][Pickups][1] = EnsurePickupCreated(pickupIds[1], 1, healthX, healthY, healthZ);
+
+	gPlayers[playerid][InsideProperty] = true;
+
+	SetPlayerPos(playerid, spawnX, spawnY, spawnZ);
+
+	return 1;
+}
+
 stock SpawnPropertyInterior(playerid, arrayID)
 {
 	if (gPlayers[playerid][InsideProperty])
 		return 0;
+
+	if (gProperties[arrayID][CustomInterior])
+		return SpawnCustomInterior(playerid, arrayID);
 
 	gPlayerInteriors[playerid][PropertyArrayID] = arrayID;
 
@@ -556,6 +621,8 @@ stock SpawnPropertyInterior(playerid, arrayID)
 		//printf("SpawnPropertyInterior: pickup no. %d: %d", i, gPlayerInteriors[playerid][Pickups][i]);
 		//ShowPickupForPlayer(playerid, gPlayerInteriors[playerid][Pickups][i]);
 	}
+
+	gPlayers[playerid][InsideProperty] = true;
 
 	SetPlayerPos(playerid, Float:X, Float:Y, Float:(Z-1.0));
 	SetPlayerFacingAngle(playerid, 0.0);
@@ -806,7 +873,7 @@ stock EditProperty(playerid)
 
 	new query[2048];
 
-	format(query, sizeof(query), "INSERT INTO properties (id, user_id, name, cost, location_offer_x, location_offer_y, location_offer_z, location_offer_rot, location_entrance_x, location_entrance_y, location_entrance_z, location_entrance_rot, location_vehicle_x, location_vehicle_y, location_vehicle_z, location_vehicle_rot, occupied) VALUES (%d, %d, '%s', %d, %.2f, %.2f, %.2f, 0.0, %.2f, %.2f, %.2f, 0.0, %.2f, %.2f, %.2f, %.2f, %d) ON CONFLICT(id) DO UPDATE SET user_id = excluded.user_id, name = excluded.name, cost = excluded.cost, location_offer_x = excluded.location_offer_x, location_offer_y = excluded.location_offer_y, location_offer_z = excluded.location_offer_z, location_entrance_x = excluded.location_entrance_x, location_entrance_y = excluded.location_entrance_y, location_entrance_z = excluded.location_entrance_z, location_vehicle_x = excluded.location_vehicle_x, location_vehicle_y = excluded.location_vehicle_y, location_vehicle_z = excluded.location_vehicle_z, location_vehicle_rot = excluded.location_vehicle_rot, occupied = excluded.occupied",
+	format(query, sizeof(query), "INSERT INTO properties (id, user_id, name, cost, location_offer_x, location_offer_y, location_offer_z, location_offer_rot, location_entrance_x, location_entrance_y, location_entrance_z, location_entrance_rot, location_vehicle_x, location_vehicle_y, location_vehicle_z, location_vehicle_rot, occupied, custom_interior) VALUES (%d, %d, '%s', %d, %.2f, %.2f, %.2f, 0.0, %.2f, %.2f, %.2f, 0.0, %.2f, %.2f, %.2f, %.2f, %d, %d) ON CONFLICT(id) DO UPDATE SET user_id = excluded.user_id, name = excluded.name, cost = excluded.cost, location_offer_x = excluded.location_offer_x, location_offer_y = excluded.location_offer_y, location_offer_z = excluded.location_offer_z, location_entrance_x = excluded.location_entrance_x, location_entrance_y = excluded.location_entrance_y, location_entrance_z = excluded.location_entrance_z, location_vehicle_x = excluded.location_vehicle_x, location_vehicle_y = excluded.location_vehicle_y, location_vehicle_z = excluded.location_vehicle_z, location_vehicle_rot = excluded.location_vehicle_rot, occupied = excluded.occupied, custom_interior = excluded.custom_interior",
 			gPropertyEdit[playerid][ID],
 			gPropertyEdit[playerid][UserID],
 			gPropertyEdit[playerid][Label],
@@ -821,7 +888,8 @@ stock EditProperty(playerid)
 			gPropertyEdit[playerid][LocationVehicle][CoordY],
 			gPropertyEdit[playerid][LocationVehicle][CoordZ],
 			gPropertyEdit[playerid][LocationVehicle][CoordR],
-			gPropertyEdit[playerid][Occupied]
+			gPropertyEdit[playerid][Occupied],
+			gPropertyEdit[playerid][CustomInterior]
 	      );
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);

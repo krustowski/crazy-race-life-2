@@ -948,7 +948,7 @@ dcmd_truck(playerid, const params[])
 		return 1;
 	}
 
-	if (!IsPlayerInAnyVehicle(playerid) && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+	if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 	{
 		return SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] You have to be in a truck as driver");
 	}

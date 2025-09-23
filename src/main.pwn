@@ -905,7 +905,6 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 			// Spawn the room.
 			SpawnPropertyInterior(playerid, i);
-			gPlayers[playerid][InsideProperty] = true;
 
 			return 1;
 		}

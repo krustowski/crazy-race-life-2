@@ -166,6 +166,40 @@ public InitPickups()
 		AddMenuItem(gTeams[i][Menus][0], 0, menuItem);
 		AddMenuItem(gTeams[i][Menus][0], 0, "Leave team");
 	}
+
+	/*NEMOVITOSTI*/
+
+	//1.barak
+	CreatePickup(1318,1,1498.13,-682.34,86.75);  //z baraku     //kompryho barak
+	//CreatePickup(1273,1,1496.85,-689.98,94.75);  //do baraku
+	CreatePickup(1254,1,1490.38,-667.30,88.21); //zdravi a naboje
+	//2.barak
+	CreatePickup(1318,1,1789.27,-2129.97,7.64);  //z baraku
+	CreatePickup(1273,1,1782.20,-2125.62,14.07); //do baraku
+	//CreatePickup(1254,1,); //zdravi a naboje
+	//3.barak
+	CreatePickup(1318,1,1801.60,-2125.57,10.9);  //z baraku
+	CreatePickup(1273,1,1804.33,-2124.37,13.94); //do baraku
+	//CreatePickup(1254,1,); //zdravi a naboje
+	//4.barak
+	CreatePickup(1318,1,1484.13,-1778.76,6.70);  //z baraku     //banka LS
+	CreatePickup(1318,1,1481.20,-1770.62,18.80); //do baraku
+ 	CreatePickup(1274,1,1470.34,-1806.61,6.70); //bankomat
+ 	//5.barak
+ 	CreatePickup(1318,1,-1063.29,-1193.96,120.53); //z baraku   //farma
+ 	CreatePickup(1273,1,-1059.74,-1205.56,129.22); //do baraku
+ 	//6.barak
+ 	CreatePickup(1318,1,-1903.26,486.28,21.93); //z baraku      //centrum SF
+ 	CreatePickup(1318,1,-1899.01,486.52,35.17); //do baraku
+
+ 	//7.barak
+ 	//CreatePickup(1318,1,1450.50,-625.42,70.85); //z baraku 		//krustyho barak
+ 	//CreatePickup(1273,1,1442.50,-629.71,95.72); //do baraku
+ 	CreatePickup(1318,1,1465.97,-615.37,70.85); //z baraku na balkon
+ 	CreatePickup(1318,1,1454.63,-608.84,95.72); //do baraku z balkonu
+ 	//CreatePickup(1254,1,1461.92,-612.28,70.85); //zdravi a naboje
+
+	/*NEMOVITOSTI*/
 }
 
 //

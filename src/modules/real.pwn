@@ -561,7 +561,7 @@ stock SpawnCustomInterior(playerid, arrayID)
 	gPlayerInteriors[playerid][PropertyArrayID] = arrayID;
 
 	new pickupIds[4] = {1239, 1240, 1241, 1318};
-	gPlayerInteriors[playerid][Pickups][0] = EnsurePickupCreated(pickupIds[0], 1, exitX, exitY, exitZ);
+	gPlayerInteriors[playerid][Pickups][3] = EnsurePickupCreated(pickupIds[3], 1, exitX, exitY, exitZ);
 	gPlayerInteriors[playerid][Pickups][1] = EnsurePickupCreated(pickupIds[1], 1, healthX, healthY, healthZ);
 
 	gPlayers[playerid][InsideProperty] = true;

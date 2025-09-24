@@ -7,6 +7,23 @@
 
 #define MAX_TIKI_PRIZES 			5
 
+#define PICKUP_INFO				1239
+#define PICKUP_HEART				1240
+#define PICKUP_PILL				1241
+#define	PICKUP_HOUSE_GREEN			1273
+#define PICUKP_TIKI				1276
+#define PICKUP_ARROW				1318
+#define PICKUP_DRUG_WHITE			1575
+#define PICKUP_DRUG_ORANGE			1576
+#define PICKUP_DRUG_YELLOW			1577
+#define PICKUP_DRUG_GREEN			1578
+#define PICKUP_DRUG_BLUE			1579
+#define PICKUP_DRUG_RED				1580
+#define PICKUP_CARD				1581
+#define PICKUP_HOUSE_RED 			19522
+
+#include "modules/bank.pwn"
+
 //
 //  Global static team objects.
 //
@@ -191,13 +208,6 @@ public InitPickups()
  	//6.barak
  	CreatePickup(1318,1,-1903.26,486.28,21.93); //z baraku      //centrum SF
  	CreatePickup(1318,1,-1899.01,486.52,35.17); //do baraku
-
- 	//7.barak
- 	//CreatePickup(1318,1,1450.50,-625.42,70.85); //z baraku 		//krustyho barak
- 	//CreatePickup(1273,1,1442.50,-629.71,95.72); //do baraku
- 	CreatePickup(1318,1,1465.97,-615.37,70.85); //z baraku na balkon
- 	CreatePickup(1318,1,1454.63,-608.84,95.72); //do baraku z balkonu
- 	//CreatePickup(1254,1,1461.92,-612.28,70.85); //zdravi a naboje
 
 	/*NEMOVITOSTI*/
 }

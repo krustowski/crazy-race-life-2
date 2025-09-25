@@ -595,21 +595,7 @@ dcmd_property(playerid, const params[])
 	}
 	else if (!strcmp(token1, "list"))
 	{
-		new stringToPrint[128];
-
-		SendClientMessage(playerid, COLOR_ORANGE, "[ REAL ] Property slots:");
-
-		for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
-		{
-			new arrayId = GetPropertyArrayIDfromID(gPlayers[playerid][Properties][i]);
-
-			format(stringToPrint, sizeof(stringToPrint), "=> %s: (property ID %5d)", 
-					gProperties[arrayId][Label], 
-					gPlayers[playerid][Properties][i]
-			);
-
-			SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
-		}
+		return ShowPropertyListDialog(playerid);
 	}
 	else if (!strcmp(token1, "spawn"))
 	{

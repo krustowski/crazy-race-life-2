@@ -20,8 +20,11 @@ enum
 	DIALOG_COMMON_CMDS,
 	DIALOG_ADMINS_ONLINE,
 	DIALOG_PLAYER_DRUGZ,
-	DIALOG_RACE_LIST
+	DIALOG_RACE_LIST,
+	DIALOG_PROPERTY_LIST
 };
+
+#include "modules/real.pwn"
 
 stock ShowHighScoresDialog(playerid)
 {
@@ -272,4 +275,22 @@ stock ShowRaceListDialog(playerid)
 	}
 
 	return ShowPlayerDialog(playerid, DIALOG_RACE_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Race List", stringToPrint, "Join", "Cancel");
+}
+
+stock ShowPropertyListDialog(playerid)
+{
+	new stringToPrint[256] = "Property Name\tID";
+
+	for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
+	{
+		new arrayId = GetPropertyArrayIDfromID(gPlayers[playerid][Properties][i]);
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%5d", 
+				stringToPrint,
+				gProperties[arrayId][Label], 
+				gPlayers[playerid][Properties][i]
+		      );
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Property List", stringToPrint, "Select", "Cancel");
 }

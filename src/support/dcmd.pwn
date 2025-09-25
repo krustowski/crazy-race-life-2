@@ -245,15 +245,7 @@ dcmd_bank(playerid, const params[])
 dcmd_cmd(playerid, const params[])
 {
 #pragma unused params
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ CMD ] Basic CMD set");
-	SendClientMessage(playerid, COLOR_YELLOW, "/acc /admins /afk /bank /cmd /dance /deathmatch /drugz /dwarp");
-	SendClientMessage(playerid, COLOR_YELLOW, "/fix /givecash /help /lay /locate /lock /property /race");
-	SendClientMessage(playerid, COLOR_YELLOW, "/rules /skydive /text /tiki /unlock");
-	SendClientMessage(playerid, COLOR_INVISIBLE, "");
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ CMD ] Specific CMD set (team-related)");
-	SendClientMessage(playerid, COLOR_YELLOW, "/deal /hide /search /wanted");
-
-	return 1;
+	return ShowCommonCommandsDialog(playerid);
 }
 
 dcmd_dance(playerid, const params[])

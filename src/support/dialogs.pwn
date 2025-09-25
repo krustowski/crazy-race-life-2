@@ -16,7 +16,8 @@ enum
 	DIALOG_PROPERTY_EDIT_COST,
 	DIALOG_TRUCKING_INFO,
 	DIALOG_HIGH_SCORES_MAIN,
-	DIALOG_ADMIN_CMDS
+	DIALOG_ADMIN_CMDS,
+	DIALOG_COMMON_CMDS
 };
 
 stock ShowHighScoresDialog(playerid)
@@ -156,4 +157,53 @@ stock ShowAdminCommandsDialog(playerid)
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_ADMIN_CMDS, DIALOG_STYLE_MSGBOX, "Admin Commands", stringToPrint, "Close", "");
+}
+
+stock ShowCommonCommandsDialog(playerid)
+{
+	new stringToPrint[2048];
+
+	format(stringToPrint, sizeof(stringToPrint), "Common Commands\n\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
+    			"/acc\t\t\tgame account info dump\n",
+			"/admins\t\t\tlists admins online\n",
+			"/afk\t\t\t(un)sets the Away-From-Keyboard state\n",
+			"/bank SUBCMD\t\tlists banking subcommands\n",
+			"/cmd\t\t\tlists available commands for player (this dialog)\n",
+
+			"/dance ID\t\tenables special animations (dancing)\n",
+			"/deathmatch SUBCMD\tlists subcommands for the deathmatch module\n",
+			"/drugz\t\t\tlists substances in pockets\n",
+			"/dwarp\t\t\tteleports the player in vehicle to racing the common location\n",
+			"/fix\t\t\trepairs the player's vehicle\n",
+
+			"/givecash ID CASH\tsends cash to other player\n",
+			"/help\t\t\tlists helper information\n",
+			"/kill\t\t\tto commit suicide\n",
+			"/lay\t\t\tenables special animations (laying)\n",
+			"/locate\t\t\tdumps the actual player's coordinates\n",
+
+			"/lock\t\t\tlocks the player's vehicle\n",
+			"/pm ID TEXT\t\tsends the private message to other player ($10)\n",
+			"/port ID\t\t\tenables to warp to special location IDs on map\n",
+			"/property SUBCMD ID\tlists subcommands for property ID handling\n",
+			"/race SUBCMD ID\tlists subcommands for racing module\n",
+
+			"/rules\t\t\tdumps the server rules information\n",
+			"/scores\t\t\tshows the High Scores table\n",
+			"/skydive\t\tenables to skydive from random locations\n",
+			"/text ID TEXT\t\tsends a public message to other player\n",
+			"/tiki\t\t\tdumps the information about Tiki prizes\n",
+
+			"/truck\t\t\tenables/disables the Trucking missions\n",
+			"/unlock\t\t\tunlocks the player's vehicle\n",
+			//
+			"\nSpecial Team-related Commands\n\n",
+			//
+			"/deal ID\t\t\tlists subcommands for dealerz\n",
+			"/hide\t\t\t(un)hides the player on map\n",
+			"/search ID SUBCMD\tspecial command for Policemen to search and pre-jail a player by ID\n",
+			"/wanted\t\t\tshows the wanted list of online players\n"
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_COMMON_CMDS, DIALOG_STYLE_MSGBOX, "Commands", stringToPrint, "Close", "");
 }

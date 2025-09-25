@@ -712,18 +712,7 @@ dcmd_race(playerid, const params[])
 	}
 	else if (!strcmp(token1, "list"))
 	{
-		SendClientMessage(playerid, COLOR_YELLOW, "[ RACE ] List of currently loaded races (cost / prize):");
-
-		for (new i = 1; i < MAX_RACE_COUNT; i++)
-		{
-			new stringToPrint[256];
-
-			if (gRaces[i][CostDollars] == 0)
-				continue;
-
-			format(stringToPrint, sizeof(stringToPrint), "-> ID: %2d: %s ($%d / $%d)", i, gRaces[i][Name], gRaces[i][CostDollars], gRaces[i][PrizeDollars]);
-			SendClientMessage(playerid, COLOR_GREY, stringToPrint);
-		}
+		return ShowRaceListDialog(playerid);
 	}
 	else if (!strcmp(token1, "warp"))
 	{

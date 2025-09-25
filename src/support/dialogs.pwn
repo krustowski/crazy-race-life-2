@@ -19,7 +19,8 @@ enum
 	DIALOG_ADMIN_CMDS,
 	DIALOG_COMMON_CMDS,
 	DIALOG_ADMINS_ONLINE,
-	DIALOG_PLAYER_DRUGZ
+	DIALOG_PLAYER_DRUGZ,
+	DIALOG_RACE_LIST
 };
 
 stock ShowHighScoresDialog(playerid)
@@ -256,4 +257,19 @@ stock ShowPlayerPocketDrugzDialog(playerid)
 	}
 
 	return ShowPlayerDialog(playerid, DIALOG_PLAYER_DRUGZ, DIALOG_STYLE_TABLIST_HEADERS, "Pocket Drugz and Stuff", stringToPrint, "Use", "Cancel");
+}
+
+stock ShowRaceListDialog(playerid)
+{
+	new stringToPrint[512] = "Race ID and Name\tCost ($)\tPrize ($)";
+
+	for (new i = 1; i < MAX_RACE_COUNT; i++)
+	{
+		if (gRaces[i][CostDollars] == 0)
+			continue;
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%2d: %s\t%d\t%d", stringToPrint, i, gRaces[i][Name], gRaces[i][CostDollars], gRaces[i][PrizeDollars]);
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_RACE_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Race List", stringToPrint, "Join", "Cancel");
 }

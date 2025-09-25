@@ -17,7 +17,8 @@ enum
 	DIALOG_TRUCKING_INFO,
 	DIALOG_HIGH_SCORES_MAIN,
 	DIALOG_ADMIN_CMDS,
-	DIALOG_COMMON_CMDS
+	DIALOG_COMMON_CMDS,
+	DIALOG_ADMINS_ONLINE
 };
 
 stock ShowHighScoresDialog(playerid)
@@ -206,4 +207,36 @@ stock ShowCommonCommandsDialog(playerid)
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_COMMON_CMDS, DIALOG_STYLE_MSGBOX, "Commands", stringToPrint, "Close", "");
+}
+
+stock ShowAdminsOnlineDialog(playerid)
+{
+	new adminCount = 0, stringToPrint[512];
+
+	format(stringToPrint, sizeof(stringToPrint), "");
+
+	for (new i = 0; i < MAX_PLAYERS; i++) 
+	{
+		// IsPlayerAdmin(i) == RCON admin
+		if (IsPlayerConnected(i) && (gPlayers[i][AdminLevel] > 0 || IsPlayerAdmin(i)))
+		{
+			adminCount++;
+
+			new adminName[MAX_PLAYER_NAME];
+
+			// Omit RCON admin(s) in the output for now...
+			if (gPlayers[i][AdminLevel] > 0) 
+			{
+				GetPlayerName(i, adminName, sizeof(adminName));
+				format(stringToPrint, sizeof(stringToPrint), "%s[ID: %2d]\t%24s \t\tLevel: %d\n", stringToPrint, i, adminName, gPlayers[i][AdminLevel]);
+			}
+		}
+	}
+
+	if (!adminCount) 
+	{
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] No admin online!");
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_ADMINS_ONLINE, DIALOG_STYLE_MSGBOX, "Admins Online", stringToPrint, "Close", "");
 }

@@ -122,36 +122,7 @@ dcmd_acc(playerid, const params[])
 dcmd_admins(playerid, const params[])
 #pragma unused params
 {
-	SendClientMessage(playerid, COLOR_YELLOW, "[ i ] Admins online:");
-
-	new adminCount = 0;
-
-	for (new i = 0; i < GetMaxPlayers(); i++) 
-	{
-		// IsPlayerAdmin(i) == RCON admin
-		if (IsPlayerConnected(i) && (gPlayers[i][AdminLevel] > 0 || IsPlayerAdmin(i)))
-		{
-			adminCount++;
-
-			new adminName[MAX_PLAYER_NAME], stringToPrint[128];
-
-			// Omit RCON admin(s) in the output for now...
-			if (gPlayers[i][AdminLevel] > 0) 
-			{
-				GetPlayerName(i, adminName, sizeof(adminName));
-				format(stringToPrint, sizeof(stringToPrint), "=> %s [ID: %2d] Level: %d", adminName, i, gPlayers[i][AdminLevel]);
-				SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
-			}
-		}
-	}
-
-	if (!adminCount) 
-	{
-		SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] No admin online!");
-		return 0;
-	}
-
-	return 1;
+	return ShowAdminsOnlineDialog(playerid);
 }
 
 dcmd_afk(playerid, const params[])

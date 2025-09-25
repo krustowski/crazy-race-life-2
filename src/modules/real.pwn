@@ -298,6 +298,10 @@ stock SpawnProperty(propertyId)
 					else
 					{
 						gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_HOUSE_RED, 1, pX, pY, pZ);
+
+						new playerName[MAX_PLAYER_NAME];
+						GetOwnerName(gProperties[propertyId][UserID], playerName);
+						Create3DTextLabel("%s owns this property", COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false, playerName);
 					}
 				}
 		}
@@ -305,6 +309,30 @@ stock SpawnProperty(propertyId)
 		i++;
 	}
 	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	return 1;
+}
+
+stock GetOwnerName(userId, playerName[MAX_PLAYER_NAME])
+{
+	new query[256];
+
+	format(query, sizeof(query), "SELECT nickname FROM users WHERE id = %d", 
+			userId
+	      );
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) 
+	{
+		printf("Database error: cannot fetch user nickname (userID: %d)!", userId);
+		print(query);
+
+		return 0;
+	}
+
+	DB_GetFieldStringByName(result, "nickname", playerName, sizeof(playerName));
 
 	DB_FreeResultSet(result);
 
@@ -521,24 +549,6 @@ stock LoadRealEstateData()
 		gProperties[i][Occupied] = bool: DB_GetFieldIntByName(result, "occupied");
 		gProperties[i][CustomInterior] = bool: DB_GetFieldIntByName(result, "custom_interior");
 
-		// Offer/Sell pickup coords
-		gProperties[i][LocationOffer][CoordX] = DB_GetFieldFloat(result, FIELD_LOCATION_OFFER_X);
-		gProperties[i][LocationOffer][CoordY] = DB_GetFieldFloat(result, FIELD_LOCATION_OFFER_Y);
-		gProperties[i][LocationOffer][CoordZ] = DB_GetFieldFloat(result, FIELD_LOCATION_OFFER_Z);
-		gProperties[i][LocationOffer][CoordR] = DB_GetFieldFloat(result, FIELD_LOCATION_OFFER_ROT);
-
-		// Entrance pickup coords
-		gProperties[i][LocationEntrance][CoordX] = DB_GetFieldFloat(result, FIELD_LOCATION_ENTRANCE_X);
-		gProperties[i][LocationEntrance][CoordY] = DB_GetFieldFloat(result, FIELD_LOCATION_ENTRANCE_Y);
-		gProperties[i][LocationEntrance][CoordZ] = DB_GetFieldFloat(result, FIELD_LOCATION_ENTRANCE_Z);
-		gProperties[i][LocationEntrance][CoordR] = DB_GetFieldFloat(result, FIELD_LOCATION_ENTRANCE_ROT);
-
-		// Vehicle pickup coords
-		gProperties[i][LocationVehicle][CoordX] = DB_GetFieldFloat(result, FIELD_LOCATION_VEHICLE_X);
-		gProperties[i][LocationVehicle][CoordY] = DB_GetFieldFloat(result, FIELD_LOCATION_VEHICLE_Y);
-		gProperties[i][LocationVehicle][CoordZ] = DB_GetFieldFloat(result, FIELD_LOCATION_VEHICLE_Z);
-		gProperties[i][LocationVehicle][CoordR] = DB_GetFieldFloat(result, FIELD_LOCATION_VEHICLE_ROT);
-
 		DB_GetFieldStringByName(result, "name", name, sizeof(name));
 
 		gProperties[i][Label] = name;
@@ -631,70 +641,13 @@ stock ExtractCoordsFromString(const input[], Float: coords[Coords])
 	return 1;
 }
 
-stock SpawnCustomInterior(playerid, arrayID)
-{
-	/*if (gPlayers[playerid][InsideProperty])
-		return 0;
-
-	new query[512];
-
-	format(query, sizeof(query), "SELECT id,property_id,spawn_x,spawn_y,spawn_z,health_x,health_y,health_z,exit_x,exit_y,exit_z FROM property_coords WHERE property_id = %d", gProperties[arrayID][ID]);
-
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) {
-		print("Database error: cannot fetch custom property coords data!");
-		return 0;
-	}
-
-	new 
-		Float: spawnX, 
-		Float: spawnY, 
-		Float: spawnZ, 
-		Float: healthX,
-		Float: healthY,
-		Float: healthZ,
-		Float: exitX,
-		Float: exitY,
-		Float: exitZ;
-
-	do 
-	{
-		spawnX = DB_GetFieldFloatByName(result, "spawn_x");
-		spawnY = DB_GetFieldFloatByName(result, "spawn_y");
-		spawnZ = DB_GetFieldFloatByName(result, "spawn_z");
-		healthX = DB_GetFieldFloatByName(result, "health_x");
-		healthY = DB_GetFieldFloatByName(result, "health_y");
-		healthZ = DB_GetFieldFloatByName(result, "health_z");
-		exitX = DB_GetFieldFloatByName(result, "exit_x");
-		exitY = DB_GetFieldFloatByName(result, "exit_y");
-		exitZ = DB_GetFieldFloatByName(result, "exit_z");
-	}
-	while (DB_SelectNextRow(result));
-
-	DB_FreeResultSet(result);
-
-	//
-
-	gPlayerInteriors[playerid][PropertyArrayID] = arrayID;
-
-	new pickupIds[4] = {1239, 1240, 1241, 1318};
-	gPlayerInteriors[playerid][Pickups][3] = EnsurePickupCreated(pickupIds[3], 1, exitX, exitY, exitZ);
-	gPlayerInteriors[playerid][Pickups][1] = EnsurePickupCreated(pickupIds[1], 1, healthX, healthY, healthZ);
-
-	gPlayers[playerid][InsideProperty] = true;
-
-	SetPlayerPos(playerid, spawnX, spawnY, spawnZ);*/
-
-	return 1;
-}
-
 stock SpawnPropertyInterior(playerid, arrayID)
 {
 	if (gPlayers[playerid][InsideProperty])
 		return 0;
 
 	if (gProperties[arrayID][CustomInterior])
-		return SpawnCustomInterior(playerid, arrayID);
+		return 1;
 
 	gPlayerInteriors[playerid][PropertyArrayID] = arrayID;
 
@@ -707,8 +660,7 @@ stock SpawnPropertyInterior(playerid, arrayID)
 	// The very room object.
 	gPlayerInteriors[playerid][Objects][0] = CreatePlayerObject(playerid, 14859, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0.0);
 
-	// Exit, Health, Pills, Info pickups.
-	new pickupIds[4] = {1239, 1240, 1241, 1318};
+	new pickupIds[4] = {PICKUP_INFO, PICKUP_HEART, PICKUP_PILL, PICKUP_ARROW};
 	new Float: pickupCoords[4][3];
 
 	// Info pickup.
@@ -1127,15 +1079,70 @@ stock CheckRealEstatePickup(playerid, pickupid)
 		}
 	}
 
+	for (new i = 0; i < SPAWN_PICKUP_COUNT; i++)
+	{
+		if (pickupid != gPlayerInteriors[playerid][Pickups][i])
+			continue;
+
+		switch (i) 
+		{
+			case PICKUP_TYPE_INFO:
+				{
+					return 1;
+				}
+			case PICKUP_TYPE_HEALTH:
+				{
+					SetPlayerHealth(playerid, 100.0);
+					SetPlayerArmour(playerid, 100.0);
+					SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ HP ] Health: 100.0, Armour: 100.0");
+					return 1;
+				}
+			case PICKUP_TYPE_PILLS:
+				{
+					if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
+						break;
+
+					ShowPlayerDrugzDialog(playerid);
+					return 1;
+				}
+			case PICKUP_TYPE_EXIT:
+				{
+					new query[256];
+
+					format(query, sizeof(query), "SELECT primary_x,primary_y_primary_z FROM property_coords WHERE property_id = %d AND type = 1", 
+							gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ][ID]
+					      );
+
+					new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+					if (!result) 
+					{
+						printf("Database error: cannot fetch spawn point (property ID: %d)!", gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ]);
+						print(query);
+
+						return 0;
+					}
+
+					new 
+						Float: pX, 
+						Float: pY,
+						Float: pZ;
+
+					DB_FreeResultSet(result);
+
+					SetPlayerPos(playerid, pX, pY, pZ);
+
+					DestroyPropertyInterior(playerid);
+					gPlayers[playerid][InsideProperty] = false;
+				}
+		}
+	}
+
 	return 1;
 }
 
 stock ShowPropertyEditDialogMain(playerid)
 {
-	new
-		propertyid = gPropertyEdit[playerid][ID],
-		stringToPrint[128],
-		title[32];
+	new propertyid = gPropertyEdit[playerid][ID], stringToPrint[128], title[32];
 
 	format(title, sizeof(title), "Edit property ID: %d", propertyid);
 	format(stringToPrint, sizeof(stringToPrint), "Name\nCost in dollars\nEntrance pickup coords\nOffer pickup coords\nVehicle coords\nOccupied state\nSave property");
@@ -1145,9 +1152,7 @@ stock ShowPropertyEditDialogMain(playerid)
 
 stock ShowPropertyEditDialogName(playerid)
 {
-	new
-		propertyid = gPropertyEdit[playerid][ID],
-		title[32];
+	new propertyid = gPropertyEdit[playerid][ID], title[32];
 
 	format(title, sizeof(title), "Edit property ID: %d", propertyid);
 
@@ -1156,9 +1161,7 @@ stock ShowPropertyEditDialogName(playerid)
 
 stock ShowPropertyEditDialogCost(playerid)
 {
-	new
-		propertyid = gPropertyEdit[playerid][ID],
-		title[32];
+	new propertyid = gPropertyEdit[playerid][ID], title[32];
 
 	format(title, sizeof(title), "Edit property ID: %d", propertyid);
 

@@ -187,9 +187,10 @@ public InitPickups()
 	/*NEMOVITOSTI*/
 
 	//1.barak
-	CreatePickup(1318,1,1498.13,-682.34,86.75);  //z baraku     //kompryho barak
+	//CreatePickup(1318,1,1498.13,-682.34,86.75);  //z baraku     //kompryho barak
 	//CreatePickup(1273,1,1496.85,-689.98,94.75);  //do baraku
-	CreatePickup(1254,1,1490.38,-667.30,88.21); //zdravi a naboje
+	//CreatePickup(1254,1,1490.38,-667.30,88.21); //zdravi a naboje
+
 	//2.barak
 	CreatePickup(1318,1,1789.27,-2129.97,7.64);  //z baraku
 	CreatePickup(1273,1,1782.20,-2125.62,14.07); //do baraku

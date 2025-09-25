@@ -275,7 +275,14 @@ stock SpawnProperty(propertyId)
 				}
 			case ENTRANCE_POINT:
 				{
-					gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_ARROW, 1, pX, pY, pZ);
+					if (gProperties[propertyId][Occupied])
+						gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_ARROW, 1, pX, pY, pZ);
+
+					gPropertyCoords[propertyId][i][Primary][CoordX] = pX;
+					gPropertyCoords[propertyId][i][Primary][CoordY] = pY;
+					gPropertyCoords[propertyId][i][Primary][CoordZ] = pZ;
+					gPropertyCoords[propertyId][i][Primary][CoordR] = pR;
+
 					gPropertyCoords[propertyId][i][Secondary][CoordX] = sX;
 					gPropertyCoords[propertyId][i][Secondary][CoordY] = sY;
 					gPropertyCoords[propertyId][i][Secondary][CoordZ] = sZ;

@@ -18,7 +18,8 @@ enum
 	DIALOG_HIGH_SCORES_MAIN,
 	DIALOG_ADMIN_CMDS,
 	DIALOG_COMMON_CMDS,
-	DIALOG_ADMINS_ONLINE
+	DIALOG_ADMINS_ONLINE,
+	DIALOG_PLAYER_DRUGZ
 };
 
 stock ShowHighScoresDialog(playerid)
@@ -202,6 +203,7 @@ stock ShowCommonCommandsDialog(playerid)
 			//
 			"/deal ID\t\t\tlists subcommands for dealerz\n",
 			"/hide\t\t\t(un)hides the player on map\n",
+
 			"/search ID SUBCMD\tspecial command for Policemen to search and pre-jail a player by ID\n",
 			"/wanted\t\t\tshows the wanted list of online players\n"
 		);
@@ -239,4 +241,19 @@ stock ShowAdminsOnlineDialog(playerid)
 	}
 
 	return ShowPlayerDialog(playerid, DIALOG_ADMINS_ONLINE, DIALOG_STYLE_MSGBOX, "Admins Online", stringToPrint, "Close", "");
+}
+
+stock ShowPlayerPocketDrugzDialog(playerid)
+{
+	new stringToPrint[512] = "Substance/stuff\tIn pockets";
+
+	for (new i = 0; i < MAX_DRUGS; i++)
+	{
+		new partial[64];
+
+		format(partial, sizeof(partial), "\n%s\t%d", gDrugz[i][DrugName], gPlayers[playerid][Drugs][i]);
+		strcat(stringToPrint, partial, sizeof(stringToPrint));
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_PLAYER_DRUGZ, DIALOG_STYLE_TABLIST_HEADERS, "Pocket Drugz and Stuff", stringToPrint, "Use", "Cancel");
 }

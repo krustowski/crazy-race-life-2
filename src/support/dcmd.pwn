@@ -337,17 +337,7 @@ dcmd_deathmatch(playerid, const params[])
 dcmd_drugz(playerid, const params[])
 {
 #pragma unused params
-	new stringToPrint[128];
-
-	SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Drug and stuff list:");
-
-	for (new i = 0; i < MAX_DRUGS; i++)
-	{
-		format(stringToPrint, sizeof(stringToPrint), "-> %s (got %d g/pcs)", gDrugz[i][DrugName], gPlayers[playerid][Drugs][i]);
-		SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
-	}
-
-	return 1;
+	return ShowPlayerPocketDrugzDialog(playerid);
 }
 
 dcmd_dwarp(playerid, const params[])

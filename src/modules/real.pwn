@@ -1145,6 +1145,10 @@ stock CheckRealEstatePickup(playerid, pickupid)
 	return 1;
 }
 
+//
+//
+//
+
 stock ShowPropertyEditDialogMain(playerid)
 {
 	new propertyid = gPropertyEdit[playerid][ID], stringToPrint[128], title[32];

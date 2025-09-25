@@ -540,7 +540,7 @@ stock LoadRealEstateData()
 		return 0;
 	}
 
-	while (DB_SelectNextRow(result))
+	do
 	{
 		printf("stock LoadRealEstateData(): i = %d", i);
 
@@ -621,6 +621,7 @@ stock LoadRealEstateData()
 
 		i++;
 	}
+	while (DB_SelectNextRow(result));
 
 	DB_FreeResultSet(result);
 

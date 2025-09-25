@@ -1114,7 +1114,7 @@ stock CheckRealEstatePickup(playerid, pickupid)
 				{
 					new query[256];
 
-					format(query, sizeof(query), "SELECT primary_x,primary_y_primary_z FROM property_coords WHERE property_id = %d AND type = 1", 
+					format(query, sizeof(query), "SELECT primary_x,primary_y,primary_z FROM property_coords WHERE property_id = %d AND type = 1", 
 							gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ][ID]
 					      );
 

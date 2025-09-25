@@ -248,7 +248,10 @@ stock SpawnProperty(propertyId)
 		{
 			case SPAWN_POINT:
 				{
-					break;
+					gPropertyCoords[propertyId][i][Primary][CoordX] = pX;
+					gPropertyCoords[propertyId][i][Primary][CoordY] = pY;
+					gPropertyCoords[propertyId][i][Primary][CoordZ] = pZ;
+					gPropertyCoords[propertyId][i][Primary][CoordR] = pR;
 				}
 			case HEALTH_POINT:
 				{
@@ -721,20 +724,21 @@ stock SpawnPlayerAtProperty(playerid)
 	if (!IsPlayerOwner(playerid, gPlayers[playerid][SpawnPoint]))
 		return 0;
 
-	for (new i = 0; i < sizeof(gProperties); i++)
+	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
-		if (!gProperties[i][ID] || !gProperties[i][Occupied])
-			continue;
+		for (new j = 0; j < MAX_PROPERTY_PICKUPS; j++)
+		{
+			if (gPropertyCoords[i][j][PickupType] != 1)
+				continue;
 
-		if (gProperties[i][ID] != gPlayers[playerid][SpawnPoint])
-			continue;
+			if (gProperties[i][ID] != gPlayers[playerid][SpawnPoint])
+				continue;
 
-		SetPlayerPos(playerid, Float:gProperties[i][LocationOffer][Coords: 0], Float:gProperties[i][LocationOffer][Coords: 1], Float:gProperties[i][LocationOffer][Coords: 2]);
-
-		return 1;
+			SetPlayerPos(playerid, gPropertyCoords[i][j][Primary][CoordX], gPropertyCoords[i][j][Primary][CoordY], gPropertyCoords[i][j][Primary][CoordZ]);
+		}
 	}
 
-	return 0;
+	return 1;
 }
 
 stock GetPropertyArrayIDfromID(propertyID)
@@ -1123,9 +1127,9 @@ stock CheckRealEstatePickup(playerid, pickupid)
 					}
 
 					new 
-						Float: pX, 
-						Float: pY,
-						Float: pZ;
+						Float: pX = DB_GetFieldFloatByName(result, "primary_x"), 
+						Float: pY = DB_GetFieldFloatByName(result, "primary_y"),
+						Float: pZ = DB_GetFieldFloatByName(result, "primary_z");
 
 					DB_FreeResultSet(result);
 

@@ -105,10 +105,6 @@ enum Property
 	Label[64],
 	Cost,
 
-	Float: LocationOffer[Coords],
-	Float: LocationEntrance[Coords],
-	Float: LocationVehicle[Coords],
-
 	Vehicle[VehicleProps],
 
 	bool: Occupied,
@@ -146,9 +142,6 @@ new gNullProperty[Property] =
 	0,
 	"",
 	0,
-	{0.0, 0.0, 0.0, 0.0},
-	{0.0, 0.0, 0.0, 0.0},
-	{0.0, 0.0, 0.0, 0.0},
 	0,
 	false,
 	false,
@@ -183,7 +176,7 @@ public InitRealEstateProperties()
 	return 1;
 }
 
-stock SpawnPlayerEntrancePickups(playerid)
+/*stock SpawnPlayerEntrancePickups(playerid)
 {
 	for (new i = 0; i < sizeof(gProperties); i++)
 	{
@@ -205,7 +198,7 @@ stock SpawnPlayerEntrancePickups(playerid)
 	}
 
 	return 1;
-}
+}*/
 
 stock SpawnProperty(propertyId)
 {
@@ -378,7 +371,7 @@ stock LoadPlayerProperties(playerid)
 
 	DB_FreeResultSet(result);
 
-	SpawnPlayerEntrancePickups(playerid);
+	//SpawnPlayerEntrancePickups(playerid);
 
 	return 1;
 }
@@ -459,24 +452,12 @@ stock SaveRealEstateData()
 			DB_FreeResultSet(result_vehicle);
 		}
 
-		format(query, sizeof(query), "INSERT INTO properties (id,user_id,vehicle_id,name,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied,custom_interior) VALUES (%d, %d, %d, '%s', %d, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %d, %d) ON CONFLICT(id) DO UPDATE SET occupied = excluded.occupied, user_id = excluded.user_id, custom_interior = excluded.custom_interior",
+		format(query, sizeof(query), "INSERT INTO properties (id,user_id,vehicle_id,name,cost,occupied,custom_interior) VALUES (%d, %d, %d, '%s', %d, %d, %d) ON CONFLICT(id) DO UPDATE SET occupied = excluded.occupied, user_id = excluded.user_id, custom_interior = excluded.custom_interior",
 				gProperties[i][ID],
 				gProperties[i][UserID],
 				vehicle_id,
 				gProperties[i][Label],
 				gProperties[i][Cost],
-				gProperties[i][LocationOffer][CoordX],
-				gProperties[i][LocationOffer][CoordY],
-				gProperties[i][LocationOffer][CoordZ],
-				gProperties[i][LocationOffer][CoordR],
-				gProperties[i][LocationEntrance][CoordX],
-				gProperties[i][LocationEntrance][CoordY],
-				gProperties[i][LocationEntrance][CoordZ],
-				gProperties[i][LocationEntrance][CoordR],
-				gProperties[i][LocationVehicle][CoordX],
-				gProperties[i][LocationVehicle][CoordY],
-				gProperties[i][LocationVehicle][CoordZ],
-				gProperties[i][LocationVehicle][CoordR],
 				gProperties[i][Occupied],
 				gProperties[i][CustomInterior]
 		      );
@@ -539,7 +520,7 @@ stock LoadRealEstateData()
 {
 	new i = 0, query[512];
 
-	format(query, sizeof(query), "SELECT id,user_id,vehicle_id,name,cost,location_offer_x,location_offer_y,location_offer_z,location_offer_rot,location_entrance_x,location_entrance_y,location_entrance_z,location_entrance_rot,location_vehicle_x,location_vehicle_y,location_vehicle_z,location_vehicle_rot,occupied,custom_interior FROM properties");
+	format(query, sizeof(query), "SELECT id,user_id,vehicle_id,name,cost,occupied,custom_interior FROM properties");
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
@@ -789,8 +770,8 @@ stock BuyPlayerProperty(playerid, propertyID)
 	if (gProperties[arrayID][Occupied])
 		return SendClientMessageLocalized(playerid, I18N_REAL_ALREADY_OCCUPIED);
 
-	if (!IsPlayerInSphere(playerid, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ], 15))
-		return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);
+	/*if (!IsPlayerInSphere(playerid, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ], 15))
+		return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);*/
 
 	if (GetPlayerMoney(playerid) < gProperties[arrayID][Cost])
 		return SendClientMessageLocalized(playerid, I18N_REAL_NO_MONEY);
@@ -806,8 +787,8 @@ stock BuyPlayerProperty(playerid, propertyID)
 	DestroyPickup(gProperties[arrayID][Pickups][PICKUP_TYPE_OFFER]);
 	//gProperties[arrayID][Pickups][PICKUP_TYPE_OFFER];
 
-	gProperties[arrayID][Pickups][PICKUP_TYPE_OFFER] = EnsurePickupCreated(19522, 1, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ]);
-	gProperties[arrayID][Pickups][PICKUP_TYPE_ENTRANCE] = EnsurePickupCreated(1318, 1, Float:gProperties[arrayID][LocationEntrance][CoordX], Float:gProperties[arrayID][LocationEntrance][CoordY], Float:gProperties[arrayID][LocationEntrance][CoordZ]);
+	/*gProperties[arrayID][Pickups][PICKUP_TYPE_OFFER] = EnsurePickupCreated(19522, 1, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ]);
+	gProperties[arrayID][Pickups][PICKUP_TYPE_ENTRANCE] = EnsurePickupCreated(1318, 1, Float:gProperties[arrayID][LocationEntrance][CoordX], Float:gProperties[arrayID][LocationEntrance][CoordY], Float:gProperties[arrayID][LocationEntrance][CoordZ]);*/
 
 	GivePlayerMoney(playerid, -gProperties[arrayID][Cost]);
 
@@ -826,8 +807,8 @@ stock SellPlayerProperty(playerid, propertyID)
 	if (arrayID == INVALID_PROPERTY_ID || !propertyID)
 		return SendClientMessageLocalized(playerid, I18N_REAL_INVALID_CODE);
 
-	if (!IsPlayerInSphere(playerid, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ], 15))
-		return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);
+	/*if (!IsPlayerInSphere(playerid, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ], 15))
+		return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);*/
 
 	if (!gProperties[arrayID][Occupied])
 		return SendClientMessageLocalized(playerid, I18N_REAL_SELL_NOT_OCCUPIED);
@@ -860,7 +841,7 @@ stock SellPlayerProperty(playerid, propertyID)
 	DestroyPickup(gProperties[arrayID][Pickups][PICKUP_TYPE_ENTRANCE]);
 	gProperties[arrayID][Pickups][PICKUP_TYPE_ENTRANCE] = 0;
 
-	gProperties[arrayID][Pickups][PICKUP_TYPE_OFFER] = EnsurePickupCreated(1273, 1, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ]);
+	/*gProperties[arrayID][Pickups][PICKUP_TYPE_OFFER] = EnsurePickupCreated(1273, 1, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ]);*/
 
 	GivePlayerMoney(playerid, floatround(float(gProperties[arrayID][Cost]) * 0.9));
 
@@ -954,21 +935,11 @@ stock EditProperty(playerid)
 
 	new query[2048];
 
-	format(query, sizeof(query), "INSERT INTO properties (id, user_id, name, cost, location_offer_x, location_offer_y, location_offer_z, location_offer_rot, location_entrance_x, location_entrance_y, location_entrance_z, location_entrance_rot, location_vehicle_x, location_vehicle_y, location_vehicle_z, location_vehicle_rot, occupied, custom_interior) VALUES (%d, %d, '%s', %d, %.2f, %.2f, %.2f, 0.0, %.2f, %.2f, %.2f, 0.0, %.2f, %.2f, %.2f, %.2f, %d, %d) ON CONFLICT(id) DO UPDATE SET user_id = excluded.user_id, name = excluded.name, cost = excluded.cost, location_offer_x = excluded.location_offer_x, location_offer_y = excluded.location_offer_y, location_offer_z = excluded.location_offer_z, location_entrance_x = excluded.location_entrance_x, location_entrance_y = excluded.location_entrance_y, location_entrance_z = excluded.location_entrance_z, location_vehicle_x = excluded.location_vehicle_x, location_vehicle_y = excluded.location_vehicle_y, location_vehicle_z = excluded.location_vehicle_z, location_vehicle_rot = excluded.location_vehicle_rot, occupied = excluded.occupied, custom_interior = excluded.custom_interior",
+	format(query, sizeof(query), "INSERT INTO properties (id, user_id, name, cost, occupied, custom_interior) VALUES (%d, %d, '%s', %d, %d, %d) ON CONFLICT(id) DO UPDATE SET user_id = excluded.user_id, name = excluded.name, cost = excluded.cost, occupied = excluded.occupied, custom_interior = excluded.custom_interior",
 			gPropertyEdit[playerid][ID],
 			gPropertyEdit[playerid][UserID],
 			gPropertyEdit[playerid][Label],
 			gPropertyEdit[playerid][Cost],
-			gPropertyEdit[playerid][LocationOffer][CoordX],
-			gPropertyEdit[playerid][LocationOffer][CoordY],
-			gPropertyEdit[playerid][LocationOffer][CoordZ],
-			gPropertyEdit[playerid][LocationEntrance][CoordX],
-			gPropertyEdit[playerid][LocationEntrance][CoordY],
-			gPropertyEdit[playerid][LocationEntrance][CoordZ],
-			gPropertyEdit[playerid][LocationVehicle][CoordX],
-			gPropertyEdit[playerid][LocationVehicle][CoordY],
-			gPropertyEdit[playerid][LocationVehicle][CoordZ],
-			gPropertyEdit[playerid][LocationVehicle][CoordR],
 			gPropertyEdit[playerid][Occupied],
 			gPropertyEdit[playerid][CustomInterior]
 	      );
@@ -1188,7 +1159,20 @@ stock AttachVehicleToProperty(playerid, propertyid)
 		if (gProperties[i][Vehicle][ID])
 			DestroyVehicle(gProperties[i][Vehicle]);
 
-		gProperties[i][Vehicle][ID] = CreateVehicle(gProperties[i][Vehicle][Model], Float:gProperties[i][LocationVehicle][CoordX], Float:gProperties[i][LocationVehicle][CoordY], Float:gProperties[i][LocationVehicle][CoordZ], Float:gProperties[i][LocationVehicle][CoordR], colour1, colour2, -1);
+		new vehiclePickupID = 0, pickupFound = false;
+
+		for (new j = 0; j < MAX_PROPERTY_PICKUPS; j++)
+		{
+			if (gPropertyCoords[i][j][PickupType] != 1)
+				continue;
+
+			vehiclePickupID = j;
+		}
+
+		if (!pickupFound)
+			return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Such property does not have a vehicle spot!");
+
+		gProperties[i][Vehicle][ID] = CreateVehicle(gProperties[i][Vehicle][Model], Float:gPropertyCoords[i][vehiclePickupID][Primary][CoordX], Float:gPropertyCoords[i][vehiclePickupID][Primary][CoordY], Float:gPropertyCoords[i][vehiclePickupID][Primary][CoordZ], Float:gPropertyCoords[i][vehiclePickupID][Primary][CoordR], colour1, colour2, -1);
 
 		for (new j = 0; j < 16; j++)
 		{

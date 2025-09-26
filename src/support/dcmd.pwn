@@ -1484,9 +1484,9 @@ dcmd_predit(playerid, const params[])
 		new Float:X, Float:Y, Float:Z;
 		GetPlayerPos(playerid, X, Y, Z);
 
-		gPropertyEdit[playerid][LocationEntrance][CoordX] = X;
-		gPropertyEdit[playerid][LocationEntrance][CoordY] = Y;
-		gPropertyEdit[playerid][LocationEntrance][CoordZ] = Z;
+		//gPropertyEdit[playerid][LocationEntrance][CoordX] = X;
+		//gPropertyEdit[playerid][LocationEntrance][CoordY] = Y;
+		//gPropertyEdit[playerid][LocationEntrance][CoordZ] = Z;
 
 		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Entrance pickup coords recorded!");
 		ShowPropertyEditDialogMain(playerid);
@@ -1496,9 +1496,9 @@ dcmd_predit(playerid, const params[])
 		new Float:X, Float:Y, Float:Z;
 		GetPlayerPos(playerid, X, Y, Z);
 
-		gPropertyEdit[playerid][LocationOffer][CoordX] = X;
-		gPropertyEdit[playerid][LocationOffer][CoordY] = Y;
-		gPropertyEdit[playerid][LocationOffer][CoordZ] = Z;
+		//gPropertyEdit[playerid][LocationOffer][CoordX] = X;
+		//gPropertyEdit[playerid][LocationOffer][CoordY] = Y;
+		//gPropertyEdit[playerid][LocationOffer][CoordZ] = Z;
 
 		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Offer pickup coords recorded!");
 		ShowPropertyEditDialogMain(playerid);
@@ -1509,10 +1509,10 @@ dcmd_predit(playerid, const params[])
 		GetPlayerPos(playerid, X, Y, Z);
 		GetPlayerFacingAngle(playerid, R);
 
-		gPropertyEdit[playerid][LocationVehicle][CoordX] = X;
-		gPropertyEdit[playerid][LocationVehicle][CoordY] = Y;
-		gPropertyEdit[playerid][LocationVehicle][CoordZ] = Z;
-		gPropertyEdit[playerid][LocationVehicle][CoordR] = R;
+		//gPropertyEdit[playerid][LocationVehicle][CoordX] = X;
+		//gPropertyEdit[playerid][LocationVehicle][CoordY] = Y;
+		//gPropertyEdit[playerid][LocationVehicle][CoordZ] = Z;
+		//gPropertyEdit[playerid][LocationVehicle][CoordR] = R;
 
 		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Vehicle coords recorded!");
 		ShowPropertyEditDialogMain(playerid);

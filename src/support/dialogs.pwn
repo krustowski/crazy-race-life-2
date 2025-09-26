@@ -23,7 +23,9 @@ enum
 	DIALOG_RACE_LIST,
 	DIALOG_PROPERTY_LIST,
 	DIALOG_PROPERTY_OPTIONS,
-	DIALOG_BANK_OPTIONS
+	DIALOG_BANK_OPTIONS,
+	DIALOG_BANK_DEPOSIT,
+	DIALOG_BANK_WITHDRAW
 };
 
 #include "modules/real.pwn"
@@ -305,7 +307,17 @@ stock ShowPropertyOptionsDialog(playerid)
 	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_OPTIONS, DIALOG_STYLE_LIST, propertyName, "Set spawn point\nAttach new vehicle\nSell property", "Select", "Cancel");
 }
 
-stock ShowBankDialog(playerid)
+stock ShowBankOptionsDialog(playerid)
 {
 	return ShowPlayerDialog(playerid, DIALOG_BANK_OPTIONS, DIALOG_STYLE_LIST, "Banking", "Deposit money\nWithdraw money\nAccount balance", "Select", "Cancel");
+}
+
+stock ShowBankDepositDialog(playerid)
+{
+	return ShowPlayerDialog(playerid, DIALOG_BANK_DEPOSIT, DIALOG_STYLE_INPUT, "Banking", "Entry cash amount ($) to deposit to your account:", "Deposit", "Cancel");
+}
+
+stock ShowBankWithdrawDialog(playerid)
+{
+	return ShowPlayerDialog(playerid, DIALOG_BANK_WITHDRAW, DIALOG_STYLE_INPUT, "Banking", "Entry cash amount ($) to withdraw from account:", "Withdraw", "Cancel");
 }

@@ -835,6 +835,66 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				return 1;
 			}
+		case DIALOG_BANK_OPTIONS:
+			{
+				if (!response)
+					return 1;
+
+				switch (listitem)
+				{
+					// Deposit
+					case 0:
+						{
+							gPlayers[playerid][DialogShown] = true;
+							return ShowBankDepositDialog(playerid);
+						}
+					case 1:
+						{
+							gPlayers[playerid][DialogShown] = true;
+							return ShowBankWithdrawDialog(playerid);
+						}
+					case 2: 
+						{
+							new stringToPrint[256];
+
+							format(stringToPrint, sizeof(stringToPrint), "[ ATM ] Account balance: $%d!", gPlayers[playerid][Bank]);
+							SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
+
+							gPlayers[playerid][DialogShown] = false;
+							return 1;
+						}
+				}
+			}
+		case DIALOG_BANK_DEPOSIT:
+			{
+				if (!response)
+				{
+					gPlayers[playerid][DialogShown] = false;
+					return 1;
+				}
+
+				if (!IsNumeric(inputtext) || !strval(inputtext))
+					return 1;
+
+				DepositMoneyToBankAccount(playerid, strval(inputtext));
+				gPlayers[playerid][DialogShown] = false;
+
+			}
+		case DIALOG_BANK_WITHDRAW:
+			{
+				if (!response)
+				{
+					gPlayers[playerid][DialogShown] = false;
+					return 1;
+				}
+
+				if (!IsNumeric(inputtext) || !strval(inputtext))
+					return 1;
+
+				WithdrawMoneyFromBankAccount(playerid, strval(inputtext));
+				gPlayers[playerid][DialogShown] = false;
+
+			}
 		case DIALOG_RACE_LIST:
 			{
 				if (!response)
@@ -904,7 +964,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		return 1;
 
 	//
-	// Banking
+	//  Banking
 	//
 
 	for (new i = 0; i < MAX_ATM_PICKUPS; i++)
@@ -912,7 +972,10 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		if (gBankPickups[i] != pickupid)
 			continue;
 
-		ShowBankDialog(playerid);
+		if (gPlayers[playerid][DialogShown])
+			continue;
+
+		ShowBankOptionsDialog(playerid);
 	}
 
 	//

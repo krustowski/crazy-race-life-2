@@ -176,31 +176,14 @@ dcmd_bank(playerid, const params[])
 	{
 		new targetAmount = strval(token2);
 
-		if (targetAmount > GetPlayerMoney(playerid))
-			return SendClientMessage(playerid, COLOR_RED, "[ ATM ] Invalid amount!");
+		DepositMoneyToBankAccount(playerid, targetAmount);
 
-		gPlayers[playerid][Bank] += targetAmount;
-		GivePlayerMoney(playerid, -targetAmount);
-
-		new stringToPrint[256];
-
-		format(stringToPrint, sizeof(stringToPrint), "[ ATM ] Cash deposit: $%d! Account balance: $%d!", targetAmount, gPlayers[playerid][Bank]);
-		SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
 	}
 	else if (!strcmp(token1, "draw"))
 	{
 		new targetAmount = strval(token2);
 
-		if (targetAmount > gPlayers[playerid][Bank])
-			return SendClientMessage(playerid, COLOR_RED, "[ ATM ] Invalid amount!");
-
-		gPlayers[playerid][Bank] -= targetAmount;
-		GivePlayerMoney(playerid, targetAmount);
-
-		new stringToPrint[256];
-
-		format(stringToPrint, sizeof(stringToPrint), "[ ATM ] Cash withdrawal: $%d! Account balance: $%d!", targetAmount, gPlayers[playerid][Bank]);
-		SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
+		WithdrawMoneyFromBankAccount(playerid, targetAmount);
 	}
 	else if (!strcmp(token1, "balance"))
 	{

@@ -796,6 +796,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 
 				SetPlayerRaceState(playerid, listitem + 1);
+
+				if (SetPlayerRaceStartPos(playerid))
+					return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ RACE ] Warp near the race start used successfully");
+
 				return 1;
 			}
 

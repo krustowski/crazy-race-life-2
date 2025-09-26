@@ -304,7 +304,9 @@ stock SpawnProperty(propertyId)
 
 						new playerName[MAX_PLAYER_NAME];
 						GetOwnerName(gProperties[propertyId][UserID], playerName);
-						Create3DTextLabel("%s owns this property", COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false, playerName);
+
+						if (strcmp(playerName, ""))
+							Create3DTextLabel("%s owns this property", COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false, playerName);
 					}
 				}
 		}

@@ -788,6 +788,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				ShowPropertyEditDialogMain(playerid);
 				return 1;
 			}
+		case DIALOG_PROPERTY_LIST:
+			{}
+		case DIALOG_RACE_LIST:
+			{
+				if (!response)
+					return 1;
+
+				SetPlayerRaceState(playerid, listitem + 1);
+				return 1;
+			}
 
 		default: 
 			return 0; // dialog ID was not found, search in other scripts

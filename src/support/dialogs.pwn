@@ -22,7 +22,8 @@ enum
 	DIALOG_PLAYER_DRUGZ,
 	DIALOG_RACE_LIST,
 	DIALOG_PROPERTY_LIST,
-	DIALOG_PROPERTY_OPTIONS
+	DIALOG_PROPERTY_OPTIONS,
+	DIALOG_BANK_OPTIONS
 };
 
 #include "modules/real.pwn"
@@ -302,4 +303,9 @@ stock ShowPropertyOptionsDialog(playerid)
         format(propertyName, sizeof(propertyName), "%s", gProperties[ GetPropertyArrayIDfromID( gPlayers[playerid][Temp] ) ][Label]);
 
 	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_OPTIONS, DIALOG_STYLE_LIST, propertyName, "Set spawn point\nAttach new vehicle\nSell property", "Select", "Cancel");
+}
+
+stock ShowBankDialog(playerid)
+{
+	return ShowPlayerDialog(playerid, DIALOG_BANK_OPTIONS, DIALOG_STYLE_LIST, "Banking", "Deposit money\nWithdraw money\nAccount balance", "Select", "Cancel");
 }

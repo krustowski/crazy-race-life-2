@@ -90,7 +90,7 @@ public InitPickups()
 	// ATMs.
 	for (new i = 0; i < sizeof(gBankLocation); i++)
 	{
-		EnsurePickupCreated(1274, PICKUP_TYPE_ALWAYS, Float:gBankLocation[i][0], Float:gBankLocation[i][1], Float:gBankLocation[i][2]);
+		gBankPickups[i] = EnsurePickupCreated(1274, PICKUP_TYPE_ALWAYS, Float:gBankLocation[i][0], Float:gBankLocation[i][1], Float:gBankLocation[i][2]);
 	}
 
 	//

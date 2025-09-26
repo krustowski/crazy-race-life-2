@@ -1,3 +1,7 @@
+#define MAX_ATM_PICKUPS 20
+
+new gBankPickups[MAX_ATM_PICKUPS];
+
 new Float: gBankLocation[][4] = 
 {
 	// LV

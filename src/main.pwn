@@ -904,6 +904,18 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		return 1;
 
 	//
+	// Banking
+	//
+
+	for (new i = 0; i < MAX_ATM_PICKUPS; i++)
+	{
+		if (gBankPickups[i] != pickupid)
+			continue;
+
+		ShowBankDialog(playerid);
+	}
+
+	//
 	//  Various joobs/teams pickups.
 	//
 

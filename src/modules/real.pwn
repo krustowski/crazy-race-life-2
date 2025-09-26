@@ -1152,6 +1152,76 @@ stock CheckRealEstatePickup(playerid, pickupid)
 	return 1;
 }
 
+stock AttachVehicleToProperty(playerid, propertyid)
+{
+	if (!IsPlayerOwner(playerid, propertyid))
+		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] You do not own such property!");
+
+	for (new i = 0; i < sizeof(gProperties); i++)
+	{
+		if (gProperties[i][ID] != propertyid || !gProperties[i][Occupied])
+			continue;
+
+		if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
+			return SendClientMessage(playerid, COLOR_RED, "[ REAL ] You must be driving/riding a vehicle!");
+
+		new vehicleId = GetPlayerVehicleID(playerid);
+		new modelId = GetVehicleModel(vehicleId);
+
+		if (gProperties[i][Vehicle][Model] == modelId)
+			return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Such vehicle model has been already attached to such property!");
+
+		gProperties[i][Vehicle][Model] = modelId;
+
+		new colour1, colour2;
+
+		GetVehicleColours(vehicleId, colour1, colour2);
+
+		gProperties[i][Vehicle][Colours][0] = colour1;
+		gProperties[i][Vehicle][Colours][1] = colour2;
+
+		for (new j = 0; j < 16; j++)
+		{
+			gProperties[i][Vehicle][Components][j] = GetVehicleComponentInSlot(vehicleId, t_CARMODTYPE: j);
+		}
+
+		if (gProperties[i][Vehicle][ID])
+			DestroyVehicle(gProperties[i][Vehicle]);
+
+		gProperties[i][Vehicle][ID] = CreateVehicle(gProperties[i][Vehicle][Model], Float:gProperties[i][LocationVehicle][CoordX], Float:gProperties[i][LocationVehicle][CoordY], Float:gProperties[i][LocationVehicle][CoordZ], Float:gProperties[i][LocationVehicle][CoordR], colour1, colour2, -1);
+
+		for (new j = 0; j < 16; j++)
+		{
+			if (gProperties[i][Vehicle][Components][j])
+				AddVehicleComponent(gProperties[i][Vehicle][ID], gProperties[i][Vehicle][Components][j]);
+		}
+
+		return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] This vehicle has been attached to your property successfully");
+	}
+
+	return 1;
+}
+
+stock SetSpawnPointAtProperty(playerid, propertyid)
+{
+	if (!IsPlayerOwner(playerid, propertyid))
+		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Such property must be owned first!");
+
+	for (new i = 0; i < sizeof(gProperties); i++)
+	{
+		if (gProperties[i][ID] != propertyid || !gProperties[i][Occupied])
+			continue;
+
+		gPlayers[playerid][SpawnPoint] = propertyid;
+
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] Spawn point changed successfully");
+
+		break;
+	}
+
+	return 1;
+}
+
 //
 //
 //

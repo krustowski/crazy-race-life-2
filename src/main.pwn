@@ -789,7 +789,52 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				return 1;
 			}
 		case DIALOG_PROPERTY_LIST:
-			{}
+			{
+				if (!response)
+					return 1;
+
+				new propertyid = gPlayers[playerid][Properties][listitem];
+
+				if (!propertyid)
+					return 1;
+
+				gPlayers[playerid][Temp] = propertyid;
+
+				ShowPropertyOptionsDialog(playerid);
+
+				return 1;
+			}
+		case DIALOG_PROPERTY_OPTIONS:
+			{
+				if (!response)
+				{
+					gPlayers[playerid][Temp] = 0;
+					return 1;
+				}
+
+				new propertyid = gPlayers[playerid][Temp];
+
+				switch (listitem)
+				{
+					// Spawn point setup
+					case 0:
+						{
+							SetSpawnPointAtProperty(playerid, propertyid);
+						}
+						// New vehicle attachment
+					case 1:
+						{
+							AttachVehicleToProperty(playerid, propertyid);
+						}
+						// Property selling
+					case 2: 
+						{
+							SellPlayerProperty(playerid, propertyid);
+						}
+				}
+
+				return 1;
+			}
 		case DIALOG_RACE_LIST:
 			{
 				if (!response)

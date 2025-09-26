@@ -21,7 +21,8 @@ enum
 	DIALOG_ADMINS_ONLINE,
 	DIALOG_PLAYER_DRUGZ,
 	DIALOG_RACE_LIST,
-	DIALOG_PROPERTY_LIST
+	DIALOG_PROPERTY_LIST,
+	DIALOG_PROPERTY_OPTIONS
 };
 
 #include "modules/real.pwn"
@@ -293,4 +294,12 @@ stock ShowPropertyListDialog(playerid)
 	}
 
 	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Property List", stringToPrint, "Select", "Cancel");
+}
+
+stock ShowPropertyOptionsDialog(playerid)
+{
+	new propertyName[64];
+        format(propertyName, sizeof(propertyName), "%s", gProperties[ GetPropertyArrayIDfromID( gPlayers[playerid][Temp] ) ][Label]);
+
+	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_OPTIONS, DIALOG_STYLE_LIST, propertyName, "Set spawn point\nAttach new vehicle\nSell property", "Select", "Cancel");
 }

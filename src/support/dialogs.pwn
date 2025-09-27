@@ -27,7 +27,8 @@ enum
 	DIALOG_BANK_DEPOSIT,
 	DIALOG_BANK_WITHDRAW,
 	DIALOG_PORT_LIST,
-	DIALOG_TRUCKING_POINT_LIST
+	DIALOG_TRUCKING_POINT_LIST,
+	DIALOG_PROPERTY_EDITOR_LIST
 };
 
 #include "modules/real.pwn"
@@ -355,4 +356,23 @@ stock ShowTruckingPointListDialog(playerid)
 	}
 
 	return ShowPlayerDialog(playerid, DIALOG_TRUCKING_POINT_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Trucking Points", stringToPrint, "Edit", "Cancel");
+}
+
+stock ShowPropertyEditorListDialog(playerid)
+{
+	new stringToPrint[2048] = "Property Name\tID";
+
+	for (new i = 0; i < MAX_PROPERTIES; i++)
+	{
+		if (!gProperties[i][ID])
+			continue;
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
+				stringToPrint,
+				gProperties[i][Label],
+				gProperties[i][ID]
+			);
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_EDITOR_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Property Editor", stringToPrint, "Edit", "Cancel");
 }

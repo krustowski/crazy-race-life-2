@@ -1439,6 +1439,8 @@ dcmd_predit(playerid, const params[])
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4)
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
+	return ShowPropertyEditorListDialog(playerid);
+
 	new token1[32], token2[32];
 	SplitIntoTwo(params, token1, token2, sizeof(token1));
 

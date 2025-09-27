@@ -165,8 +165,6 @@ public InitRealEstateProperties()
 
 	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
-		printf("public InitRealEstateProperties(): i = %d", i);
-
 		if (!gProperties[i][ID])
 			continue;
 		
@@ -235,7 +233,7 @@ stock SpawnProperty(propertyId)
 
 		gPropertyCoords[propertyId][i][PickupType] = type;
 
-		printf("stock SpawnProperty(): i = %d\n", i);
+		//printf("stock SpawnProperty(): i = %d", i);
 
 		switch (type)
 		{
@@ -415,15 +413,15 @@ stock SaveRealEstateData()
 {
 	new query[1024];
 
-	new vehicle_id = 0;
-
 	for (new i = 0; i < sizeof(gProperties); i++)
 	{
+		new vehicle_id = 0;
+
 		if (!gProperties[i][ID])
 			continue;
 
 		if (gProperties[i][Vehicle][Model]) {
-			vehicle_id = gPlayers[i][ID];
+			vehicle_id = gProperties[i][ID];
 
 			new componentsString[128];
 
@@ -454,7 +452,7 @@ stock SaveRealEstateData()
 			DB_FreeResultSet(result_vehicle);
 		}
 
-		format(query, sizeof(query), "INSERT INTO properties (id,user_id,vehicle_id,name,cost,occupied,custom_interior) VALUES (%d, %d, %d, '%s', %d, %d, %d) ON CONFLICT(id) DO UPDATE SET occupied = excluded.occupied, user_id = excluded.user_id, custom_interior = excluded.custom_interior",
+		format(query, sizeof(query), "INSERT INTO properties (id,user_id,vehicle_id,name,cost,occupied,custom_interior) VALUES (%d, %d, %d, '%s', %d, %d, %d) ON CONFLICT(id) DO UPDATE SET occupied = excluded.occupied, user_id = excluded.user_id, custom_interior = excluded.custom_interior, vehicle_id = excluded.vehicle_id",
 				gProperties[i][ID],
 				gProperties[i][UserID],
 				vehicle_id,
@@ -552,7 +550,7 @@ stock LoadRealEstateData()
 
 		new vehicle_id;
 
-		vehicle_id = DB_GetFieldInt(result, FIELD_VEHICLE_ID);
+		vehicle_id = DB_GetFieldIntByName(result, "vehicle_id");
 
 		if (!vehicle_id) {
 			i++;
@@ -1130,7 +1128,7 @@ stock AttachVehicleToProperty(playerid, propertyid)
 	if (!IsPlayerOwner(playerid, propertyid))
 		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] You do not own such property!");
 
-	for (new i = 0; i < sizeof(gProperties); i++)
+	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
 		if (gProperties[i][ID] != propertyid || !gProperties[i][Occupied])
 			continue;
@@ -1143,6 +1141,20 @@ stock AttachVehicleToProperty(playerid, propertyid)
 
 		if (gProperties[i][Vehicle][Model] == modelId)
 			return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Such vehicle model has been already attached to such property!");
+
+		new vehiclePickupID = 0, pickupFound = false;
+
+		for (new j = 0; j < MAX_PROPERTY_PICKUPS; j++)
+		{
+			if (gPropertyCoords[i][j][PickupType] != 7)
+				continue;
+
+			vehiclePickupID = j;
+			pickupFound = true;
+		}
+
+		if (!pickupFound)
+			return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Such property does not have a vehicle spot!");
 
 		gProperties[i][Vehicle][Model] = modelId;
 
@@ -1160,19 +1172,6 @@ stock AttachVehicleToProperty(playerid, propertyid)
 
 		if (gProperties[i][Vehicle][ID])
 			DestroyVehicle(gProperties[i][Vehicle]);
-
-		new vehiclePickupID = 0, pickupFound = false;
-
-		for (new j = 0; j < MAX_PROPERTY_PICKUPS; j++)
-		{
-			if (gPropertyCoords[i][j][PickupType] != 1)
-				continue;
-
-			vehiclePickupID = j;
-		}
-
-		if (!pickupFound)
-			return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Such property does not have a vehicle spot!");
 
 		gProperties[i][Vehicle][ID] = CreateVehicle(gProperties[i][Vehicle][Model], Float:gPropertyCoords[i][vehiclePickupID][Primary][CoordX], Float:gPropertyCoords[i][vehiclePickupID][Primary][CoordY], Float:gPropertyCoords[i][vehiclePickupID][Primary][CoordZ], Float:gPropertyCoords[i][vehiclePickupID][Primary][CoordR], colour1, colour2, -1);
 

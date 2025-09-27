@@ -195,7 +195,7 @@ stock ShowCommonCommandsDialog(playerid)
 
 			"/lock\t\t\tlocks the player's vehicle\n",
 			"/pm ID TEXT\t\tsends the private message to other player ($10)\n",
-			"/port ID\t\t\tenables to warp to special location IDs on map\n",
+			"/port\t\t\tenables to warp to special locations on map\n",
 			"/property SUBCMD ID\tlists subcommands for property ID handling\n",
 			"/race SUBCMD ID\tlists subcommands for racing module\n",
 

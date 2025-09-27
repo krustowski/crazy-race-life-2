@@ -26,7 +26,8 @@ enum
 	DIALOG_BANK_OPTIONS,
 	DIALOG_BANK_DEPOSIT,
 	DIALOG_BANK_WITHDRAW,
-	DIALOG_PORT_LIST
+	DIALOG_PORT_LIST,
+	DIALOG_TRUCKING_POINT_LIST
 };
 
 #include "modules/real.pwn"
@@ -333,4 +334,25 @@ stock ShowPortListDialog(playerid)
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_PORT_LIST, DIALOG_STYLE_LIST, "Port List", portList, "Port", "Cancel");
+}
+
+#include "modules/trucking.pwn"
+
+stock ShowTruckingPointListDialog(playerid)
+{
+	new stringToPrint[1024] = "Point Name\tID";
+
+	for (new i = 0; i < MAX_TRUCKING_POINTS; i++)
+	{
+		if (!gTruckingPoints[i][Type] || !gTruckingPoints[i][ID])
+			continue;
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
+				stringToPrint,
+				gTruckingPoints[i][Name],
+				gTruckingPoints[i][ID]
+			);
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_TRUCKING_POINT_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Trucking Points", stringToPrint, "Edit", "Cancel");
 }

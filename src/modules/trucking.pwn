@@ -284,6 +284,7 @@ stock InitTrucking()
 	do 
 	{
 		new id = DB_GetFieldIntByName(result, "id");
+		new type = DB_GetFieldIntByName(result, "type");
 		new name[64];
 
 		if (!id)
@@ -291,9 +292,11 @@ stock InitTrucking()
 			continue;
 		}
 
-		DB_GetFieldString(result, 1, name, sizeof(name));
+		DB_GetFieldStringByName(result, "name", name, sizeof(name));
 
 		gTruckingPoints[id][Name] = name;
+		gTruckingPoints[id][ID] = id;
+		gTruckingPoints[id][Type] = type;
 	}
 	while (DB_SelectNextRow(result));
 

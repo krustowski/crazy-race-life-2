@@ -910,6 +910,30 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				return 1;
 			}
+		case DIALOG_PORT_LIST: 
+			{
+				if (!response)
+					return 1;
+
+				if (IsPlayerInAnyVehicle(playerid))
+					RemovePlayerFromVehicle(playerid);
+
+				switch (listitem)
+				{
+					case 0:
+						{
+							SetPlayerPos(playerid, 1958.3783, 1343.1572, 15.3746);
+							SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] Las Venturas Escalators");
+						}
+					case 1:
+						{
+							SetPlayerPos(playerid, -1951.58, 296.77, 41.04);
+							SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] San Fierro WangCars");
+						}
+				}
+
+				return 1;
+			}
 
 		default: 
 			return 0; // dialog ID was not found, search in other scripts

@@ -523,30 +523,12 @@ dcmd_pm(playerid, const params[])
 
 dcmd_port(playerid, const params[])
 {
+#pragma unused params
+
 	if (gPlayers[playerid][InsideProperty])
 		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Leave the property to be able to use such command!");
 
-	if (IsPlayerInAnyVehicle(playerid))
-		RemovePlayerFromVehicle(playerid);
-
-	if (!strlen(params) || !IsNumeric(params))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /port [location ID]");
-
-	switch (strval(params))
-	{
-		case 0:
-			{
-				SetPlayerPos(playerid, 1958.3783, 1343.1572, 15.3746);
-				SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] Las Venturas Escalators");
-			}
-		case 1:
-			{
-				SetPlayerPos(playerid, -1951.58, 296.77, 41.04);
-				SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] San Fierro WangCars");
-			}
-	}
-
-	return 1;
+	return ShowPortListDialog(playerid);
 }
 
 dcmd_property(playerid, const params[])

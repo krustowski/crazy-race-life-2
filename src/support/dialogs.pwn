@@ -25,7 +25,8 @@ enum
 	DIALOG_PROPERTY_OPTIONS,
 	DIALOG_BANK_OPTIONS,
 	DIALOG_BANK_DEPOSIT,
-	DIALOG_BANK_WITHDRAW
+	DIALOG_BANK_WITHDRAW,
+	DIALOG_PORT_LIST
 };
 
 #include "modules/real.pwn"
@@ -320,4 +321,16 @@ stock ShowBankDepositDialog(playerid)
 stock ShowBankWithdrawDialog(playerid)
 {
 	return ShowPlayerDialog(playerid, DIALOG_BANK_WITHDRAW, DIALOG_STYLE_INPUT, "Banking", "Entry cash amount ($) to withdraw from account:", "Withdraw", "Cancel");
+}
+
+stock ShowPortListDialog(playerid)
+{
+	new portList[256];
+
+	format(portList, sizeof(portList), "%s\n%s",
+			"Las Venturas Escalators",
+			"San Fierro WangCars"
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_PORT_LIST, DIALOG_STYLE_LIST, "Port List", portList, "Port", "Cancel");
 }

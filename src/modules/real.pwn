@@ -1171,9 +1171,17 @@ stock AttachVehicleToProperty(playerid, propertyid)
 		}
 
 		if (gProperties[i][Vehicle][ID])
-			DestroyVehicle(gProperties[i][Vehicle]);
+		{
+			DestroyVehicle(gProperties[i][Vehicle][ID]);
+		}
 
-		gProperties[i][Vehicle][ID] = CreateVehicle(gProperties[i][Vehicle][Model], Float:gPropertyCoords[i][vehiclePickupID][Primary][CoordX], Float:gPropertyCoords[i][vehiclePickupID][Primary][CoordY], Float:gPropertyCoords[i][vehiclePickupID][Primary][CoordZ], Float:gPropertyCoords[i][vehiclePickupID][Primary][CoordR], colour1, colour2, -1);
+		new 
+			Float: pX = gPropertyCoords[i][vehiclePickupID][Primary][CoordX],
+			Float: pY = gPropertyCoords[i][vehiclePickupID][Primary][CoordY],
+			Float: pZ = gPropertyCoords[i][vehiclePickupID][Primary][CoordZ],
+			Float: pR = gPropertyCoords[i][vehiclePickupID][Primary][CoordR];
+
+		gProperties[i][Vehicle][ID] = CreateVehicle(modelId, pX, pY, pZ, pR, colour1, colour2, -1);
 
 		for (new j = 0; j < 16; j++)
 		{

@@ -51,7 +51,6 @@
 #include "support/http.pwn" 
 
 new const GAMEMODE_NAME[] = "CrazyRaceLife2";
-new const GAMEMODE_CREDITS[] = "krusty, kompry, DRaGsTeR, amdulka";
 
 new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 
@@ -954,6 +953,79 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				return 1;
 			}
+		case DIALOG_PLAYER_CLICKED_LIST:
+			{
+				if (!response)
+					return 1;
+
+				new clickedplayerid = gPlayers[playerid][Temp];
+				gPlayers[playerid][Temp] = 0;
+
+				if (!IsPlayerConnected(clickedplayerid))
+					return SendClientMessage(playerid, COLOR_RED, "[ ! ] Player not connected!");
+
+				switch (listitem)
+				{
+					case 0:
+						// Set HP
+						{
+							SetPlayerHealth(clickedplayerid, 100.0);
+							SetPlayerArmour(clickedplayerid, 100.0);
+
+							SendClientMessage(clickedplayerid, COLOR_LIGHTGREEN, "[ HP ] Health: 100.0, Armour: 100.0");
+						}
+					case 1:
+						// Install nitro
+						{
+							SetPlayerVehicleNitro(playerid, clickedplayerid);
+						}
+					case 2:
+						// Get the player (port)
+						{
+							MovePlayerToPlayer(playerid, clickedplayerid, true);
+						}
+					case 3:
+						// Goto player (port)
+						{
+							MovePlayerToPlayer(playerid, clickedplayerid, false);
+						}
+					case 4:
+						// Set skin ID
+						{}
+					case 5:
+						// Set drunk drunk level
+						{}
+					case 6:
+						// Kick from server
+						{}
+					case 7:
+						// Packet loss
+						{}
+					case 8:
+						// Reset cach money
+						{}
+					case 9:
+						// Spectate
+						{}
+					case 10:
+						// Give weapons
+						{}
+					case 11:
+						// Give a specific weapon
+						{}
+					case 12:
+						// Ban
+						{}
+					case 13:
+						// Send fakechat
+						{}
+					case 14:
+						// Set admin level
+						{}
+				}
+
+				return 1;
+			}
 
 		default: 
 			return 0; // dialog ID was not found, search in other scripts
@@ -1042,13 +1114,13 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	//
 
 	/*for (new i = 0; i < MAX_TRUCKING_POINTS; i++)
-	{
-		if (pickupid == gTruckingPoints[i][InfoPickup])
-		{
-			format(stringToPrint, sizeof(stringToPrint), "Info Point\n\n%s\n", gTruckingPoints[i][Name]);
-			return ShowPlayerDialog(playerid, DIALOG_TRUCKING_INFO, DIALOG_STYLE_MSGBOX, "Trucking Point", stringToPrint, "Close", "");
-		}
-	}*/
+	  {
+	  if (pickupid == gTruckingPoints[i][InfoPickup])
+	  {
+	  format(stringToPrint, sizeof(stringToPrint), "Info Point\n\n%s\n", gTruckingPoints[i][Name]);
+	  return ShowPlayerDialog(playerid, DIALOG_TRUCKING_INFO, DIALOG_STYLE_MSGBOX, "Trucking Point", stringToPrint, "Close", "");
+	  }
+	  }*/
 
 	//
 	//  Real Estate pickups.

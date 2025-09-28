@@ -1230,33 +1230,10 @@ dcmd_get(playerid, const params[])
 		//return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /get [ID]!");
 		return ShowGetPlayerListDialog(playerid);
 
-	new targetId = strval(params), Float:x, Float:y, Float:z;
+	new targetid = strval(params);
 
-	if (!IsPlayerConnected(targetId)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+	return MovePlayerToPlayer(playerid, targetid, true);
 
-	if (targetId == playerid)
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Cannot get such player!");
-
-	GetPlayerPos(playerid, x, y, z);
-
-	new targetPlayerState = GetPlayerState(targetId), targetVehicleId = GetPlayerVehicleID(targetId);
-
-	SetPlayerInterior(targetId, 0);
-
-	switch (targetPlayerState)
-	{
-		case PLAYER_STATE_DRIVER:
-			{
-				SetVehiclePos(targetVehicleId, x, y, z);
-			}
-		default:
-			{
-				SetPlayerPos(targetId, x, y, z);
-			}
-	}
-
-	return 1;
 }
 
 dcmd_goto(playerid, const params[])
@@ -1265,38 +1242,12 @@ dcmd_goto(playerid, const params[])
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	if (!strlen(params) || !IsNumeric(params)) 
-		//return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usagei: /goto [ID]!");
+		//return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /goto [ID]!");
 		return ShowGotoPlayerListDialog(playerid);
 
-	new targetId = strval(params), Float:x, Float:y, Float:z;
+	new targetid = strval(params);
 
-	if (!IsPlayerConnected(targetId)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
-
-	if (targetId == playerid)
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Cannot go to the player!");
-
-	// Fetch the coordinates of the targetId player.
-	GetPlayerPos(targetId, x, y, z);
-
-	new playerState = GetPlayerState(playerid), vehicleId = GetPlayerVehicleID(playerid);
-
-	// Ensure the player is outside.
-	SetPlayerInterior(playerid, 0);
-
-	switch (playerState) 
-	{
-		case PLAYER_STATE_DRIVER:
-			{
-				SetVehiclePos(vehicleId, x, y, z);
-			}
-		default:
-			{
-				SetPlayerPos(playerid, x, y, z);
-			}
-	}
-
-	return 1;
+	return MovePlayerToPlayer(playerid, targetid, false);
 }
 
 dcmd_hp(playerid, const params[])
@@ -1395,35 +1346,9 @@ dcmd_nitro(playerid, const params[])
 	if (!strlen(params) || !IsNumeric(params))
 		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /nitro [ID]");
 
-	new targetId = strval(params);
+	new targetid = strval(params);
 
-	if (!IsPlayerConnected(targetId))
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
-
-	if (!IsPlayerInAnyVehicle(targetId))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] The player must be driving a vehicle!");
-
-	new t_PLAYER_STATE: targetPlayerState = GetPlayerState(targetId), targetVehicleId = GetPlayerVehicleID(targetId);
-
-	if (targetPlayerState != PLAYER_STATE_DRIVER)
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] The player must be driving a vehicle!");
-
-	if (!IsPlayerInValidNosVehicle(targetId, targetVehicleId)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Cannot mod such vehicle!");
-
-	new adminName[MAX_PLAYER_NAME], stringToPrint[128];
-
-	GetPlayerName(playerid, adminName, sizeof(adminName));
-
-	// Add the NoS component to such vehicleId.
-	AddVehicleComponent(targetVehicleId, 1010);
-
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s installed the Nitrous component to your vehicle!", adminName);
-
-	SendClientMessage(playerid, COLOR_GREY, "[ i ] The Nitrous component installed for the player!");
-	SendClientMessage(targetId, COLOR_LIGHTGREEN, stringToPrint);
-
-	return 1;
+	return SetPlayerVehicleNitro(playerid, targetid);
 }
 
 dcmd_packet(playerid, const params[])

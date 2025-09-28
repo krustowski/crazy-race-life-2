@@ -8,6 +8,7 @@
 #include "db/sql.pwn"
 #include "modules/team.pwn"
 #include "modules/drugz.pwn"
+#include "support/helpers.pwn"
 
 //
 //  Player's props.
@@ -345,6 +346,81 @@ stock OnPlayerPrivMsg(playerid, receiverid, text[])
 	GameTextForPlayer(receiverid, "~w~PM ~g~Prijata~w~.", 3000, 3);
 
 	GivePlayerMoney(playerid, -10); 
+
+	return 1;
+}
+
+stock MovePlayerToPlayer(playerid, targetid, bool: reversed)
+{
+	if (!IsPlayerConnected(playerid) || !IsPlayerConnected(targetid)) 
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+
+	if (targetid == playerid)
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Cannot get such player!");
+
+	new 
+		portedid,
+		Float: X, 
+		Float: Y, 
+		Float: Z;
+
+	if (!reversed)
+	{
+		GetPlayerPos(targetid, X, Y, Z);
+		portedid = targetid;
+	}
+	else
+	{
+		GetPlayerPos(playerid, X, Y, Z);
+		portedid = playerid;
+	}
+
+	new portedPlayerState = GetPlayerState(portedid), portedVehicleId = GetPlayerVehicleID(portedid);
+
+	SetPlayerInterior(portedid, 0);
+
+	switch (portedPlayerState)
+	{
+		case PLAYER_STATE_DRIVER:
+			{
+				SetVehiclePos(portedVehicleId, X, Y, Z);
+			}
+		default:
+			{
+				SetPlayerPos(portedid, X, Y, Z);
+			}
+	}
+
+	return 1;
+}
+
+stock SetPlayerVehicleNitro(playerid, targetid)
+{
+	if (!IsPlayerConnected(targetid))
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+
+	if (!IsPlayerInAnyVehicle(targetid))
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] The player must be driving a vehicle!");
+
+	new t_PLAYER_STATE: targetPlayerState = GetPlayerState(targetid), targetVehicleId = GetPlayerVehicleID(targetid);
+
+	if (targetPlayerState != PLAYER_STATE_DRIVER)
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] The player must be driving a vehicle!");
+
+	if (!IsPlayerInValidNosVehicle(targetid, targetVehicleId)) 
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Cannot mod such vehicle!");
+
+	new adminName[MAX_PLAYER_NAME], stringToPrint[128];
+
+	GetPlayerName(playerid, adminName, sizeof(adminName));
+
+	// Add the NoS component to such vehicleId.
+	AddVehicleComponent(targetVehicleId, 1010);
+
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s installed the Nitrous component to your vehicle!", adminName);
+
+	SendClientMessage(playerid, COLOR_GREY, "[ i ] The Nitrous component installed for the player!");
+	SendClientMessage(targetid, COLOR_LIGHTGREEN, stringToPrint);
 
 	return 1;
 }

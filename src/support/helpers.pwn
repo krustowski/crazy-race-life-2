@@ -6,6 +6,8 @@
 #define RC_TANK    	564
 #define RC_CAM      	594
 
+new const GAMEMODE_CREDITS[] = "krusty, kompry, DRaGsTeR, amdulka";
+
 forward AutosaveData();
 forward StartServerReset();
 
@@ -18,7 +20,6 @@ public AutosaveData()
 public StartServerReset()
 {
 	SendRconCommand("gmx");
-
 	return 1;
 }
 
@@ -116,7 +117,7 @@ stock GetPlayerDistanceToPointEx(playerid, Float:x, Float:y, Float:z)
 	return floatround(tmpdis);
 }
 
-stock bool:IsPlayerInValidNosVehicle(playerid, vehicleid)
+stock bool: IsPlayerInValidNosVehicle(playerid, vehicleid)
 {
 #define MAX_INVALID_NOS_VEHICLES 31
 

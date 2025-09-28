@@ -1033,14 +1033,14 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	//  Trucking pickups.
 	//
 
-	for (new i = 0; i < MAX_TRUCKING_POINTS; i++)
+	/*for (new i = 0; i < MAX_TRUCKING_POINTS; i++)
 	{
 		if (pickupid == gTruckingPoints[i][InfoPickup])
 		{
 			format(stringToPrint, sizeof(stringToPrint), "Info Point\n\n%s\n", gTruckingPoints[i][Name]);
 			return ShowPlayerDialog(playerid, DIALOG_TRUCKING_INFO, DIALOG_STYLE_MSGBOX, "Trucking Point", stringToPrint, "Close", "");
 		}
-	}
+	}*/
 
 	//
 	//  Real Estate pickups.

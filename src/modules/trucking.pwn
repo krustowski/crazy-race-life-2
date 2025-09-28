@@ -214,9 +214,41 @@ stock InitTrucking()
 {
 	new i = 0, query[512];
 
-	format(query, sizeof(query), "SELECT type, x, y, z, rot FROM trucking_coords"); 
+	format(query, sizeof(query), "SELECT id, name, type FROM trucking_points"); 
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) 
+	{
+		printf("Database error: cannot read trucking points data");
+		print(query);
+
+		return 0;
+	}
+
+	do 
+	{
+		new id = DB_GetFieldIntByName(result, "id");
+		new type = DB_GetFieldIntByName(result, "type");
+		new name[64];
+
+		if (!id)
+		{
+			continue;
+		}
+
+		DB_GetFieldStringByName(result, "name", name, sizeof(name));
+
+		gTruckingPoints[id][Name] = name;
+		gTruckingPoints[id][ID] = id;
+		gTruckingPoints[id][Type] = type;
+	}
+	while (DB_SelectNextRow(result));
+
+	//
+
+	format(query, sizeof(query), "SELECT type, x, y, z, rot, trucking_id FROM trucking_coords"); 
+
+	result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		printf("Database error: cannot read trucking coords data");
@@ -248,6 +280,10 @@ stock InitTrucking()
 			case CT_INFO_PICKUP:
 				{
 					gTruckingPoints[i][InfoPickup] = EnsurePickupCreated(1239, 1, X, Y, Z);
+
+					new trucking_id = DB_GetFieldIntByName(result, "trucking_id");
+
+					Create3DTextLabel("%s", COLOR_ORANGE, X, Y, Z, 15.0, -1, false, gTruckingPoints[trucking_id][Name]);
 				}
 			case CT_JOB_PICKUP:
 				{}
@@ -269,36 +305,6 @@ stock InitTrucking()
 	while (DB_SelectNextRow(result));
 
 	DB_FreeResultSet(result);
-
-	format(query, sizeof(query), "SELECT id, name, type FROM trucking_points"); 
-
-	result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) 
-	{
-		printf("Database error: cannot read trucking points data");
-		print(query);
-
-		return 0;
-	}
-
-	do 
-	{
-		new id = DB_GetFieldIntByName(result, "id");
-		new type = DB_GetFieldIntByName(result, "type");
-		new name[64];
-
-		if (!id)
-		{
-			continue;
-		}
-
-		DB_GetFieldStringByName(result, "name", name, sizeof(name));
-
-		gTruckingPoints[id][Name] = name;
-		gTruckingPoints[id][ID] = id;
-		gTruckingPoints[id][Type] = type;
-	}
-	while (DB_SelectNextRow(result));
 
 	print("Trucking initialized!");
 

@@ -87,7 +87,12 @@ public AddMapicons(playerid)
 		if (!strcmp(gRaces[i][Name], ""))
 			continue;
 
-		SetPlayerMapIcon(playerid, 50 + i - 1, gRaces[i][Start][E_RACE_COORD_X], gRaces[i][Start][E_RACE_COORD_Y], gRaces[i][Start][E_RACE_COORD_Z], E_MAPICON_ID_RACE_TOURNAMENT, 0, MAPICON_LOCAL);
+		new 
+			Float: pX = gRaces[i][Start][E_RACE_COORD_X],
+			Float: pY = gRaces[i][Start][E_RACE_COORD_Y],
+			Float: pZ = gRaces[i][Start][E_RACE_COORD_Z];
+
+		SetPlayerMapIcon(playerid, 50 + i - 1, pX, pY, pZ, E_MAPICON_ID_RACE_TOURNAMENT, 0, MAPICON_LOCAL);
 	}
 
 	// Housing.

@@ -67,9 +67,21 @@ public InitRaces()
 		gRaces[i][CostDollars] = DB_GetFieldIntByName(result, "cost_dollars");
 		gRaces[i][PrizeDollars] = DB_GetFieldIntByName(result, "prize_dollars");
 
-		gRaces[i][Start][E_RACE_COORD_X] = DB_GetFieldFloatByName(result, "start_x");
-		gRaces[i][Start][E_RACE_COORD_Y] = DB_GetFieldFloatByName(result, "start_y");
-		gRaces[i][Start][E_RACE_COORD_Z] = DB_GetFieldFloatByName(result, "start_z");
+		new 
+			Float: pX,
+			Float: pY,
+			Float: pZ;
+
+		pX = DB_GetFieldFloatByName(result, "start_x");
+		pY = DB_GetFieldFloatByName(result, "start_y");
+		pZ = DB_GetFieldFloatByName(result, "start_z");
+
+		gRaces[i][Start][E_RACE_COORD_X] = pX;
+		gRaces[i][Start][E_RACE_COORD_Y] = pY;
+		gRaces[i][Start][E_RACE_COORD_Z] = pZ;
+
+		EnsurePickupCreated(1314, 1, pX, pY, pZ);
+		Create3DTextLabel("%s", COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false, name);
 
 		i++;
 	}

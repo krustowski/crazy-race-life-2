@@ -997,25 +997,62 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{}
 					case 6:
 						// Kick from server
-						{}
+						{
+							new adminName[MAX_PLAYER_NAME], kickedName[MAX_PLAYER_NAME], stringToPrint[128];
+
+							GetPlayerName(playerid, adminName, sizeof(adminName));
+							GetPlayerName(clickedplayerid, kickedName, sizeof(kickedName));
+
+							format(stringToPrint, sizeof(stringToPrint), "[ KICK ] Admin %s [ID: %d] kicked player %s [ID: %d] from server! ", adminName, playerid, kickedName, clickedplayerid);
+
+							SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+							Kick(clickedplayerid);
+						}
 					case 7:
 						// Packet loss
-						{}
+						{
+							new 
+								Float: loss = 0.0, 
+								stringToPrint[128];
+
+							GetPlayerPacketLoss(clickedplayerid, loss);
+
+							format(stringToPrint, sizeof(stringToPrint), "[ NET ] Player ID: %d, packet loss: %.2f %%", clickedplayerid, loss);
+							SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
+						}
 					case 8:
 						// Reset cach money
-						{}
+						{
+							ResetPlayerMoney(clickedplayerid);
+						}
 					case 9:
 						// Spectate
 						{}
 					case 10:
 						// Give weapons
-						{}
+						{
+							GivePlayerWeapon(clickedplayerid, t_WEAPON: 26, 400);
+							GivePlayerWeapon(clickedplayerid, t_WEAPON: 28, 400);
+							GivePlayerWeapon(clickedplayerid, t_WEAPON: 31, 400);
+							GivePlayerWeapon(clickedplayerid, t_WEAPON: 43, 1);
+							GivePlayerWeapon(clickedplayerid, t_WEAPON: 46, 1);
+						}
 					case 11:
 						// Give a specific weapon
 						{}
 					case 12:
 						// Ban
-						{}
+						{
+							new adminName[MAX_PLAYER_NAME], bannedName[MAX_PLAYER_NAME], stringToPrint[128];
+
+							GetPlayerName(playerid, adminName, sizeof(adminName));
+							GetPlayerName(clickedplayerid, bannedName, sizeof(bannedName));
+
+							format(stringToPrint, sizeof(stringToPrint), "[ BAN ] Admin %s [ID: %d] banned player %s [ID: %d] from server!", adminName, playerid, bannedName, clickedplayerid);
+							SendClientMessageToAll(COLOR_CYAN, stringToPrint);
+
+							Ban(clickedplayerid);
+						}
 					case 13:
 						// Send fakechat
 						{}

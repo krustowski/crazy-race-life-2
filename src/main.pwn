@@ -899,8 +899,26 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if (!gPlayerRace[playerid][listitem + 1])
 					return 1;
 
+				/*if (!CheckPlayerRaceState(playerid))
+					return 1;*/
+
 				if (SetPlayerRaceStartPos(playerid))
 					return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ RACE ] Warp near the race start used successfully");
+
+				return 1;
+			}
+		case DIALOG_RACE_OPTIONS:
+			{
+				if (!response)
+					return 1;
+
+				switch (listitem)
+				{
+					case 0:
+						{
+							ResetPlayerRaceState(playerid, 0, false);
+						}
+				}
 
 				return 1;
 			}

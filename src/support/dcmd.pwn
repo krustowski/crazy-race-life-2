@@ -586,7 +586,12 @@ dcmd_race(playerid, const params[])
 {
 #pragma unused params
 
-	return ShowRaceListDialog(playerid);
+	new raceid = CheckPlayerRaceState(playerid);
+
+	if (!raceid)
+		return ShowRaceListDialog(playerid);
+
+	return ShowRaceOptionsDialog(playerid, raceid);
 
 	/*new token1[32], token2[32];
 	SplitIntoTwo(params, token1, token2, sizeof(token1));

@@ -28,7 +28,8 @@ enum
 	DIALOG_BANK_WITHDRAW,
 	DIALOG_PORT_LIST,
 	DIALOG_TRUCKING_POINT_LIST,
-	DIALOG_PROPERTY_EDITOR_LIST
+	DIALOG_PROPERTY_EDITOR_LIST,
+	DIALOG_RACE_OPTIONS
 };
 
 #include "modules/real.pwn"
@@ -375,4 +376,12 @@ stock ShowPropertyEditorListDialog(playerid)
 	}
 
 	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_EDITOR_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Property Editor", stringToPrint, "Edit", "Cancel");
+}
+
+stock ShowRaceOptionsDialog(playerid, raceid)
+{
+	new title[70];
+	format(title, sizeof(title), "Race '%s'", gRaces[raceid][Name]);
+
+	return ShowPlayerDialog(playerid, DIALOG_RACE_OPTIONS, DIALOG_STYLE_LIST, title, "Exit race", "Select", "Cancel");
 }

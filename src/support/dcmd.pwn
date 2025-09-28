@@ -1227,7 +1227,8 @@ dcmd_get(playerid, const params[])
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	if (!strlen(params) || !IsNumeric(params)) 
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /get [ID]!");
+		//return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /get [ID]!");
+		return ShowGetPlayerListDialog(playerid);
 
 	new targetId = strval(params), Float:x, Float:y, Float:z;
 
@@ -1264,7 +1265,8 @@ dcmd_goto(playerid, const params[])
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	if (!strlen(params) || !IsNumeric(params)) 
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usagei: /goto [ID]!");
+		//return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usagei: /goto [ID]!");
+		return ShowGotoPlayerListDialog(playerid);
 
 	new targetId = strval(params), Float:x, Float:y, Float:z;
 
@@ -1272,7 +1274,7 @@ dcmd_goto(playerid, const params[])
 		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
 
 	if (targetId == playerid)
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Cannot go to such player!");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Cannot go to the player!");
 
 	// Fetch the coordinates of the targetId player.
 	GetPlayerPos(targetId, x, y, z);
@@ -1399,12 +1401,12 @@ dcmd_nitro(playerid, const params[])
 		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
 
 	if (!IsPlayerInAnyVehicle(targetId))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Such player must be driving a vehicle!");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] The player must be driving a vehicle!");
 
 	new t_PLAYER_STATE: targetPlayerState = GetPlayerState(targetId), targetVehicleId = GetPlayerVehicleID(targetId);
 
 	if (targetPlayerState != PLAYER_STATE_DRIVER)
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Such player must be driving a vehicle!");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] The player must be driving a vehicle!");
 
 	if (!IsPlayerInValidNosVehicle(targetId, targetVehicleId)) 
 		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Cannot mod such vehicle!");
@@ -1418,7 +1420,7 @@ dcmd_nitro(playerid, const params[])
 
 	format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s installed the Nitrous component to your vehicle!", adminName);
 
-	SendClientMessage(playerid, COLOR_GREY, "[ i ] The Nitrous component installed for such player!");
+	SendClientMessage(playerid, COLOR_GREY, "[ i ] The Nitrous component installed for the player!");
 	SendClientMessage(targetId, COLOR_LIGHTGREEN, stringToPrint);
 
 	return 1;

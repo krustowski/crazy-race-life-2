@@ -29,7 +29,10 @@ enum
 	DIALOG_PORT_LIST,
 	DIALOG_TRUCKING_POINT_LIST,
 	DIALOG_PROPERTY_EDITOR_LIST,
-	DIALOG_RACE_OPTIONS
+	DIALOG_RACE_OPTIONS,
+	DIALOG_GET_LIST,
+	DIALOG_GOTO_LIST,
+	DIALOG_PLAYER_CLICKED_LIST
 };
 
 #include "modules/real.pwn"
@@ -384,4 +387,108 @@ stock ShowRaceOptionsDialog(playerid, raceid)
 	format(title, sizeof(title), "Race '%s'", gRaces[raceid][Name]);
 
 	return ShowPlayerDialog(playerid, DIALOG_RACE_OPTIONS, DIALOG_STYLE_LIST, title, "Exit race", "Select", "Cancel");
+}
+
+stock ShowGetPlayerListDialog(playerid)
+{
+	new stringToPrint[512] = "Name\tID";
+
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i))
+			continue;
+
+		new playerName[MAX_PLAYER_NAME];
+		GetPlayerName(i, playerName);
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
+				stringToPrint,
+				playerName,
+				i
+		      );
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_GET_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Player List", stringToPrint, "Get", "Cancel");
+}
+
+stock ShowGotoPlayerListDialog(playerid)
+{
+	new stringToPrint[1024] = "Name\tID";
+
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i))
+			continue;
+
+		new playerName[MAX_PLAYER_NAME];
+		GetPlayerName(i, playerName);
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
+				stringToPrint,
+				playerName,
+				i
+		      );
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_GOTO_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Player List", stringToPrint, "Goto", "Cancel");
+}
+
+stock ShowPlayerClickedDialog(playerid, clickedplayerid)
+{
+	new playerName[MAX_PLAYER_NAME], stringToPrint[512], title[MAX_PLAYER_NAME + 17];
+
+	if (!IsPlayerConnected(clickedplayerid) || gPlayers[playerid][AdminLevel] < 1)
+		return 1;
+
+	GetPlayerName(clickedplayerid, playerName);
+	format(title, sizeof(title), "Player '%s' Options", playerName);
+
+	gPlayers[playerid][Temp] = clickedplayerid;
+
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s",
+			"Set 100 HP + armour",
+			"Install nitro"
+		);
+
+	if (gPlayers[playerid][AdminLevel] < 2)
+	{
+		return ShowPlayerDialog(playerid, DIALOG_PLAYER_CLICKED_LIST, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
+	}
+
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s",
+			stringToPrint,
+			"Port (get) the player",
+			"Port (goto) to the player",
+			"Set skin ID"
+	      );
+
+	if (gPlayers[playerid][AdminLevel] < 3)
+	{
+		return ShowPlayerDialog(playerid, DIALOG_PLAYER_CLICKED_LIST, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
+	}
+
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
+			stringToPrint,
+			"Set drunk level",
+			"Kick from server",
+			"Print the packet loss",
+			"Reset cash money",
+			"Spectate",
+			"Give weapons",
+			"Give a specific weapon"
+	      );
+
+	if (gPlayers[playerid][AdminLevel] < 4)
+	{
+		return ShowPlayerDialog(playerid, DIALOG_PLAYER_CLICKED_LIST, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
+	}
+
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s",
+			stringToPrint,
+			"Ban",
+			"Send fakechat",
+			"Set admin level"
+	      );
+
+	return ShowPlayerDialog(playerid, DIALOG_PLAYER_CLICKED_LIST, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
 }

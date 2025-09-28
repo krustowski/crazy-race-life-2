@@ -515,11 +515,19 @@ public OnPlayerText(playerid, text[])
 	return 1;
 }
 
+public OnPlayerClickPlayer(playerid, clickedplayerid, CLICK_SOURCE:source)
+{
+	if (gPlayers[playerid][AdminLevel] < 1)
+		return 1;
+
+	return ShowPlayerClickedDialog(playerid, clickedplayerid);
+}
+
 public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
 {
 	if (gPlayers[playerid][AdminLevel] < 3)
 	{
-		return 1;
+		return 0;
 	}
 
 	SetPlayerPosFindZ(playerid, fX, fY, fZ);

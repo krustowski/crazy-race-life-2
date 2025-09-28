@@ -124,7 +124,7 @@ stock ShowAuthDialog(playerid)
 		DB_FreeResultSet(result);
 		format(stringToPrint, sizeof(stringToPrint), "Welcome %s! Register your account by entering a password:", gPlayers[playerid][Name]);
 
-		ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registeration", stringToPrint, "Register", "Cacnel");
+		ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registeration", stringToPrint, "Register", "Cancel");
 	}
 
 	return 1;

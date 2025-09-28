@@ -533,7 +533,11 @@ dcmd_port(playerid, const params[])
 
 dcmd_property(playerid, const params[])
 {
-	new token1[32], token2[32];
+#pragma unused params
+
+	return ShowPropertyListDialog(playerid);
+
+	/*new token1[32], token2[32];
 	SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || (strcmp(token1, "buy") && strcmp(token1, "sell") && strcmp(token1, "list") && strcmp(token1, "spawn") && strcmp(token1, "vehicle")) || (strcmp(token1, "list") && !IsNumeric(token2)))
@@ -575,12 +579,16 @@ dcmd_property(playerid, const params[])
 		return AttachVehicleToProperty(playerid, propertyID);
 	}
 
-	return 1;
+	return 1;*/
 }
 
 dcmd_race(playerid, const params[])
 {
-	new token1[32], token2[32];
+#pragma unused params
+
+	return ShowRaceListDialog(playerid);
+
+	/*new token1[32], token2[32];
 	SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || (strcmp(token1, "join") && strcmp(token1, "exit") && strcmp(token1, "list") && strcmp(token1, "warp")) || (!strcmp(token1, "join") && !IsNumeric(token2)))
@@ -616,7 +624,7 @@ dcmd_race(playerid, const params[])
 			return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ RACE ] Warp near the race start used successfully");
 	}
 
-	return 1;
+	return 1;*/
 }
 
 dcmd_rules(playerid, const params[])
@@ -1436,12 +1444,14 @@ dcmd_packet(playerid, const params[])
 
 dcmd_predit(playerid, const params[])
 {
+#pragma unused params
+
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4)
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	return ShowPropertyEditorListDialog(playerid);
 
-	new token1[32], token2[32];
+	/*new token1[32], token2[32];
 	SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || (strcmp(token1, "entrance") && strcmp(token1, "offer") && strcmp(token1, "vehicle") && !IsNumeric(token1)))
@@ -1502,7 +1512,7 @@ dcmd_predit(playerid, const params[])
 		ShowPropertyEditDialogMain(playerid);
 	}
 
-	return 1;
+	return 1;*/
 }
 
 dcmd_redit(playerid, const params[])
@@ -1632,12 +1642,14 @@ dcmd_spectate(playerid, const params[])
 
 dcmd_tredit(playerid, const params[])
 {
+#pragma unused params
+
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4)
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	return ShowTruckingPointListDialog(playerid);
 
-	new token1[32], token2[32];
+	/*new token1[32], token2[32];
 	SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || (strcmp(token1, "save") && strcmp(token1, "checkpoint") && strcmp(token1, "truck") && strcmp(token1, "freight") && strcmp(token1, "gas") && strcmp(token1, "info") && !IsNumeric(token1)))
@@ -1760,7 +1772,7 @@ dcmd_tredit(playerid, const params[])
 		SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error occured while saving trucking data");
 	}
 
-	return 1;
+	return 1;*/
 }
 
 dcmd_vehicle(playerid, const params[])

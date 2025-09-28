@@ -867,14 +867,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 		case DIALOG_BANK_DEPOSIT:
 			{
-				if (!response)
+				if (!response || !IsNumeric(inputtext) || !strval(inputtext))
 				{
 					gPlayers[playerid][DialogShown] = false;
 					return 1;
 				}
-
-				if (!IsNumeric(inputtext) || !strval(inputtext))
-					return 1;
 
 				DepositMoneyToBankAccount(playerid, strval(inputtext));
 				gPlayers[playerid][DialogShown] = false;
@@ -882,14 +879,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 		case DIALOG_BANK_WITHDRAW:
 			{
-				if (!response)
+				if (!response || !IsNumeric(inputtext) || !strval(inputtext))
 				{
 					gPlayers[playerid][DialogShown] = false;
 					return 1;
 				}
-
-				if (!IsNumeric(inputtext) || !strval(inputtext))
-					return 1;
 
 				WithdrawMoneyFromBankAccount(playerid, strval(inputtext));
 				gPlayers[playerid][DialogShown] = false;

@@ -367,12 +367,12 @@ stock MovePlayerToPlayer(playerid, targetid, bool: reversed)
 	if (!reversed)
 	{
 		GetPlayerPos(targetid, X, Y, Z);
-		portedid = targetid;
+		portedid = playerid;
 	}
 	else
 	{
 		GetPlayerPos(playerid, X, Y, Z);
-		portedid = playerid;
+		portedid = targetid;
 	}
 
 	new portedPlayerState = GetPlayerState(portedid), portedVehicleId = GetPlayerVehicleID(portedid);

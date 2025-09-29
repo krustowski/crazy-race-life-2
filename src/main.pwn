@@ -959,7 +959,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 
 				new clickedplayerid = gPlayers[playerid][Temp];
-				gPlayers[playerid][Temp] = 0;
 
 				if (!IsPlayerConnected(clickedplayerid))
 					return SendClientMessage(playerid, COLOR_RED, "[ ! ] Player not connected!");
@@ -991,10 +990,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 					case 4:
 						// Set skin ID
-						{}
+						{
+							ShowPlayerSkinIDSetDialog(playerid);
+						}
 					case 5:
 						// Set drunk drunk level
-						{}
+						{
+							ShowPlayerDrunkLevelSetDialog(playerid);
+						}
 					case 6:
 						// Kick from server
 						{
@@ -1027,7 +1030,24 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 					case 9:
 						// Spectate
-						{}
+						{
+							if (gPlayers[playerid][Spectating])
+							{
+								TogglePlayerSpectating(playerid, false);
+
+								gPlayers[playerid][Spectating] = false;
+								return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ SPECTATE ] Mode disabled!");
+							}
+
+							if (playerid == clickedplayerid)
+								return SendClientMessage(playerid, COLOR_RED, "[ ! ] Invalid player!");
+
+							TogglePlayerSpectating(playerid, true);
+							PlayerSpectatePlayer(playerid, clickedplayerid);
+
+							gPlayers[playerid][Spectating] = true;
+							return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ SPECTATE ] Mode enabled!");
+						}
 					case 10:
 						// Give weapons
 						{
@@ -1036,10 +1056,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							GivePlayerWeapon(clickedplayerid, t_WEAPON: 31, 400);
 							GivePlayerWeapon(clickedplayerid, t_WEAPON: 43, 1);
 							GivePlayerWeapon(clickedplayerid, t_WEAPON: 46, 1);
+
+							SendClientMessage(clickedplayerid, COLOR_ORANGE, "[ WEAPON ] Received a weapons pack");
+							SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ ADMIN ] Weapons sent");
 						}
 					case 11:
 						// Give a specific weapon
-						{}
+						{
+							ShowPlayerGiveWeaponDialog(playerid);
+						}
 					case 12:
 						// Ban
 						{
@@ -1055,13 +1080,146 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 					case 13:
 						// Send fakechat
-						{}
+						{
+							ShowPlayerFakechatDialog(playerid);
+						}
 					case 14:
 						// Set admin level
-						{}
+						{
+							ShowPlayerAdminLevelSetDialog(playerid);
+						}
 				}
 
 				return 1;
+			}
+		case DIALOG_PLAYER_SKIN_ID_SET:
+			{
+				if (!response)
+				{
+					gPlayers[playerid][Temp] = 0;
+					return 1;
+				}
+
+				new clickedplayerid = gPlayers[playerid][Temp];
+				gPlayers[playerid][Temp] = 0;
+
+				if (!IsPlayerConnected(clickedplayerid))
+					return SendClientMessage(playerid, COLOR_RED, "[ ! ] Player not connected!");
+
+				new skinid = strval(inputtext);
+
+				if (!IsNumeric(inputtext) || skinid < 0 || skinid > 311)
+				{
+					return SendClientMessage(playerid, COLOR_RED, "[ ADMIN ] Skin ID must be between 0 and 311!");
+				}
+
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ ADMIN ] Skin ID changed");
+				return SetPlayerSkin(clickedplayerid, skinid);
+			}
+		case DIALOG_PLAYER_DRUNK_LEVEL_SET:
+			{
+				if (!response)
+				{
+					gPlayers[playerid][Temp] = 0;
+					return 1;
+				}
+
+				new clickedplayerid = gPlayers[playerid][Temp];
+				gPlayers[playerid][Temp] = 0;
+
+				if (!IsPlayerConnected(clickedplayerid))
+					return SendClientMessage(playerid, COLOR_RED, "[ ! ] Player not connected!");
+
+				new level = strval(inputtext);
+
+				if (!IsNumeric(inputtext) || level < 0 || level > 50000)
+				{
+					return SendClientMessage(playerid, COLOR_RED, "[ ADMIN ] Drunk level must be between 0 and 50000!");
+				}
+
+				SendClientMessage(clickedplayerid, COLOR_ORANGE, "[ DRUGZ ] Drunk level changed");
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ ADMIN ] Drunk level changed");
+				return SetPlayerDrunkLevel(clickedplayerid, level);
+			}
+		case DIALOG_PLAYER_WEAPON_SET:
+			{
+				if (!response)
+				{
+					gPlayers[playerid][Temp] = 0;
+					return 1;
+				}
+
+				new clickedplayerid = gPlayers[playerid][Temp];
+				gPlayers[playerid][Temp] = 0;
+
+				if (!IsPlayerConnected(clickedplayerid))
+					return SendClientMessage(playerid, COLOR_RED, "[ ! ] Player not connected!");
+
+				new weaponid = strval(inputtext);
+
+				if (!IsNumeric(inputtext) || weaponid < 331 || weaponid > 370)
+				{
+					return SendClientMessage(playerid, COLOR_RED, "[ ADMIN ] Weapon Model ID must be between 331 and 370!");
+				}
+
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ ADMIN ] Weapon sent");
+				return GivePlayerWeapon(clickedplayerid, t_WEAPON: weaponid, 1000);
+			}
+		case DIALOG_PLAYER_FAKECHAT:
+			{
+				if (!response)
+				{
+					gPlayers[playerid][Temp] = 0;
+					return 1;
+				}
+
+				new clickedplayerid = gPlayers[playerid][Temp];
+				gPlayers[playerid][Temp] = 0;
+
+				if (!IsPlayerConnected(clickedplayerid))
+					return SendClientMessage(playerid, COLOR_RED, "[ ! ] Player not connected!");
+
+				SendPlayerMessageToAll(clickedplayerid, inputtext);
+
+				return SendClientMessage(playerid, COLOR_WHITE, "[ FAKE ] Fake client message sent!");
+			}
+		case DIALOG_PLAYER_ADMIN_LEVEL_SET:
+			{
+				if (!response)
+				{
+					gPlayers[playerid][Temp] = 0;
+					return 1;
+				}
+
+				new clickedplayerid = gPlayers[playerid][Temp];
+				gPlayers[playerid][Temp] = 0;
+
+				if (!IsPlayerConnected(clickedplayerid))
+					return SendClientMessage(playerid, COLOR_RED, "[ ! ] Player not connected!");
+
+				new level = strval(inputtext);
+
+				if (!IsNumeric(inputtext) || level < 0 || level > 5)
+				{
+					return SendClientMessage(playerid, COLOR_RED, "[ ADMIN ] Admin level must between 0 and 5!");
+				}
+
+				if (gPlayers[playerid][AdminLevel] > level || gPlayers[playerid][AdminLevel] < gPlayers[clickedplayerid][AdminLevel])
+				{
+					return SendClientMessage(playerid, COLOR_RED, "[ ADMIM ] Admin level must be lower or equal to one you possess yourself!");
+				}
+
+				new adminName[MAX_PLAYER_NAME], playerName[MAX_PLAYER_NAME], stringToPrint[128];
+
+				GetPlayerName(playerid, adminName, sizeof(adminName));
+				GetPlayerName(clickedplayerid, playerName, sizeof(playerName));
+
+				format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s set player %s [ ID: %d ] an Admin (level %d)!", adminName, playerName, clickedplayerid, level);
+
+				gPlayers[clickedplayerid][AdminLevel] = level;
+				SavePlayerData(clickedplayerid);
+
+				return SendClientMessageToAll(COLOR_GREY, stringToPrint);
 			}
 
 		default: 

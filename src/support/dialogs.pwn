@@ -32,7 +32,12 @@ enum
 	DIALOG_RACE_OPTIONS,
 	DIALOG_GET_LIST,
 	DIALOG_GOTO_LIST,
-	DIALOG_PLAYER_CLICKED_LIST
+	DIALOG_PLAYER_CLICKED_LIST,
+	DIALOG_PLAYER_SKIN_ID_SET,
+	DIALOG_PLAYER_DRUNK_LEVEL_SET,
+	DIALOG_PLAYER_WEAPON_SET,
+	DIALOG_PLAYER_FAKECHAT,
+	DIALOG_PLAYER_ADMIN_LEVEL_SET
 };
 
 #include "modules/real.pwn"
@@ -491,4 +496,64 @@ stock ShowPlayerClickedDialog(playerid, clickedplayerid)
 	      );
 
 	return ShowPlayerDialog(playerid, DIALOG_PLAYER_CLICKED_LIST, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
+}
+
+stock ShowPlayerSkinIDSetDialog(playerid)
+{
+	new playerName[MAX_PLAYER_NAME], title[128];
+
+	new clickedplayerid = gPlayers[playerid][Temp];
+
+	GetPlayerName(clickedplayerid, playerName);
+	format(title, sizeof(title), "Player '%s' Options", playerName);
+
+	return ShowPlayerDialog(playerid, DIALOG_PLAYER_SKIN_ID_SET, DIALOG_STYLE_INPUT, title, "Set player skin ID (0-311):", "Set", "Cancel");
+}
+
+stock ShowPlayerDrunkLevelSetDialog(playerid)
+{
+	new playerName[MAX_PLAYER_NAME], title[128];
+
+	new clickedplayerid = gPlayers[playerid][Temp];
+
+	GetPlayerName(clickedplayerid, playerName);
+	format(title, sizeof(title), "Player '%s' Options", playerName);
+
+	return ShowPlayerDialog(playerid, DIALOG_PLAYER_DRUNK_LEVEL_SET, DIALOG_STYLE_INPUT, title, "Set player drunk level (0-50000):", "Set", "Cancel");
+}
+
+stock ShowPlayerAdminLevelSetDialog(playerid)
+{
+	new playerName[MAX_PLAYER_NAME], title[128];
+
+	new clickedplayerid = gPlayers[playerid][Temp];
+
+	GetPlayerName(clickedplayerid, playerName);
+	format(title, sizeof(title), "Player '%s' Options", playerName);
+
+	return ShowPlayerDialog(playerid, DIALOG_PLAYER_ADMIN_LEVEL_SET, DIALOG_STYLE_INPUT, title, "Set player admin level (0-5):", "Set", "Cancel");
+}
+
+stock ShowPlayerGiveWeaponDialog(playerid)
+{
+	new playerName[MAX_PLAYER_NAME], title[128];
+
+	new clickedplayerid = gPlayers[playerid][Temp];
+
+	GetPlayerName(clickedplayerid, playerName);
+	format(title, sizeof(title), "Player '%s' Options", playerName);
+
+	return ShowPlayerDialog(playerid, DIALOG_PLAYER_WEAPON_SET, DIALOG_STYLE_INPUT, title, "Give player a specific weapon model (311-370):", "Set", "Cancel");
+}
+
+stock ShowPlayerFakechatDialog(playerid)
+{
+	new playerName[MAX_PLAYER_NAME], title[128];
+
+	new clickedplayerid = gPlayers[playerid][Temp];
+
+	GetPlayerName(clickedplayerid, playerName);
+	format(title, sizeof(title), "Player '%s' Options", playerName);
+
+	return ShowPlayerDialog(playerid, DIALOG_PLAYER_FAKECHAT, DIALOG_STYLE_INPUT, title, "Set a message to be send as a fakechat as clicked player ID:", "Send", "Cancel");
 }

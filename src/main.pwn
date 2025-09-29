@@ -17,7 +17,7 @@
  [ Created: 	Jan 2025 (Extends legacy GameMode CRL (2008-2010)) ]
  [ Credits: 	krusty, kompry, DRaGsTeR, amdulka ]
  [ Language: 	CZ, EN ]
- [ Version: 	0.6.0 ]
+ [ Version: 	0.6. ]
 
  *****************************************************************************************************************************************/
 
@@ -139,7 +139,9 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
  *    \____/_/   \__,_/ /___/\__, /_/ |_|\__,_/\___/\___/_____/_/_/  \___/____/ 
  *                          /____/                                              
 
- [ *** GameMode CRL2 *** Credits: krusty, kompry, DRaGsTeR *** Jan 2025 *** ]
+ *** GameMode CRL2 
+ *** Credits: krusty, kompry, DRaGsTeR 
+ *** Jan 2025
 
  *************************************************************************************/
 
@@ -1561,7 +1563,9 @@ public OnTrailerUpdate(playerid, vehicleid)
  *    \____/_/   \__,_/ /___/\__, /_/ |_|\__,_/\___/\___/_____/_/_/  \___/____/ 
  *                          /____/                                              
 
- [ *** GameMode CRL2 *** Credits: krusty, kompry, DRaGsTeR *** Jan 2025 *** ]
+ *** GameMode CRL2 
+ *** Credits: krusty, kompry, DRaGsTeR 
+ *** Jan 2025
 
  *************************************************************************************/
 

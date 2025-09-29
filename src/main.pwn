@@ -1437,11 +1437,14 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if (!IsPlayerConnected(i) || gPlayerMoneyPickup[i] == -1)
+		/*if (!IsPlayerConnected(i) || gPlayerMoneyPickup[i] == -1)
+			continue;*/
+
+		if (pickupid != gPlayerMoneyPickup[i])
 			continue;
 
 		DestroyPickup(gPlayerMoneyPickup[i]);
-		gPlayerMoneyPickup[i] = 0;
+		gPlayerMoneyPickup[i] = -1;
 
 		GivePlayerMoney(playerid, gPlayerMoneyPickupAmount[i]);
 		gPlayerMoneyPickupAmount[i] = 0;

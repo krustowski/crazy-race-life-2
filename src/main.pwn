@@ -696,7 +696,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							gPlayers[playerid][Drugs][drugID] += gProperties[propertyID][Drugs][drugID];
 							gProperties[propertyID][Drugs][drugID] = 0;
 
-							SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Save to your pockets");
+							SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Saved to your pockets");
 						}
 				}
 

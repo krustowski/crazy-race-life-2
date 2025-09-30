@@ -1116,6 +1116,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 
 				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ ADMIN ] Skin ID changed");
+
+				gPlayers[clickedplayerid][Skin] = skinid;
 				return SetPlayerSkin(clickedplayerid, skinid);
 			}
 		case DIALOG_PLAYER_DRUNK_LEVEL_SET:
@@ -1141,6 +1143,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				SendClientMessage(clickedplayerid, COLOR_ORANGE, "[ DRUGZ ] Drunk level changed");
 				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ ADMIN ] Drunk level changed");
+
 				return SetPlayerDrunkLevel(clickedplayerid, level);
 			}
 		case DIALOG_PLAYER_WEAPON_SET:
@@ -1159,9 +1162,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				new weaponid = strval(inputtext);
 
-				if (!IsNumeric(inputtext) || weaponid < 331 || weaponid > 370)
+				if (!IsNumeric(inputtext) || weaponid < 0 || weaponid > 46)
 				{
-					return SendClientMessage(playerid, COLOR_RED, "[ ADMIN ] Weapon Model ID must be between 331 and 370!");
+					return SendClientMessage(playerid, COLOR_RED, "[ ADMIN ] Weapon Model ID must be between 0 and 46!");
 				}
 
 				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ ADMIN ] Weapon sent");

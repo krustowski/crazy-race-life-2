@@ -543,7 +543,7 @@ stock ShowPlayerGiveWeaponDialog(playerid)
 	GetPlayerName(clickedplayerid, playerName);
 	format(title, sizeof(title), "Player '%s' Options", playerName);
 
-	return ShowPlayerDialog(playerid, DIALOG_PLAYER_WEAPON_SET, DIALOG_STYLE_INPUT, title, "Give player a specific weapon model (311-370):", "Set", "Cancel");
+	return ShowPlayerDialog(playerid, DIALOG_PLAYER_WEAPON_SET, DIALOG_STYLE_INPUT, title, "Give player a specific weapon model (0-46):", "Set", "Cancel");
 }
 
 stock ShowPlayerFakechatDialog(playerid)

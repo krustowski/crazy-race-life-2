@@ -301,6 +301,9 @@ stock ShowPropertyListDialog(playerid)
 	{
 		new arrayId = GetPropertyArrayIDfromID(gPlayers[playerid][Properties][i]);
 
+		if (arrayId <= 0 || !gPlayers[playerid][Properties][i]) 
+			continue;
+
 		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%5d", 
 				stringToPrint,
 				gProperties[arrayId][Label], 

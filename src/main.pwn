@@ -885,6 +885,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				DepositMoneyToBankAccount(playerid, strval(inputtext));
 				gPlayers[playerid][DialogShown] = false;
 
+				return 1;
+
 			}
 		case DIALOG_BANK_WITHDRAW:
 			{
@@ -896,6 +898,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				WithdrawMoneyFromBankAccount(playerid, strval(inputtext));
 				gPlayers[playerid][DialogShown] = false;
+
+				return 1;
 
 			}
 		case DIALOG_RACE_LIST:

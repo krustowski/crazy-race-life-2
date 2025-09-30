@@ -1539,6 +1539,12 @@ public OnEnterExitModShop(playerid, enterexit, interiorid)
 	return 1;
 }
 
+public OnVehiclePaintjob(playerid, vehicleid, paintjobid)
+{
+	UpdatePropertyVehiclePaintjob(playerid, vehicleid, paintjobid);
+	return 1;
+}
+
 // TODO: This does not work properly in game: deattached trailer is not recognized or this playback is not called at all..
 public OnTrailerUpdate(playerid, vehicleid)
 {

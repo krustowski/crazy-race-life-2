@@ -94,6 +94,7 @@ enum VehicleProps
 {
 	ID,
 	Model,
+	Paintjob,
 	Colours[2],
 	Components[16]
 }
@@ -290,6 +291,8 @@ stock SpawnProperty(propertyId)
 							if (gProperties[propertyId][Vehicle][Components][j])
 								AddVehicleComponent(gProperties[propertyId][Vehicle][ID], gProperties[propertyId][Vehicle][Components][j]);
 						}
+
+						ChangeVehiclePaintjob(gProperties[propertyId][Vehicle][ID], gProperties[propertyId][Vehicle][Paintjob]);
 					}
 				}
 			case OFFER_POINT:
@@ -436,12 +439,13 @@ stock SaveRealEstateData()
 				format(componentsString, sizeof(componentsString), "%s,%d", componentsString, gProperties[i][Vehicle][Components][j]);
 			}
 
-			format(query, sizeof(query), "INSERT INTO vehicles (id, model, color1, color2, components) VALUES (%d, %d, %d, %d, \"%s\") ON CONFLICT(id) DO UPDATE SET model = excluded.model, color1 = excluded.color1, color2 = excluded.color2, components = excluded.components",
+			format(query, sizeof(query), "INSERT INTO vehicles (id, model, color1, color2, components, paintjob) VALUES (%d, %d, %d, %d, \"%s\") ON CONFLICT(id) DO UPDATE SET model = excluded.model, color1 = excluded.color1, color2 = excluded.color2, components = excluded.components",
 					gProperties[i][ID],
 					gProperties[i][Vehicle][Model],
 					gProperties[i][Vehicle][Colours][0],
 					gProperties[i][Vehicle][Colours][1],
-					componentsString
+					componentsString,
+					gProperties[i][Vehicle][Paintjob]
 			      );
 
 			new DBResult: result_vehicle = DB_ExecuteQuery(gDbConnectionHandle, query);
@@ -557,7 +561,7 @@ stock LoadRealEstateData()
 			continue;
 		}
 
-		format(query, sizeof(query), "SELECT model,color1,color2,components FROM vehicles WHERE id = %d", vehicle_id);
+		format(query, sizeof(query), "SELECT model,color1,color2,components,paintjob FROM vehicles WHERE id = %d", vehicle_id);
 
 		new DBResult: result_vehicle = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result_vehicle) {
@@ -577,6 +581,7 @@ stock LoadRealEstateData()
 		gProperties[i][Vehicle][Model] = DB_GetFieldInt(result_vehicle, FIELD_VEHICLE_MODEL);
 		gProperties[i][Vehicle][Colours][0] = DB_GetFieldInt(result_vehicle, FIELD_VEHICLE_COLOR1);
 		gProperties[i][Vehicle][Colours][1] = DB_GetFieldInt(result_vehicle, FIELD_VEHICLE_COLOR2);
+		gProperties[i][Vehicle][Paintjob] = DB_GetFieldIntByName(result_vehicle, "paintjob");
 
 		DB_FreeResultSet(result_vehicle);
 
@@ -848,6 +853,39 @@ stock SellPlayerProperty(playerid, propertyID)
 	return SendClientMessageLocalized(playerid, I18N_REAL_SELL_SUCCESS);
 }
 
+stock UpdatePropertyVehiclePaintjob(playerid, vehicleid, paintjobid)
+{
+	if (!IsPlayerInAnyVehicle(playerid))
+		return 0;
+
+	new arrayID, bool: modelMatch = false;
+
+	for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
+	{
+		arrayID = GetPropertyArrayIDfromID(gPlayers[playerid][Properties][i]);
+
+		if (arrayID == -1)
+			continue;
+
+		if (GetVehicleModel(vehicleid) == gProperties[arrayID][Vehicle][Model] && vehicleid == gProperties[arrayID][Vehicle][ID])
+		{
+			modelMatch = true;
+			break;
+		}
+	}
+
+	if (!modelMatch)
+	{
+		return 0;
+	}
+
+	gProperties[arrayID][Vehicle][Paintjob] = paintjobid;
+
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] New paintjob assigned to property vehicle!");
+
+	return 1;
+}
+
 stock UpdatePropertyVehicle(playerid)
 {
 	if (!IsPlayerInAnyVehicle(playerid))
@@ -879,12 +917,14 @@ stock UpdatePropertyVehicle(playerid)
 	if (!modelMatch)
 		return 0;
 
-	new colour1, colour2;
+	new colour1, colour2, paintjobid;
 
 	GetVehicleColours(vehicleID, colour1, colour2);
+	paintjobid = GetVehiclePaintjob(vehicleID);
 
 	gProperties[arrayID][Vehicle][Colours][0] = colour1;
 	gProperties[arrayID][Vehicle][Colours][1] = colour2;
+	gProperties[arrayID][Vehicle][Paintjob] = paintjobid;
 
 	for (new i = 0; i < 16; i++)
 	{

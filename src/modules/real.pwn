@@ -84,8 +84,9 @@ enum Coords
 
 enum PropertyPickup
 {
-	PickupType[PropertyPoint],
+	PropertyPoint: PickupType,
 	Pickup,
+	Text3D: Text,
 	Primary[Coords],
 	Secondary[Coords]
 }
@@ -232,7 +233,7 @@ stock SpawnProperty(propertyId)
 			Float: sZ = DB_GetFieldFloatByName(result, "secondary_z"),
 			Float: sR = DB_GetFieldFloatByName(result, "secondary_rot");
 
-		gPropertyCoords[propertyId][i][PickupType] = type;
+		gPropertyCoords[propertyId][i][PickupType] = PropertyPoint: type;
 
 		//printf("stock SpawnProperty(): i = %d", i);
 
@@ -307,7 +308,7 @@ stock SpawnProperty(propertyId)
 						GetOwnerName(gProperties[propertyId][UserID], playerName);
 
 						if (strcmp(playerName, ""))
-							Create3DTextLabel("%s owns this property", COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false, playerName);
+							gPropertyCoords[propertyId][i][Text] = Create3DTextLabel("%s owns this property", COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false, playerName);
 					}
 				}
 		}
@@ -439,7 +440,7 @@ stock SaveRealEstateData()
 				format(componentsString, sizeof(componentsString), "%s,%d", componentsString, gProperties[i][Vehicle][Components][j]);
 			}
 
-			format(query, sizeof(query), "INSERT INTO vehicles (id, model, color1, color2, components, paintjob) VALUES (%d, %d, %d, %d, \"%s\") ON CONFLICT(id) DO UPDATE SET model = excluded.model, color1 = excluded.color1, color2 = excluded.color2, components = excluded.components",
+			format(query, sizeof(query), "INSERT INTO vehicles (id, model, color1, color2, components, paintjob) VALUES (%d, %d, %d, %d, \"%s\", %d) ON CONFLICT(id) DO UPDATE SET model = excluded.model, color1 = excluded.color1, color2 = excluded.color2, components = excluded.components, paintjob = excluded.paintjob",
 					gProperties[i][ID],
 					gProperties[i][Vehicle][Model],
 					gProperties[i][Vehicle][Colours][0],
@@ -722,7 +723,7 @@ stock SpawnPlayerAtProperty(playerid)
 	{
 		for (new j = 0; j < MAX_PROPERTY_PICKUPS; j++)
 		{
-			if (gPropertyCoords[i][j][PickupType] != 1)
+			if (gPropertyCoords[i][j][PickupType] != SPAWN_POINT)
 				continue;
 
 			if (gProperties[i][ID] != gPlayers[playerid][SpawnPoint])
@@ -775,9 +776,6 @@ stock BuyPlayerProperty(playerid, propertyID)
 	if (gProperties[arrayID][Occupied])
 		return SendClientMessageLocalized(playerid, I18N_REAL_ALREADY_OCCUPIED);
 
-	/*if (!IsPlayerInSphere(playerid, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ], 15))
-		return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);*/
-
 	if (GetPlayerMoney(playerid) < gProperties[arrayID][Cost])
 		return SendClientMessageLocalized(playerid, I18N_REAL_NO_MONEY);
 
@@ -785,20 +783,39 @@ stock BuyPlayerProperty(playerid, propertyID)
 	//  Ok, proceed with the transaction.
 	//
 
+	for (new i = 0; i < MAX_PROPERTY_PICKUPS; i++)
+	{
+		if (gPropertyCoords[arrayID][i][PickupType] == OFFER_POINT)
+		{
+			/*if (!IsPlayerInSphere(playerid, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ], 15.0))
+				return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);*/
+
+			DestroyPickup(gPropertyCoords[arrayID][i][Pickup]);
+			gPropertyCoords[arrayID][i][Pickup] = 0;
+			gPropertyCoords[arrayID][i][Pickup] = EnsurePickupCreated(PICKUP_HOUSE_RED, 1, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ]);
+
+			new playerName[MAX_PLAYER_NAME];
+			GetOwnerName(gProperties[arrayID][UserID], playerName);
+
+			if (strcmp(playerName, ""))
+				gPropertyCoords[arrayID][i][Text] = Create3DTextLabel("%s owns this property", COLOR_ORANGE, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ], 15.0, -1, false, playerName);
+		}
+
+		if (gPropertyCoords[arrayID][i][PickupType] == ENTRANCE_POINT)
+		{
+			gPropertyCoords[arrayID][i][Pickup] = EnsurePickupCreated(PICKUP_ARROW, 1, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ]);
+		}
+
+	}
+
 	gProperties[arrayID][Occupied] = true;
 	gProperties[arrayID][UserID] = gPlayers[playerid][OrmID];
 	gPlayers[playerid][Properties][freeSlot] = propertyID;
 
-	DestroyPickup(gProperties[arrayID][Pickups][PICKUP_TYPE_OFFER]);
-	//gProperties[arrayID][Pickups][PICKUP_TYPE_OFFER];
-
-	/*gProperties[arrayID][Pickups][PICKUP_TYPE_OFFER] = EnsurePickupCreated(19522, 1, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ]);
-	gProperties[arrayID][Pickups][PICKUP_TYPE_ENTRANCE] = EnsurePickupCreated(1318, 1, Float:gProperties[arrayID][LocationEntrance][CoordX], Float:gProperties[arrayID][LocationEntrance][CoordY], Float:gProperties[arrayID][LocationEntrance][CoordZ]);*/
-
 	GivePlayerMoney(playerid, -gProperties[arrayID][Cost]);
 
 	// Play property bought theme sound
-	PlayerPlaySound(playerid, 183, 0.0, 0.0, 0.0);
+	PlayerPlaySound(playerid, 182, 0.0, 0.0, 0.0);
 
 	return SendClientMessageLocalized(playerid, I18N_REAL_PROPERTY_ACQ);
 }
@@ -811,9 +828,6 @@ stock SellPlayerProperty(playerid, propertyID)
 
 	if (arrayID == INVALID_PROPERTY_ID || !propertyID)
 		return SendClientMessageLocalized(playerid, I18N_REAL_INVALID_CODE);
-
-	/*if (!IsPlayerInSphere(playerid, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ], 15))
-		return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);*/
 
 	if (!gProperties[arrayID][Occupied])
 		return SendClientMessageLocalized(playerid, I18N_REAL_SELL_NOT_OCCUPIED);
@@ -838,13 +852,32 @@ stock SellPlayerProperty(playerid, propertyID)
 		}
 	}
 
+	for (new i = 0; i < MAX_PROPERTY_PICKUPS; i++)
+	{
+		if (gPropertyCoords[arrayID][i][PickupType] == ENTRANCE_POINT)
+		{
+			DestroyPickup(gPropertyCoords[arrayID][i][Pickup]);
+		}
+
+		if (gPropertyCoords[arrayID][i][PickupType] == OFFER_POINT)
+		{
+			/*if (!IsPlayerInSphere(playerid, gPropertyCoords[i][j][Primary][CoordX], gPropertyCoords[i][j][Primary][CoordY], gPropertyCoords[i][j][Primary][CoordZ], 15.0))
+			  return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);*/
+
+			DestroyPickup(gPropertyCoords[arrayID][i][Pickup]);
+			Delete3DTextLabel(gPropertyCoords[arrayID][i][Text]);
+
+			gPropertyCoords[arrayID][i][Pickup] = EnsurePickupCreated(PICKUP_HOUSE_GREEN, 1, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ]);
+		}
+	}
+
 	gProperties[arrayID][Occupied] = false;
 
-	DestroyPickup(gProperties[arrayID][Pickups][PICKUP_TYPE_OFFER]);
-	gProperties[arrayID][Pickups][PICKUP_TYPE_OFFER] = 0;
+	/*DestroyPickup(gProperties[arrayID][Pickups][PICKUP_TYPE_OFFER]);
+	  gProperties[arrayID][Pickups][PICKUP_TYPE_OFFER] = 0;
 
-	DestroyPickup(gProperties[arrayID][Pickups][PICKUP_TYPE_ENTRANCE]);
-	gProperties[arrayID][Pickups][PICKUP_TYPE_ENTRANCE] = 0;
+	  DestroyPickup(gProperties[arrayID][Pickups][PICKUP_TYPE_ENTRANCE]);
+	  gProperties[arrayID][Pickups][PICKUP_TYPE_ENTRANCE] = 0;*/
 
 	/*gProperties[arrayID][Pickups][PICKUP_TYPE_OFFER] = EnsurePickupCreated(1273, 1, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ]);*/
 
@@ -1186,7 +1219,7 @@ stock AttachVehicleToProperty(playerid, propertyid)
 
 		for (new j = 0; j < MAX_PROPERTY_PICKUPS; j++)
 		{
-			if (gPropertyCoords[i][j][PickupType] != 7)
+			if (gPropertyCoords[i][j][PickupType] != VEHICLE_POINT)
 				continue;
 
 			vehiclePickupID = j;

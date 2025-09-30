@@ -201,7 +201,7 @@ public SavePlayerData(playerid)
 			format(propertiesString, sizeof(propertiesString), "%s,%d", propertiesString, gPlayers[playerid][Properties][j]);
 		}
 
-		writecfg(gPlayers[playerid][Name], "", "properties", propertiesString);
+		//writecfg(gPlayers[playerid][Name], "", "properties", propertiesString);
 
 		new query[512];
 

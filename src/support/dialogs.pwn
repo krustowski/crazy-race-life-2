@@ -38,7 +38,8 @@ enum
 	DIALOG_PLAYER_WEAPON_SET,
 	DIALOG_PLAYER_FAKECHAT,
 	DIALOG_PLAYER_ADMIN_LEVEL_SET,
-	DIALOG_DEATHMATCH_OPTIONS
+	DIALOG_DEATHMATCH_OPTIONS,
+	DIALOG_PHONE_OPTIONS
 };
 
 #include "modules/real.pwn"
@@ -582,4 +583,17 @@ stock ShowDeathmatchOptionsDialog(playerid)
 	      );
 
 	return ShowPlayerDialog(playerid, DIALOG_DEATHMATCH_OPTIONS, DIALOG_STYLE_LIST, "Deathmatch Options", stringToPrint, "Select", "Cancel");
+}
+
+stock ShowPhoneOptionsDialog(playerid)
+{
+	new stringToPrint[256];
+
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s",
+			"Check Bank Account Balance",
+			"Send SMS to Player",
+			"Lmao"
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_PHONE_OPTIONS, DIALOG_STYLE_LIST, "Phone Operations List", stringToPrint, "Select", "Cancel");
 }

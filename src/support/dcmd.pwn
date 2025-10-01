@@ -27,6 +27,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(lay, 3, cmdtext);		  //all
 	dcmd(locate, 6, cmdtext); 	  //all
 	dcmd(lock, 4, cmdtext);           //all
+	dcmd(phone, 5, cmdtext);	  //all
 	dcmd(pm, 2, cmdtext);		  //all
 	dcmd(port, 4, cmdtext); 	  //all
 	dcmd(property, 8, cmdtext);	  //all
@@ -128,6 +129,11 @@ dcmd_admins(playerid, const params[])
 dcmd_afk(playerid, const params[])
 {
 #pragma unused params
+	if (gDeathmatch[playerid][InGame] || gDeathmatch[playerid][IsRegistered])
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ AFK ] Cannot go to AFK mode while in Deathmatch!");
+	}
+
 	new playerName[MAX_PLAYER_NAME], stringToPrint[256];
 
 	GetPlayerName(playerid, playerName, sizeof(playerName));
@@ -136,6 +142,10 @@ dcmd_afk(playerid, const params[])
 	{
 		format(stringToPrint, sizeof(stringToPrint), "[ AFK ] Player %s (ID: %d) has just gone away from the keyboard (/afk)!", playerName, playerid);
 		SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+
+		new playerAFKName[MAX_PLAYER_NAME];
+		format(playerAFKName, sizeof(playerAFKName), "(AFK) %s", gPlayers[playerid][Name]);
+		SetPlayerName(playerid, playerAFKName);
 
 		// Lock the player's animations.
 		TogglePlayerControllable(playerid, false);
@@ -146,6 +156,8 @@ dcmd_afk(playerid, const params[])
 	{
 		format(stringToPrint, sizeof(stringToPrint), "[ AFK ] Player %s (ID: %d) is back in game (/afk)!", playerName, playerid);
 		SendClientMessageToAll(COLOR_LIGHTGREEN, stringToPrint);
+
+		SetPlayerName(playerid, gPlayers[playerid][Name]);
 
 		// Re-enable player's animations.
 		TogglePlayerControllable(playerid, true);
@@ -471,6 +483,18 @@ dcmd_lock(playerid, const params[])
 	GetPlayerPos(playerid, pX, pY, pZ);
 
 	PlayerPlaySound(playerid, 1056, pX, pY, pZ);
+
+	return 1;
+}
+
+dcmd_phone(playerid, const params[])
+{
+#pragma unused params
+	ApplyAnimation(playerid, "ped", "phone_in", 4.1, false, false, false, true, 0);
+	SetPlayerAttachedObject(playerid, 3, 330, 6, 0.00, 0.00, 0.05, 59.59, 60.19, -30.50, 1.02, 1.00, 1.00);
+
+	//EditAttachedObject(playerid, 3);
+	ShowPhoneOptionsDialog(playerid);
 
 	return 1;
 }

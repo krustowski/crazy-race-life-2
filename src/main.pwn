@@ -394,7 +394,7 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 		// Increment the killer's score.
 		gDeathmatch[killerid][Score]++;
 
-		UpdateDeathmatchScoreboard();
+		//UpdateDeathmatchScoreboard();
 
 		ResetPlayerDeathmatchState(playerid);
 		return 1;
@@ -1237,6 +1237,31 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				return 1;
 			}
+		case DIALOG_PHONE_OPTIONS:
+			{
+				if (!response)
+				{
+					ApplyAnimation(playerid, "ped", "phone_out", 4.1, false, false, false, false, 0);
+					//ClearAnimations(playerid);
+					RemovePlayerAttachedObject(playerid, 3);
+					return 1;
+				}
+
+				switch (listitem)
+				{
+					case 0:
+						{}
+					case 1:
+						{}
+					case 2:
+						{}
+				}
+
+				ApplyAnimation(playerid, "ped", "phone_out", 4.1, false, false, false, false, 0);
+				//ClearAnimations(playerid);
+				RemovePlayerAttachedObject(playerid, 3);
+				return 1;
+			}
 
 		default: 
 			return 0; // dialog ID was not found, search in other scripts
@@ -1573,6 +1598,62 @@ public OnTrailerUpdate(playerid, vehicleid)
 
 	  SetVehicleParamsForPlayer(vehicleid, playerid, true, false);
 	  SendClientMessage(playerid, COLOR_ORANGE, "[ TRUCK ] The trailer has just detached from the cab, reatach it to continue the mission");*/
+
+	return 1;
+}
+
+enum AO
+{
+	Float: X,
+	Float: Y,
+	Float: Z,
+	Float: rX,
+	Float: rY,
+	Float: rZ,
+	Float: sX,
+	Float: sY,
+	Float: sZ
+}
+
+new gPlayerAO[MAX_PLAYERS][AO];
+
+public OnPlayerEditAttachedObject(playerid, EDIT_RESPONSE:response, index, modelid, boneid, Float:fOffsetX, Float:fOffsetY, Float:fOffsetZ, Float:fRotX, Float:fRotY, Float:fRotZ, Float:fScaleX, Float:fScaleY, Float:fScaleZ)
+{
+	switch (response)
+	{
+		case EDIT_RESPONSE_FINAL:
+			{
+				gPlayerAO[playerid][X] = fOffsetX;
+				gPlayerAO[playerid][Y] = fOffsetY;
+				gPlayerAO[playerid][Z] = fOffsetZ;
+				gPlayerAO[playerid][rX] = fRotX;
+				gPlayerAO[playerid][rY] = fRotY;
+				gPlayerAO[playerid][rZ] = fRotZ;
+				gPlayerAO[playerid][sX] = fScaleX;
+				gPlayerAO[playerid][sY] = fScaleY;
+				gPlayerAO[playerid][sZ] = fScaleZ;
+			}
+		case EDIT_RESPONSE_CANCEL:
+			{
+				SetPlayerAttachedObject(playerid, index, modelid, boneid, gPlayerAO[playerid][X], gPlayerAO[playerid][Y], gPlayerAO[playerid][Z], gPlayerAO[playerid][rX], gPlayerAO[playerid][rY], gPlayerAO[playerid][rZ], gPlayerAO[playerid][sX], gPlayerAO[playerid][sY], gPlayerAO[playerid][sZ]);
+
+				new stringToPrint[512];
+				format(stringToPrint, sizeof(stringToPrint), "AO: X: %.2f, Y: %.2f, Z: %.2f, rX: %.2f, rY: %.2f, rZ: %.2f, sX: %.2f, sY: %.2f, sZ: %.2f", 
+						gPlayerAO[playerid][X],
+						gPlayerAO[playerid][Y],
+						gPlayerAO[playerid][Z],
+						gPlayerAO[playerid][rX],
+						gPlayerAO[playerid][rY],
+						gPlayerAO[playerid][rZ],
+						gPlayerAO[playerid][sX],
+						gPlayerAO[playerid][sY],
+						gPlayerAO[playerid][sZ]
+					);
+
+				SendClientMessage(playerid, COLOR_GREY, stringToPrint);
+				ClearAnimations(playerid);
+			}
+	}
 
 	return 1;
 }

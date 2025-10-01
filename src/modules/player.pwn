@@ -269,6 +269,9 @@ public SendPlayerSalary()
 		if (gPlayers[i][TeamID] == 0)
 			continue;
 
+		if (gPlayers[i][AFK])
+			continue;
+
 		teamSalary = gTeams[ gPlayers[i][TeamID] ][SalaryBase] + random(gTeams[ gPlayers[i][TeamID] ][SalaryVolatile]);
 
 		switch (gPlayers[i][Locale]) 

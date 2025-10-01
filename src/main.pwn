@@ -464,6 +464,8 @@ public OnVehicleSpawn(vehicleid)
 			if (gProperties[i][Vehicle][Components][j])
 				AddVehicleComponent(gProperties[i][Vehicle][ID], gProperties[i][Vehicle][Components][j]);
 		}
+
+		ChangeVehiclePaintjob(gProperties[i][Vehicle][ID], gProperties[i][Vehicle][Paintjob]);
 	}
 
 	SetVehicleNumberPlate(vehicleid, VEHICLE_PLATE);
@@ -1302,7 +1304,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	}
 
 	//
-	//  Various joobs/teams pickups.
+	//  Various jobs/teams pickups.
 	//
 
 	for (new i = 0; i < sizeof(gTeams); i++)

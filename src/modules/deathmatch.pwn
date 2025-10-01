@@ -63,6 +63,7 @@ public StartDeathmatch()
 	else
 	{
 		SendClientMessageToAll(COLOR_GREY, "[ DEATHMATCH ] No players registered, resetting the minigame.");
+		EndDeathmatch();
 	}
 
 	return 1;
@@ -72,6 +73,11 @@ public EndDeathmatch()
 {
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
+		if (!IsPlayerConnected(i))
+		{
+			continue;
+		}
+
 		if (gDeathmatch[i][InGame] || gDeathmatch[i][IsRegistered])
 		{
 			LeaveDeathmatch(i);
@@ -146,7 +152,7 @@ stock ResetPlayerDeathmatchState(playerid)
 
 stock RegisterToDeathmatch(playerid)
 {
-	if (gDeathmatchTimers[Game])
+	if (IsValidTimer(_: gDeathmatchTimers[Game]))
 	{
 		return SendClientMessage(playerid, COLOR_GREY, "[ DEATHMATCH ] The game already started, try again later!");
 	}

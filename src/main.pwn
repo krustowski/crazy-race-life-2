@@ -17,7 +17,7 @@
  [ Created: 	Jan 2025 (Extends legacy GameMode CRL (2008-2010)) ]
  [ Credits: 	krusty, kompry, DRaGsTeR, amdulka ]
  [ Language: 	CZ, EN ]
- [ Version: 	0.6. ]
+ [ Version: 	0.6.5 ]
 
  *****************************************************************************************************************************************/
 
@@ -154,10 +154,6 @@ main()
 
 public OnGameModeInit()
 {
-	InitDB();
-	InitDrugValues();
-	InitTeams();
-
 	SetGameModeText(GAMEMODE_NAME);
 
 	AllowAdminTeleport(true);
@@ -168,6 +164,24 @@ public OnGameModeInit()
 	ShowNameTags(true);
 	ShowPlayerMarkers(t_PLAYER_MARKERS_MODE: true); 
 	UsePlayerPedAnims();
+
+	//
+	// Create pickups, static objects and static vehicles + DrawTexts.
+	//
+
+	InitDB();
+	InitDrugValues();
+	InitTeams();
+
+	InitRealEstateProperties();
+	InitRaces();
+	InitHighScores();
+	InitTrucking();
+
+	InitPickups();
+	InitObjects();
+	InitVehicles();
+	InitTexts();
 
 	//
 	// Start various timers.
@@ -185,20 +199,6 @@ public OnGameModeInit()
 	SetTimer("DrawClockText", 10 * SECOND_MS, true);
 
 	SetTimer("ShowAdvert", 120 * SECOND_MS, true);
-
-	//
-	// Create pickups, static objects and static vehicles + DrawTexts.
-	//
-
-	InitRealEstateProperties();
-	InitRaces();
-	InitHighScores();
-	InitTrucking();
-
-	InitPickups();
-	InitObjects();
-	InitVehicles();
-	InitTexts();
 
 	return 1;
 }

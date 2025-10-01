@@ -345,8 +345,8 @@ stock OnPlayerPrivMsg(playerid, receiverid, text[])
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0); 
 	PlayerPlaySound(receiverid, 1057, 0.0, 0.0, 0.0);
 
-	GameTextForPlayer(playerid, "~w~PM ~g~Odeslana~w~.", 3000, 3); 
-	GameTextForPlayer(receiverid, "~w~PM ~g~Prijata~w~.", 3000, 3);
+	GameTextForPlayer(playerid, "~w~PM ~g~Sent~w~.", 3000, 3); 
+	GameTextForPlayer(receiverid, "~w~PM ~g~Received~w~.", 3000, 3);
 
 	GivePlayerMoney(playerid, -10); 
 

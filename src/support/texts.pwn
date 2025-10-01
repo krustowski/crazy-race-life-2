@@ -2,7 +2,7 @@
 //  Texts.
 //
 
-new Text:gGameModeText;
+new Text: gGameModeText;
 
 forward AddTexts(playerid);
 forward InitTexts();
@@ -30,6 +30,7 @@ public AddTexts(playerid)
 {
 	gRaceInfoText[playerid] = TextDrawCreate(460.0, 400.0, "");
 	gMissionInfoText[playerid] = TextDrawCreate(460.0, 400.0, "");
+	gDeathmatchText[playerid] = TextDrawCreate(400.0, 400, "");
 
 	TextDrawLetterSize(gRaceInfoText[playerid], 0.5, 1.5);
 	TextDrawFont(gRaceInfoText[playerid], t_TEXT_DRAW_FONT: 3);
@@ -39,8 +40,11 @@ public AddTexts(playerid)
 	TextDrawFont(gMissionInfoText[playerid], t_TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gMissionInfoText[playerid], 1);
 
+	TextDrawLetterSize(gDeathmatchText[playerid], 0.5, 1.5);
+	TextDrawFont(gDeathmatchText[playerid], t_TEXT_DRAW_FONT: 3);
+	TextDrawSetOutline(gDeathmatchText[playerid], 1);
+
 	// Show the game clock.
 	TextDrawShowForPlayer(playerid, gClockText);
 	TextDrawShowForPlayer(playerid, gGameModeText);
-
 }

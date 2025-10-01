@@ -2,6 +2,8 @@
 //  deathmatch.pwn
 //
 
+#define DEATHMATCH_TIME_SECONDS 240
+
 enum Deathmatch
 {
 	bool: InGame,
@@ -12,11 +14,14 @@ enum Deathmatch
 enum DeathmatchTimers
 {
 	Timer: Start,
-	Timer: Game
+	Timer: Game,
+	Timer: Elapsed,
+	TimeElapsed
 }
 
 new gDeathmatch[MAX_PLAYERS][Deathmatch];
 new gDeathmatchTimers[DeathmatchTimers];
+new Text: gDeathmatchText[MAX_PLAYERS];
 
 forward StartDeathmatch();
 forward UpdateDeathmatchScoreboard();
@@ -24,6 +29,7 @@ forward EndDeathmatch();
 
 public StartDeathmatch()
 {
+	KillTimer(_: gDeathmatchTimers[Start]);
 	gDeathmatchTimers[Start] = Timer: 0;
 
 	new totalPlayers;
@@ -50,7 +56,9 @@ public StartDeathmatch()
 
 	if (totalPlayers)
 	{
-		gDeathmatchTimers[Game] = Timer: SetTimer("EndDeathmatch", 4 * 60 * 1000, false);
+		gDeathmatchTimers[Game] = Timer: SetTimer("EndDeathmatch", DEATHMATCH_TIME_SECONDS * 1000, false);
+		gDeathmatchTimers[Elapsed] = Timer: SetTimer("UpdateDeathmatchScoreboard", 1000, true);
+		gDeathmatchTimers[TimeElapsed] = DEATHMATCH_TIME_SECONDS * 1000;
 	}
 	else
 	{
@@ -70,6 +78,10 @@ public EndDeathmatch()
 		}
 	}
 
+	KillTimer(_: gDeathmatchTimers[Elapsed]);
+	KillTimer(_: gDeathmatchTimers[Game]);
+
+	gDeathmatchTimers[Elapsed] = Timer: 0;
 	gDeathmatchTimers[Game] = Timer: 0;
 
 	return 1;
@@ -77,6 +89,10 @@ public EndDeathmatch()
 
 public UpdateDeathmatchScoreboard()
 {
+	new stringToPrint[256], topPlayer, topPlayerName[MAX_PLAYER_NAME], topScore, totalPlayers;
+
+	gDeathmatchTimers[TimeElapsed] -= 1000;
+
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if (!IsPlayerConnected(i))
@@ -85,27 +101,36 @@ public UpdateDeathmatchScoreboard()
 		if (!gDeathmatch[i][InGame])
 			continue;
 
-		new playerName[MAX_PLAYER_NAME], stringToPrint[128];
+		totalPlayers++;
+
+		/*new playerName[MAX_PLAYER_NAME], stringToPrint[128];
 
 		GetPlayerName(i, playerName, sizeof(playerName));
 		format(stringToPrint, sizeof(stringToPrint), "%20s [ID %2d]: %3d points\n", playerName, i, gDeathmatch[i][Score]);
 
-		SendClientMessage(i, COLOR_GREY, stringToPrint);
+		SendClientMessage(i, COLOR_GREY, stringToPrint);*/
+
+		if (topScore <= gDeathmatch[i][Score])
+		{
+			topScore = gDeathmatch[i][Score];
+			topPlayer = i;
+			GetPlayerName(topPlayer, topPlayerName, sizeof(topPlayerName));
+		}
+
+		format(stringToPrint, sizeof(stringToPrint), "~w~Players:_~g~%d~n~~w~Leader:__~y~%s:_~g~%2d~n~~w~Time:____~b~%d~y~:~b~%2d", totalPlayers, topPlayerName, topScore, floatround(floatround(gDeathmatchTimers[TimeElapsed] / 1000) / 60), floatround(gDeathmatchTimers[TimeElapsed] / 1000) % 60);
+
+		TextDrawSetString(gDeathmatchText[i], stringToPrint);
+		TextDrawShowForPlayer(i, gDeathmatchText[i]);
 	}
 
-	/*if (gPaintball[killerid] > vytezgPaintball)
-	  {
-	  new killer[MAX_PLAYER_NAME];
+	if (!totalPlayers)
+	{
+		KillTimer(_: gDeathmatchTimers[Elapsed]);
+		KillTimer(_: gDeathmatchTimers[Game]);
 
-	  vytez = killerid;
-	  vytezgPaintball = gPaintball[killerid];
-	  GetPlayerName(killerid, killer, sizeof(killer));
-	  for (new i = 0; i < MAX_PLAYERS; i++)
-	  {
-	  format(text, sizeof(text), "[ i ] %s je ve vedení ! [ Score: %d ].", killer, vytezgPaintball); //text kdo je ve vedeni podle gPaintball :)
-	  SendClientMessage(playerid, COLOR_BILA, text);
-	  }
-	  }*/
+		if (gDeathmatchTimers[TimeElapsed])
+			SendClientMessageToAll(COLOR_GREY, "[ DEATHMATCH ] No players in game, resetting the minigame.");
+	}
 
 	return 1;
 }
@@ -126,6 +151,7 @@ stock RegisterToDeathmatch(playerid)
 		return SendClientMessage(playerid, COLOR_GREY, "[ DEATHMATCH ] The game already started, try again later!");
 	}
 
+	gDeathmatch[playerid][Score] = 0;
 	gDeathmatch[playerid][IsRegistered] = true;
 
 	SetPlayerPos(playerid, -1365.1, -2307.0, 39.1);
@@ -133,7 +159,7 @@ stock RegisterToDeathmatch(playerid)
 
 	if (!gDeathmatchTimers[Start])
 	{
-		SendClientMessageToAll(COLOR_YELLOW, "[ DEATHMATCH ] Deathmatch starts in 45 seconds! /deathmatch");
+		SendClientMessageToAll(COLOR_YELLOW, "[ DEATHMATCH ] Deathmatch starts in 45 seconds! Join /deathmatch!");
 		gDeathmatchTimers[Start] = Timer: SetTimer("StartDeathmatch", 45 * 1000, false);
 	}
 
@@ -150,6 +176,8 @@ stock LeaveDeathmatch(playerid)
 
 		format(stringToPrint, sizeof(stringToPrint), "[ DEATHMATCH ] Player %s left the /deathmatch!", playerName);
 		SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+
+		TextDrawHideForPlayer(playerid, gDeathmatchText[playerid]);
 
 		gDeathmatch[playerid][IsRegistered] = false;
 		gDeathmatch[playerid][InGame] = false;

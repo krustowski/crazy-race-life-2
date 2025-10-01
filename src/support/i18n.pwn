@@ -133,7 +133,7 @@ new gI18nMessageEn[][] =
 	"[ RACE ] No such race prepared to join!",
 	"[ RACE ] You have already joined the race!",
 	"[ RACE ] You haven't got enough moeny to join such race!",
-	"[ DEATHMATCH ] New match just started, join to play!",
+	"[ DEATHMATCH ] New match just started!",
 	"[ CMD ] No such command! /cmd /help /rules",
 	"[ CASH ] You dropped your money at the death position!",
 	"[ REAL ] Vehicle modifications saved",

@@ -389,7 +389,7 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 	// Hide velocity meters.
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
-	if (gDeathmatch[playerid][InGame])
+	if (gDeathmatch[playerid][InGame] && playerid != killerid)
 	{
 		// Increment the killer's score.
 		gDeathmatch[killerid][Score]++;
@@ -1224,7 +1224,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					case 0:
 						{
-							if (gDeathmatch[playerid][IsRegistered])
+							if (gDeathmatch[playerid][IsRegistered] || gDeathmatch[playerid][InGame])
 							{
 								LeaveDeathmatch(playerid);
 							}

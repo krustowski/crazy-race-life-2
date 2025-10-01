@@ -568,7 +568,7 @@ stock ShowDeathmatchOptionsDialog(playerid)
 {
 	new stringToPrint[256];
 
-	if (!gDeathmatch[playerid][IsRegistered])
+	if (!gDeathmatch[playerid][IsRegistered] && !gDeathmatch[playerid][InGame])
 	{
 		format(stringToPrint, sizeof(stringToPrint), "%s",
 				"Register to Deathmatch"

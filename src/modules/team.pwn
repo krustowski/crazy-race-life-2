@@ -180,3 +180,17 @@ stock ExtractWeaponsAmmuFromString(const input[], ints[11])
 	return ints;
 }
 
+stock CheckTaxiDriversOnline()
+{
+	return 0;
+}
+
+stock CheckCarMechanicsOnline()
+{
+	return 0;
+}
+
+stock CheckPizzaguysOnline()
+{
+	return 0;
+}

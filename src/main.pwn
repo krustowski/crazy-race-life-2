@@ -1250,12 +1250,67 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				switch (listitem)
 				{
 					case 0:
-						{}
+						// Account balance
+						{
+							new stringToPrint[256];
+
+							format(stringToPrint, sizeof(stringToPrint), "[ PHONE ] Account balance: $%d!", gPlayers[playerid][Bank]);
+							SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
+						}
 					case 1:
-						{}
+						// PM to player
+						{
+							return ShowPhonePMPlayerListDialog(playerid);
+						}
 					case 2:
-						{}
+						// Taxi
+						{
+							if (CheckTaxiDriversOnline())
+							{}
+						}
+					case 3:
+						// Car mechanic
+						{
+							if (CheckCarMechanicsOnline())
+							{}
+						}
+					case 4:
+						// Pizza delivery
+						{
+							if (CheckPizzaguysOnline())
+							{}
+						}
 				}
+
+				ApplyAnimation(playerid, "ped", "phone_out", 4.1, false, false, false, false, 0);
+				//ClearAnimations(playerid);
+				RemovePlayerAttachedObject(playerid, 3);
+				return 1;
+			}
+		case DIALOG_PHONE_PM_PLAYER_LIST:
+			{
+				if (!response)
+				{
+					ApplyAnimation(playerid, "ped", "phone_out", 4.1, false, false, false, false, 0);
+					//ClearAnimations(playerid);
+					RemovePlayerAttachedObject(playerid, 3);
+					return 1;
+				}
+
+				return ShowPhonePMTextDialog(playerid, listitem);
+			}
+		case DIALOG_PHONE_PM_TEXT:
+			{
+				if (!response || !strlen(inputtext))
+				{
+					ApplyAnimation(playerid, "ped", "phone_out", 4.1, false, false, false, false, 0);
+					//ClearAnimations(playerid);
+					RemovePlayerAttachedObject(playerid, 3);
+					return 1;
+				}
+
+				OnPlayerPrivMsg(playerid, gPlayers[playerid][Temp], inputtext);
+				gPlayers[playerid][Temp] = 0;
 
 				ApplyAnimation(playerid, "ped", "phone_out", 4.1, false, false, false, false, 0);
 				//ClearAnimations(playerid);
@@ -1477,7 +1532,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		/*if (!IsPlayerConnected(i) || gPlayerMoneyPickup[i] == -1)
-			continue;*/
+		  continue;*/
 
 		if (pickupid != gPlayerMoneyPickup[i])
 			continue;
@@ -1604,15 +1659,15 @@ public OnTrailerUpdate(playerid, vehicleid)
 
 enum AO
 {
-	Float: X,
-	Float: Y,
-	Float: Z,
-	Float: rX,
-	Float: rY,
-	Float: rZ,
-	Float: sX,
-	Float: sY,
-	Float: sZ
+Float: X,
+       Float: Y,
+       Float: Z,
+       Float: rX,
+       Float: rY,
+       Float: rZ,
+       Float: sX,
+       Float: sY,
+       Float: sZ
 }
 
 new gPlayerAO[MAX_PLAYERS][AO];
@@ -1648,7 +1703,7 @@ public OnPlayerEditAttachedObject(playerid, EDIT_RESPONSE:response, index, model
 						gPlayerAO[playerid][sX],
 						gPlayerAO[playerid][sY],
 						gPlayerAO[playerid][sZ]
-					);
+				      );
 
 				SendClientMessage(playerid, COLOR_GREY, stringToPrint);
 				ClearAnimations(playerid);

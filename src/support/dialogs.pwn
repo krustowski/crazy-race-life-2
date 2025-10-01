@@ -39,7 +39,9 @@ enum
 	DIALOG_PLAYER_FAKECHAT,
 	DIALOG_PLAYER_ADMIN_LEVEL_SET,
 	DIALOG_DEATHMATCH_OPTIONS,
-	DIALOG_PHONE_OPTIONS
+	DIALOG_PHONE_OPTIONS,
+	DIALOG_PHONE_PM_PLAYER_LIST,
+	DIALOG_PHONE_PM_TEXT
 };
 
 #include "modules/real.pwn"
@@ -589,11 +591,47 @@ stock ShowPhoneOptionsDialog(playerid)
 {
 	new stringToPrint[256];
 
-	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s",
-			"Check Bank Account Balance",
-			"Send SMS to Player",
-			"Lmao"
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s\n%s",
+			"Check Bank account balance",
+			"Send SMS to player",
+			"Call Taxi",
+			"Call Car mechanic",
+			"Call Pizza delivery"
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_PHONE_OPTIONS, DIALOG_STYLE_LIST, "Phone Operations List", stringToPrint, "Select", "Cancel");
+}
+
+stock ShowPhonePMPlayerListDialog(playerid)
+{
+	new stringToPrint[512] = "Name\tID";
+
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i))
+			continue;
+
+		new playerName[MAX_PLAYER_NAME];
+		GetPlayerName(i, playerName);
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
+				stringToPrint,
+				playerName,
+				i
+		      );
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_PHONE_PM_PLAYER_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Players List", stringToPrint, "Select", "Cancel");
+}
+
+stock ShowPhonePMTextDialog(playerid, clickedplayerid)
+{
+	new playerName[MAX_PLAYER_NAME], title[128];
+
+	gPlayers[playerid][Temp] = clickedplayerid;
+
+	GetPlayerName(clickedplayerid, playerName, sizeof(playerName));
+	format(title, sizeof(title), "New PM to '%s'", playerName);
+
+	return ShowPlayerDialog(playerid, DIALOG_PHONE_PM_TEXT, DIALOG_STYLE_INPUT, title, "Write a new PM to selected player:", "Send", "Cancel");
 }

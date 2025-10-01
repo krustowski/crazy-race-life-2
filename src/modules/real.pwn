@@ -283,6 +283,11 @@ stock SpawnProperty(propertyId)
 				}
 			case VEHICLE_POINT:
 				{
+					gPropertyCoords[propertyId][i][Primary][CoordX] = pX;
+					gPropertyCoords[propertyId][i][Primary][CoordY] = pY;
+					gPropertyCoords[propertyId][i][Primary][CoordZ] = pZ;
+					gPropertyCoords[propertyId][i][Primary][CoordR] = pR;
+
 					if (gProperties[propertyId][Vehicle][Model] && gProperties[propertyId][Vehicle][Model] >= 400 && gProperties[propertyId][Vehicle][Model] <= 611)
 					{
 						gProperties[propertyId][Vehicle][ID] = CreateVehicle(gProperties[propertyId][Vehicle][Model], pX, pY, pZ, pR, gProperties[propertyId][Vehicle][Colours][0], gProperties[propertyId][Vehicle][Colours][1], -1);
@@ -298,6 +303,11 @@ stock SpawnProperty(propertyId)
 				}
 			case OFFER_POINT:
 				{
+					gPropertyCoords[propertyId][i][Primary][CoordX] = pX;
+					gPropertyCoords[propertyId][i][Primary][CoordY] = pY;
+					gPropertyCoords[propertyId][i][Primary][CoordZ] = pZ;
+					gPropertyCoords[propertyId][i][Primary][CoordR] = pR;
+
 					if (!gProperties[propertyId][Occupied])
 						gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_HOUSE_GREEN, 1, pX, pY, pZ);
 					else
@@ -787,8 +797,8 @@ stock BuyPlayerProperty(playerid, propertyID)
 	{
 		if (gPropertyCoords[arrayID][i][PickupType] == OFFER_POINT)
 		{
-			/*if (!IsPlayerInSphere(playerid, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ], 15.0))
-				return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);*/
+			if (!IsPlayerInSphere(playerid, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ], 15.0))
+				return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);
 
 			DestroyPickup(gPropertyCoords[arrayID][i][Pickup]);
 			gPropertyCoords[arrayID][i][Pickup] = 0;
@@ -861,8 +871,8 @@ stock SellPlayerProperty(playerid, propertyID)
 
 		if (gPropertyCoords[arrayID][i][PickupType] == OFFER_POINT)
 		{
-			/*if (!IsPlayerInSphere(playerid, gPropertyCoords[i][j][Primary][CoordX], gPropertyCoords[i][j][Primary][CoordY], gPropertyCoords[i][j][Primary][CoordZ], 15.0))
-			  return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);*/
+			if (!IsPlayerInSphere(playerid, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ], 15.0))
+			  return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);
 
 			DestroyPickup(gPropertyCoords[arrayID][i][Pickup]);
 			Delete3DTextLabel(gPropertyCoords[arrayID][i][Text]);

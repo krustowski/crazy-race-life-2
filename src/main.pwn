@@ -248,9 +248,10 @@ public OnPlayerConnect(playerid)
 	// Reset the auth status for a new player.
 	gPlayers[playerid][IsLogged] = false;
 
-	// Reset the paintball states.
-	gPaintball[playerid][E_PAINTBALL_INGAME] = 0;
-	gPaintball[playerid][E_PAINTBALL_SCORE] = 0;
+	// Reset the deathmatch states.
+	gDeathmatch[playerid][IsRegistered] = false;
+	gDeathmatch[playerid][InGame] = false;
+	gDeathmatch[playerid][Score] = 0;
 
 	// Reset trucking
 	gTrucking[playerid] = false;
@@ -359,12 +360,10 @@ public OnPlayerSpawn(playerid)
 		gPlayers[playerid][InsideProperty] = false;
 	}
 
-	// Set the player back to the paintball area if is set in game.
-	if (gPaintball[playerid][E_PAINTBALL_INGAME])
+	// Set the player back to the deathmatch area if is set in game.
+	if (gDeathmatch[playerid][InGame])
 	{
-		SetPlayerPos(playerid, Float: -1365.1, Float: -2307.0, Float: 39.1);
-		GivePlayerWeapon(playerid, t_WEAPON: 29, 999);
-
+		ResetPlayerDeathmatchState(playerid);
 		return 1;
 	}
 
@@ -388,30 +387,16 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 	SendDeathMessage(killerid, playerid, reason);
 
 	// Hide velocity meters.
-	//TextDrawHideForPlayer(playerid, KPH[playerid]);
-	//TextDrawHideForPlayer(playerid, KPHR[playerid]);
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
-	if (gPaintball[playerid][E_PAINTBALL_INGAME])
+	if (gDeathmatch[playerid][InGame])
 	{
 		// Increment the killer's score.
-		gPaintball[killerid][E_PAINTBALL_SCORE]++;
+		gDeathmatch[killerid][Score]++;
 
-		GetPaintballScoreboard();
+		UpdateDeathmatchScoreboard();
 
-		/*if (gPaintball[killerid] > vytezgPaintball)
-		  {
-		  new killer[MAX_PLAYER_NAME];
-
-		  vytez = killerid;
-		  vytezgPaintball = gPaintball[killerid];
-		  GetPlayerName(killerid, killer, sizeof(killer));
-		  for (new i = 0; i < MAX_PLAYERS; i++)
-		  {
-		  format(text, sizeof(text), "[ i ] %s je ve vedení ! [ Score: %d ].", killer, vytezgPaintball); //text kdo je ve vedeni podle gPaintball :)
-		  SendClientMessage(playerid, COLOR_BILA, text);
-		  }
-		  }*/
+		ResetPlayerDeathmatchState(playerid);
 		return 1;
 	}
 
@@ -435,8 +420,6 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 		GetPlayerName(killerid, killerName, MAX_PLAYER_NAME);
 
 		// Hide velocity meters.
-		//TextDrawHideForPlayer(playerid, KPH[playerid]);
-		//TextDrawHideForPlayer(playerid, KPHR[playerid]);
 		TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
 		format(stringToPrint, sizeof(stringToPrint), "[ CARKILL ] Player %s [ID: %d] has just broken the server rules", killerName, killerid);
@@ -1231,6 +1214,28 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				SavePlayerData(clickedplayerid);
 
 				return SendClientMessageToAll(COLOR_GREY, stringToPrint);
+			}
+		case DIALOG_DEATHMATCH_OPTIONS:
+			{
+				if (!response)
+					return 1;
+
+				switch (listitem)
+				{
+					case 0:
+						{
+							if (gDeathmatch[playerid][IsRegistered])
+							{
+								LeaveDeathmatch(playerid);
+							}
+							else
+							{
+								RegisterToDeathmatch(playerid);
+							}
+						}
+				}
+
+				return 1;
 			}
 
 		default: 

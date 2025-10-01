@@ -285,36 +285,8 @@ dcmd_deal(playerid, const params[])
 
 dcmd_deathmatch(playerid, const params[])
 {
-	if (!strcmp(params, "join"))
-	{
-		SendClientMessageToAll(COLOR_YELLOW, "[ DEATHMATCH ] Deathmatch starts in 45 seconds! /deathmatch join");
-		SetPlayerPos(playerid, -1365.1, -2307.0, 39.1);
-
-		SetTimer("StartPaintball", 45000, false);
-
-		gPaintball[playerid][E_PAINTBALL_INGAME] = 1;
-	}
-	else if (!strcmp(params, "exit"))
-	{
-		new playerName[MAX_PLAYER_NAME], stringToPrint[128];
-
-		GetPlayerName(playerid, playerName, sizeof(playerName));
-
-		if (gPaintball[playerid][E_PAINTBALL_INGAME])
-		{
-			format(stringToPrint, sizeof(stringToPrint), "[ DEATHMATCH ] Player %s left the deathmatch (/deathmatch exit)!", playerName);
-			SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
-
-			SetPlayerHealth(playerid, 0.0);
-			gPaintball[playerid][E_PAINTBALL_INGAME] = 0;
-		}
-	}
-	else
-	{
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /deathmatch [join/exit]");
-	}
-
-	return 1;
+#pragma unused params
+	return ShowDeathmatchOptionsDialog(playerid);
 }
 
 dcmd_drugz(playerid, const params[])

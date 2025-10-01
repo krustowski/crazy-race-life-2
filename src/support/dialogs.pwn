@@ -37,7 +37,8 @@ enum
 	DIALOG_PLAYER_DRUNK_LEVEL_SET,
 	DIALOG_PLAYER_WEAPON_SET,
 	DIALOG_PLAYER_FAKECHAT,
-	DIALOG_PLAYER_ADMIN_LEVEL_SET
+	DIALOG_PLAYER_ADMIN_LEVEL_SET,
+	DIALOG_DEATHMATCH_OPTIONS
 };
 
 #include "modules/real.pwn"
@@ -559,4 +560,26 @@ stock ShowPlayerFakechatDialog(playerid)
 	format(title, sizeof(title), "Player '%s' Options", playerName);
 
 	return ShowPlayerDialog(playerid, DIALOG_PLAYER_FAKECHAT, DIALOG_STYLE_INPUT, title, "Set a message to be send as a fakechat as clicked player ID:", "Send", "Cancel");
+}
+
+#include "modules/deathmatch.pwn"
+
+stock ShowDeathmatchOptionsDialog(playerid)
+{
+	new stringToPrint[256];
+
+	if (!gDeathmatch[playerid][IsRegistered])
+	{
+		format(stringToPrint, sizeof(stringToPrint), "%s",
+				"Register to Deathmatch"
+		      );
+
+		return ShowPlayerDialog(playerid, DIALOG_DEATHMATCH_OPTIONS, DIALOG_STYLE_LIST, "Deathmatch Options", stringToPrint, "Select", "Cancel");
+	}
+
+	format(stringToPrint, sizeof(stringToPrint), "%s",
+			"Leave Deathmatch"
+	      );
+
+	return ShowPlayerDialog(playerid, DIALOG_DEATHMATCH_OPTIONS, DIALOG_STYLE_LIST, "Deathmatch Options", stringToPrint, "Select", "Cancel");
 }

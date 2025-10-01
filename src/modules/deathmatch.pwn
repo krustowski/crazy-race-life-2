@@ -24,6 +24,8 @@ forward EndDeathmatch();
 
 public StartDeathmatch()
 {
+	gDeathmatchTimers[Start] = Timer: 0;
+
 	new totalPlayers;
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
@@ -60,8 +62,17 @@ public StartDeathmatch()
 
 public EndDeathmatch()
 {
-	return 1;
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (gDeathmatch[i][InGame] || gDeathmatch[i][IsRegistered])
+		{
+			LeaveDeathmatch(i);
+		}
+	}
 
+	gDeathmatchTimers[Game] = Timer: 0;
+
+	return 1;
 }
 
 public UpdateDeathmatchScoreboard()
@@ -110,30 +121,28 @@ stock ResetPlayerDeathmatchState(playerid)
 
 stock RegisterToDeathmatch(playerid)
 {
-	gDeathmatch[playerid][IsRegistered] = true;
+	if (gDeathmatchTimers[Game])
+	{
+		return SendClientMessage(playerid, COLOR_GREY, "[ DEATHMATCH ] The game already started, try again later!");
+	}
 
-	SendClientMessageToAll(COLOR_YELLOW, "[ DEATHMATCH ] Deathmatch starts in 45 seconds! /deathmatch");
+	gDeathmatch[playerid][IsRegistered] = true;
 
 	SetPlayerPos(playerid, -1365.1, -2307.0, 39.1);
 	TogglePlayerControllable(playerid, false);
 
-	new totalPlayers;
-
-	for (new i = 0; i < MAX_PLAYERS; i++)
+	if (!gDeathmatchTimers[Start])
 	{
-		if (IsPlayerConnected(i) && gDeathmatch[i][IsRegistered])
-			totalPlayers++;
+		SendClientMessageToAll(COLOR_YELLOW, "[ DEATHMATCH ] Deathmatch starts in 45 seconds! /deathmatch");
+		gDeathmatchTimers[Start] = Timer: SetTimer("StartDeathmatch", 45 * 1000, false);
 	}
-
-	if (!totalPlayers)
-		SetTimer("StartPaintball", 45 * 1000, false);
 
 	return 1;
 }
 
 stock LeaveDeathmatch(playerid)
 {
-	if (gDeathmatch[playerid][InGame])
+	if (gDeathmatch[playerid][InGame] || gDeathmatch[playerid][IsRegistered])
 	{
 		new playerName[MAX_PLAYER_NAME], stringToPrint[128];
 
@@ -142,7 +151,10 @@ stock LeaveDeathmatch(playerid)
 		format(stringToPrint, sizeof(stringToPrint), "[ DEATHMATCH ] Player %s left the /deathmatch!", playerName);
 		SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
 
+		gDeathmatch[playerid][IsRegistered] = false;
 		gDeathmatch[playerid][InGame] = false;
+
+		TogglePlayerControllable(playerid, true);
 		ResetPlayerWeapons(playerid);
 		SpawnPlayer(playerid);
 	}

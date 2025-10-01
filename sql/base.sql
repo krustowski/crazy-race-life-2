@@ -1,12 +1,4 @@
 CREATE TABLE sqlite_sequence(name,seq);
-CREATE TABLE IF NOT EXISTS "vehicles" (
-	"id"	INTEGER,
-	"model"	INTEGER,
-	"color1"	INTEGER,
-	"color2"	INTEGER,
-	"components"	TEXT,
-	PRIMARY KEY("id")
-);
 CREATE TABLE IF NOT EXISTS "drug_prices" (
 	"id"	INTEGER,
 	"name"	TEXT,
@@ -180,4 +172,13 @@ CREATE TABLE IF NOT EXISTS "properties" (
 	PRIMARY KEY("id"),
 	FOREIGN KEY("user_id") REFERENCES "users"("id") ON DELETE CASCADE,
 	FOREIGN KEY("vehicle_id") REFERENCES "vehicles"("id")
+);
+CREATE TABLE IF NOT EXISTS "vehicles" (
+	"id"	INTEGER,
+	"model"	INTEGER,
+	"color1"	INTEGER,
+	"color2"	INTEGER,
+	"components"	TEXT,
+	"paintjob"	INTEGER,
+	PRIMARY KEY("id")
 );

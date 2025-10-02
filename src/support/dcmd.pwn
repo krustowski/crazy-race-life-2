@@ -367,12 +367,7 @@ dcmd_givecash(playerid, const params[])
 dcmd_help(playerid, const params[])
 {
 #pragma unused params
-	SendClientMessage(playerid, COLOR_YELLOWGREEN, "[ HELP ]");
-	SendClientMessage(playerid, COLOR_YELLOW, "=> Command list:        /cmd");
-	SendClientMessage(playerid, COLOR_YELLOW, "=> Admin command list:  /acmd");
-	SendClientMessage(playerid, COLOR_YELLOW, "=> Server rules:        /rules");
-
-	return 1;
+	return ShowServerHelpListDialog(playerid);
 }
 
 dcmd_hide(playerid, const params[]) 
@@ -609,12 +604,7 @@ dcmd_race(playerid, const params[])
 dcmd_rules(playerid, const params[])
 {
 #pragma unused params
-	SendClientMessage(playerid, COLOR_ORANGERED, "[ GAME RULES ]");
-	SendClientMessage(playerid, COLOR_ORANGERED, "=> No CARKILL, HELIKILL, or BIKEKILL");
-	SendClientMessage(playerid, COLOR_ORANGERED, "=> No MINIGUN, or JETPACK usage, No cheating");
-	SendClientMessage(playerid, COLOR_ORANGERED, "=> Anti-Cheat filterscript enabled (cheating => kick, or ban)");
-
-	return 1;
+	return ShowServerRulesDialog(playerid);
 }
 
 dcmd_scores(playerid, const params[])

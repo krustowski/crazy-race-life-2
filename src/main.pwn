@@ -1317,6 +1317,29 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				RemovePlayerAttachedObject(playerid, 3);
 				return 1;
 			}
+		case DIALOG_HELP_LIST:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				switch (listitem)
+				{
+					case 0:
+						{
+							return ShowCommonCommandsDialog(playerid);
+						}
+					case 1:
+						{
+							return ShowAdminCommandsDialog(playerid);
+						}
+					case 2:
+						{
+							return ShowServerRulesDialog(playerid);
+						}
+				}
+			}
 
 		default: 
 			return 0; // dialog ID was not found, search in other scripts

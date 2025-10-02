@@ -1,7 +1,7 @@
 {
 	"user": "krustowski",
 	"repo": "crazy-race-life-2",
-	"tag": "v0.6.5",
+	"tag": "v0.6.6",
 	"entry": "src/main.pwn",
 	"output": "gamemodes/crl2.amx",
 	"dependencies": [

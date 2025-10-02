@@ -41,7 +41,8 @@ enum
 	DIALOG_DEATHMATCH_OPTIONS,
 	DIALOG_PHONE_OPTIONS,
 	DIALOG_PHONE_PM_PLAYER_LIST,
-	DIALOG_PHONE_PM_TEXT
+	DIALOG_PHONE_PM_TEXT,
+	DIALOG_PLAYER_ACCOUNT
 };
 
 #include "modules/real.pwn"
@@ -635,4 +636,20 @@ stock ShowPhonePMTextDialog(playerid, clickedplayerid)
 	format(title, sizeof(title), "New PM to '%s'", playerName);
 
 	return ShowPlayerDialog(playerid, DIALOG_PHONE_PM_TEXT, DIALOG_STYLE_INPUT, title, "Write a new PM to selected player:", "Send", "Cancel");
+}
+
+stock ShowPlayerAccountDialog(playerid)
+{
+	new stringToPrint[256];
+
+	format(stringToPrint, sizeof(stringToPrint), "Account details:\n\n{FFFFFF}Cash: \t\t${00FF00}%d{FFFFFF}\nTeam: \t\t{FFD700}%s{FFFFFF} (ID: {FFD700}%d{FFFFFF})\nSkin ID:\t\t{FFD700}%d{FFFFFF}\nAdmin level: \t{FFD700}%d{FFFFFF}\nWanted level: \t{FFD700}%d{FFFFFF}",
+			GetPlayerMoney(playerid),
+			gTeams[ gPlayers[playerid][TeamID] ][TeamName],
+			gPlayers[playerid][TeamID],
+			GetPlayerSkin(playerid),
+			gPlayers[playerid][AdminLevel],
+			GetPlayerWantedLevel(playerid)
+	      );
+
+	return ShowPlayerDialog(playerid, DIALOG_PLAYER_ACCOUNT, DIALOG_STYLE_MSGBOX, "Player Account Info", stringToPrint, "Close", "");
 }

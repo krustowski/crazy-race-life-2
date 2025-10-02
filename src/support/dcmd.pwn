@@ -86,39 +86,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 dcmd_acc(playerid, const params[])
 {
 #pragma unused params
-	new accountPropsText[][] =
-	{
-		"=> Money: cash $%d, bank $%d",
-		"=> TeamID: %d, SkinID: %d",
-		"=> Admin level: %d, Wanted level: %d"
-	};
-
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ ACCOUNT ] Game account stats");
-
-	for (new i = 0; i < sizeof(accountPropsText); i++)
-	{
-		new stringToPrint[128];
-
-		switch (i)
-		{
-			case 0:
-				{
-					format(stringToPrint, sizeof(stringToPrint), accountPropsText[i], GetPlayerMoney(playerid), gPlayers[playerid][Bank]);
-				}
-			case 1:
-				{
-					format(stringToPrint, sizeof(stringToPrint), accountPropsText[i], gPlayers[playerid][TeamID], GetPlayerSkin(playerid));
-				}
-			case 2:
-				{
-					format(stringToPrint, sizeof(stringToPrint), accountPropsText[i], gPlayers[playerid][AdminLevel], GetPlayerWantedLevel(playerid));
-				}
-		}
-
-		SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
-	}
-
-	return 1;
+	return ShowPlayerAccountDialog(playerid);
 }
 
 dcmd_admins(playerid, const params[])

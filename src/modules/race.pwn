@@ -246,8 +246,10 @@ stock ResetPlayerRaceState(playerid, raceId, finishedSuccessfully)
 		GetPlayerName(playerid, playerName, sizeof(playerName));
 		GivePlayerMoney(playerid, gRaces[raceId][PrizeDollars]);
 
-		format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s just won the '%s' race, and received a price of $%d!", playerName, gRaces[raceId][Name], gRaces[raceId][PrizeDollars]);
+		format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s just finished the '%s' race, and received a price of $%d!", playerName, gRaces[raceId][Name], gRaces[raceId][PrizeDollars]);
 		SendClientMessageToAll(COLOR_LIGHTGREEN, stringToPrint);
+
+		GameTextForPlayer(playerid, "~w~Race ~g~Finished", 3000, 3); 
 
 		SaveNewScore(raceId, playerid, gPlayerRaceTime[playerid], GetVehicleModel(GetPlayerVehicleID(playerid)));
 	}
@@ -257,6 +259,8 @@ stock ResetPlayerRaceState(playerid, raceId, finishedSuccessfully)
 	if (!finishedSuccessfully && CheckPlayerRaceState(playerid))
 	{
 		SendClientMessageLocalized(playerid, I18N_RACE_ENDED_PREMATURELY);
+
+		GameTextForPlayer(playerid, "~w~Race ~r~Aborted", 3000, 3); 
 	}
 
 	// Reset all race states to be sure not to interfere with others.
@@ -347,6 +351,8 @@ stock CheckRaceCheckpoint(playerid)
 	{
 		gPlayerRaceTimer[playerid] = Timer: SetTimerEx("UpdateRaceInfoText", 1 * SECOND_MS, true, "i", playerid);
 		TextDrawShowForPlayer(playerid, gRaceInfoText[playerid]);
+
+		GameTextForPlayer(playerid, "~w~Race ~g~Started", 3000, 3); 
 	}
 
 	DisablePlayerRaceCheckpoint(playerid);

@@ -306,7 +306,7 @@ stock SetPlayerRaceStartPos(playerid)
 		return 0;
 	}
 
-	SetVehiclePos(GetPlayerVehicleID(playerid), Float:gRaces[raceId][Start][E_RACE_COORD_X], Float:gRaces[raceId][Start][E_RACE_COORD_Y], Float:gRaces[raceId][Start][E_RACE_COORD_Z]);
+	SetVehiclePos(GetPlayerVehicleID(playerid), Float:gRaces[raceId][Start][E_RACE_COORD_X], Float:gRaces[raceId][Start][E_RACE_COORD_Y], Float:gRaces[raceId][Start][E_RACE_COORD_Z] + 2.00);
 
 	return 1;
 }

@@ -110,18 +110,19 @@ public UpdateDeathmatchScoreboard()
 
 		totalPlayers++;
 
-		/*new playerName[MAX_PLAYER_NAME], stringToPrint[128];
-
-		GetPlayerName(i, playerName, sizeof(playerName));
-		format(stringToPrint, sizeof(stringToPrint), "%20s [ID %2d]: %3d points\n", playerName, i, gDeathmatch[i][Score]);
-
-		SendClientMessage(i, COLOR_GREY, stringToPrint);*/
-
 		if (topScore <= gDeathmatch[i][Score])
 		{
 			topScore = gDeathmatch[i][Score];
 			topPlayer = i;
 			GetPlayerName(topPlayer, topPlayerName, sizeof(topPlayerName));
+		}
+	}
+
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i) || !gDeathmatch[i][InGame])
+		{
+			continue;
 		}
 
 		format(stringToPrint, sizeof(stringToPrint), "~w~Players:_~g~%d~n~~w~Leader:__~y~%s:_~g~%2d~n~~w~Time:____~b~%d~y~:~b~%2d", totalPlayers, topPlayerName, topScore, floatround(floatround(gDeathmatchTimers[TimeElapsed] / 1000) / 60), floatround(gDeathmatchTimers[TimeElapsed] / 1000) % 60);

@@ -12,6 +12,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(acc, 3, cmdtext);            //all
 	dcmd(admins, 6, cmdtext);         //all
 	dcmd(afk, 3, cmdtext);            //all
+	dcmd(animoff, 7, cmdtext);        //all
 	dcmd(bank, 4, cmdtext);		  //all
 	dcmd(cmd, 3, cmdtext);            //all
 	dcmd(dance, 5, cmdtext);	  //all
@@ -164,6 +165,15 @@ dcmd_afk(playerid, const params[])
 
 		gPlayers[playerid][AFK] = false;
 	}
+
+	return 1;
+}
+
+dcmd_animoff(playerid, const params[])
+{
+#pragma unused params
+	ClearAnimations(playerid);
+	SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
 
 	return 1;
 }

@@ -44,7 +44,8 @@ enum
 	DIALOG_PHONE_PM_TEXT,
 	DIALOG_PLAYER_ACCOUNT,
 	DIALOG_HELP_LIST,
-	DIALOG_SERVER_RULES
+	DIALOG_SERVER_RULES,
+	DIALOG_EDITOR_LIST
 };
 
 #include "modules/real.pwn"
@@ -671,8 +672,19 @@ stock ShowServerHelpListDialog(playerid)
 stock ShowServerRulesDialog(playerid)
 {
 	new stringToPrint[512];
-
 	format(stringToPrint, sizeof(stringToPrint), "Game Server Rules\n\n1. No Carkill, Helikill, or Bikekill\n2. No Minigun or Jetpack usage\n3. No Cheating\n\nAnti-Cheat filterscript enabled (cheating => kick, or ban)");
 
 	return ShowPlayerDialog(playerid, DIALOG_SERVER_RULES, DIALOG_STYLE_MSGBOX, "Server Rules", stringToPrint, "Close", "");
+}
+
+stock ShowGameEditorListDialog(playerid)
+{
+	new stringToPrint[256];
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s",
+			"Property Editor",
+			"Trucking Editor",
+			"Race Editor"
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_EDITOR_LIST, DIALOG_STYLE_LIST, "Game Editors", stringToPrint, "Select", "Cancel");
 }

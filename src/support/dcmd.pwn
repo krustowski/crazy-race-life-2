@@ -54,6 +54,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(countdown, 9, cmdtext);      //rcon + 
 	dcmd(crime, 5, cmdtext);	  //rcon
 	dcmd(drunk, 5, cmdtext);          //rcon +
+	dcmd(edit, 4, cmdtext);		  //rcon + lvl 4
 	dcmd(elevator, 8, cmdtext);	  //rcon + lvl 4
 	dcmd(fakechat, 8, cmdtext);       //rcon + lvl 2
 	dcmd(flip, 4, cmdtext);           //rcon + 
@@ -1096,6 +1097,15 @@ dcmd_drunk(playerid, const params[])
 	SendClientMessage(targetId, COLOR_ORANGE, "[ DRUGZ ] Your drunk level changed");
 
 	return 1;
+}
+
+dcmd_edit(playerid, const params[])
+{
+#pragma unused params
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4) 
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+
+	return ShowGameEditorListDialog(playerid);
 }
 
 dcmd_elevator(playerid, const params[])

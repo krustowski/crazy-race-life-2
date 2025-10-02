@@ -1340,6 +1340,27 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 				}
 			}
+		case DIALOG_EDITOR_LIST:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				switch (listitem)
+				{
+					case 0:
+						{
+							return ShowPropertyEditorListDialog(playerid);
+						}
+					case 1:
+						{}
+					case 2:
+						{}
+				}
+
+				return 1;
+			}
 
 		default: 
 			return 0; // dialog ID was not found, search in other scripts

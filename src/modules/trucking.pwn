@@ -150,7 +150,9 @@ public CheckPlayerTrailerAttached(playerid)
 	}
 
 	SetVehicleParamsForPlayer(trailerid, playerid, true, false);
-	SendClientMessage(playerid, COLOR_ORANGE, "[ TRUCK ] The trailer has just detached from the cab, reatach it to continue the mission");
+	//SendClientMessage(playerid, COLOR_ORANGE, "[ TRUCK ] The trailer has just detached from the cab, reatach it to continue the mission");
+
+	GameTextForPlayer(playerid, "~w~Trailer ~r~Detached! ~w~Reattach to continue!", 1000, 3); 
 
 	return 1;
 }

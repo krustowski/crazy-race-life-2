@@ -975,6 +975,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 0:
 						// Set HP
 						{
+							if (gDeathmatch[clickedplayerid][IsRegistered] || gDeathmatch[clickedplayerid][InGame])
+							{
+								return SendClientMessage(playerid, COLOR_RED, "[ ! ] Target ID is playing a minigame!");
+							}
+
 							SetPlayerHealth(clickedplayerid, 100.0);
 							SetPlayerArmour(clickedplayerid, 100.0);
 
@@ -1058,6 +1063,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 10:
 						// Give weapons
 						{
+							if (gDeathmatch[clickedplayerid][IsRegistered] || gDeathmatch[clickedplayerid][InGame])
+							{
+								return SendClientMessage(playerid, COLOR_RED, "[ ! ] Target ID is playing a minigame!");
+							}
+
 							GivePlayerWeapon(clickedplayerid, t_WEAPON: 26, 400);
 							GivePlayerWeapon(clickedplayerid, t_WEAPON: 28, 400);
 							GivePlayerWeapon(clickedplayerid, t_WEAPON: 31, 400);
@@ -1070,6 +1080,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 11:
 						// Give a specific weapon
 						{
+							if (gDeathmatch[clickedplayerid][IsRegistered] || gDeathmatch[clickedplayerid][InGame])
+							{
+								return SendClientMessage(playerid, COLOR_RED, "[ ! ] Target ID is playing a minigame!");
+							}
+
 							ShowPlayerGiveWeaponDialog(playerid);
 						}
 					case 12:

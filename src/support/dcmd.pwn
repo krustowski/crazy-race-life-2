@@ -1254,6 +1254,11 @@ dcmd_hp(playerid, const params[])
 	if (!IsPlayerConnected(targetId))
 		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
 
+	if (gDeathmatch[targetId][IsRegistered] || gDeathmatch[targetId][InGame])
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Target ID is playing a minigame!");
+	}
+
 	SetPlayerHealth(targetId, 100.0);
 	SetPlayerArmour(targetId, 100.0);
 
@@ -1735,6 +1740,11 @@ dcmd_weapon(playerid, const params[])
 	if (!IsPlayerConnected(targetId))
 		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] No such player online!");
 
+	if (gDeathmatch[targetId][IsRegistered] || gDeathmatch[targetId][InGame])
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Target ID is playing a minigame!");
+	}
+
 	GivePlayerWeapon(targetId, t_WEAPON: targetWeapon, 1000);
 
 	return 1;
@@ -1753,6 +1763,11 @@ dcmd_weapons(playerid, const params[])
 	if (!IsPlayerConnected(targetId))
 		//return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
 		targetId = playerid;
+
+	if (gDeathmatch[targetId][IsRegistered] || gDeathmatch[targetId][InGame])
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Target ID is playing a minigame!");
+	}
 
 	GivePlayerWeapon(targetId, t_WEAPON: 26, 400);
 	GivePlayerWeapon(targetId, t_WEAPON: 28, 400);

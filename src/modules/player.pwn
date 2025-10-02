@@ -353,6 +353,8 @@ stock OnPlayerPrivMsg(playerid, receiverid, text[])
 	return 1;
 }
 
+#include "modules/deathmatch.pwn"
+
 stock MovePlayerToPlayer(playerid, targetid, bool: reversed)
 {
 	if (!IsPlayerConnected(playerid) || !IsPlayerConnected(targetid)) 
@@ -376,6 +378,11 @@ stock MovePlayerToPlayer(playerid, targetid, bool: reversed)
 	{
 		GetPlayerPos(playerid, X, Y, Z);
 		portedid = targetid;
+	}
+
+	if (gDeathmatch[portedid][IsRegistered] || gDeathmatch[portedid][InGame])
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Target ID is playing a minigame!");
 	}
 
 	new portedPlayerState = GetPlayerState(portedid), portedVehicleId = GetPlayerVehicleID(portedid);

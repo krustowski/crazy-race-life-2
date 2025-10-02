@@ -756,6 +756,8 @@ dcmd_truck(playerid, const params[])
 		SetVehicleParamsForPlayer(gPlayerMissions[playerid][VehicleID], playerid, false, false);
 		SetVehicleParamsForPlayer(gPlayerMissions[playerid][TrailerID], playerid, false, false);
 
+		GameTextForPlayer(playerid, "~w~Trucking Mission ~r~Aborted", 3000, 3); 
+
 		SendClientMessage(playerid, COLOR_YELLOW, "[ TRUCK ] Mission aborted");
 
 		return 1;
@@ -821,6 +823,7 @@ dcmd_truck(playerid, const params[])
 		gPlayerMissions[playerid][TimerElapsed] = SetTimerEx("UpdateMissionInfoText", 1000, true, "i", playerid);
 		gPlayerMissions[playerid][TimerAttachedCheck] = SetTimerEx("CheckPlayerTrailerAttached", 1500, true, "i", playerid);
 
+		GameTextForPlayer(playerid, "~w~Trucking Mission ~g~Started", 3000, 3); 
 
 		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TRUCK ] Vehicle and trailer registered successfully");
 	}

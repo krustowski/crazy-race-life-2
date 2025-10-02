@@ -52,6 +52,7 @@ public StartDeathmatch()
 		SendClientMessageLocalized(i, I18N_DEATHMATCH_STARTED);
 
 		PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
+		GameTextForPlayer(i, "~w~Deathmatch ~g~Started", 3000, 3); 
 	}
 
 	if (totalPlayers)

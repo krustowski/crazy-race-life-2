@@ -782,6 +782,18 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				ShowPropertyEditDialogMain(playerid);
 				return 1;
 			}
+		case DIALOG_PROPERTY_EDITOR_LIST:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				gPlayers[playerid][EditingMode] = true;
+				gPropertyEdit[playerid][ID] = gProperties[listitem][ID];
+
+				return ShowPropertyEditDialogMain(playerid);
+			}
 		case DIALOG_PROPERTY_LIST:
 			{
 				if (!response)
@@ -1354,12 +1366,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							return ShowPropertyEditorListDialog(playerid);
 						}
 					case 1:
-						{}
+						{
+							return ShowTruckingPointListDialog(playerid);
+						}
 					case 2:
-						{}
+						{
+							return 1;
+						}
 				}
-
-				return 1;
 			}
 
 		default: 

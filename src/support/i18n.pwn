@@ -117,7 +117,7 @@ new gI18nMessageColor[] =
 
 new gI18nMessageEn[][] = 
 {
-	"Welcome to the gamemode CrazyRaceLife2!",
+	"Welcome to the gamemode CrazyRaceLife2! /help",
 	"[ DATA ] Loading user data...",
 	"[ DATA ] Data loaded successfully!",
 	"[ AUTOSAVE ] Saving user and system data... ",
@@ -151,7 +151,7 @@ new gI18nMessageEn[][] =
 
 new gI18nMessageCz[][] = 
 {
-	"Vitej ve hre!",
+	"Vitej ve hre! /help",
 	"[ DATA ] Nacitam ulozena uzivatelska data...",
 	"[ DATA ] Data uspesne nactena!",
 	"[ AUTOSAVE ] Ukladam uzivatelska a systemova data...",

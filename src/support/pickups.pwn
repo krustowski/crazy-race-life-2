@@ -182,6 +182,7 @@ public InitPickups()
 
 		AddMenuItem(gTeams[i][Menus][0], 0, menuItem);
 		AddMenuItem(gTeams[i][Menus][0], 0, "Leave team");
+		AddMenuItem(gTeams[i][Menus][0], 0, "Cancel");
 	}
 
 	/*NEMOVITOSTI*/

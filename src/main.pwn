@@ -1551,6 +1551,11 @@ public OnPlayerSelectedMenuRow(playerid, row)
 {
 	new Menu:currentMenu = GetPlayerMenu(playerid), stringToPrint[256];
 
+	if (row == 2)
+	{
+		return 1;
+	}
+
 	if (row == 1)
 	{
 		ResetPlayerWeapons(playerid);

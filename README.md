@@ -72,6 +72,7 @@ The examples above are shown respectively to the config file names mentioned.
     /acc        --- game account info dump
 	/admins     --- lists admins online
 	/afk        --- (un)sets the Away-From-Keyboard state
+    /animoff    --- clears all animations
 	/bank       --- lists banking subcommands
 	/cmd        --- lists available commands for player
 	/dance      --- enables special animations (dancing)
@@ -87,6 +88,7 @@ The examples above are shown respectively to the config file names mentioned.
 	/lay        --- enables special animations (laying)
 	/locate     --- dumps the actual player's coordinates 
 	/lock       --- locks the player's vehicle
+    /phone      --- shows the phone call menu
 	/pm         --- sends the private message to other player
 	/port       --- enables to warp to special locations on map
 	/property   --- lists subcommands for property handling

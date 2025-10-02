@@ -1276,7 +1276,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 1:
 						// PM to player
 						{
-							return ShowPhonePMPlayerListDialog(playerid);
+							ShowPhonePMPlayerListDialog(playerid);
 						}
 					case 2:
 						// Taxi
@@ -1681,6 +1681,13 @@ public OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 			}
 		}
 	}
+
+	if (newkeys == KEY_YES)
+	{
+		ShowPhoneOptionsDialog(playerid);
+	}
+
+	return 1;
 }
 
 public OnEnterExitModShop(playerid, enterexit, interiorid)

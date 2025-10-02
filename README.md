@@ -132,6 +132,7 @@ The examples above are shown respectively to the config file names mentioned.
 	/weapons    --- (lvl 3) sets the weapons pack to player
 
 	/ban        --- (lvl 4) bans the player (via IP)
+	/edit       --- (lvl 4) shows a dialog window with all common editors
 	/fakechat   --- (lvl 4) sends the fake chat as a player
 	/lvl        --- (lvl 4) sets the Admin level to player
 	/predit     --- (lvl 4) starts the property editor

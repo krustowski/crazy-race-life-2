@@ -411,6 +411,10 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 		ResetPlayerMoney(playerid);
 	}
 
+	// Adjust the wanted level
+	gPlayers[killerid][WantedLevel]++;
+	SetPlayerWantedLevel(killerid, gPlayers[killerid][WantedLevel]);
+
 	new t_PLAYER_STATE:killerState = GetPlayerState(killerid);
 
 	if (IsPlayerInAnyVehicle(killerid) && !IsPlayerInAnyVehicle(playerid) && killerState == PLAYER_STATE_DRIVER && reason != WEAPON_VEHICLE)

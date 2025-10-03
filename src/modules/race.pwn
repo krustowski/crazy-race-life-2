@@ -140,6 +140,15 @@ stock SetPlayerRaceSingle(playerid, raceId, const Float:coords[][E_RACE_COORD], 
 	return 1;
 }
 
+stock UpdateRaceCoords(raceId)
+{
+	new query[512];
+
+	format(query, sizeof(query), "");
+
+	return 1;
+}
+
 stock SetPlayerRace(playerid, raceId)
 {
 	// Check if player has joined such race

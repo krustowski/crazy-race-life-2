@@ -45,7 +45,10 @@ enum
 	DIALOG_PLAYER_ACCOUNT,
 	DIALOG_HELP_LIST,
 	DIALOG_SERVER_RULES,
-	DIALOG_EDITOR_LIST
+	DIALOG_EDITOR_LIST,
+	DIALOG_RACE_EDITOR_MAIN,
+	DIALOG_RACE_EDITOR_LIST,
+	DIALOG_RACE_EDITOR_OPTIONS
 };
 
 #include "modules/real.pwn"
@@ -399,6 +402,27 @@ stock ShowPropertyEditorListDialog(playerid)
 	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_EDITOR_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Property Editor", stringToPrint, "Edit", "Cancel");
 }
 
+stock ShowRaceEditorListDialog(playerid)
+{
+	new stringToPrint[1024] = "Race Name\tID";
+
+	for (new i = 0; i < MAX_RACE_COUNT; i++)
+	{
+		if (!strcmp(gRaces[i][Name], ""))
+		{
+			continue;
+		}
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
+				stringToPrint,
+				gRaces[i][Name],
+				gRaces[i][ID]
+			);
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_RACE_EDITOR_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Race Editor", stringToPrint, "Edit", "Cancel");
+}
+
 stock ShowRaceOptionsDialog(playerid, raceid)
 {
 	new title[70];
@@ -691,4 +715,32 @@ stock ShowGameEditorListDialog(playerid)
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_EDITOR_LIST, DIALOG_STYLE_LIST, "Game Editors", stringToPrint, "Select", "Cancel");
+}
+
+stock ShowRaceEditorMainDialog(playerid)
+{
+	new stringToPrint[128];
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s",
+			"Draft New Race",
+			"List Existing Races"
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_RACE_EDITOR_MAIN, DIALOG_STYLE_LIST, "Race Editor", stringToPrint, "Select", "Cancel");
+}
+
+stock ShowRaceEditorOptionsDialog(playerid, raceid)
+{
+	new title[70];
+	format(title, sizeof(title), "Race '%s'", gRaces[raceid][Name]);
+
+	new stringToPrint[256];
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s\n%s",
+			"Change Name",
+			"Change Cost in Dollars",
+			"Change Prize in Dollars",
+			"Change Start Coords",
+			"Record New Race Track/Path"
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_RACE_EDITOR_OPTIONS, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
 }

@@ -1390,9 +1390,73 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 					case 2:
 						{
-							return 1;
+							return ShowRaceEditorMainDialog(playerid);
 						}
 				}
+			}
+		case DIALOG_RACE_EDITOR_MAIN:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				switch (listitem)
+				{
+					case 0:
+						// Draft new race
+						{
+							return 1;
+						}
+					case 1:
+						// List existing races
+						{
+							return ShowRaceEditorListDialog(playerid);
+						}
+				}
+			}
+		case DIALOG_RACE_EDITOR_LIST:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				gPlayers[playerid][EditingMode] = true;
+				gPlayers[playerid][Temp] = gRaces[listitem + 1][ID];
+
+				return ShowRaceEditorOptionsDialog(playerid, gPlayers[playerid][Temp]);
+			}
+		case DIALOG_RACE_EDITOR_OPTIONS:
+			{
+				if (!response)
+				{
+					gPlayers[playerid][EditingMode] = false;
+					gPlayers[playerid][Temp] = -1;
+
+					return 1;
+				}
+
+				switch (listitem)
+				{
+					case 0:
+						// Change Name
+						{}
+					case 1:
+						// Change Cost in Dollars
+						{}
+					case 2:
+						// Change Prize in Dollars
+						{}
+					case 3:
+						// Change Start Coords
+						{}
+					case 4:
+						// Record New Race Track/Path
+						{}
+				}
+
+				return 1;
 			}
 
 		default: 
@@ -1670,36 +1734,50 @@ public OnPlayerExitedMenu(playerid)
 
 public OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 {
-	if (newkeys == KEY_SECONDARY_ATTACK)
+	switch (newkeys)
 	{
-		if (!IsPlayerInAnyVehicle(playerid))
-		{
-			new Float:x, Float:y, Float:z, vehicle;
-			GetPlayerPos(playerid, x, y, z);
-			GetVehicleWithinDistance(playerid, x, y, z, 20.0, vehicle);
-			if (IsVehicleRcTram(vehicle))
+		case KEY_SECONDARY_ATTACK:
 			{
-				PutPlayerInVehicle(playerid, vehicle, 0);
-			}
-		}
-		else
-		{
-			new vehicleID = GetPlayerVehicleID(playerid);
-			if (IsVehicleRcTram(vehicleID) || GetVehicleModel(vehicleID) == RC_CAM)
-			{
-				if (GetVehicleModel(vehicleID) != D_TRAM)
+				if (!IsPlayerInAnyVehicle(playerid))
 				{
-					new Float:x, Float:y, Float:z;
+					new Float:x, Float:y, Float:z, vehicle;
 					GetPlayerPos(playerid, x, y, z);
-					SetPlayerPos(playerid, x + 0.5, y, z + 1.0);
+					GetVehicleWithinDistance(playerid, x, y, z, 20.0, vehicle);
+					if (IsVehicleRcTram(vehicle))
+					{
+						PutPlayerInVehicle(playerid, vehicle, 0);
+					}
+				}
+				else
+				{
+					new vehicleID = GetPlayerVehicleID(playerid);
+					if (IsVehicleRcTram(vehicleID) || GetVehicleModel(vehicleID) == RC_CAM)
+					{
+						if (GetVehicleModel(vehicleID) != D_TRAM)
+						{
+							new Float:x, Float:y, Float:z;
+							GetPlayerPos(playerid, x, y, z);
+							SetPlayerPos(playerid, x + 0.5, y, z + 1.0);
+						}
+					}
 				}
 			}
-		}
-	}
+		case KEY_YES:
+			{
+				ShowPhoneOptionsDialog(playerid);
+			}
+		case KEY_NO:
+			{
+				if (gPlayers[playerid][AdminLevel] < 4)
+				{
+					return 1;
+				}
 
-	if (newkeys == KEY_YES)
-	{
-		ShowPhoneOptionsDialog(playerid);
+				if (!gPlayers[playerid][EditingMode])
+				{
+					return 1;
+				}
+			}
 	}
 
 	return 1;

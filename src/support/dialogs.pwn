@@ -741,3 +741,12 @@ stock ShowRaceEditorOptionsDialog(playerid, raceid)
 
 	return ShowPlayerDialog(playerid, DIALOG_RACE_EDITOR_OPTIONS, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
 }
+
+stock ShowRaceEditorNameChangeDialog(playerid)
+{}
+
+stock ShowRaceEditorCostChangeDialog(playerid)
+{}
+
+stock ShowRaceEditorPrizeChangeDialog(playerid)
+{}

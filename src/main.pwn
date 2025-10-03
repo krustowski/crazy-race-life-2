@@ -1433,6 +1433,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							gPlayers[playerid][EditingMode] = true;
 							gPlayers[playerid][Temp] = newraceid;
 
+							gPlayerRaceEdit[playerid][ID] = newraceid;
+
 							return ShowRaceEditorOptionsDialog(playerid, gPlayers[playerid][Temp]);
 						}
 					case 1:
@@ -1470,19 +1472,31 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					case 0:
 						// Change Name
-						{}
+						{
+							return ShowRaceEditorNameChangeDialog(playerid);
+						}
 					case 1:
 						// Change Cost in Dollars
-						{}
+						{
+							return ShowRaceEditorCostChangeDialog(playerid);
+						}
 					case 2:
 						// Change Prize in Dollars
-						{}
+						{
+							return ShowRaceEditorPrizeChangeDialog(playerid);
+						}
 					case 3:
 						// Change Start Coords
-						{}
+						{
+							gPlayerRaceEdit[playerid][EditType] = RACE_EDITOR_START_COORDS;
+							return SendClientMessage(playerid, COLOR_ORANGE, "[ EDIT ] Record start coords using the KEY_NO (N)");
+						}
 					case 4:
 						// Record New Race Track/Path
-						{}
+						{
+							gPlayerRaceEdit[playerid][EditType] = RACE_EDITOR_TRACK_COORDS;
+							return SendClientMessage(playerid, COLOR_ORANGE, "[ EDIT ] Record track coords using the KEY_NO (N)");
+						}
 				}
 
 				return 1;
@@ -1808,6 +1822,44 @@ public OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 				if (!gPlayers[playerid][EditingMode])
 				{
 					return 1;
+				}
+
+				if (gPlayerRaceEdit[playerid][ID])
+				{
+					switch (gPlayerRaceEdit[playerid][EditType])
+					{
+						case RACE_EDITOR_START_COORDS:
+							{
+								new Float: X, Float: Y, Float: Z;
+								GetPlayerPos(playerid, X, Y, Z);
+
+								gPlayerRaceEdit[playerid][Start][E_RACE_COORD_X] = X;
+								gPlayerRaceEdit[playerid][Start][E_RACE_COORD_Y] = Y;
+								gPlayerRaceEdit[playerid][Start][E_RACE_COORD_Z] = Z;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Start coords recorded!");
+								return ShowRaceEditorOptionsDialog(playerid, gPlayerRaceEdit[playerid][ID]);
+							}
+						case RACE_EDITOR_TRACK_COORDS:
+							{
+								new Float: X, Float: Y, Float: Z;
+								GetPlayerPos(playerid, X, Y, Z);
+
+								new coord_no = gPlayerRaceEdit[playerid][EditTrackCoordNo];
+									
+								gPlayerRaceEditTrackCoords[playerid][coord_no][E_RACE_COORD_X] = X;
+								gPlayerRaceEditTrackCoords[playerid][coord_no][E_RACE_COORD_Y] = Y;
+								gPlayerRaceEditTrackCoords[playerid][coord_no][E_RACE_COORD_Z] = Z;
+
+								gPlayerRaceEdit[playerid][EditTrackCoordNo]++;
+
+								new stringToPrint[128];
+								format(stringToPrint, sizeof(stringToPrint), "[ EDIT ] Track coords no. %d recorded!", coord_no);
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
+
+								return ShowRaceEditorOptionsDialog(playerid, gPlayerRaceEdit[playerid][ID]);
+							}
+					}
 				}
 			}
 	}

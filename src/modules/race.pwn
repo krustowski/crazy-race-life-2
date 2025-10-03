@@ -10,6 +10,12 @@ Float: E_RACE_COORD_X,
        Float: E_RACE_COORD_Z
 }
 
+enum E_RACE_EDIT_TYPE
+{
+	RACE_EDITOR_START_COORDS,
+	RACE_EDITOR_TRACK_COORDS
+}
+
 enum Race 
 {
 	ID,
@@ -19,14 +25,19 @@ enum Race
 	PrizeDollars,
 	Start[E_RACE_COORD],
 	Float: Time,
+	CheckPointCount,
 
-	CheckPointCount
+	E_RACE_EDIT_TYPE: EditType,
+	EditTrackCoordNo
 }
 
 new gRaces[MAX_RACE_COUNT][Race];
 
 // gPlayerRace hold a reference to the state of a player's registration to such race. Thus if registered, a value for such RACE_ID should return true (1).
 new gPlayerRace[MAX_PLAYERS][MAX_RACE_COUNT];
+
+new gPlayerRaceEdit[MAX_PLAYERS][Race];
+new gPlayerRaceEditTrackCoords[MAX_PLAYERS][MAX_RACE_CP][E_RACE_COORD];
 
 new Timer:gPlayerRaceTimer[MAX_PLAYERS];
 

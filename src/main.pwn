@@ -1287,29 +1287,43 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 							format(stringToPrint, sizeof(stringToPrint), "[ PHONE ] Account balance: $%d!", gPlayers[playerid][Bank]);
 							SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
+
+							return ShowPhoneOptionsDialog(playerid);
 						}
 					case 1:
 						// PM to player
 						{
-							ShowPhonePMPlayerListDialog(playerid);
+							return ShowPhonePMPlayerListDialog(playerid);
 						}
 					case 2:
 						// Taxi
 						{
-							if (CheckTaxiDriversOnline())
-							{}
+							if (!CheckTaxiDriversOnline())
+							{
+								SendClientMessage(playerid, COLOR_YELLOW, "[ PHONE ] No Taxi drivers online!");
+							}
+
+							return ShowPhoneOptionsDialog(playerid);
 						}
 					case 3:
 						// Car mechanic
 						{
-							if (CheckCarMechanicsOnline())
-							{}
+							if (!CheckCarMechanicsOnline())
+							{
+								SendClientMessage(playerid, COLOR_YELLOW, "[ PHONE ] No Car mechanics online!");
+							}
+
+							return ShowPhoneOptionsDialog(playerid);
 						}
 					case 4:
 						// Pizza delivery
 						{
-							if (CheckPizzaguysOnline())
-							{}
+							if (!CheckPizzaguysOnline())
+							{
+								SendClientMessage(playerid, COLOR_YELLOW, "[ PHONE ] No Pizzaguys online!");
+							}
+
+							return ShowPhoneOptionsDialog(playerid);
 						}
 				}
 
@@ -1334,19 +1348,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				if (!response || !strlen(inputtext))
 				{
-					ApplyAnimation(playerid, "ped", "phone_out", 4.1, false, false, false, false, 0);
-					//ClearAnimations(playerid);
-					RemovePlayerAttachedObject(playerid, 3);
-					return 1;
+					return ShowPhoneOptionsDialog(playerid);
 				}
 
 				OnPlayerPrivMsg(playerid, gPlayers[playerid][Temp], inputtext);
 				gPlayers[playerid][Temp] = 0;
 
-				ApplyAnimation(playerid, "ped", "phone_out", 4.1, false, false, false, false, 0);
-				//ClearAnimations(playerid);
-				RemovePlayerAttachedObject(playerid, 3);
-				return 1;
+				return ShowPhoneOptionsDialog(playerid);
 			}
 		case DIALOG_HELP_LIST:
 			{
@@ -1785,6 +1793,9 @@ public OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 			}
 		case KEY_YES:
 			{
+				ApplyAnimation(playerid, "ped", "phone_in", 4.1, false, false, false, true, 0);
+				SetPlayerAttachedObject(playerid, 3, 330, 6, 0.00, 0.00, 0.05, 59.59, 60.19, -30.50, 1.02, 1.00, 1.00);
+
 				ShowPhoneOptionsDialog(playerid);
 			}
 		case KEY_NO:

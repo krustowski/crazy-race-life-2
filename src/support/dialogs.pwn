@@ -629,9 +629,6 @@ stock ShowPhoneOptionsDialog(playerid)
 			"Call Pizza delivery"
 		);
 
-	ApplyAnimation(playerid, "ped", "phone_in", 4.1, false, false, false, true, 0);
-	SetPlayerAttachedObject(playerid, 3, 330, 6, 0.00, 0.00, 0.05, 59.59, 60.19, -30.50, 1.02, 1.00, 1.00);
-
 	return ShowPlayerDialog(playerid, DIALOG_PHONE_OPTIONS, DIALOG_STYLE_LIST, "Phone Operations List", stringToPrint, "Select", "Cancel");
 }
 

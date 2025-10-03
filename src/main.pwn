@@ -1406,7 +1406,26 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 0:
 						// Draft new race
 						{
-							return 1;
+							new newraceid = -1;
+							for (new i = 1; i < MAX_RACE_COUNT; i++)
+							{
+								if (!strcmp(gRaces[i][Name], ""))
+								{
+									newraceid = i;
+									break;
+								}
+							}
+
+							if (newraceid == -1)
+							{
+								return SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Max race count reached!");
+							}
+
+							SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Editting mode enabled");
+							gPlayers[playerid][EditingMode] = true;
+							gPlayers[playerid][Temp] = newraceid;
+
+							return ShowRaceEditorOptionsDialog(playerid, gPlayers[playerid][Temp]);
 						}
 					case 1:
 						// List existing races
@@ -1422,6 +1441,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Editting mode enabled");
 				gPlayers[playerid][EditingMode] = true;
 				gPlayers[playerid][Temp] = gRaces[listitem + 1][ID];
 
@@ -1431,6 +1451,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				if (!response)
 				{
+					SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Editting mode disabled");
 					gPlayers[playerid][EditingMode] = false;
 					gPlayers[playerid][Temp] = -1;
 

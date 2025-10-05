@@ -470,3 +470,73 @@ stock SaveNewScore(raceId, playerid, time, vehicleModel)
 
 	return 1;
 }
+
+stock SaveRaceData(playerid)
+{
+	new raceid = gPlayerRaceEdit[playerid][ID];
+
+	if (raceid == -1)
+	{
+		return 1;
+	}
+
+	new query[2048];
+	format(query, sizeof(query), "INSERT INTO races (id, name, type, cost_dollars, prize_dollars, start_x, start_y, start_z) VALUES (%d, '%s', %d, %d, %d, %.2f, %.2f, %.2f)",
+			gPlayerRaceEdit[playerid][ID],
+			gPlayerRaceEdit[playerid][Name],
+			1,
+			gPlayerRaceEdit[playerid][CostDollars],
+			gPlayerRaceEdit[playerid][PrizeDollars],
+			gPlayerRaceEdit[playerid][Start][E_RACE_COORD_X],
+			gPlayerRaceEdit[playerid][Start][E_RACE_COORD_Y],
+			gPlayerRaceEdit[playerid][Start][E_RACE_COORD_Z]
+		);
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) {
+		SendClientMessage(playerid, COLOR_RED, "[ RACE ] Database error!");
+		printf("Database error: cannot write new race data (race_id: %d)!", raceid);
+
+		return 0;
+	}
+
+	DB_FreeResultSet(result);
+
+	//
+
+	format(query, sizeof(query), "INSERT INTO race_coords (race_id, seq_no, x, y, z, rot) VALUES (%d, %d, %.2f, %.2f, %.2f, %.2f)",
+			gPlayerRaceEdit[playerid][ID],
+			1,
+			gPlayerRaceEditTrackCoords[playerid][0][E_RACE_COORD_X],
+			gPlayerRaceEditTrackCoords[playerid][0][E_RACE_COORD_Y],
+			gPlayerRaceEditTrackCoords[playerid][0][E_RACE_COORD_Z],
+			0.0
+		);
+
+	for (new i = 1; i < gPlayerRaceEdit[playerid][EditTrackCoordNo]; i++)
+	{
+		format(query, sizeof(query), "%s ,(%d, %d, %.2f, %.2f, %.2f, %.2f)",
+				query,
+				gPlayerRaceEdit[playerid][ID],
+				i + 1,
+				gPlayerRaceEditTrackCoords[playerid][i][E_RACE_COORD_X],
+				gPlayerRaceEditTrackCoords[playerid][i][E_RACE_COORD_Y],
+				gPlayerRaceEditTrackCoords[playerid][i][E_RACE_COORD_Z],
+				0.0
+		      );
+	}
+
+	result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) {
+		SendClientMessage(playerid, COLOR_RED, "[ RACE ] Database error!");
+		printf("Database error: cannot write new race coord data (race_id: %d)!", raceid);
+
+		return 0;
+	}
+
+	DB_FreeResultSet(result);
+
+	InitRaces();
+
+	return 1;
+}

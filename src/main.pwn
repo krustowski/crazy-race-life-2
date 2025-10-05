@@ -1497,9 +1497,51 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							gPlayerRaceEdit[playerid][EditType] = RACE_EDITOR_TRACK_COORDS;
 							return SendClientMessage(playerid, COLOR_ORANGE, "[ EDIT ] Record track coords using the KEY_NO (N)");
 						}
+					case 5:
+						// Save race
+						{
+							return SaveRaceData(playerid);
+						}
+
 				}
 
 				return 1;
+			}
+		case DIALOG_RACE_EDITOR_NAME:
+			{
+				if (!response)
+				{
+					return ShowRaceEditorOptionsDialog(playerid, gPlayerRaceEdit[playerid][ID]);
+				}
+
+				format(gPlayerRaceEdit[playerid][Name], 64, "%s", inputtext);
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Race name changed!");
+
+				return ShowRaceEditorOptionsDialog(playerid, gPlayerRaceEdit[playerid][ID]);
+			}
+		case DIALOG_RACE_EDITOR_COST:
+			{
+				if (!response || !IsNumeric(inputtext))
+				{
+					return ShowRaceEditorOptionsDialog(playerid, gPlayerRaceEdit[playerid][ID]);
+				}
+
+				gPlayerRaceEdit[playerid][CostDollars] = strval(inputtext);
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Race cost in dollars changed!");
+
+				return ShowRaceEditorOptionsDialog(playerid, gPlayerRaceEdit[playerid][ID]);
+			}
+		case DIALOG_RACE_EDITOR_PRIZE:
+			{
+				if (!response || !IsNumeric(inputtext))
+				{
+					return ShowRaceEditorOptionsDialog(playerid, gPlayerRaceEdit[playerid][ID]);
+				}
+
+				gPlayerRaceEdit[playerid][PrizeDollars] = strval(inputtext);
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Race prize in dollars changed!");
+
+				return ShowRaceEditorOptionsDialog(playerid, gPlayerRaceEdit[playerid][ID]);
 			}
 
 		default: 

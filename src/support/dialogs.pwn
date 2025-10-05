@@ -48,7 +48,10 @@ enum
 	DIALOG_EDITOR_LIST,
 	DIALOG_RACE_EDITOR_MAIN,
 	DIALOG_RACE_EDITOR_LIST,
-	DIALOG_RACE_EDITOR_OPTIONS
+	DIALOG_RACE_EDITOR_OPTIONS,
+	DIALOG_RACE_EDITOR_NAME,
+	DIALOG_RACE_EDITOR_COST,
+	DIALOG_RACE_EDITOR_PRIZE
 };
 
 #include "modules/real.pwn"
@@ -731,22 +734,29 @@ stock ShowRaceEditorOptionsDialog(playerid, raceid)
 	format(title, sizeof(title), "Race '%s'", gRaces[raceid][Name]);
 
 	new stringToPrint[256];
-	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s\n%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s\n%s\n%s",
 			"Change Name",
 			"Change Cost in Dollars",
 			"Change Prize in Dollars",
 			"Change Start Coords",
-			"Record New Race Track/Path"
+			"Record New Race Track/Path",
+			"Save Race Data"
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_RACE_EDITOR_OPTIONS, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
 }
 
 stock ShowRaceEditorNameChangeDialog(playerid)
-{}
+{
+	return ShowPlayerDialog(playerid, DIALOG_RACE_EDITOR_NAME, DIALOG_STYLE_INPUT, "Race Editor", "Enter new name for such race:", "Apply", "Cancel");
+}
 
 stock ShowRaceEditorCostChangeDialog(playerid)
-{}
+{
+	return ShowPlayerDialog(playerid, DIALOG_RACE_EDITOR_COST, DIALOG_STYLE_INPUT, "Race Editor", "Enter new cost in dollars for such race:", "Apply", "Cancel");
+}
 
 stock ShowRaceEditorPrizeChangeDialog(playerid)
-{}
+{
+	return ShowPlayerDialog(playerid, DIALOG_RACE_EDITOR_PRIZE, DIALOG_STYLE_INPUT, "Race Editor", "Enter new prize in dollars for such race:", "Apply", "Cancel");
+}

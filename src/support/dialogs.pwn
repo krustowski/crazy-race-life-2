@@ -815,3 +815,28 @@ stock ShowTruckingEditorOptionsDialog(playerid)
 
 	return ShowPlayerDialog(playerid, DIALOG_TRUCKING_EDITOR_OPTIONS, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
 }
+
+stock ShowTruckingEditorNameDialog(playerid)
+{
+	new title[128];
+	format(title, sizeof(title), "Trucking Point ID: %d",
+			gTruckingEdit[playerid][ID]
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_TRUCKING_EDITOR_NAME, DIALOG_STYLE_INPUT, title, "Enter new name for the trucking point:", "Apply", "Cancel");
+}
+
+stock ShowTruckingEditorTypeDialog(playerid)
+{
+	new stringToPrint[128], title[128];
+	format(stringToPrint, sizeof(stringToPrint), "%s%s",
+			"Petrol Station\n",
+			"Generic Freight Point"
+		);
+
+	format(title, sizeof(title), "Trucking Point ID: %d",
+			gTruckingEdit[playerid][ID]
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_TRUCKING_EDITOR_TYPE, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
+}

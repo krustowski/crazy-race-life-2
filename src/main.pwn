@@ -1719,7 +1719,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 0:
 						// Name
 						{
-							return ShowTruckingEditorMameDialog(playerid);
+							return ShowTruckingEditorNameDialog(playerid);
 						}
 					case 1:
 						// Type
@@ -1767,6 +1767,41 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 
 				return 1;
+			}
+		case DIALOG_TRUCKING_EDITOR_NAME:
+			{
+				if (!response || !strlen(inputtext))
+				{
+					return ShowTruckingEditorOptionsDialog(playerid);
+				}
+
+				format(gTruckingEdit[playerid][Name], 64, "%s", inputtext);
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Trucking point name changed!");
+				return ShowTruckingEditorOptionsDialog(playerid);
+			}
+		case DIALOG_TRUCKING_EDITOR_TYPE:
+			{
+				if (!response)
+				{
+					return ShowTruckingEditorOptionsDialog(playerid);
+				}
+
+				switch (listitem)
+				{
+					case 0:
+						// Petrol station
+						{
+							gTruckingEdit[playerid][Type] = FT_GAS_STATION;
+							SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Trucking point type set to petrol station!");
+						}
+					case 1:
+						{
+							gTruckingEdit[playerid][Type] = FT_FREIGHT;
+							SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Trucking point type set to freight point!");
+						}
+				}
+
+				return ShowTruckingEditorOptionsDialog(playerid);
 			}
 
 		default: 

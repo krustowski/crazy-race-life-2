@@ -187,16 +187,13 @@ stock ShowAdminCommandsDialog(playerid)
 	if (gPlayers[playerid][AdminLevel] < 4)
 		return ShowPlayerDialog(playerid, DIALOG_ADMIN_CMDS, DIALOG_STYLE_MSGBOX, "Admin Commands", stringToPrint, "Close", "");
 
-	format(stringToPrint, sizeof(stringToPrint), "%s\nLevel 4\n\n%s%s%s%s%s%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s\nLevel 4\n\n%s%s%s%s%s",
 			stringToPrint,
 			"/ban ID\t\t\tbans the player ID (via IP)\n",
 			"/edit\t\t\tshows a dialog window with all common editors\n",
 			"/fakechat ID TEXT\tsends the fake chat TEXT as the player ID\n",
 			"/lvl pID LVL\t\tsets the Admin LVL to player ID\n",
-			"/predit ID\t\tstarts the property editor for property ID\n",
-			"/redit ID\t\t\tstarts the race editor for race ID\n",
-			"/restart\t\t\tsets the countdown for 60 seconds to restart the server\n",
-			"/tredit ID\t\tstarts the Trucking editor for point ID\n"
+			"/restart\t\t\tsets the countdown for 60 seconds to restart the server\n"
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_ADMIN_CMDS, DIALOG_STYLE_MSGBOX, "Admin Commands", stringToPrint, "Close", "");

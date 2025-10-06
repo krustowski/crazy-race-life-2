@@ -998,6 +998,34 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				return 1;
 			}
+		case DIALOG_GET_LIST:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				if (!IsPlayerConnected(listitem))
+				{
+					return SendClientMessage(playerid, COLOR_RED, "[ ! ] The player is not connected!");
+				}
+
+				return MovePlayerToPlayer(playerid, listitem, true);
+			}
+		case DIALOG_GOTO_LIST:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				if (!IsPlayerConnected(listitem))
+				{
+					return SendClientMessage(playerid, COLOR_RED, "[ ! ] The player is not connected!");
+				}
+
+				return MovePlayerToPlayer(playerid, listitem, false);
+			}
 		case DIALOG_PLAYER_CLICKED_LIST:
 			{
 				if (!response)

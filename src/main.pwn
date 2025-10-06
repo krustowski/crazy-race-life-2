@@ -462,6 +462,14 @@ public OnVehicleSpawn(vehicleid)
 
 public OnVehicleDeath(vehicleid, killerid)
 {
+	if (gTrucking[killerid])
+	{
+		if (vehicleid == gPlayerMissions[killerid][VehicleID] || vehicleid == gPlayerMissions[killerid][TrailerID])
+		{
+			return AbortTruckingMission(killerid);
+		}
+	}
+
 	return 1;
 }
 

@@ -123,9 +123,13 @@ stock CheckTruckingCheckpoint(playerid)
 	new provision, stringToPrint[128];
 
 	if (!gPlayerMissions[playerid][DoneCount])
+	{
 		provision = 10000 + (floatround(gPlayerMissions[playerid][ProvisionBonusWeight] * 1 * 5000));
+	}
 	else
-		provision = 10000 + (floatround(gPlayerMissions[playerid][ProvisionBonusWeight] * (random( gPlayerMissions[playerid][DoneCount]) + 1) * 5000));
+	{
+		provision = 10000 + (floatround(gPlayerMissions[playerid][ProvisionBonusWeight] * (random(gPlayerMissions[playerid][DoneCount]) + 1) * 5000));
+	}
 
 	GivePlayerMoney(playerid, provision);
 	gPlayerMissions[playerid][Earned] += provision;
@@ -486,3 +490,21 @@ stock SetTruckingPoint(playerid)
 	return 1;
 }
 
+stock AbortTruckingMission(playerid)
+{
+	gTrucking[playerid] = false;
+	DisablePlayerRaceCheckpoint(playerid);
+	TextDrawHideForPlayer(playerid, gMissionInfoText[playerid]);
+
+	KillTimer(_: gPlayerMissions[playerid][TimerElapsed]);
+	KillTimer(_: gPlayerMissions[playerid][TimerAttachedCheck]);
+
+	SetVehicleParamsForPlayer(gPlayerMissions[playerid][VehicleID], playerid, false, false);
+	SetVehicleParamsForPlayer(gPlayerMissions[playerid][TrailerID], playerid, false, false);
+
+	GameTextForPlayer(playerid, "~w~Trucking Mission ~r~Aborted", 3000, 3); 
+
+	SendClientMessage(playerid, COLOR_YELLOW, "[ TRUCK ] Mission aborted");
+
+	return 1;
+}

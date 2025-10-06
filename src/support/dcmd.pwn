@@ -746,21 +746,7 @@ dcmd_truck(playerid, const params[])
 #pragma unused params
 	if (gTrucking[playerid])
 	{
-		gTrucking[playerid] = false;
-		DisablePlayerRaceCheckpoint(playerid);
-		TextDrawHideForPlayer(playerid, gMissionInfoText[playerid]);
-
-		KillTimer(_: gPlayerMissions[playerid][TimerElapsed]);
-		KillTimer(_: gPlayerMissions[playerid][TimerAttachedCheck]);
-
-		SetVehicleParamsForPlayer(gPlayerMissions[playerid][VehicleID], playerid, false, false);
-		SetVehicleParamsForPlayer(gPlayerMissions[playerid][TrailerID], playerid, false, false);
-
-		GameTextForPlayer(playerid, "~w~Trucking Mission ~r~Aborted", 3000, 3); 
-
-		SendClientMessage(playerid, COLOR_YELLOW, "[ TRUCK ] Mission aborted");
-
-		return 1;
+		return AbortTruckingMission(playerid);
 	}
 
 	if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)

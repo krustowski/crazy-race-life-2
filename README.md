@@ -23,6 +23,12 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
 + Trucking
     + 15+ trucking points (petrol stations etc)
     + Custom missions
+    + Weighted provision/bonus per done mission/delivery
++ Personal cellphone
+    + Accessed easily via the `KEY_YES` key (Y usually)
+    + Send private messages directly to a player
+    + Check bank account balance
+    + Call a service (car mechanic, pizza delivery, taxi ride, ...)
 
 
 ## How to build
@@ -135,10 +141,7 @@ The examples above are shown respectively to the config file names mentioned.
 	/edit       --- (lvl 4) shows a dialog window with all common editors
 	/fakechat   --- (lvl 4) sends the fake chat as a player
 	/lvl        --- (lvl 4) sets the Admin level to player
-	/predit     --- (lvl 4) starts the property editor
-	/redit      --- (lvl 4) starts the race editor
 	/restart    --- (lvl 4) sets the countdown for 60 seconds to restart the server
-	/tredit     --- (lvl 4) starts the Trucking editor
 ```
 
 ### Real Estate

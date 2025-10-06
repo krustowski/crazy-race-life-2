@@ -126,6 +126,7 @@ enum Property
 	Float: CoordsEntrance[Coords],
 	Float: CoordsOffer[Coords],
 	Float: CoordsMoney[Coords],
+	Float: CoordsShirt[Coords],
 	Float: CoordsVehicle[Coords],
 
 	bool: Occupied,
@@ -165,6 +166,7 @@ new gNullProperty[Property] =
 	0,
 	0,
 	PREDIT_NONE,
+	{0.0, 0.0, 0.0, 0.0},
 	{0.0, 0.0, 0.0, 0.0},
 	{0.0, 0.0, 0.0, 0.0},
 	{0.0, 0.0, 0.0, 0.0},

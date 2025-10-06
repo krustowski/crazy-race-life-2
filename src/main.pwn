@@ -706,6 +706,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if (!response)
 				{
 					gPropertyEdit[playerid] = gNullProperty;
+					gPlayers[playerid][EditingMode] = false;
 
 					SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Property edit cancelled.");
 					return 1;
@@ -1481,6 +1482,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 
 				gPlayers[playerid][EditingMode] = true;
+
+				gPropertyEdit[playerid] = gNullProperty;
 				gPropertyEdit[playerid][ID] = propertyid;
 
 				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Property edit enabled.");
@@ -1985,6 +1988,95 @@ public OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 								SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 
 								return ShowRaceEditorOptionsDialog(playerid, gPlayerRaceEdit[playerid][ID]);
+							}
+					}
+				}
+
+				if (gPropertyEdit[playerid][ID])
+				{
+					new Float: X, Float: Y, Float: Z, Float: R;
+					GetPlayerPos(playerid, X, Y, Z);
+
+					switch (gPropertyEdit[playerid][EditingMode])
+					{
+						case PREDIT_SPAWN_POINT:
+							{
+								gPropertyEdit[playerid][CoordsSpawn][CoordX] = X;
+								gPropertyEdit[playerid][CoordsSpawn][CoordY] = Y;
+								gPropertyEdit[playerid][CoordsSpawn][CoordZ] = Z;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Spawn coords recorded!");
+								gPropertyEdit[playerid][EditingMode] = PREDIT_NONE;
+
+								return ShowPropertyEditDialogMain(playerid);
+							}
+						case PREDIT_ENTRANCE_POINT:
+							{
+								gPropertyEdit[playerid][CoordsEntrance][CoordX] = X;
+								gPropertyEdit[playerid][CoordsEntrance][CoordY] = Y;
+								gPropertyEdit[playerid][CoordsEntrance][CoordZ] = Z;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Entrance coords recorded!");
+								gPropertyEdit[playerid][EditingMode] = PREDIT_NONE;
+
+								return ShowPropertyEditDialogMain(playerid);
+							}
+						case PREDIT_OFFER_POINT:
+							{
+								gPropertyEdit[playerid][CoordsOffer][CoordX] = X;
+								gPropertyEdit[playerid][CoordsOffer][CoordY] = Y;
+								gPropertyEdit[playerid][CoordsOffer][CoordZ] = Z;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Offer coords recorded!");
+								gPropertyEdit[playerid][EditingMode] = PREDIT_NONE;
+
+								return ShowPropertyEditDialogMain(playerid);
+							}
+						case PREDIT_MONEY_POINT:
+							{
+								gPropertyEdit[playerid][CoordsMoney][CoordX] = X;
+								gPropertyEdit[playerid][CoordsMoney][CoordY] = Y;
+								gPropertyEdit[playerid][CoordsMoney][CoordZ] = Z;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Money coords recorded!");
+								gPropertyEdit[playerid][EditingMode] = PREDIT_NONE;
+
+								return ShowPropertyEditDialogMain(playerid);
+							}
+						case PREDIT_SHIRT_POINT:
+							{
+								if (!gPropertyEdit[playerid][CustomInterior])
+								{
+									SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Shirt coords are automatic when the property has no custom interior!");
+									return ShowPropertyEditDialogMain(playerid);
+								}
+
+								gPropertyEdit[playerid][CoordsShirt][CoordX] = X;
+								gPropertyEdit[playerid][CoordsShirt][CoordY] = Y;
+								gPropertyEdit[playerid][CoordsShirt][CoordZ] = Z;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Shirt coords recorded!");
+								gPropertyEdit[playerid][EditingMode] = PREDIT_NONE;
+
+								return ShowPropertyEditDialogMain(playerid);
+							}
+						case PREDIT_VEHICLE_POINT:
+							{
+								GetPlayerFacingAngle(playerid, R);
+
+								gPropertyEdit[playerid][CoordsVehicle][CoordX] = X;
+								gPropertyEdit[playerid][CoordsVehicle][CoordY] = Y;
+								gPropertyEdit[playerid][CoordsVehicle][CoordZ] = Z;
+								gPropertyEdit[playerid][CoordsVehicle][CoordR] = R;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Vehicle coords recorded!");
+								gPropertyEdit[playerid][EditingMode] = PREDIT_NONE;
+
+								return ShowPropertyEditDialogMain(playerid);
+							}
+						default:
+							{
+								return 1;
 							}
 					}
 				}

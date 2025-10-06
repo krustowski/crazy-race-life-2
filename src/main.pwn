@@ -713,41 +713,70 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				switch (listitem)
 				{
-					// Name
 					case 0:
+						// Name
 						{
 							ShowPropertyEditDialogName(playerid);
 						}
-						// Cost
 					case 1:
+						// Cost
 						{
 							ShowPropertyEditDialogCost(playerid);
 						}
-						// Entrance pickup coords
 					case 2:
+						// Spawn point coords
 						{
-							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Go to a spot to record the Entrance pickup coords and type /predit entrance");
+							gPropertyEdit[playerid][EditingMode] = PREDIT_SPAWN_POINT;
+							SendClientMessage(playerid, COLOR_ORANGE, "[ EDIT ] Record spawn coords using the KEY_NO (N) key.");
 						}
-						// Offer pickup coords
 					case 3:
+						// Entrance pickup coords
 						{
-							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Go to a spot to record the Offer pickup coords and type /predit offer");
+							gPropertyEdit[playerid][EditingMode] = PREDIT_ENTRANCE_POINT;
+							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Record entrance coords using the KEY_NO (N) key.");
 						}
-						// Vehicle coords
 					case 4:
+						// Offer pickup coords
 						{
-							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Go to a spot to record the Vehicle coords and type /predit vehicle");
+							gPropertyEdit[playerid][EditingMode] = PREDIT_OFFER_POINT;
+							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Record offer coords using the KEY_NO (N) key.");
 						}
-						// Occupied state
 					case 5:
+						// Money pickup coords
+						{
+							gPropertyEdit[playerid][EditingMode] = PREDIT_MONEY_POINT;
+							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Record money coords using the KEY_NO (N) key.");
+						}
+					case 6:
+						// Shirt pickup coords
+						{
+							gPropertyEdit[playerid][EditingMode] = PREDIT_SHIRT_POINT;
+							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Record shirt coords using the KEY_NO (N) key.");
+						}
+					case 7:
+						// Vehicle coords
+						{
+							gPropertyEdit[playerid][EditingMode] = PREDIT_VEHICLE_POINT;
+							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Record vehicle coords using the KEY_NO (N) key.");
+						}
+					case 8:
+						// Occupied state
 						{
 							gPropertyEdit[playerid][Occupied] = !gPropertyEdit[playerid][Occupied];
 							SendClientMessage(playerid, COLOR_GREEN, "[ EDIT ] Occupied state of the property toggled");
 
 							ShowPropertyEditDialogMain(playerid);
 						}
+					case 9:
+						// Custom interior state
+						{
+							gPropertyEdit[playerid][CustomInterior] = !gPropertyEdit[playerid][CustomInterior];
+							SendClientMessage(playerid, COLOR_GREEN, "[ EDIT ] Custom interior state of the property toggled");
+
+							ShowPropertyEditDialogMain(playerid);
+						}
+					case 10:
 						// Save property
-					case 6:
 						{
 							EditProperty(playerid);
 						}

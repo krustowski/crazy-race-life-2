@@ -29,6 +29,17 @@ enum
 	PICKUP_TYPE_EXIT
 }
 
+enum PropertyEditingType
+{
+	PREDIT_NONE,
+	PREDIT_SPAWN_POINT,
+	PREDIT_ENTRANCE_POINT,
+	PREDIT_OFFER_POINT,
+	PREDIT_MONEY_POINT,
+	PREDIT_SHIRT_POINT,
+	PREDIT_VEHICLE_POINT
+}
+
 enum PropertyPoint
 {
 	NULL_POINT,
@@ -109,6 +120,14 @@ enum Property
 
 	Vehicle[VehicleProps],
 
+	PropertyEditingType: EditingMode,
+
+	Float: CoordsSpawn[Coords],
+	Float: CoordsEntrance[Coords],
+	Float: CoordsOffer[Coords],
+	Float: CoordsMoney[Coords],
+	Float: CoordsVehicle[Coords],
+
 	bool: Occupied,
 	bool: CustomInterior,
 
@@ -145,6 +164,12 @@ new gNullProperty[Property] =
 	"",
 	0,
 	0,
+	PREDIT_NONE,
+	{0.0, 0.0, 0.0, 0.0},
+	{0.0, 0.0, 0.0, 0.0},
+	{0.0, 0.0, 0.0, 0.0},
+	{0.0, 0.0, 0.0, 0.0},
+	{0.0, 0.0, 0.0, 0.0},
 	false,
 	false,
 	{0, 0, 0, 0, 0},
@@ -1307,7 +1332,19 @@ stock ShowPropertyEditDialogMain(playerid)
 	new propertyid = gPropertyEdit[playerid][ID], stringToPrint[128], title[32];
 
 	format(title, sizeof(title), "Edit property ID: %d", propertyid);
-	format(stringToPrint, sizeof(stringToPrint), "Name\nCost in dollars\nEntrance pickup coords\nOffer pickup coords\nVehicle coords\nOccupied state\nSave property");
+	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%s%s%s%s%s%s%s",
+			"Name\n",
+			"Cost in dollars\n",
+			"Spawn point coords\n",
+			"Entrance pickup coords\n",
+			"Offer pickup coords\n",
+			"Money pickup coords\n",
+			"Shirt pickup coords\n",
+			"Vehicle coords\n",
+			"Toggle Occupied state\n",
+			"Toggle Custom interior state\n",
+			"Save property"
+		);
 
 	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_EDIT_MAIN, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
 }

@@ -1679,6 +1679,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Trucking point editor mode enabled!");
 							gPlayers[playerid][EditingMode] = true;
 							gTruckingEdit[playerid][ID] = truckingid;
+							gTruckingVehiclesIndex = 0;
 
 							return ShowTruckingEditorOptionsDialog(playerid);
 						}
@@ -1699,8 +1700,73 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Trucking point editor enabled!");
 				gPlayers[playerid][EditingMode] = true;
 				gTruckingEdit[playerid][ID] = listitem + 1;
+				gTruckingVehiclesIndex = 0;
 
 				return ShowTruckingEditorOptionsDialog(playerid);
+			}
+		case DIALOG_TRUCKING_EDITOR_OPTIONS:
+			{
+				if (!response)
+				{
+					gTruckingEdit[playerid][ID] = -1;
+					gPlayers[playerid][EditingMode] = false;
+					gTruckingVehiclesIndex = 0;
+					return SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Trucking editor mode disabled!");
+				}
+
+				switch (listitem)
+				{
+					case 0:
+						// Name
+						{
+							return ShowTruckingEditorMameDialog(playerid);
+						}
+					case 1:
+						// Type
+						{
+							return ShowTruckingEditorTypeDialog(playerid);
+						}
+					case 2:
+						// Checkpoint
+						{
+							gTruckingEdit[playerid][EditType] = TREDIT_CHECKPOINT;
+							return SendClientMessage(playerid, COLOR_ORANGE, "[ EDIT ] Record new checkpoint coords using the KEY_NO (N) key.");
+						}
+					case 3:
+						// Info pickup
+						{
+							gTruckingEdit[playerid][EditType] = TREDIT_INFO_PICKUP;
+							return SendClientMessage(playerid, COLOR_ORANGE, "[ EDIT ] Record new info pickup coords using the KEY_NO (N) key.");
+						}
+					case 4:
+						// Truck
+						{
+							gTruckingEdit[playerid][EditType] = TREDIT_TRUCK;
+							return SendClientMessage(playerid, COLOR_ORANGE, "[ EDIT ] Record new truck coords using the KEY_NO (N) key.");
+						}
+					case 5:
+						// Gas
+						{
+							gTruckingEdit[playerid][EditType] = TREDIT_GAS;
+							return SendClientMessage(playerid, COLOR_ORANGE, "[ EDIT ] Record new gas trailer coords using the KEY_NO (N) key.");
+						}
+					case 6:
+						// Freight
+						{
+							gTruckingEdit[playerid][EditType] = TREDIT_FREIGHT;
+							return SendClientMessage(playerid, COLOR_ORANGE, "[ EDIT ] Record new freight trailer coords using the KEY_NO (N) key.");
+						}
+					case 7:
+						// Save
+						{
+							if (SetTruckingPoint(playerid))
+								return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Trucking point and vehicles saved successfully!");
+
+							return SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error occured while saving trucking data!");
+						}
+				}
+
+				return 1;
 			}
 
 		default: 
@@ -2144,6 +2210,83 @@ public OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 								gPropertyEdit[playerid][EditingMode] = PREDIT_NONE;
 
 								return ShowPropertyEditDialogMain(playerid);
+							}
+						default:
+							{
+								return 1;
+							}
+					}
+				}
+
+				if (gTruckingEdit[playerid][ID])
+				{
+					new Float: X, Float: Y, Float: Z, Float: R;
+					GetPlayerPos(playerid, X, Y, Z);
+
+					switch (gTruckingEdit[playerid][EditType])
+					{
+						case TREDIT_CHECKPOINT:
+							{
+								gTruckingEdit[playerid][LocationCheckpoint][CoordX] = X;
+								gTruckingEdit[playerid][LocationCheckpoint][CoordY] = Y;
+								gTruckingEdit[playerid][LocationCheckpoint][CoordZ] = Z;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Checkpoint coords recorded!");
+								return ShowTruckingEditorOptionsDialog(playerid);
+							}
+						case TREDIT_INFO_PICKUP:
+							{
+								gTruckingEdit[playerid][LocationInfoPickup][CoordX] = X;
+								gTruckingEdit[playerid][LocationInfoPickup][CoordY] = Y;
+								gTruckingEdit[playerid][LocationInfoPickup][CoordZ] = Z;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Info pickup coords recorded!");
+								return ShowTruckingEditorOptionsDialog(playerid);
+							}
+						case TREDIT_TRUCK:
+							{
+								GetPlayerFacingAngle(playerid, R);
+
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordX] = X;
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordY] = Y;
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordZ] = Z;
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordR] = R;
+
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Type] = Truck;
+								gTruckingVehiclesIndex++;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Truck vehicle coords recorded!");
+								return ShowTruckingEditorOptionsDialog(playerid);
+							}
+						case TREDIT_GAS:
+							{
+								GetPlayerFacingAngle(playerid, R);
+
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordX] = X;
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordY] = Y;
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordZ] = Z;
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordR] = R;
+
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Type] = Gas;
+								gTruckingVehiclesIndex++;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Gas trailer vehicle coords recorded!");
+								return ShowTruckingEditorOptionsDialog(playerid);
+							}
+						case TREDIT_FREIGHT:
+							{
+								GetPlayerFacingAngle(playerid, R);
+
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordX] = X;
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordY] = Y;
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordZ] = Z;
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordR] = R;
+
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Type] = Freight;
+								gTruckingVehiclesIndex++;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Freight trailer vehicle coords recorded!");
+								return ShowTruckingEditorOptionsDialog(playerid);
 							}
 						default:
 							{

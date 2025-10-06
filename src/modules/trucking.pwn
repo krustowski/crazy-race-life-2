@@ -25,6 +25,16 @@ enum
 	FT_GAS_STATION
 }
 
+enum TruckingEditorType
+{
+	TREDIT_NONE,
+	TREDIT_CHECKPOINT,
+	TREDIT_INFO_PICKUP,
+	TREDIT_TRUCK,
+	TREDIT_GAS,
+	TREDIT_FREIGHT
+}
+
 // Mission types
 enum MissionType
 {
@@ -55,7 +65,9 @@ enum TruckingkPoint
 	LocationCheckpoint[Coords],
 	LocationInfoPickup[Coords],
 	LocationJobPickup[Coords],
-	InfoPickup
+	InfoPickup,
+
+	TruckingEditorType: EditType
 }
 
 enum MissionStats

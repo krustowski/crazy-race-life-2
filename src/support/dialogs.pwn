@@ -797,17 +797,18 @@ stock ShowTruckingEditorMainDialog(playerid)
 stock ShowTruckingEditorOptionsDialog(playerid)
 {
 	new stringToPrint[256], title[128];
-	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%s%s%s%s",
 			"Change Name\n",
 			"Change Type\n",
 			"Record Checkpoint Coords\n",
 			"Record Info Pickup Coords\n",
 			"Record Truck Coords\n",
 			"Record Gas Trailer Coords\n",
-			"Record Freight Trailer Coords"
+			"Record Freight Trailer Coords\n",
+			"Save Trucking Point"
 		);
 
-	format(title, sizeof(title), "Trucking Point ID %d: %s", 
+	format(title, sizeof(title), "Trucking Point (ID %d): %s", 
 			gTruckingEdit[playerid][ID],
 			gTruckingPoints[ gTruckingEdit[playerid][ID] ][Name]
 		);

@@ -1398,7 +1398,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					case 0:
 						{
-							return ShowPropertyEditorListDialog(playerid);
+							return ShowPropertyEditorMainDialog(playerid);
 						}
 					case 1:
 						{
@@ -1409,6 +1409,54 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							return ShowRaceEditorMainDialog(playerid);
 						}
 				}
+			}
+		case DIALOG_PROPERTY_EDITOR_MAIN:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				switch (listitem)
+				{
+					case 0:
+						// Draft new property
+						{
+							return ShowPropertyEditorNewIDDialog(playerid);
+						}
+					case 1:
+						// List existing properties
+						{
+							return ShowPropertyEditorListDialog(playerid);
+						}
+				}
+			}
+		case DIALOG_PROPERTY_EDITOR_NEW_ID:
+			{
+				if (!response || !IsNumeric(inputtext))
+				{
+					return 1;
+				}
+
+				if (GetPropertyArrayIDfromID(strval(inputtext)) != -1)
+				{
+					// Existing property
+					return SendClientMessage(playerid, COLOR_RED, "[ EDIT ] The entered property ID already exists!");
+				}
+
+				new propertyid = strval(inputtext);
+
+				if (propertyid < 10101 || propertyid > 59999)
+				{
+					return SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Invalid property ID (10101-59999)!");
+				}
+
+				gPlayers[playerid][EditingMode] = true;
+				gPropertyEdit[playerid][ID] = propertyid;
+
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Property edit enabled.");
+
+				return ShowPropertyEditDialogMain(playerid);
 			}
 		case DIALOG_RACE_EDITOR_MAIN:
 			{

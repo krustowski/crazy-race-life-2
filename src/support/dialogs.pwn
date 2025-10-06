@@ -29,6 +29,8 @@ enum
 	DIALOG_PORT_LIST,
 	DIALOG_TRUCKING_POINT_LIST,
 	DIALOG_PROPERTY_EDITOR_LIST,
+	DIALOG_PROPERTY_EDITOR_MAIN,
+	DIALOG_PROPERTY_EDITOR_NEW_ID,
 	DIALOG_RACE_OPTIONS,
 	DIALOG_GET_LIST,
 	DIALOG_GOTO_LIST,
@@ -715,6 +717,22 @@ stock ShowGameEditorListDialog(playerid)
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_EDITOR_LIST, DIALOG_STYLE_LIST, "Game Editors", stringToPrint, "Select", "Cancel");
+}
+
+stock ShowPropertyEditorMainDialog(playerid)
+{
+	new stringToPrint[128];
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s",
+			"Draft New Property",
+			"List Existing Properties"
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_EDITOR_MAIN, DIALOG_STYLE_LIST, "Property Editor", stringToPrint, "Select", "Cancel");
+}
+
+stock ShowPropertyEditorNewIDDialog(playerid)
+{
+	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_EDITOR_NEW_ID, DIALOG_STYLE_INPUT, "Property New ID", "Enter new property ID:", "Apply", "Cancel");
 }
 
 stock ShowRaceEditorMainDialog(playerid)

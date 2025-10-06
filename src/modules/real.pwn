@@ -26,7 +26,8 @@ enum
 	PICKUP_TYPE_INFO,
 	PICKUP_TYPE_HEALTH,
 	PICKUP_TYPE_PILLS,
-	PICKUP_TYPE_EXIT
+	PICKUP_TYPE_EXIT,
+	PICKUP_TYPE_SHIRT
 }
 
 enum PropertyEditingType
@@ -50,7 +51,9 @@ enum PropertyPoint
 	EXIT_POINT,
 	ENTRANCE_POINT,
 	VEHICLE_POINT,
-	OFFER_POINT
+	OFFER_POINT,
+	MONEY_POINT,
+	SHIRT_POINT
 }
 
 // Helper enum for the real estate data field parsing.
@@ -284,6 +287,10 @@ stock SpawnProperty(propertyId)
 			case INFO_POINT:
 				{
 					gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_INFO, 1, pX, pY, pZ);
+				}
+			case SHIRT_POINT:
+				{
+					gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_SHIRT, 1, pX, pY, pZ);
 				}
 			case EXIT_POINT:
 				{
@@ -1056,12 +1063,142 @@ stock EditProperty(playerid)
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
-		SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error!");
+		SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error (property)!");
 		printf("Database error: cannot write property data (ID: %d)!", propertyid);
 		return 0;
 	}
 
 	DB_FreeResultSet(result);
+
+	if (!existingRecord && gPropertyEdit[playerid][CoordsSpawn][CoordX] != 0.0 && gPropertyEdit[playerid][CoordsSpawn][CoordY] != 0.0)
+	{
+		format(query, sizeof(query), "INSERT INTO property_coords (property_id, type, primary_x, primary_y, primary_z, primary_rot) VALUES (%d, %d, %.2f, %.2f, %.2f, %.2f)",
+				gPropertyEdit[playerid][ID],
+				_: SPAWN_POINT,
+				gPropertyEdit[playerid][CoordsSpawn][CoordX],
+				gPropertyEdit[playerid][CoordsSpawn][CoordY],
+				gPropertyEdit[playerid][CoordsSpawn][CoordZ],
+				0.0
+		      );
+
+		result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result) {
+			SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error (spawn point)!");
+			printf("Database error: cannot write property data: new spawn point (ID: %d)!", gPropertyEdit[playerid][ID]);
+			return 0;
+		}
+
+		DB_FreeResultSet(result);
+	}
+
+	if (!existingRecord && gPropertyEdit[playerid][CoordsEntrance][CoordX] != 0.0 && gPropertyEdit[playerid][CoordsEntrance][CoordY] != 0.0)
+	{
+		format(query, sizeof(query), "INSERT INTO property_coords (property_id, type, primary_x, primary_y, primary_z, primary_rot) VALUES (%d, %d, %.2f, %.2f, %.2f, %.2f)",
+				gPropertyEdit[playerid][ID],
+				_: ENTRANCE_POINT,
+				gPropertyEdit[playerid][CoordsEntrance][CoordX],
+				gPropertyEdit[playerid][CoordsEntrance][CoordY],
+				gPropertyEdit[playerid][CoordsEntrance][CoordZ],
+				0.0
+		      );
+
+		result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result) {
+			SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error (entrance point)!");
+			printf("Database error: cannot write property data: new entrance point (ID: %d)!", gPropertyEdit[playerid][ID]);
+			return 0;
+		}
+
+		DB_FreeResultSet(result);
+	}
+
+	if (!existingRecord && gPropertyEdit[playerid][CoordsOffer][CoordX] != 0.0 && gPropertyEdit[playerid][CoordsOffer][CoordY] != 0.0)
+	{
+		format(query, sizeof(query), "INSERT INTO property_coords (property_id, type, primary_x, primary_y, primary_z, primary_rot) VALUES (%d, %d, %.2f, %.2f, %.2f, %.2f)",
+				gPropertyEdit[playerid][ID],
+				_: OFFER_POINT,
+				gPropertyEdit[playerid][CoordsOffer][CoordX],
+				gPropertyEdit[playerid][CoordsOffer][CoordY],
+				gPropertyEdit[playerid][CoordsOffer][CoordZ],
+				0.0
+		      );
+
+		result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result) {
+			SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error (offer point)!");
+			printf("Database error: cannot write property data: new offer point (ID: %d)!", gPropertyEdit[playerid][ID]);
+			return 0;
+		}
+
+		DB_FreeResultSet(result);
+	}
+
+	if (!existingRecord && gPropertyEdit[playerid][CoordsMoney][CoordX] != 0.0 && gPropertyEdit[playerid][CoordsMoney][CoordY] != 0.0)
+	{
+		format(query, sizeof(query), "INSERT INTO property_coords (property_id, type, primary_x, primary_y, primary_z, primary_rot) VALUES (%d, %d, %.2f, %.2f, %.2f, %.2f)",
+				gPropertyEdit[playerid][ID],
+				_: MONEY_POINT,
+				gPropertyEdit[playerid][CoordsMoney][CoordX],
+				gPropertyEdit[playerid][CoordsMoney][CoordY],
+				gPropertyEdit[playerid][CoordsMoney][CoordZ],
+				0.0
+		      );
+
+		result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result) {
+			SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error (money point)!");
+			printf("Database error: cannot write property data: new money point (ID: %d)!", gPropertyEdit[playerid][ID]);
+			return 0;
+		}
+
+		DB_FreeResultSet(result);
+	}
+
+	if (!existingRecord && gPropertyEdit[playerid][CustomInterior] && gPropertyEdit[playerid][CoordsShirt][CoordX] != 0.0 && gPropertyEdit[playerid][CoordsShirt][CoordY] != 0.0)
+	{
+		format(query, sizeof(query), "INSERT INTO property_coords (property_id, type, primary_x, primary_y, primary_z, primary_rot) VALUES (%d, %d, %.2f, %.2f, %.2f, %.2f)",
+				gPropertyEdit[playerid][ID],
+				_: SHIRT_POINT,
+				gPropertyEdit[playerid][CoordsShirt][CoordX],
+				gPropertyEdit[playerid][CoordsShirt][CoordY],
+				gPropertyEdit[playerid][CoordsShirt][CoordZ],
+				0.0
+		      );
+
+		result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result) {
+			SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error (shirt point)!");
+			printf("Database error: cannot write property data: new shirt point (ID: %d)!", gPropertyEdit[playerid][ID]);
+			return 0;
+		}
+
+		DB_FreeResultSet(result);
+	}
+
+	if (!existingRecord && gPropertyEdit[playerid][CoordsVehicle][CoordX] != 0.0 && gPropertyEdit[playerid][CoordsVehicle][CoordY] != 0.0)
+	{
+		format(query, sizeof(query), "INSERT INTO property_coords (property_id, type, primary_x, primary_y, primary_z, primary_rot) VALUES (%d, %d, %.2f, %.2f, %.2f, %.2f)",
+				gPropertyEdit[playerid][ID],
+				_: VEHICLE_POINT,
+				gPropertyEdit[playerid][CoordsVehicle][CoordX],
+				gPropertyEdit[playerid][CoordsVehicle][CoordY],
+				gPropertyEdit[playerid][CoordsVehicle][CoordZ],
+				gPropertyEdit[playerid][CoordsVehicle][CoordR]
+		      );
+
+		result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result) {
+			SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error (vehicle point)!");
+			printf("Database error: cannot write property data: new vehicle point (ID: %d)!", gPropertyEdit[playerid][ID]);
+			return 0;
+		}
+
+		DB_FreeResultSet(result);
+	}
+
+	//
+	//  Save and spawn property in memory
+	//
 
 	// Update the server memory
 	if (existingRecord)
@@ -1331,7 +1468,7 @@ stock SetSpawnPointAtProperty(playerid, propertyid)
 
 stock ShowPropertyEditDialogMain(playerid)
 {
-	new propertyid = gPropertyEdit[playerid][ID], stringToPrint[128], title[32];
+	new propertyid = gPropertyEdit[playerid][ID], stringToPrint[256], title[32];
 
 	format(title, sizeof(title), "Edit property ID: %d", propertyid);
 	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%s%s%s%s%s%s%s",
@@ -1346,7 +1483,7 @@ stock ShowPropertyEditDialogMain(playerid)
 			"Toggle Occupied state\n",
 			"Toggle Custom interior state\n",
 			"Save property"
-		);
+	      );
 
 	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_EDIT_MAIN, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
 }

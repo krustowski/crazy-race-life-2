@@ -361,7 +361,7 @@ stock MovePlayerToPlayer(playerid, targetid, bool: reversed)
 		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
 
 	if (targetid == playerid)
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Cannot get such player!");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Cannot use get/goto for the player!");
 
 	new 
 		portedid,

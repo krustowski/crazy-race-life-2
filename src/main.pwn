@@ -1450,7 +1450,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 					case 1:
 						{
-							return ShowTruckingPointListDialog(playerid);
+							return ShowTruckingEditorMainDialog(playerid);
 						}
 					case 2:
 						{
@@ -1648,6 +1648,59 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Race prize in dollars changed!");
 
 				return ShowRaceEditorOptionsDialog(playerid, gPlayerRaceEdit[playerid][ID]);
+			}
+		case DIALOG_TRUCKING_EDITOR_MAIN:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				switch (listitem)
+				{
+					case 0:
+						// New trucking point
+						{
+							new truckingid = -1;
+							for (new i = 1; i < MAX_TRUCKING_POINTS; i++)
+							{
+								if (!strcmp(gTruckingPoints[i][Name], ""))
+								{
+									truckingid = i;
+									break;
+								}
+							}
+
+							if (truckingid == -1)
+							{
+								return SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Max trucking point count reached!");
+							}
+
+							SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Trucking point editor mode enabled!");
+							gPlayers[playerid][EditingMode] = true;
+							gTruckingEdit[playerid][ID] = truckingid;
+
+							return ShowTruckingEditorOptionsDialog(playerid);
+						}
+					case 1:
+						// List existing trucking points
+						{
+							return ShowTruckingPointListDialog(playerid);
+						}
+				}
+			}
+		case DIALOG_TRUCKING_POINT_LIST:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Trucking point editor enabled!");
+				gPlayers[playerid][EditingMode] = true;
+				gTruckingEdit[playerid][ID] = listitem + 1;
+
+				return ShowTruckingEditorOptionsDialog(playerid);
 			}
 
 		default: 

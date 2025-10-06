@@ -28,6 +28,10 @@ enum
 	DIALOG_BANK_WITHDRAW,
 	DIALOG_PORT_LIST,
 	DIALOG_TRUCKING_POINT_LIST,
+	DIALOG_TRUCKING_EDITOR_MAIN,
+	DIALOG_TRUCKING_EDITOR_OPTIONS,
+	DIALOG_TRUCKING_EDITOR_NAME,
+	DIALOG_TRUCKING_EDITOR_TYPE,
 	DIALOG_PROPERTY_EDITOR_LIST,
 	DIALOG_PROPERTY_EDITOR_MAIN,
 	DIALOG_PROPERTY_EDITOR_NEW_ID,
@@ -777,4 +781,36 @@ stock ShowRaceEditorCostChangeDialog(playerid)
 stock ShowRaceEditorPrizeChangeDialog(playerid)
 {
 	return ShowPlayerDialog(playerid, DIALOG_RACE_EDITOR_PRIZE, DIALOG_STYLE_INPUT, "Race Editor", "Enter new prize in dollars for such race:", "Apply", "Cancel");
+}
+
+stock ShowTruckingEditorMainDialog(playerid)
+{
+	new stringToPrint[256];
+	format(stringToPrint, sizeof(stringToPrint), "%s%s",
+			"New Trucking Point\n",
+			"List Existing Points"
+	      );
+
+	return ShowPlayerDialog(playerid, DIALOG_TRUCKING_EDITOR_MAIN, DIALOG_STYLE_LIST, "Trucking Point Editor", stringToPrint, "Select", "Cancel");
+}
+
+stock ShowTruckingEditorOptionsDialog(playerid)
+{
+	new stringToPrint[256], title[128];
+	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%s%s%s",
+			"Change Name\n",
+			"Change Type\n",
+			"Record Checkpoint Coords\n",
+			"Record Info Pickup Coords\n",
+			"Record Truck Coords\n",
+			"Record Gas Trailer Coords\n",
+			"Record Freight Trailer Coords"
+		);
+
+	format(title, sizeof(title), "Trucking Point ID %d: %s", 
+			gTruckingEdit[playerid][ID],
+			gTruckingPoints[ gTruckingEdit[playerid][ID] ][Name]
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_TRUCKING_EDITOR_OPTIONS, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
 }

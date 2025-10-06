@@ -65,13 +65,10 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(lvl, 3, cmdtext);            //rcon + lvl 4
 	dcmd(nitro, 5, cmdtext);          //rcon + lvl 3
 	dcmd(packet, 6, cmdtext);         //rcon +
-	dcmd(predit, 6, cmdtext);         //rcon +
-	dcmd(redit, 5, cmdtext);          //rcon +
 	dcmd(reset, 5, cmdtext);	  //rcon + lvl 4
 	dcmd(restart, 7, cmdtext);	  //rcon + lvl 4
 	dcmd(skin, 4, cmdtext); 	  //rcon + lvl 3
 	dcmd(spectate, 8, cmdtext);	  //rcon + lvl 2
-	dcmd(tredit, 6, cmdtext);         //rcon +
 	dcmd(vehicle, 7, cmdtext);	  //rcon + lvl 4
 	dcmd(weapon, 6, cmdtext); 	  //rcon + lvl 3
 	dcmd(weapons, 7, cmdtext); 	  //rcon + lvl 3
@@ -1352,112 +1349,6 @@ dcmd_packet(playerid, const params[])
 
 	format(stringToPrint, sizeof(stringToPrint), "[ NET ] Player ID: %d, packet loss: %.2f %%", targetId, loss);
 	SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
-
-	return 1;
-}
-
-dcmd_predit(playerid, const params[])
-{
-#pragma unused params
-
-	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4)
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
-
-	return ShowPropertyEditorListDialog(playerid);
-
-	/*new token1[32], token2[32];
-	  SplitIntoTwo(params, token1, token2, sizeof(token1));
-
-	  if (!strlen(params) || (strcmp(token1, "entrance") && strcmp(token1, "offer") && strcmp(token1, "vehicle") && !IsNumeric(token1)))
-	  {
-	  SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /predit [ID]");
-	  SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /predit entrance");
-	  SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /predit offer");
-	  SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /predit vehicle");
-
-	  return 1;
-	  }
-
-	  if (IsNumeric(token1))
-	  {
-	  new propertyid = strval(token1);
-
-	  gPlayers[playerid][EditingMode] = true;
-	  gPropertyEdit[playerid][ID] = propertyid;
-
-	  ShowPropertyEditDialogMain(playerid);
-	  }
-	  else if (!strcmp(token1, "entrance"))
-	  {
-	  new Float:X, Float:Y, Float:Z;
-	  GetPlayerPos(playerid, X, Y, Z);
-
-	//gPropertyEdit[playerid][LocationEntrance][CoordX] = X;
-	//gPropertyEdit[playerid][LocationEntrance][CoordY] = Y;
-	//gPropertyEdit[playerid][LocationEntrance][CoordZ] = Z;
-
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Entrance pickup coords recorded!");
-	ShowPropertyEditDialogMain(playerid);
-	}
-	else if (!strcmp(token1, "offer"))
-	{
-	new Float:X, Float:Y, Float:Z;
-	GetPlayerPos(playerid, X, Y, Z);
-
-	//gPropertyEdit[playerid][LocationOffer][CoordX] = X;
-	//gPropertyEdit[playerid][LocationOffer][CoordY] = Y;
-	//gPropertyEdit[playerid][LocationOffer][CoordZ] = Z;
-
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Offer pickup coords recorded!");
-	ShowPropertyEditDialogMain(playerid);
-	}
-	else if (!strcmp(token1, "vehicle"))
-	{
-	new Float:X, Float:Y, Float:Z, Float:R;
-	GetPlayerPos(playerid, X, Y, Z);
-	GetPlayerFacingAngle(playerid, R);
-
-	//gPropertyEdit[playerid][LocationVehicle][CoordX] = X;
-	//gPropertyEdit[playerid][LocationVehicle][CoordY] = Y;
-	//gPropertyEdit[playerid][LocationVehicle][CoordZ] = Z;
-	//gPropertyEdit[playerid][LocationVehicle][CoordR] = R;
-
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Vehicle coords recorded!");
-	ShowPropertyEditDialogMain(playerid);
-	}
-
-	return 1;*/
-}
-
-dcmd_redit(playerid, const params[])
-{
-	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4)
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
-
-	new token1[32], token2[32];
-	SplitIntoTwo(params, token1, token2, sizeof(token1));
-
-	if (!strlen(params) || (strcmp(token1, "save") && strcmp(token1, "checkpoint") && strcmp(token1, "truck") && strcmp(token1, "freight") && strcmp(token1, "gas") && strcmp(token1, "info") && !IsNumeric(token1)))
-	{
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /redit [ID]");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /redit checkpoint");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /redit info");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /redit truck");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /redit freight");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /redit gas");
-
-		return 1;
-	}
-
-	new facilityId = strval(token1);
-
-	if (IsNumeric(params))
-	{
-		gPlayers[playerid][EditingMode] = true;
-		gTruckingEdit[playerid][ID] = facilityId;
-
-		SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] New trucking point editing initialized");
-	}
 
 	return 1;
 }

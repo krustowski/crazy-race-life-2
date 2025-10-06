@@ -23,11 +23,11 @@ enum
 // Interior pickups
 enum
 {
-	PICKUP_TYPE_INFO,
+	PICKUP_TYPE_SHIRT,
 	PICKUP_TYPE_HEALTH,
 	PICKUP_TYPE_PILLS,
 	PICKUP_TYPE_EXIT,
-	PICKUP_TYPE_SHIRT
+	PICKUP_TYPE_INFO
 }
 
 enum PropertyEditingType
@@ -702,10 +702,10 @@ stock SpawnPropertyInterior(playerid, arrayID)
 	// The very room object.
 	gPlayerInteriors[playerid][Objects][0] = CreatePlayerObject(playerid, 14859, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0.0);
 
-	new pickupIds[4] = {PICKUP_INFO, PICKUP_HEART, PICKUP_PILL, PICKUP_ARROW};
+	new pickupIds[4] = {PICKUP_SHIRT, PICKUP_HEART, PICKUP_PILL, PICKUP_ARROW};
 	new Float: pickupCoords[4][3];
 
-	// Info pickup.
+	// Shirt pickup.
 	pickupCoords[0][0] = X+2.50; pickupCoords[0][1] = Y+2.20; pickupCoords[0][2] = Z-1.0;
 	// Health pickup.
 	pickupCoords[1][0] = X-2.20; pickupCoords[1][1] = Y-2.50; pickupCoords[1][2] = Z-1.0;
@@ -1257,6 +1257,10 @@ stock CheckRealEstatePickup(playerid, pickupid)
 						ShowPlayerDrugzDialog(playerid);
 						return 1;
 					}
+				case SHIRT_POINT:
+					{
+						return 1;
+					}
 				case EXIT_POINT:
 					{
 						// Make the player exit the property interior, which is then destroyed
@@ -1316,7 +1320,7 @@ stock CheckRealEstatePickup(playerid, pickupid)
 
 		switch (i) 
 		{
-			case PICKUP_TYPE_INFO:
+			case PICKUP_TYPE_SHIRT:
 				{
 					return 1;
 				}
@@ -1363,6 +1367,10 @@ stock CheckRealEstatePickup(playerid, pickupid)
 
 					DestroyPropertyInterior(playerid);
 					gPlayers[playerid][InsideProperty] = false;
+				}
+			case PICKUP_TYPE_INFO:
+				{
+					return 1;
 				}
 		}
 	}

@@ -63,9 +63,12 @@ enum MissionStats
 	VehicleID,
 	TrailerID,
 	MissionType: Type,
+
+	Float: ProvisionBonusWeight,
 	DoneCount,
 	TimeElapsed,
 	Earned,
+
 	TimerElapsed,
 	TimerAttachedCheck
 }
@@ -117,8 +120,12 @@ stock CheckTruckingCheckpoint(playerid)
 
 	DisablePlayerRaceCheckpoint(playerid);
 
-	// TODO: Improve the calculation with distance and done missions count 
-	new provision = 1500 + random(100) + 100 * random(45) - 100, stringToPrint[128];
+	new provision, stringToPrint[128];
+
+	if (!gPlayerMissions[playerid][DoneCount])
+		provision = 10000 + (floatround(gPlayerMissions[playerid][ProvisionBonusWeight] * 1 * 5000));
+	else
+		provision = 10000 + (floatround(gPlayerMissions[playerid][ProvisionBonusWeight] * (random( gPlayerMissions[playerid][DoneCount]) + 1) * 5000));
 
 	GivePlayerMoney(playerid, provision);
 	gPlayerMissions[playerid][Earned] += provision;
@@ -190,9 +197,14 @@ stock SetPlayerTruckingMission(playerid, MissionType: missionType)
 		pointId = -1;
 	}
 
+	new Float: X, Float: Y, Float: Z;
+	GetPlayerPos(playerid, X, Y, Z);
+
 	x0 = gTruckingPoints[pointId][LocationCheckpoint][CoordX];
 	y0 = gTruckingPoints[pointId][LocationCheckpoint][CoordY];
 	z0 = gTruckingPoints[pointId][LocationCheckpoint][CoordZ];
+
+	gPlayerMissions[playerid][ProvisionBonusWeight] = floatabs( floatabs(X - x0) / 3000 + floatabs(Y - y0) / 3000 ) / 2;
 
 	SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, Float:x0, Float:y0, Float:z0, Float:x0, Float:y0, Float:z0, 10.0);
 

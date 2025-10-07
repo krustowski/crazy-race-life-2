@@ -1803,6 +1803,62 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				return ShowTruckingEditorOptionsDialog(playerid);
 			}
+		case DIALOG_PROPERTY_SKIN_MAIN:
+			{
+				if (!response)
+				{
+					gPlayers[playerid][SkinOp] = SKIN_OP_NONE;
+					return 1;
+				}
+
+				switch (listitem)
+				{
+					case 0:
+						// Save new skin
+						{
+							gPlayers[playerid][SkinOp] = SKIN_OP_NEW;
+							return SavePropertySkin(playerid);
+						}
+					case 1:
+						// Select skin
+						{
+							gPlayers[playerid][SkinOp] = SKIN_OP_SELECT;
+							return ShowPropertySkinListDialog(playerid);
+						}
+					case 2:
+						// Delete skin
+						{
+							gPlayers[playerid][SkinOp] = SKIN_OP_DELETE;
+							return ShowPropertySkinListDialog(playerid);
+						}
+				}
+			}
+		case DIALOG_PROPERTY_SKIN_LIST:
+			{
+				if (!response)
+				{
+					gPlayers[playerid][SkinOp] = SKIN_OP_NONE;
+					return 1;
+				}
+
+				gPlayers[playerid][Temp] = listitem;
+
+				switch (gPlayers[playerid][SkinOp])
+				{
+					case SKIN_OP_SELECT:
+						{
+							return SelectPropertySkin(playerid);
+						}
+					case SKIN_OP_DELETE:
+						{
+							return DeletePropertySkin(playerid);
+						}
+					default:
+						{
+							return 1;
+						}
+				}
+			}
 
 		default: 
 			return 0; // dialog ID was not found, search in other scripts

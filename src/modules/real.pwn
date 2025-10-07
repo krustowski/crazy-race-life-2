@@ -5,6 +5,7 @@
 
 #define MAX_PROPERTIES		128
 #define MAX_PLAYER_PROPERTIES	5
+#define MAX_PROPERTY_SKINS	5
 #define MAX_PROPERTY_PICKUPS	32
 #define SPAWN_PICKUP_COUNT	4
 #define INVALID_PROPERTY_ID	-1
@@ -139,7 +140,8 @@ enum Property
 	Menu[5],
 	Pickups[MAX_PROPERTY_PICKUPS],
 
-	Drugs[MAX_DRUGS]
+	Drugs[MAX_DRUGS],
+	Skins[MAX_PROPERTY_SKINS]
 }
 
 // The structure of the object+pickups system shown to a player when entering a house.
@@ -519,7 +521,7 @@ stock SaveRealEstateData()
 		DB_FreeResultSet(result);
 
 		//
-		//
+		//  Drugz
 		//
 
 		format(query, sizeof(query), "INSERT INTO drugz (owner_type, owner_id, cocaine, heroin, meth, fent, zaza, tobacco, pcp, paper, lighter, joint) VALUES (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) ON CONFLICT(owner_id) DO UPDATE SET cocaine = excluded.cocaine, heroin = excluded.heroin, meth = excluded.meth, fent = excluded.fent, zaza = excluded.zaza, tobacco = excluded.tobacco, pcp = excluded.pcp, paper = excluded.paper, lighter = excluded.lighter, joint = excluded.joint",
@@ -629,6 +631,31 @@ stock LoadRealEstateData()
 		gProperties[i][Vehicle][Paintjob] = DB_GetFieldIntByName(result_vehicle, "paintjob");
 
 		DB_FreeResultSet(result_vehicle);
+
+		//
+		//  Skins
+		//
+
+		format(query, sizeof(query), "SELECT skin_id WHERE user_id = %d AND property_id = %d LIMIT 5 ORDER by id ASC",
+				gProperties[i][UserID],
+				gProperties[i][ID]
+			);
+
+		result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result) {
+			print("Database error: cannot fetch property skins!");
+		}
+
+		new skin_no = 0;
+
+		do
+		{
+			gProperties[i][Skins][skin_no] = DB_GetFieldIntByName(result, "skin_id");
+			skin_no++;
+		}
+		while (DB_SelectNextRow(result));
+
+		DB_FreeResultSet(result);
 
 		//
 		//   Drugz
@@ -1246,20 +1273,18 @@ stock CheckRealEstatePickup(playerid, pickupid)
 					{
 						SetPlayerHealth(playerid, 100.0);
 						SetPlayerArmour(playerid, 100.0);
-						SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ HP ] Health: 100.0, Armour: 100.0");
-						return 1;
+						return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ HP ] Health: 100.0, Armour: 100.0");
 					}
 				case DRUGZ_POINT:
 					{
 						if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
 							break;
 
-						ShowPlayerDrugzDialog(playerid);
-						return 1;
+						return ShowPlayerDrugzDialog(playerid);
 					}
 				case SHIRT_POINT:
 					{
-						return 1;
+						return ShowPropertySkinMainDialog(playerid, gProperties[i][ID]);
 					}
 				case EXIT_POINT:
 					{
@@ -1466,6 +1491,61 @@ stock SetSpawnPointAtProperty(playerid, propertyid)
 
 		break;
 	}
+
+	return 1;
+}
+
+stock SavePropertySkin(playerid)
+{
+	if (!gPlayers[playerid][InsideProperty])
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] You need to be inside your owned property!");
+	}
+
+	if (!IsPlayerOwner(playerid, gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ][ID]))
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Such property must be owned first!");
+	}
+
+	new arrayid = gPlayerInteriors[playerid][PropertyArrayID], freeSlot = -1, skin_model = GetPlayerSkin(playerid);
+
+	for (new i = 0; i < MAX_PROPERTY_SKINS; i++)
+	{
+		if (gProperties[arrayid][Skins][i] == skin_model)
+		{
+			return SendClientMessage(playerid, COLOR_RED, "[ REAL ] This skin model has been already saved!");
+		}
+
+		if (gProperties[arrayid][Skins][i])
+		{
+			continue;
+		}
+
+		freeSlot = i;
+		break;
+	}
+
+	if (freeSlot == -1)
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] No more free skin slots for such property!");
+	}
+
+	new query[256];
+	format(query, sizeof(query), "INSERT INTO property_skins (property_id, skin_id) VALUES (%d, %d)",
+			gProperties[arrayid][ID],
+			skin_model
+		);
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) {
+		printf("Database error: cannot save new property skin (property_id: %d)!", gProperties[arrayid][ID]);
+		return 0;
+	}
+
+	DB_FreeResultSet(result);
+
+	gProperties[arrayid][Skins][freeSlot] = skin_model;
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] New skin model saved successfully!");
 
 	return 1;
 }

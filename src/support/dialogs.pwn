@@ -57,7 +57,9 @@ enum
 	DIALOG_RACE_EDITOR_OPTIONS,
 	DIALOG_RACE_EDITOR_NAME,
 	DIALOG_RACE_EDITOR_COST,
-	DIALOG_RACE_EDITOR_PRIZE
+	DIALOG_RACE_EDITOR_PRIZE,
+	DIALOG_PROPERTY_SKIN_MAIN,
+	DIALOG_PROPERTY_SKIN_LIST
 };
 
 #include "modules/real.pwn"
@@ -836,4 +838,48 @@ stock ShowTruckingEditorTypeDialog(playerid)
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_TRUCKING_EDITOR_TYPE, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
+}
+
+stock ShowPropertySkinMainDialog(playerid, propertyid)
+{
+	new stringToPrint[256], title[128];
+	format(stringToPrint, sizeof(stringToPrint), "%s%s%s",
+			"Save new skin\n",
+			"Select saved skin\n",
+			"Delete saved skin"
+	      );
+
+	format(title, sizeof(title), "Property Skins for '%s'",
+			gProperties[ GetPropertyArrayIDfromID(propertyid) ][Label]
+		);
+
+	gPlayers[playerid][Temp] = propertyid;
+
+	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_SKIN_MAIN, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
+}
+
+stock ShowPropertySkinListDialog(playerid)
+{
+	new stringToPrint[256] = "ID\tSkin Model";
+
+	if (!gPlayers[playerid][InsideProperty])
+	{
+		return 1;
+	}
+
+	for (new i = 0; i < MAX_PROPERTY_SKINS; i++)
+	{
+		if (!gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ][Skins][i])
+		{
+			continue;
+		}
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%d\t%d",
+				stringToPrint,
+				i,
+				gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ][Skins][i]
+		      );
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_SKIN_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Property Skins", stringToPrint, "Select", "Cancel");
 }

@@ -14,6 +14,14 @@
 //  Player's props.
 //
 
+enum SkinOperation
+{
+	SKIN_OP_NONE,
+	SKIN_OP_NEW,
+	SKIN_OP_SELECT,
+	SKIN_OP_DELETE
+}
+
 enum Player
 {
 	ID,
@@ -22,6 +30,7 @@ enum Player
 
 	PasswordHash[65],
 	PasswordSalt[17],
+	LoginAttempts,
 
 	TeamID,
 	Skin,
@@ -31,7 +40,6 @@ enum Player
 	Float: Armour,
 	AdminLevel,
 	WantedLevel,
-	LoginAttempts,
 	SpawnPoint,
 
 	Locale[PlayerLocale],
@@ -48,7 +56,8 @@ enum Player
 	Drugs[MAX_DRUGS],
 	Properties[MAX_PLAYER_PROPERTIES],
 
-	Temp
+	Temp,
+	SkinOperation: SkinOp
 }
 
 new gPlayers[MAX_PLAYERS][Player];

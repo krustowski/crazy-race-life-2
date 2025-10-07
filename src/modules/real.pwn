@@ -1594,7 +1594,19 @@ stock DeletePropertySkin(playerid, skinid)
 		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Such property must be owned first!");
 	}
 
-	return 1;
+	if (!gProperties[arrayid][Skins][skinid])
+	{
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ REAL ] This skin slot is free!");
+	}
+
+	new query[256];
+	format(query, sizeof(query), "DELETE FROM property_skins WHERE property_id = %d AND skin_id = %d",
+			gProperties[arrayid][ID],
+			gProperties[arrayid][Skins][skinid]
+		);
+
+	gProperties[arrayid][Skins][skinid] = 0;
+	return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] Selected skin model deleted successfully!");
 }
 
 //

@@ -223,7 +223,7 @@ public OnGameModeExit()
 
 public OnPlayerRequestClass(playerid, classid)
 {
-	SetPlayerPos(playerid, 2323.73, 1283.18, 97.60);
+	//SetPlayerPos(playerid, 2323.73, 1283.18, 97.60);
 	/*SetPlayerPos(playerid, 1966.1, 1936.1, 127.5);
 	SetPlayerCameraPos(playerid, 1871.3, 1933.6, 127.5);
 	SetPlayerCameraLookAt(playerid, 1966.1, 1936.1, 127.5);*/

@@ -477,8 +477,9 @@ stock LoadPlayerProperties(playerid)
 {
 	new query[256];
 
-	format(query, sizeof(query), "SELECT id FROM properties WHERE user_id = %d AND occupied = 1", 
-			gPlayers[playerid][OrmID]
+	format(query, sizeof(query), "SELECT id FROM properties WHERE user_id = %d AND occupied = 1 AND type = %d", 
+			gPlayers[playerid][OrmID],
+			_: PROPERTY_TYPE_PERSONAL
 	      );
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);

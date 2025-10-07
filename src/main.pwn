@@ -866,7 +866,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				ShowPropertyEditDialogMain(playerid);
 				return 1;
 			}
-		case DIALOG_PROPERTY_EDITOR_LIST:
+		case DIALOG_PROPERTY_EDITOR_LIST_PER:
 			{
 				if (!response)
 				{
@@ -875,6 +875,20 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				gPlayers[playerid][EditingMode] = true;
 				gPropertyEdit[playerid][ID] = gProperties[listitem][ID];
+				gPropertyEdit[playerid][Type] = PROPERTY_TYPE_PERSONAL;
+
+				return ShowPropertyEditDialogMain(playerid);
+			}
+		case DIALOG_PROPERTY_EDITOR_LIST_COM:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				gPlayers[playerid][EditingMode] = true;
+				gPropertyEdit[playerid][ID] = gProperties[listitem][ID];
+				gPropertyEdit[playerid][Type] = PROPERTY_TYPE_COMMERCIAL;
 
 				return ShowPropertyEditDialogMain(playerid);
 			}
@@ -1515,9 +1529,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							return ShowPropertyEditorNewIDDialog(playerid);
 						}
 					case 1:
-						// List existing properties
+						// List existing properties (personal)
 						{
-							return ShowPropertyEditorListDialog(playerid);
+							return ShowPropertyEditorListPerDialog(playerid);
+						}
+					case 2:
+						// List existing properties (commercial)
+						{
+							return ShowPropertyEditorListComDialog(playerid);
 						}
 				}
 			}

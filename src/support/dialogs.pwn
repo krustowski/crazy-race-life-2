@@ -33,7 +33,8 @@ enum
 	DIALOG_TRUCKING_EDITOR_OPTIONS,
 	DIALOG_TRUCKING_EDITOR_NAME,
 	DIALOG_TRUCKING_EDITOR_TYPE,
-	DIALOG_PROPERTY_EDITOR_LIST,
+	DIALOG_PROPERTY_EDITOR_LIST_PER,
+	DIALOG_PROPERTY_EDITOR_LIST_COM,
 	DIALOG_PROPERTY_EDITOR_MAIN,
 	DIALOG_PROPERTY_EDITOR_NEW_ID,
 	DIALOG_RACE_OPTIONS,
@@ -392,13 +393,13 @@ stock ShowTruckingPointListDialog(playerid)
 	return ShowPlayerDialog(playerid, DIALOG_TRUCKING_POINT_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Trucking Points", stringToPrint, "Edit", "Cancel");
 }
 
-stock ShowPropertyEditorListDialog(playerid)
+stock ShowPropertyEditorListPerDialog(playerid)
 {
 	new stringToPrint[2048] = "Property Name\tID";
 
 	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
-		if (!gProperties[i][ID])
+		if (!gProperties[i][ID] || gProperties[i][Type] != PROPERTY_TYPE_PERSONAL)
 			continue;
 
 		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
@@ -408,7 +409,26 @@ stock ShowPropertyEditorListDialog(playerid)
 			);
 	}
 
-	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_EDITOR_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Property Editor", stringToPrint, "Edit", "Cancel");
+	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_EDITOR_LIST_PER, DIALOG_STYLE_TABLIST_HEADERS, "Property Editor", stringToPrint, "Edit", "Cancel");
+}
+
+stock ShowPropertyEditorListComDialog(playerid)
+{
+	new stringToPrint[2048] = "Property Name\tID";
+
+	for (new i = 0; i < MAX_PROPERTIES; i++)
+	{
+		if (!gProperties[i][ID] || gProperties[i][Type] != PROPERTY_TYPE_COMMERCIAL)
+			continue;
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
+				stringToPrint,
+				gProperties[i][Label],
+				gProperties[i][ID]
+			);
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_EDITOR_LIST_COM, DIALOG_STYLE_TABLIST_HEADERS, "Property Editor", stringToPrint, "Edit", "Cancel");
 }
 
 stock ShowRaceEditorListDialog(playerid)
@@ -725,10 +745,11 @@ stock ShowGameEditorListDialog(playerid)
 
 stock ShowPropertyEditorMainDialog(playerid)
 {
-	new stringToPrint[128];
-	format(stringToPrint, sizeof(stringToPrint), "%s\n%s",
+	new stringToPrint[256];
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s",
 			"Draft New Property",
-			"List Existing Properties"
+			"List Existing Properties (personal)",
+			"List Existing Properties (commercial)"
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_EDITOR_MAIN, DIALOG_STYLE_LIST, "Property Editor", stringToPrint, "Select", "Cancel");

@@ -220,7 +220,7 @@ stock SetPlayerTruckingMission(playerid, MissionType: missionType)
 	y0 = gTruckingPoints[pointId][LocationCheckpoint][CoordY];
 	z0 = gTruckingPoints[pointId][LocationCheckpoint][CoordZ];
 
-	gPlayerMissions[playerid][ProvisionBonusWeight] = floatabs( floatabs(X - x0) / 3000 + floatabs(Y - y0) / 3000 ) / 2;
+	gPlayerMissions[playerid][ProvisionBonusWeight] = (floatabs(X - x0) / 3000 + floatabs(Y - y0) / 3000) / 2;
 
 	SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, Float:x0, Float:y0, Float:z0, Float:x0, Float:y0, Float:z0, 10.0);
 

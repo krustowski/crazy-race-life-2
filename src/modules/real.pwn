@@ -912,9 +912,9 @@ stock RentProperty(playerid, propertyID)
 {
 	new arrayid = GetPropertyArrayIDfromID(propertyID);
 
-	if (arrayid == -1)
+	if (arrayid == -1 || !propertyID)
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Unknown property for rent!");
+		return SendClientMessageLocalized(playerid, I18N_REAL_INVALID_CODE);
 	}
 
 	if (GetPlayerMoney(playerid) < gProperties[arrayid][Cost])

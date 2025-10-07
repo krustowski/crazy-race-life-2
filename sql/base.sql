@@ -161,18 +161,6 @@ CREATE TABLE IF NOT EXISTS "property_coords" (
 	FOREIGN KEY("property_id") REFERENCES "properties"("id"),
 	FOREIGN KEY("type") REFERENCES "property_coord_types"("id")
 );
-CREATE TABLE IF NOT EXISTS "properties" (
-	"id"	INTEGER,
-	"user_id"	INTEGER NOT NULL,
-	"vehicle_id"	INTEGER,
-	"name"	TEXT NOT NULL,
-	"cost"	INTEGER NOT NULL,
-	"occupied"	INTEGER,
-	"custom_interior"	INTEGER DEFAULT 0,
-	PRIMARY KEY("id"),
-	FOREIGN KEY("user_id") REFERENCES "users"("id") ON DELETE CASCADE,
-	FOREIGN KEY("vehicle_id") REFERENCES "vehicles"("id")
-);
 CREATE TABLE IF NOT EXISTS "vehicles" (
 	"id"	INTEGER,
 	"model"	INTEGER,
@@ -188,4 +176,23 @@ CREATE TABLE IF NOT EXISTS "property_skins" (
 	"skin_id"	INTEGER NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT),
 	FOREIGN KEY("property_id") REFERENCES "properties"("id")
+);
+CREATE TABLE IF NOT EXISTS "property_types" (
+	"id"	INTEGER,
+	"name"	TEXT UNIQUE,
+	PRIMARY KEY("id")
+);
+CREATE TABLE IF NOT EXISTS "properties" (
+	"id"	INTEGER,
+	"type"	INTEGER NOT NULL DEFAULT 1,
+	"user_id"	INTEGER NOT NULL,
+	"vehicle_id"	INTEGER,
+	"name"	TEXT NOT NULL,
+	"cost"	INTEGER NOT NULL,
+	"occupied"	INTEGER,
+	"custom_interior"	INTEGER DEFAULT 0,
+	PRIMARY KEY("id"),
+	FOREIGN KEY("type") REFERENCES "property_types"("id"),
+	FOREIGN KEY("user_id") REFERENCES "users"("id") ON DELETE CASCADE,
+	FOREIGN KEY("vehicle_id") REFERENCES "vehicles"("id")
 );

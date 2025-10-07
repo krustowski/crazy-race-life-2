@@ -400,6 +400,18 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 		return 1;
 	}
 
+	if (gTrucking[playerid])
+	{
+		AbortTruckingMission(playerid);
+	}
+
+	new raceid = CheckPlayerRaceState(playerid);
+
+	if (raceid)
+	{
+		ResetPlayerRaceState(playerid, raceid, false);
+	}
+
 	// Drop all money at the spot of death
 	if (GetPlayerMoney(playerid) > 0)
 	{

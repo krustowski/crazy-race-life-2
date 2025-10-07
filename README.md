@@ -42,18 +42,31 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
 
 ![](.github/img/crl2_racing_start.jpg)
 
+*^ Racing point right after registration into the race. Showing the racing point pickup with the racing point name `3DText` text. The first checkpoint starts the race when entered.*
+
 ### Real Estate
 
 ![](.github/img/crl2_real_estate_exterior.png)
+
+*^ The exterior of every common personal property shows the entrance point (white arrow pickup), the offer point (green/red house pickup according to the occupance state of such property), and custom vehicle attached.*
+
 ![](.github/img/crl2_real_estate_interior.png)
+
+*^ The common interior shows 4 pickups in total: shirt pickup (to change the skin), pills pickup (to deposit/withdraw owned drugz and stuff), heart pickup (to gain full HP and armour), and the exit pickup (to exit the property interior).*
+
 ![](.github/img/crl2_real_estate_custom_interior.png)
+
+*^ The custom interior is an ad-hoc built interior (very limited occurance). Pickups are places to custom points, allowing the secondary exit(s) as well.*
 
 ### Trucking
 
 ![](.github/img/crl2_trucking_marked_truck.png)
 
+*^ The trucking mission details shown in the right bottom corner. The marked truck in the picture indicates that the mission is "paused" as the player has to drive it to continue the mission.*
+
 ![](.github/img/crl2_trucking_lost_trailer.jpg)
 
+*^ The detail of a detached trailer (decomposing in the sea waters). Custom information text is shown until the trailer is reattached back to the truck registered for the mission.*
 
 ## How to build
 

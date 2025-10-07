@@ -44,6 +44,7 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
 
 *^ Racing point right after registration into the race. Showing the racing point pickup with the racing point name `3DText` text. The first checkpoint starts the race when entered.*
 
+
 ### Real Estate
 
 ![](.github/img/crl2_real_estate_exterior.png)
@@ -58,6 +59,11 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
 
 *^ The custom interior is an ad-hoc built interior (very limited occurance). Pickups are places to custom points, allowing the secondary exit(s) as well.*
 
+![](.github/img/crl2_real_estate_exterior_commercial.png)
+
+*^ The commercial property exterior example. Occupied state is indicated via the `3DText` text with the tenant's name. This property can still be outbought by another player though.*
+
+
 ### Trucking
 
 ![](.github/img/crl2_trucking_marked_truck.png)
@@ -66,7 +72,8 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
 
 ![](.github/img/crl2_trucking_lost_trailer.jpg)
 
-*^ The detail of a detached trailer (decomposing in the sea waters). Custom information text is shown until the trailer is reattached back to the truck registered for the mission.*
+*^ Detail of a detached trailer (decomposing in the sea waters). Custom information text is shown until the trailer is reattached back to the truck registered for the mission.*
+
 
 ## How to build
 

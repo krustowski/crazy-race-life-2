@@ -16,6 +16,7 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
     + Custom vehicle attached (including the modifitaions)
     + Custom safehouse
     + Up to 5 properties per player
+    + Save custom skins (up to 5 per property)
 + Teams
     + Custom salary per team 
     + Special commands available
@@ -29,6 +30,10 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
     + Send private messages directly to a player
     + Check bank account balance
     + Call a service (car mechanic, pizza delivery, taxi ride, ...)
++ Admin Zone
+    + Game editors (property, race and trucking point editting tools)
+    + Admin levels 0 to 5 (+ RCON)
+    + Granularity for commands
 
 
 ## How to build

@@ -222,7 +222,7 @@ public SendRealEstateCommission()
 {
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if (!IsPlayerConnected(i) && gPlayers[i][IsLogged])
+		if (!IsPlayerConnected(i) || !gPlayers[i][IsLogged] || gPlayers[i][AFK])
 		{
 			continue;
 		}

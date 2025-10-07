@@ -253,7 +253,7 @@ public SendRealEstateCommission()
 		do
 		{
 			new cost = DB_GetFieldIntByName(result, "cost");
-			commission += (cost / 10) + random(cost / 10);
+			commission += (cost / 100) + random(cost / 200);
 		}
 		while (DB_SelectNextRow(result));
 
@@ -907,6 +907,84 @@ stock GetPropertyArrayIDfromID(propertyID)
 	return -1;
 }
 
+stock RentProperty(playerid, propertyID)
+{
+	new arrayid = GetPropertyArrayIDfromID(propertyID);
+
+	if (arrayid == -1)
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Unknown property for rent!");
+	}
+
+	if (GetPlayerMoney(playerid) < gProperties[arrayid][Cost])
+	{
+		return SendClientMessageLocalized(playerid, I18N_REAL_NO_MONEY);
+	}
+
+	if (gProperties[arrayid][UserID] == gPlayers[playerid][OrmID])
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] This property is already rented by you!");
+	}
+
+	// 
+	//  Proceed
+	//
+
+	new query[256];
+	format(query, sizeof(query), "UPDATE properties SET user_id = %d, occupied = 1 WHERE id = %d",
+			gPlayers[playerid][OrmID],
+			propertyID
+		);
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		SendClientMessage(playerid, COLOR_RED, "[ REAL ] Database error!");
+		printf("Database error: cannot update property (ID: %d)", propertyID);
+		print(query);
+		return 0;
+	}
+
+	DB_FreeResultSet(result);
+
+	for (new i = 0; i < MAX_PROPERTY_PICKUPS; i++)
+	{
+		if (gPropertyCoords[arrayid][i][PickupType] == OFFER_POINT)
+		{
+			if (gPropertyCoords[arrayid][i][Text])
+				Delete3DTextLabel(gPropertyCoords[arrayid][i][Text]);
+
+			gPropertyCoords[arrayid][i][Text] = Create3DTextLabel("property is rented by %s", COLOR_ORANGE, gPropertyCoords[arrayid][i][Primary][CoordX], gPropertyCoords[arrayid][i][Primary][CoordY], gPropertyCoords[arrayid][i][Primary][CoordZ], 15.0, -1, false, gPlayers[playerid][Name]);
+			break;
+		}
+	}
+
+	new exTenant = gProperties[arrayid][UserID];
+
+	gProperties[arrayid][Occupied] = true;
+	gProperties[arrayid][UserID] = gPlayers[playerid][OrmID];
+
+	GivePlayerMoney(playerid, -gProperties[arrayid][Cost]);
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] Property rented successfully!");
+
+	// Send message to ex-tenant if online
+
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i) || !gPlayers[i][IsLogged])
+		{
+			continue;
+		}
+
+		if (gPlayers[i][OrmID] == exTenant)
+		{
+			return SendClientMessage(i, COLOR_ORANGE, "[ REAL ] Somebody has outbought one of your rented properties!");
+		}
+	}
+
+	return 1;
+}
+
 stock BuyPlayerProperty(playerid, propertyID)
 {
 	new arrayID, freeSlot = -1;
@@ -1410,23 +1488,43 @@ stock CheckRealEstatePickup(playerid, pickupid)
 					}
 				case OFFER_POINT:
 					{
-						if (!gProperties[i][Occupied])
-						{
-							if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
+						if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
 								return 1;
 
-							format(stringToPrint, sizeof(stringToPrint), "Property '%s' for sell.\n\n\tCost: $%d (%.2f mio)\n\n\nProperty code: %d\n\nTo buy this property, enter its code below:", gProperties[i][Label], gProperties[i][Cost], float(gProperties[i][Cost]) / 1000000, gProperties[i][ID]);
-							return ShowPlayerDialog(playerid, DIALOG_PROPERTY_BUY, DIALOG_STYLE_INPUT, "Real Estate", stringToPrint, "Buy", "Cancel");
-						} 
+						switch (gProperties[i][Type])
+						{
+							case PROPERTY_TYPE_PERSONAL:
+								{
+									if (!gProperties[i][Occupied])
+									{
+										format(stringToPrint, sizeof(stringToPrint), "Property '%s' for sell.\n\n\tCost: $%d (%.2f mio)\n\n\nProperty code: %d\n\nTo buy this property, enter its code below:", gProperties[i][Label], gProperties[i][Cost], float(gProperties[i][Cost]) / 1000000, gProperties[i][ID]);
+										return ShowPlayerDialog(playerid, DIALOG_PROPERTY_BUY, DIALOG_STYLE_INPUT, "Real Estate", stringToPrint, "Buy", "Cancel");
+									}
 
-						if (!IsPlayerOwner(playerid, gProperties[i][ID]))
-							return SendClientMessage(playerid, COLOR_RED, "[ REAL ] This property has been already sold.");
+									if (!IsPlayerOwner(playerid, gProperties[i][ID]))
+										return SendClientMessage(playerid, COLOR_RED, "[ REAL ] This property has been already sold.");
 
-						if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
-							return 1;
+									format(stringToPrint, sizeof(stringToPrint), "Property '%s' is owned by you.\n\nCurrent value: $%d (%.2f mio)\n\n\nProperty code: %d\n\nThe selling fee is set to 10% of the property value.\nEnter its code to sell this property:", gProperties[i][Label], gProperties[i][Cost], float(gProperties[i][Cost]) / 1000000, gProperties[i][ID]);
+									return ShowPlayerDialog(playerid, DIALOG_PROPERTY_SELL, DIALOG_STYLE_INPUT, "Real Estate", stringToPrint, "Sell", "Cancel");
+								}
+							case PROPERTY_TYPE_COMMERCIAL:
+								{
+									if (!gProperties[i][Occupied])
+									{
+										format(stringToPrint, sizeof(stringToPrint), "Property '%s' for rent.\n\n\tCost: $%d (%.2f mio)\n\n\nProperty code: %d\n\nTo rent this property, enter its code below:", gProperties[i][Label], gProperties[i][Cost], float(gProperties[i][Cost]) / 1000000, gProperties[i][ID]);
+										return ShowPlayerDialog(playerid, DIALOG_PROPERTY_RENT, DIALOG_STYLE_INPUT, "Real Estate (Commercial)", stringToPrint, "Rent", "Cancel");
+									}
 
-						format(stringToPrint, sizeof(stringToPrint), "Property '%s' is owned by you.\n\nCurrent value: $%d (%.2f mio)\n\n\nProperty code: %d\n\nThe selling fee is set to 10% of the property value.\nEnter its code to sell this property:", gProperties[i][Label], gProperties[i][Cost], float(gProperties[i][Cost]) / 1000000, gProperties[i][ID]);
-						return ShowPlayerDialog(playerid, DIALOG_PROPERTY_SELL, DIALOG_STYLE_INPUT, "Real Estate", stringToPrint, "Sell", "Cancel");
+									new playerName[MAX_PLAYER_NAME];
+									GetOwnerName(gProperties[i][UserID], playerName);
+
+									format(stringToPrint, sizeof(stringToPrint), "Property '%s' is currently rented by %s, but you can still pay the cost to rent it yourself.\n\n\tCost: $%d (%.2f mio)\n\n\nProperty code: %d\n\nTo rent this property, enter its code below:", gProperties[i][Label], playerName, gProperties[i][Cost], float(gProperties[i][Cost]) / 1000000, gProperties[i][ID]);
+									return ShowPlayerDialog(playerid, DIALOG_PROPERTY_RENT, DIALOG_STYLE_INPUT, "Real Estate (Commercial)", stringToPrint, "Rent", "Cancel");
+								}
+						}
+
+						//
+
 					}
 			}
 		}

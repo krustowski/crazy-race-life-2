@@ -662,6 +662,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				return 1;
 			}
+		case DIALOG_PROPERTY_RENT:
+			{
+				if (!response)
+					return 1;
+
+				return RentProperty(playerid, strval(inputtext));
+			}
 		case DIALOG_PROPERTY_SELL:
 			{
 				if (!response)

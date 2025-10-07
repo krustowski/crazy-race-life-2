@@ -182,3 +182,10 @@ CREATE TABLE IF NOT EXISTS "vehicles" (
 	"paintjob"	INTEGER,
 	PRIMARY KEY("id")
 );
+CREATE TABLE IF NOT EXISTS "property_skins" (
+	"id"	INTEGER,
+	"property_id"	INTEGER NOT NULL,
+	"skin_id"	INTEGER NOT NULL,
+	PRIMARY KEY("id" AUTOINCREMENT),
+	FOREIGN KEY("property_id") REFERENCES "properties"("id")
+);

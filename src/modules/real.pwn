@@ -228,7 +228,7 @@ public SendRealEstateCommission()
 		}
 
 		new query[256];
-		format(query, sizeof(query), "SELECT FROM properties WHERE user_id = %d AND type = %d",
+		format(query, sizeof(query), "SELECT cost FROM properties WHERE user_id = %d AND type = %d",
 				gPlayers[i][OrmID],
 				_: PROPERTY_TYPE_COMMERCIAL
 			);

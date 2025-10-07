@@ -853,8 +853,6 @@ stock ShowPropertySkinMainDialog(playerid, propertyid)
 			gProperties[ GetPropertyArrayIDfromID(propertyid) ][Label]
 		);
 
-	gPlayers[playerid][Temp] = propertyid;
-
 	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_SKIN_MAIN, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
 }
 
@@ -871,6 +869,10 @@ stock ShowPropertySkinListDialog(playerid)
 	{
 		if (!gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ][Skins][i])
 		{
+			format(stringToPrint, sizeof(stringToPrint), "%s\n%d\t---free slot---",
+					stringToPrint,
+					i
+				);
 			continue;
 		}
 

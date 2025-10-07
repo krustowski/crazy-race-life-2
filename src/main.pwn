@@ -683,7 +683,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					case 0:
 						{
-							// "Ulozit vse doma"
+							// Save all at home
 							gProperties[propertyID][Drugs][drugID] += gPlayers[playerid][Drugs][drugID];
 							gPlayers[playerid][Drugs][drugID] = 0;
 
@@ -691,7 +691,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 					case 1:
 						{
-							// "Vybrat vse z domu"
+							// Withdraw all to pockets
 							gPlayers[playerid][Drugs][drugID] += gProperties[propertyID][Drugs][drugID];
 							gProperties[propertyID][Drugs][drugID] = 0;
 
@@ -1841,17 +1841,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				gPlayers[playerid][Temp] = listitem;
-
 				switch (gPlayers[playerid][SkinOp])
 				{
 					case SKIN_OP_SELECT:
 						{
-							return SelectPropertySkin(playerid);
+							return SelectPropertySkin(playerid, listitem);
 						}
 					case SKIN_OP_DELETE:
 						{
-							return DeletePropertySkin(playerid);
+							return DeletePropertySkin(playerid, listitem);
 						}
 					default:
 						{

@@ -636,26 +636,32 @@ stock LoadRealEstateData()
 		//  Skins
 		//
 
-		format(query, sizeof(query), "SELECT skin_id WHERE user_id = %d AND property_id = %d LIMIT 5 ORDER by id ASC",
-				gProperties[i][UserID],
+		gProperties[i][Skins] = {0, 0, 0, 0, 0};
+
+		format(query, sizeof(query), "SELECT skin_id FROM property_skins WHERE property_id = %d ORDER BY id ASC LIMIT 5",
 				gProperties[i][ID]
 			);
 
-		result = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result) {
+		new DBResult: result_skins = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result_skins) {
 			print("Database error: cannot fetch property skins!");
 		}
-
-		new skin_no = 0;
-
-		do
+		else 
 		{
-			gProperties[i][Skins][skin_no] = DB_GetFieldIntByName(result, "skin_id");
-			skin_no++;
-		}
-		while (DB_SelectNextRow(result));
+			if (DB_GetRowCount(result_skins))
+			{
+				new skin_no = 0;
 
-		DB_FreeResultSet(result);
+				do
+				{
+					gProperties[i][Skins][skin_no] = DB_GetFieldIntByName(result_skins, "skin_id");
+					skin_no++;
+				}
+				while (DB_SelectNextRow(result_skins));
+			}
+
+			DB_FreeResultSet(result_skins);
+		}
 
 		//
 		//   Drugz
@@ -933,7 +939,7 @@ stock SellPlayerProperty(playerid, propertyID)
 		if (gPropertyCoords[arrayID][i][PickupType] == OFFER_POINT)
 		{
 			if (!IsPlayerInSphere(playerid, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ], 15.0))
-			  return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);
+				return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);
 
 			DestroyPickup(gPropertyCoords[arrayID][i][Pickup]);
 			Delete3DTextLabel(gPropertyCoords[arrayID][i][Text]);
@@ -1347,7 +1353,10 @@ stock CheckRealEstatePickup(playerid, pickupid)
 		{
 			case PICKUP_TYPE_SHIRT:
 				{
-					return 1;
+					if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
+						break;
+
+					return ShowPropertySkinMainDialog(playerid, gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ][ID]);
 				}
 			case PICKUP_TYPE_HEALTH:
 				{
@@ -1534,7 +1543,7 @@ stock SavePropertySkin(playerid)
 	format(query, sizeof(query), "INSERT INTO property_skins (property_id, skin_id) VALUES (%d, %d)",
 			gProperties[arrayid][ID],
 			skin_model
-		);
+	      );
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
@@ -1545,7 +1554,45 @@ stock SavePropertySkin(playerid)
 	DB_FreeResultSet(result);
 
 	gProperties[arrayid][Skins][freeSlot] = skin_model;
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] New skin model saved successfully!");
+	return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] New skin model saved successfully!");
+}
+
+stock SelectPropertySkin(playerid, skinid)
+{
+	if (!gPlayers[playerid][InsideProperty])
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] You need to be inside your owned property!");
+	}
+
+	new arrayid = gPlayerInteriors[playerid][PropertyArrayID];
+
+	if (!IsPlayerOwner(playerid, gProperties[arrayid][ID]))
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Such property must be owned first!");
+	}
+
+	if (!gProperties[arrayid][Skins][skinid])
+	{
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ REAL ] This skin slot is free!");
+	}
+
+	SetPlayerSkin(playerid, gProperties[arrayid][Skins][skinid]);
+	return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] Property skin set successfully!");
+}
+
+stock DeletePropertySkin(playerid, skinid)
+{
+	if (!gPlayers[playerid][InsideProperty])
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] You need to be inside your owned property!");
+	}
+
+	new arrayid = gPlayerInteriors[playerid][PropertyArrayID];
+
+	if (!IsPlayerOwner(playerid, gProperties[arrayid][ID]))
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Such property must be owned first!");
+	}
 
 	return 1;
 }

@@ -199,6 +199,7 @@ new gNullProperty[Property] =
 //
 
 forward InitRealEstateProperties();
+forward SendRealEstateCommission();
 
 public InitRealEstateProperties()
 {
@@ -215,6 +216,58 @@ public InitRealEstateProperties()
 	}
 
 	return 1;
+}
+
+public SendRealEstateCommission()
+{
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i) && gPlayers[i][IsLogged])
+		{
+			continue;
+		}
+
+		new query[256];
+		format(query, sizeof(query), "SELECT FROM properties WHERE user_id = %d AND type = %d",
+				gPlayers[i][OrmID],
+				_: PROPERTY_TYPE_COMMERCIAL
+			);
+
+		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result) 
+		{
+			printf("Database error: cannot fetch commercial properties by user (user_id: %d)!", gPlayers[i][OrmID]);
+			print(query);
+
+			continue;
+		}
+
+		if (!DB_GetRowCount(result))
+		{
+			DB_FreeResultSet(result);
+			continue;
+		}
+
+		new commission;
+
+		do
+		{
+			new cost = DB_GetFieldIntByName(result, "cost");
+			commission += (cost / 10) + random(cost / 10);
+		}
+		while (DB_SelectNextRow(result));
+
+		DB_FreeResultSet(result);
+
+		if (commission > 0)
+		{
+			new stringToPrint[128];
+			format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Periodic commission from rented properties: $%d", commission);
+
+			SendClientMessage(i, COLOR_ORANGE, stringToPrint);
+			GivePlayerMoney(i, commission);
+		}
+	}
 }
 
 /*stock SpawnPlayerEntrancePickups(playerid)
@@ -380,7 +433,7 @@ stock SpawnProperty(propertyId)
 									GetOwnerName(gProperties[propertyId][UserID], playerName);
 
 									if (strcmp(playerName, ""))
-										gPropertyCoords[propertyId][i][Text] = Create3DTextLabel("%s has this property on lease", COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false, playerName);
+										gPropertyCoords[propertyId][i][Text] = Create3DTextLabel("property is rented by %s", COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false, playerName);
 								}
 							}
 					}

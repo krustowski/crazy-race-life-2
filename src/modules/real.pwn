@@ -1290,6 +1290,9 @@ stock CheckRealEstatePickup(playerid, pickupid)
 					}
 				case SHIRT_POINT:
 					{
+						if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
+							break;
+
 						return ShowPropertySkinMainDialog(playerid, gProperties[i][ID]);
 					}
 				case EXIT_POINT:
@@ -1315,6 +1318,8 @@ stock CheckRealEstatePickup(playerid, pickupid)
 						}
 						else 
 						{
+							gPlayers[playerid][InsideProperty] = true;
+							gPlayerInteriors[playerid][PropertyArrayID] = i;
 							SetPlayerPos(playerid, gPropertyCoords[i][j][Secondary][CoordX], gPropertyCoords[i][j][Secondary][CoordY], gPropertyCoords[i][j][Secondary][CoordZ]);
 						}
 

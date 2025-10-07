@@ -42,6 +42,13 @@ enum PropertyEditingType
 	PREDIT_VEHICLE_POINT
 }
 
+enum PropertyType 
+{
+	PROPERTY_TYPE_NONE,
+	PROPERTY_TYPE_PERSONAL,
+	PROPERTY_TYPE_COMMERCIAL
+}
+
 enum PropertyPoint
 {
 	NULL_POINT,
@@ -121,6 +128,7 @@ enum Property
 	UserID,
 	Label[64],
 	Cost,
+	PropertyType: Type,
 
 	Vehicle[VehicleProps],
 
@@ -169,6 +177,7 @@ new gNullProperty[Property] =
 	0,
 	"",
 	0,
+	PROPERTY_TYPE_NONE,
 	0,
 	PREDIT_NONE,
 	{0.0, 0.0, 0.0, 0.0},
@@ -344,17 +353,36 @@ stock SpawnProperty(propertyId)
 					gPropertyCoords[propertyId][i][Primary][CoordZ] = pZ;
 					gPropertyCoords[propertyId][i][Primary][CoordR] = pR;
 
-					if (!gProperties[propertyId][Occupied])
-						gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_HOUSE_GREEN, 1, pX, pY, pZ);
-					else
+					switch (gProperties[propertyId][Type])
 					{
-						gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_HOUSE_RED, 1, pX, pY, pZ);
+						case PROPERTY_TYPE_PERSONAL:
+							{
+								if (!gProperties[propertyId][Occupied])
+									gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_HOUSE_GREEN, 1, pX, pY, pZ);
+								else
+								{
+									gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_HOUSE_RED, 1, pX, pY, pZ);
 
-						new playerName[MAX_PLAYER_NAME];
-						GetOwnerName(gProperties[propertyId][UserID], playerName);
+									new playerName[MAX_PLAYER_NAME];
+									GetOwnerName(gProperties[propertyId][UserID], playerName);
 
-						if (strcmp(playerName, ""))
-							gPropertyCoords[propertyId][i][Text] = Create3DTextLabel("%s owns this property", COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false, playerName);
+									if (strcmp(playerName, ""))
+										gPropertyCoords[propertyId][i][Text] = Create3DTextLabel("%s owns this property", COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false, playerName);
+								}
+							}
+						case PROPERTY_TYPE_COMMERCIAL:
+							{
+								gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_HOUSE_BLUE, 1, pX, pY, pZ);
+
+								if (gProperties[propertyId][Occupied])
+								{
+									new playerName[MAX_PLAYER_NAME];
+									GetOwnerName(gProperties[propertyId][UserID], playerName);
+
+									if (strcmp(playerName, ""))
+										gPropertyCoords[propertyId][i][Text] = Create3DTextLabel("%s has this property on lease", COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false, playerName);
+								}
+							}
 					}
 				}
 		}
@@ -503,8 +531,9 @@ stock SaveRealEstateData()
 			DB_FreeResultSet(result_vehicle);
 		}
 
-		format(query, sizeof(query), "INSERT INTO properties (id,user_id,vehicle_id,name,cost,occupied,custom_interior) VALUES (%d, %d, %d, '%s', %d, %d, %d) ON CONFLICT(id) DO UPDATE SET occupied = excluded.occupied, user_id = excluded.user_id, custom_interior = excluded.custom_interior, vehicle_id = excluded.vehicle_id",
+		format(query, sizeof(query), "INSERT INTO properties (id,type,user_id,vehicle_id,name,cost,occupied,custom_interior) VALUES (%d, %d, %d, %d, '%s', %d, %d, %d) ON CONFLICT(id) DO UPDATE SET type = excluded.type, occupied = excluded.occupied, user_id = excluded.user_id, custom_interior = excluded.custom_interior, vehicle_id = excluded.vehicle_id",
 				gProperties[i][ID],
+				_: gProperties[i][Type],
 				gProperties[i][UserID],
 				vehicle_id,
 				gProperties[i][Label],
@@ -571,7 +600,7 @@ stock LoadRealEstateData()
 {
 	new i = 0, query[512];
 
-	format(query, sizeof(query), "SELECT id,user_id,vehicle_id,name,cost,occupied,custom_interior FROM properties");
+	format(query, sizeof(query), "SELECT id,type,user_id,vehicle_id,name,cost,occupied,custom_interior FROM properties");
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
@@ -586,6 +615,7 @@ stock LoadRealEstateData()
 		new name[64];
 
 		gProperties[i][ID] = DB_GetFieldIntByName(result, "id");
+		gProperties[i][Type] = PropertyType: DB_GetFieldIntByName(result, "type");
 		gProperties[i][UserID] = DB_GetFieldIntByName(result, "user_id");
 		gProperties[i][Cost] = DB_GetFieldIntByName(result, "cost");
 		gProperties[i][Occupied] = bool: DB_GetFieldIntByName(result, "occupied");
@@ -640,7 +670,7 @@ stock LoadRealEstateData()
 
 		format(query, sizeof(query), "SELECT skin_id FROM property_skins WHERE property_id = %d ORDER BY id ASC LIMIT 5",
 				gProperties[i][ID]
-			);
+		      );
 
 		new DBResult: result_skins = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result_skins) {
@@ -1608,7 +1638,7 @@ stock DeletePropertySkin(playerid, skinid)
 	format(query, sizeof(query), "DELETE FROM property_skins WHERE property_id = %d AND skin_id = %d",
 			gProperties[arrayid][ID],
 			gProperties[arrayid][Skins][skinid]
-		);
+	      );
 
 	gProperties[arrayid][Skins][skinid] = 0;
 	return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] Selected skin model deleted successfully!");
@@ -1623,8 +1653,9 @@ stock ShowPropertyEditDialogMain(playerid)
 	new propertyid = gPropertyEdit[playerid][ID], stringToPrint[256], title[32];
 
 	format(title, sizeof(title), "Edit property ID: %d", propertyid);
-	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%s%s%s%s%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%s%s%s%s%s%s%s%s",
 			"Name\n",
+			"Type\n",
 			"Cost in dollars\n",
 			"Spawn point coords\n",
 			"Entrance pickup coords\n",
@@ -1647,6 +1678,19 @@ stock ShowPropertyEditDialogName(playerid)
 	format(title, sizeof(title), "Edit property ID: %d", propertyid);
 
 	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_EDIT_NAME, DIALOG_STYLE_INPUT, title, "Enter a new property name:", "Enter", "Cancel");
+}
+
+stock ShowPropertyEditDialogType(playerid)
+{
+	new propertyid = gPropertyEdit[playerid][ID], stringToPrint[128], title[32];
+	format(stringToPrint, sizeof(stringToPrint), "%s%s",
+			"Personal Property\n",
+			"Commercial Property"
+	      );
+
+	format(title, sizeof(title), "Edit property ID: %d", propertyid);
+
+	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_EDIT_TYPE, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
 }
 
 stock ShowPropertyEditDialogCost(playerid)

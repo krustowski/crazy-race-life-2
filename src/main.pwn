@@ -732,47 +732,52 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							ShowPropertyEditDialogName(playerid);
 						}
 					case 1:
+						// Type
+						{
+							ShowPropertyEditDialogType(playerid);
+						}
+					case 2:
 						// Cost
 						{
 							ShowPropertyEditDialogCost(playerid);
 						}
-					case 2:
+					case 3:
 						// Spawn point coords
 						{
 							gPropertyEdit[playerid][EditingMode] = PREDIT_SPAWN_POINT;
 							SendClientMessage(playerid, COLOR_ORANGE, "[ EDIT ] Record spawn coords using the KEY_NO (N) key.");
 						}
-					case 3:
+					case 4:
 						// Entrance pickup coords
 						{
 							gPropertyEdit[playerid][EditingMode] = PREDIT_ENTRANCE_POINT;
 							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Record entrance coords using the KEY_NO (N) key.");
 						}
-					case 4:
+					case 5:
 						// Offer pickup coords
 						{
 							gPropertyEdit[playerid][EditingMode] = PREDIT_OFFER_POINT;
 							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Record offer coords using the KEY_NO (N) key.");
 						}
-					case 5:
+					case 6:
 						// Money pickup coords
 						{
 							gPropertyEdit[playerid][EditingMode] = PREDIT_MONEY_POINT;
 							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Record money coords using the KEY_NO (N) key.");
 						}
-					case 6:
+					case 7:
 						// Shirt pickup coords
 						{
 							gPropertyEdit[playerid][EditingMode] = PREDIT_SHIRT_POINT;
 							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Record shirt coords using the KEY_NO (N) key.");
 						}
-					case 7:
+					case 8:
 						// Vehicle coords
 						{
 							gPropertyEdit[playerid][EditingMode] = PREDIT_VEHICLE_POINT;
 							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Record vehicle coords using the KEY_NO (N) key.");
 						}
-					case 8:
+					case 9:
 						// Occupied state
 						{
 							gPropertyEdit[playerid][Occupied] = !gPropertyEdit[playerid][Occupied];
@@ -780,7 +785,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 							ShowPropertyEditDialogMain(playerid);
 						}
-					case 9:
+					case 10:
 						// Custom interior state
 						{
 							gPropertyEdit[playerid][CustomInterior] = !gPropertyEdit[playerid][CustomInterior];
@@ -788,7 +793,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 							ShowPropertyEditDialogMain(playerid);
 						}
-					case 10:
+					case 11:
 						// Save property
 						{
 							EditProperty(playerid);
@@ -801,8 +806,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				if (!response)
 				{
-					ShowPropertyEditDialogMain(playerid);
-					return 1;
+					return ShowPropertyEditDialogMain(playerid);
 				}
 
 				new label[64];
@@ -814,12 +818,36 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				ShowPropertyEditDialogMain(playerid);
 				return 1;
 			}
+		case DIALOG_PROPERTY_EDIT_TYPE:
+			{
+				if (!response)
+				{
+					return ShowPropertyEditDialogMain(playerid);
+				}
+
+				switch (listitem)
+				{
+					case 0:
+						// Personal
+						{
+							gPropertyEdit[playerid][Type] = PROPERTY_TYPE_PERSONAL;
+							SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Property type set to personal!");
+						}
+					case 1:
+						// Commercial
+						{
+							gPropertyEdit[playerid][Type] = PROPERTY_TYPE_COMMERCIAL;
+							SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Property type set to commercial!");
+						}
+				}
+
+				return ShowPropertyEditDialogMain(playerid);
+			}
 		case DIALOG_PROPERTY_EDIT_COST:
 			{
 				if (!response)
 				{
-					ShowPropertyEditDialogMain(playerid);
-					return 1;
+					return ShowPropertyEditDialogMain(playerid);
 				}
 
 				if (!IsNumeric(inputtext))

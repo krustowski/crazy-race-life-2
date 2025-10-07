@@ -65,6 +65,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(lvl, 3, cmdtext);            //rcon + lvl 4
 	dcmd(nitro, 5, cmdtext);          //rcon + lvl 3
 	dcmd(packet, 6, cmdtext);         //rcon +
+	dcmd(radio, 5, cmdtext);	  //rcon + lvl 4
 	dcmd(reset, 5, cmdtext);	  //rcon + lvl 4
 	dcmd(restart, 7, cmdtext);	  //rcon + lvl 4
 	dcmd(skin, 4, cmdtext); 	  //rcon + lvl 3
@@ -1351,6 +1352,24 @@ dcmd_packet(playerid, const params[])
 	SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
 
 	return 1;
+}
+
+dcmd_radio(playerid, const params[])
+{
+#pragma unused params
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+
+	if (!gPlayers[playerid][Listening])
+	{
+		gPlayers[playerid][Listening] = true;
+		return PlayAudioStreamForPlayer(playerid, "https://icecast8.play.cz/freeradio128.mp3");
+	}
+	else
+	{
+		gPlayers[playerid][Listening] = false;
+		return StopAudioStreamForPlayer(playerid);
+	}
 }
 
 dcmd_reset(playerid, const params[])

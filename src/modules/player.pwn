@@ -52,6 +52,7 @@ enum Player
 	bool: InsideProperty,
 	bool: EditingMode,
 	bool: DialogShown,
+	bool: Listening,
 
 	Drugs[MAX_DRUGS],
 	Properties[MAX_PLAYER_PROPERTIES],

@@ -652,6 +652,7 @@ stock SaveRealEstateData()
 			new DBResult: result_vehicle = DB_ExecuteQuery(gDbConnectionHandle, query);
 			if (!result_vehicle) {
 				printf("Database error: cannot write property data (vehicle, ID: %d)!", gProperties[i][ID]);
+				print(query);
 			}
 
 			DB_FreeResultSet(result_vehicle);
@@ -672,6 +673,7 @@ stock SaveRealEstateData()
 		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result) {
 			printf("Database error: cannot write property data (ID: %d)!", gProperties[i][ID]);
+			print(query);
 		}
 
 		DB_FreeResultSet(result);
@@ -698,6 +700,7 @@ stock SaveRealEstateData()
 		new DBResult: result_drugz = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result_drugz) {
 			printf("Database error: cannot write property data (drugz, ID: %d)!", gProperties[i][ID]);
+			print(query);
 		}
 
 		DB_FreeResultSet(result_drugz);
@@ -1322,19 +1325,23 @@ stock EditProperty(playerid)
 
 	new query[2048];
 
-	format(query, sizeof(query), "INSERT INTO properties (id, user_id, name, cost, occupied, custom_interior) VALUES (%d, %d, '%s', %d, %d, %d) ON CONFLICT(id) DO UPDATE SET user_id = excluded.user_id, name = excluded.name, cost = excluded.cost, occupied = excluded.occupied, custom_interior = excluded.custom_interior",
+	format(query, sizeof(query), "INSERT INTO properties (id, type, user_id, name, cost, occupied, custom_interior, locked_until_timestamp) VALUES (%d, %d, '%s', %d, %d, %d, %d) ON CONFLICT(id) DO UPDATE SET user_id = excluded.user_id, name = excluded.name, cost = excluded.cost, occupied = excluded.occupied, custom_interior = excluded.custom_interior, locked_until_timestamp = excluded.locked_until_timestamp",
 			gPropertyEdit[playerid][ID],
+			_: gPropertyEdit[playerid][Type],
 			gPropertyEdit[playerid][UserID],
 			gPropertyEdit[playerid][Label],
 			gPropertyEdit[playerid][Cost],
 			gPropertyEdit[playerid][Occupied],
-			gPropertyEdit[playerid][CustomInterior]
+			gPropertyEdit[playerid][CustomInterior],
+			gPropertyEdit[playerid][LockedUntilTime]
 	      );
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
 		SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error (property)!");
 		printf("Database error: cannot write property data (ID: %d)!", propertyid);
+		print(query);
+
 		return 0;
 	}
 
@@ -1355,6 +1362,8 @@ stock EditProperty(playerid)
 		if (!result) {
 			SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error (spawn point)!");
 			printf("Database error: cannot write property data: new spawn point (ID: %d)!", gPropertyEdit[playerid][ID]);
+			print(query);
+
 			return 0;
 		}
 
@@ -1376,6 +1385,8 @@ stock EditProperty(playerid)
 		if (!result) {
 			SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error (entrance point)!");
 			printf("Database error: cannot write property data: new entrance point (ID: %d)!", gPropertyEdit[playerid][ID]);
+			print(query);
+
 			return 0;
 		}
 
@@ -1397,6 +1408,8 @@ stock EditProperty(playerid)
 		if (!result) {
 			SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error (offer point)!");
 			printf("Database error: cannot write property data: new offer point (ID: %d)!", gPropertyEdit[playerid][ID]);
+			print(query);
+
 			return 0;
 		}
 
@@ -1418,6 +1431,8 @@ stock EditProperty(playerid)
 		if (!result) {
 			SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error (money point)!");
 			printf("Database error: cannot write property data: new money point (ID: %d)!", gPropertyEdit[playerid][ID]);
+			print(query);
+
 			return 0;
 		}
 
@@ -1439,6 +1454,8 @@ stock EditProperty(playerid)
 		if (!result) {
 			SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error (shirt point)!");
 			printf("Database error: cannot write property data: new shirt point (ID: %d)!", gPropertyEdit[playerid][ID]);
+			print(query);
+
 			return 0;
 		}
 
@@ -1460,6 +1477,8 @@ stock EditProperty(playerid)
 		if (!result) {
 			SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error (vehicle point)!");
 			printf("Database error: cannot write property data: new vehicle point (ID: %d)!", gPropertyEdit[playerid][ID]);
+			print(query);
+
 			return 0;
 		}
 

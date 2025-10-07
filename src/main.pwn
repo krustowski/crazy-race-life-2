@@ -301,6 +301,8 @@ public OnPlayerConnect(playerid)
 
 public OnPlayerDisconnect(playerid, reason)
 {
+	StopAudioStreamForPlayer(playerid);
+
 	// Hide the vehicle velocity game text.
 	//TextDrawHideForPlayer(playerid, KPH[playerid]);
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);

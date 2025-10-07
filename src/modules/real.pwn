@@ -144,6 +144,8 @@ enum Property
 	bool: Occupied,
 	bool: CustomInterior,
 
+	LockedUntilTime,
+
 	Objects[5],
 	Menu[5],
 	Pickups[MAX_PROPERTY_PICKUPS],
@@ -188,6 +190,7 @@ new gNullProperty[Property] =
 	{0.0, 0.0, 0.0, 0.0},
 	false,
 	false,
+	0,
 	{0, 0, 0, 0, 0},
 	{0, 0, 0, 0, 0},
 	{0, 0, 0, 0, 0, 0},
@@ -342,22 +345,47 @@ stock SpawnProperty(propertyId)
 				}
 			case HEALTH_POINT:
 				{
+					if (gPropertyCoords[propertyId][i][Pickup])
+					{
+						DestroyPickup(gPropertyCoords[propertyId][i][Pickup]);
+					}
+
 					gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_HEART, 1, pX, pY, pZ);
 				}
 			case DRUGZ_POINT:
 				{
+					if (gPropertyCoords[propertyId][i][Pickup])
+					{
+						DestroyPickup(gPropertyCoords[propertyId][i][Pickup]);
+					}
+
 					gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_PILL, 1, pX, pY, pZ);
 				}
 			case INFO_POINT:
 				{
+					if (gPropertyCoords[propertyId][i][Pickup])
+					{
+						DestroyPickup(gPropertyCoords[propertyId][i][Pickup]);
+					}
+
 					gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_INFO, 1, pX, pY, pZ);
 				}
 			case SHIRT_POINT:
 				{
+					if (gPropertyCoords[propertyId][i][Pickup])
+					{
+						DestroyPickup(gPropertyCoords[propertyId][i][Pickup]);
+					}
+
 					gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_SHIRT, 1, pX, pY, pZ);
 				}
 			case EXIT_POINT:
 				{
+					if (gPropertyCoords[propertyId][i][Pickup])
+					{
+						DestroyPickup(gPropertyCoords[propertyId][i][Pickup]);
+					}
+
 					gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_ARROW, 1, pX, pY, pZ);
 					gPropertyCoords[propertyId][i][Secondary][CoordX] = sX;
 					gPropertyCoords[propertyId][i][Secondary][CoordY] = sY;
@@ -366,6 +394,11 @@ stock SpawnProperty(propertyId)
 				}
 			case ENTRANCE_POINT:
 				{
+					if (gPropertyCoords[propertyId][i][Pickup])
+					{
+						DestroyPickup(gPropertyCoords[propertyId][i][Pickup]);
+					}
+
 					if (gProperties[propertyId][Occupied])
 						gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_ARROW, 1, pX, pY, pZ);
 
@@ -385,6 +418,11 @@ stock SpawnProperty(propertyId)
 					gPropertyCoords[propertyId][i][Primary][CoordY] = pY;
 					gPropertyCoords[propertyId][i][Primary][CoordZ] = pZ;
 					gPropertyCoords[propertyId][i][Primary][CoordR] = pR;
+
+					if (IsValidVehicle(gProperties[propertyId][Vehicle][ID]))
+					{
+						DestroyVehicle(gProperties[propertyId][Vehicle][ID]);
+					}
 
 					if (gProperties[propertyId][Vehicle][Model] && gProperties[propertyId][Vehicle][Model] >= 400 && gProperties[propertyId][Vehicle][Model] <= 611)
 					{
@@ -410,8 +448,15 @@ stock SpawnProperty(propertyId)
 					{
 						case PROPERTY_TYPE_PERSONAL:
 							{
+								if (gPropertyCoords[propertyId][i][Pickup])
+								{
+									DestroyPickup(gPropertyCoords[propertyId][i][Pickup]);
+								}
+
 								if (!gProperties[propertyId][Occupied])
+								{
 									gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_HOUSE_GREEN, 1, pX, pY, pZ);
+								}
 								else
 								{
 									gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_HOUSE_RED, 1, pX, pY, pZ);
@@ -425,15 +470,42 @@ stock SpawnProperty(propertyId)
 							}
 						case PROPERTY_TYPE_COMMERCIAL:
 							{
+								if (gPropertyCoords[propertyId][i][Pickup])
+								{
+									DestroyPickup(gPropertyCoords[propertyId][i][Pickup]);
+								}
+
 								gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_HOUSE_BLUE, 1, pX, pY, pZ);
 
 								if (gProperties[propertyId][Occupied])
 								{
-									new playerName[MAX_PLAYER_NAME];
+									new playerName[MAX_PLAYER_NAME], text[64];
 									GetOwnerName(gProperties[propertyId][UserID], playerName);
 
+									format(text, sizeof(text), "property is rented by %s",
+											playerName
+										);
+
+									if (gProperties[propertyId][LockedUntilTime] && gettime() < gProperties[propertyId][LockedUntilTime])
+									{
+										new day, month, year, hour, minute, second;
+										UnixToDateTime(gProperties[propertyId][LockedUntilTime], year, month, day, hour, minute, second);
+
+										format(text, sizeof(text), "%s\n\nlocked until %02d/%02d/%4d %02d:%02d:%02d UTC",
+												text,
+												day,
+												month,
+												year,
+												hour,
+												minute,
+												second
+											);
+									}
+
 									if (strcmp(playerName, ""))
-										gPropertyCoords[propertyId][i][Text] = Create3DTextLabel("property is rented by %s", COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false, playerName);
+									{
+										gPropertyCoords[propertyId][i][Text] = Create3DTextLabel(text, COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false);
+									}
 								}
 							}
 					}
@@ -585,7 +657,7 @@ stock SaveRealEstateData()
 			DB_FreeResultSet(result_vehicle);
 		}
 
-		format(query, sizeof(query), "INSERT INTO properties (id,type,user_id,vehicle_id,name,cost,occupied,custom_interior) VALUES (%d, %d, %d, %d, '%s', %d, %d, %d) ON CONFLICT(id) DO UPDATE SET type = excluded.type, occupied = excluded.occupied, user_id = excluded.user_id, custom_interior = excluded.custom_interior, vehicle_id = excluded.vehicle_id",
+		format(query, sizeof(query), "INSERT INTO properties (id,type,user_id,vehicle_id,name,cost,occupied,custom_interior,locked_until_timestamp) VALUES (%d, %d, %d, %d, '%s', %d, %d, %d, %d) ON CONFLICT(id) DO UPDATE SET type = excluded.type, occupied = excluded.occupied, user_id = excluded.user_id, custom_interior = excluded.custom_interior, vehicle_id = excluded.vehicle_id, locked_until_timestamp = excluded.locked_until_timestamp",
 				gProperties[i][ID],
 				_: gProperties[i][Type],
 				gProperties[i][UserID],
@@ -593,7 +665,8 @@ stock SaveRealEstateData()
 				gProperties[i][Label],
 				gProperties[i][Cost],
 				gProperties[i][Occupied],
-				gProperties[i][CustomInterior]
+				gProperties[i][CustomInterior],
+				gProperties[i][LockedUntilTime]
 		      );
 
 		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
@@ -654,7 +727,7 @@ stock LoadRealEstateData()
 {
 	new i = 0, query[512];
 
-	format(query, sizeof(query), "SELECT id,type,user_id,vehicle_id,name,cost,occupied,custom_interior FROM properties");
+	format(query, sizeof(query), "SELECT id,type,user_id,vehicle_id,name,cost,occupied,custom_interior,locked_until_timestamp FROM properties");
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
@@ -674,6 +747,7 @@ stock LoadRealEstateData()
 		gProperties[i][Cost] = DB_GetFieldIntByName(result, "cost");
 		gProperties[i][Occupied] = bool: DB_GetFieldIntByName(result, "occupied");
 		gProperties[i][CustomInterior] = bool: DB_GetFieldIntByName(result, "custom_interior");
+		gProperties[i][LockedUntilTime] = DB_GetFieldIntByName(result, "locked_until_timestamp");
 
 		DB_GetFieldStringByName(result, "name", name, sizeof(name));
 
@@ -927,6 +1001,16 @@ stock RentProperty(playerid, propertyID)
 		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] This property is already rented by you!");
 	}
 
+	if (gProperties[arrayid][LockedUntilTime])
+	{
+		new timestamp = gettime();
+
+		if (timestamp < gProperties[arrayid][LockedUntilTime])
+		{
+			return SendClientMessage(playerid, COLOR_RED, "[ REAL ] This property is still locked for rent!");
+		}
+	}
+
 	// 
 	//  Proceed
 	//
@@ -948,22 +1032,13 @@ stock RentProperty(playerid, propertyID)
 
 	DB_FreeResultSet(result);
 
-	for (new i = 0; i < MAX_PROPERTY_PICKUPS; i++)
-	{
-		if (gPropertyCoords[arrayid][i][PickupType] == OFFER_POINT)
-		{
-			if (gPropertyCoords[arrayid][i][Text])
-				Delete3DTextLabel(gPropertyCoords[arrayid][i][Text]);
-
-			gPropertyCoords[arrayid][i][Text] = Create3DTextLabel("property is rented by %s", COLOR_ORANGE, gPropertyCoords[arrayid][i][Primary][CoordX], gPropertyCoords[arrayid][i][Primary][CoordY], gPropertyCoords[arrayid][i][Primary][CoordZ], 15.0, -1, false, gPlayers[playerid][Name]);
-			break;
-		}
-	}
-
 	new exTenant = gProperties[arrayid][UserID];
 
 	gProperties[arrayid][Occupied] = true;
 	gProperties[arrayid][UserID] = gPlayers[playerid][OrmID];
+	gProperties[arrayid][LockedUntilTime] = gettime() + 3 * 24 * 60 * 60;
+
+	SpawnProperty(arrayid);
 
 	GivePlayerMoney(playerid, -gProperties[arrayid][Cost]);
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] Property rented successfully!");

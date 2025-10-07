@@ -246,3 +246,55 @@ stock PrintAsciiLogoToLogs()
 	printf(" *************************************************************************************   ");
 }
 
+// GPT-generated
+stock UnixToDateTime(timestamp, &year, &month, &day, &hour, &minute, &second)
+{
+	new days, secs;
+
+	secs = timestamp % 86400;
+	days = timestamp / 86400;
+
+	hour = secs / 3600;
+	secs %= 3600;
+	minute = secs / 60;
+	second = secs % 60;
+
+	year = 1970;
+	for (;;)
+	{
+		new leap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+		new year_days = leap ? 366 : 365;
+		if (days >= year_days)
+		{
+			days -= year_days;
+			year++;
+		}
+		else break;
+	}
+
+	// Days in each month
+	new month_days[12] = {
+		31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+	};
+
+	// Adjust February for leap year
+	new is_leap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+	if (is_leap) 
+		month_days[1] = 29; 
+	else 
+		month_days[1] = 28;
+
+	month = 1;
+	for (new i = 0; i < 12; i++)
+	{
+		if (days >= month_days[i])
+		{
+			days -= month_days[i];
+			month++;
+		}
+		else break;
+	}
+
+	day = days + 1;
+}
+

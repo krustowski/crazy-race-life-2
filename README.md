@@ -5,8 +5,17 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
 
 ## Features
 
++ Admin Zone
+    + Game editors (property, race and trucking point editting tools)
+    + Admin levels 0 to 5 (+ RCON)
+    + Granularity for commands
 + ATM for banking services
     + At least one ATM per city/town/village
++ Personal cellphone
+    + Accessed easily via the `KEY_YES` key (Y usually)
+    + Send private messages directly to a player
+    + Check bank account balance
+    + Call a service (car mechanic, pizza delivery, taxi ride, ...)
 + Racing
     + Custom races all across the map
     + Air and ground
@@ -25,15 +34,6 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
     + 15+ trucking points (petrol stations etc)
     + Custom missions
     + Weighted provision/bonus per done mission/delivery
-+ Personal cellphone
-    + Accessed easily via the `KEY_YES` key (Y usually)
-    + Send private messages directly to a player
-    + Check bank account balance
-    + Call a service (car mechanic, pizza delivery, taxi ride, ...)
-+ Admin Zone
-    + Game editors (property, race and trucking point editting tools)
-    + Admin levels 0 to 5 (+ RCON)
-    + Granularity for commands
 
 
 ## Preview
@@ -41,6 +41,12 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
 ### Racing
 
 ![](.github/img/crl2_racing_start.jpg)
+
+### Real Estate
+
+![](.github/img/crl2_real_estate_exterior.png)
+![](.github/img/crl2_real_estate_interior.png)
+![](.github/img/crl2_real_estate_custom_interior.png)
 
 ### Trucking
 

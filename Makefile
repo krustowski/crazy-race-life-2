@@ -15,3 +15,6 @@ push:
 
 watch:
 	@sampctl build --watch
+
+schema:
+	@sqlite3 crl2_data.db '.schema' > sql/base.sql

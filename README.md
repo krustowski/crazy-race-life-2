@@ -42,6 +42,8 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
 
 ![](.github/img/crl2_trucking_marked_truck.png)
 
+![](.github/img/crl2_trucking_lost_trailer.jpg)
+
 
 ## How to build
 

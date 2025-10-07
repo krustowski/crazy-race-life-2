@@ -24,6 +24,7 @@
 #define PICKUP_DRUG_BLUE			1579
 #define PICKUP_DRUG_RED				1580
 #define PICKUP_CARD				1581
+#define PICKUP_PUMPKIN				19320
 #define PICKUP_HOUSE_RED 			19522
 
 #include "modules/bank.pwn"

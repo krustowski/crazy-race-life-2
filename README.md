@@ -36,6 +36,13 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
     + Granularity for commands
 
 
+## Preview
+
+### Trucking
+
+![](.github/img/crl2_trucking_marked_truck.png)
+
+
 ## How to build
 
 Fetch the `sampctl` tool for the `pawn` package management.

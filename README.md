@@ -38,6 +38,10 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
 
 ## Preview
 
+### Racing
+
+![](.github/img/crl2_racing_start.jpg)
+
 ### Trucking
 
 ![](.github/img/crl2_trucking_marked_truck.png)

@@ -193,6 +193,6 @@ CREATE TABLE IF NOT EXISTS "properties" (
 	"custom_interior"	INTEGER DEFAULT 0,
 	PRIMARY KEY("id"),
 	FOREIGN KEY("type") REFERENCES "property_types"("id"),
-	FOREIGN KEY("user_id") REFERENCES "users"("id") ON DELETE CASCADE,
+	FOREIGN KEY("user_id") REFERENCES "users"("id"),
 	FOREIGN KEY("vehicle_id") REFERENCES "vehicles"("id")
 );

@@ -1610,6 +1610,9 @@ stock CheckRealEstatePickup(playerid, pickupid)
 										return ShowPlayerDialog(playerid, DIALOG_PROPERTY_RENT, DIALOG_STYLE_INPUT, "Real Estate (Commercial)", stringToPrint, "Rent", "Cancel");
 									}
 
+									if (gProperties[i][LockedUntilTime] > gettime())
+										return SendClientMessage(playerid, COLOR_RED, "[ REAL ] This property is locked until the date shown in the pickup text.");
+
 									new playerName[MAX_PLAYER_NAME];
 									GetOwnerName(gProperties[i][UserID], playerName);
 

@@ -1325,7 +1325,7 @@ stock EditProperty(playerid)
 
 	new query[2048];
 
-	format(query, sizeof(query), "INSERT INTO properties (id, type, user_id, name, cost, occupied, custom_interior, locked_until_timestamp) VALUES (%d, %d, '%s', %d, %d, %d, %d) ON CONFLICT(id) DO UPDATE SET user_id = excluded.user_id, name = excluded.name, cost = excluded.cost, occupied = excluded.occupied, custom_interior = excluded.custom_interior, locked_until_timestamp = excluded.locked_until_timestamp",
+	format(query, sizeof(query), "INSERT INTO properties (id, type, user_id, name, cost, occupied, custom_interior, locked_until_timestamp) VALUES (%d, %d, '%s', %d, %d, %d, %d, %d) ON CONFLICT(id) DO UPDATE SET user_id = excluded.user_id, name = excluded.name, cost = excluded.cost, occupied = excluded.occupied, custom_interior = excluded.custom_interior, locked_until_timestamp = excluded.locked_until_timestamp",
 			gPropertyEdit[playerid][ID],
 			_: gPropertyEdit[playerid][Type],
 			gPropertyEdit[playerid][UserID],

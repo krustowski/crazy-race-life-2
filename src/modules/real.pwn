@@ -504,6 +504,9 @@ stock SpawnProperty(propertyId)
 
 									if (strcmp(playerName, ""))
 									{
+										if (gPropertyCoords[propertyId][i][Text])
+											Delete3DTextLabel(gPropertyCoords[propertyId][i][Text]);
+
 										gPropertyCoords[propertyId][i][Text] = Create3DTextLabel(text, COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false);
 									}
 								}

@@ -479,7 +479,7 @@ stock SpawnProperty(propertyId)
 
 								if (gProperties[propertyId][Occupied])
 								{
-									new playerName[MAX_PLAYER_NAME], text[64];
+									new playerName[MAX_PLAYER_NAME], text[128];
 									GetOwnerName(gProperties[propertyId][UserID], playerName);
 
 									format(text, sizeof(text), "property is rented by %s",

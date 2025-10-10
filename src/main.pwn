@@ -303,6 +303,7 @@ public OnPlayerDisconnect(playerid, reason)
 {
 	StopAudioStreamForPlayer(playerid);
 	gPlayers[playerid][Listening] = false;
+	gPlayers[playerid][AFK] = false;
 
 	// Hide the vehicle velocity game text.
 	//TextDrawHideForPlayer(playerid, KPH[playerid]);

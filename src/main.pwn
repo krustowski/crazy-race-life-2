@@ -1061,6 +1061,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							SetPlayerPos(playerid, -1951.58, 296.77, 41.04);
 							SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] San Fierro WangCars");
 						}
+					case 2:
+						{
+							SetPlayerPos(playerid, 1896.13, -2393.53, 13.11);
+							SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] Los Santos Airport");
+						}
 				}
 
 				return 1;

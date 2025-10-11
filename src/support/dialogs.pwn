@@ -365,9 +365,10 @@ stock ShowPortListDialog(playerid)
 {
 	new portList[256];
 
-	format(portList, sizeof(portList), "%s\n%s",
+	format(portList, sizeof(portList), "%s\n%s\n%s",
 			"Las Venturas Escalators",
-			"San Fierro WangCars"
+			"San Fierro WangCars",
+			"Los Santos Airport"
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_PORT_LIST, DIALOG_STYLE_LIST, "Port List", portList, "Port", "Cancel");

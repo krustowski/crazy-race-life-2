@@ -197,3 +197,11 @@ CREATE TABLE IF NOT EXISTS "properties" (
 	FOREIGN KEY("user_id") REFERENCES "users"("id"),
 	FOREIGN KEY("vehicle_id") REFERENCES "vehicles"("id")
 );
+CREATE TABLE IF NOT EXISTS "atm_coords" (
+	"id"	INTEGER,
+	"x"	REAL NOT NULL,
+	"y"	REAL NOT NULL,
+	"z"	REAL NOT NULL,
+	"comment"	TEXT,
+	PRIMARY KEY("id")
+);

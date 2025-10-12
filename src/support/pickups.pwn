@@ -227,7 +227,8 @@ stock InitTikiPrizes()
 {
 	new i = 0, query[256];
 
-	format(query, sizeof(query), "SELECT id, coord_x, coord_y, coord_z FROM tiki_prizes WHERE hidden = 0");
+	// Type 1 = TIKI
+	format(query, sizeof(query), "SELECT id, x, y, z FROM prize_coords WHERE type = 1 AND hidden = 0");
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
@@ -239,9 +240,9 @@ stock InitTikiPrizes()
 
 	do
 	{
-		X = DB_GetFieldFloatByName(result, "coord_x");
-		Y = DB_GetFieldFloatByName(result, "coord_y");
-		Z = DB_GetFieldFloatByName(result, "coord_z");
+		X = DB_GetFieldFloatByName(result, "x");
+		Y = DB_GetFieldFloatByName(result, "y");
+		Z = DB_GetFieldFloatByName(result, "z");
 
 		gTikiPrizes[i][ID] = DB_GetFieldIntByName(result, "id");
 		gTikiPrizes[i][Pickup] = PICKUP: EnsurePickupCreated(1276, PICKUP_TYPE_NO_RESPAWN, X, Y, Z);

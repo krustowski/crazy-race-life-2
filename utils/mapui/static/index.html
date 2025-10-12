@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>CrazyRaceLife2 POI Map</title>
+	<style>
+		html,
+		body {
+			margin: 0;
+			padding: 0;
+			overflow: hidden;
+			background: #111;
+			font-family: sans-serif;
+			color: #eee;
+		}
+
+		canvas {
+			display: block;
+			cursor: grab;
+		}
+
+		#tooltip {
+			position: absolute;
+			background: rgba(0, 0, 0, 0.8);
+			padding: 4px 8px;
+			border-radius: 5px;
+			pointer-events: none;
+			display: none;
+			font-size: 13px;
+		}
+
+		#sidebar {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 260px;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.9);
+			padding: 12px;
+			overflow-y: auto;
+			box-sizing: border-box;
+		}
+
+		#sidebar h2 {
+			margin-top: 0;
+			font-size: 18px;
+			color: #ffd700;
+		}
+
+		#sidebar input {
+			width: 100%;
+			padding: 6px;
+			margin-bottom: 10px;
+			border: none;
+			border-radius: 5px;
+			background: #222;
+			color: #eee;
+		}
+
+		.property-item {
+			padding: 4px 6px;
+			margin: 2px 0;
+			cursor: pointer;
+			border-radius: 4px;
+		}
+
+		.property-item:hover {
+			background: rgba(255, 255, 255, 0.1);
+		}
+
+	</style>
+</head>
+
+<body>
+	<canvas id="map"></canvas>
+	<div id="tooltip"></div>
+	<div id="sidebar">
+		<h2>Points of Interest</h2>
+		<input id="search" placeholder="Search by name, owner, ID...">
+		<div id="list"></div>
+	</div>
+
+	<script>
+		const canvas = document.getElementById('map');
+		const ctx = canvas.getContext('2d');
+		const tooltip = document.getElementById('tooltip');
+		const sidebar = document.getElementById('sidebar');
+		const searchInput = document.getElementById('search');
+		const listDiv = document.getElementById('list');
+
+		let width = window.innerWidth;
+		let height = window.innerHeight;
+		canvas.width = width;
+		canvas.height = height;
+
+		const img = new Image();
+		img.src = 'gta_sa_map.png';
+
+		let properties = [];
+		let filtered = [];
+		let scale = 0.15;
+		let offsetX = width / 2;
+		let offsetY = height / 2;
+		let isDragging = false;
+		let lastX, lastY;
+
+		img.onload = async () => {
+			const res = await fetch('/data');
+			properties = await res.json();
+			filtered = properties;
+			updateSidebar();
+			draw();
+		};
+
+		function worldToImage(x, y, imgSize) {
+			const scale = imgSize / 6000.0;
+			const ix = (x + 3000.0) * scale;
+			const iy = (3000.0 - y) * scale;
+			return [ix, iy];
+		}
+
+		function draw() {
+			ctx.clearRect(0, 0, width, height);
+			ctx.save();
+			ctx.translate(offsetX, offsetY);
+			ctx.scale(scale, scale);
+			ctx.drawImage(img, -img.width / 2, -img.height / 2);
+
+			for (const p of filtered) {
+				switch (p.type) {
+					case 1: {
+						ctx.fillStyle = "rgba(0, 255, 0, 0.85)";
+
+						if (p.occupied) {
+							ctx.fillStyle = "rgba(255, 0, 0, 0.85)";
+						}
+						break;
+					}
+					case 2: {
+						ctx.fillStyle = "rgba(0, 0, 255, 0.85)";
+						break;
+					}
+					case 3: {
+						ctx.fillStyle = "rgba(255, 255, 0, 0.85)";
+						break;
+					}
+					case 4: {
+						ctx.fillStyle = "rgba(12, 138, 58, 0.85)";
+						break;
+					}
+					case 5: {
+						ctx.fillStyle = "rgba(255, 165 ,0, 0.85)";
+						break;
+					}
+				}
+
+				const [ix, iy] = worldToImage(p.x, p.y, img.width);
+				const px = ix - img.width / 2;
+				const py = iy - img.height / 2;
+				ctx.beginPath();
+				ctx.arc(px, py, 6, 0, Math.PI * 2);
+				ctx.fill();
+			}
+
+			ctx.restore();
+		}
+
+		canvas.addEventListener('mousedown', e => {
+			isDragging = true;
+			lastX = e.clientX;
+			lastY = e.clientY;
+			canvas.style.cursor = "grabbing";
+		});
+		canvas.addEventListener('mouseup', e => {
+			isDragging = false;
+			canvas.style.cursor = "grab";
+		});
+		canvas.addEventListener('mousemove', e => {
+			if (isDragging) {
+				offsetX += e.clientX - lastX;
+				offsetY += e.clientY - lastY;
+				lastX = e.clientX;
+				lastY = e.clientY;
+				draw();
+			} else {
+				showTooltip(e);
+			}
+		});
+		canvas.addEventListener('wheel', e => {
+			const zoom = Math.exp(-e.deltaY * 0.001);
+			scale *= zoom;
+			draw();
+		});
+
+		function showTooltip(e) {
+			const rect = canvas.getBoundingClientRect();
+			const cx = e.clientX - rect.left;
+			const cy = e.clientY - rect.top;
+			const xRel = (cx - offsetX) / scale;
+			const yRel = (cy - offsetY) / scale;
+
+			let hover = null;
+			for (const p of filtered) {
+				const [ix, iy] = worldToImage(p.x, p.y, img.width);
+				const px = ix - img.width / 2;
+				const py = iy - img.height / 2;
+				const dx = xRel - px;
+				const dy = yRel - py;
+				const dist = Math.sqrt(dx * dx + dy * dy);
+				if (dist < 25 / scale) {
+					hover = p;
+					break;
+				}
+			}
+
+			if (hover) {
+				tooltip.style.display = "block";
+				tooltip.style.left = e.clientX + 12 + "px";
+				tooltip.style.top = e.clientY + 12 + "px";
+				tooltip.innerHTML = `
+      <b>#${hover.id}</b> ${hover.name || '(no name)'}<br>
+      ${hover.owner || '(unowned)'}<br>
+      <small>(${hover.x.toFixed(0)}, ${hover.y.toFixed(0)})</small>
+    `;
+			} else {
+				tooltip.style.display = "none";
+			}
+		}
+
+		searchInput.addEventListener('input', () => {
+			const q = searchInput.value.toLowerCase();
+			filtered = properties.filter(p =>
+				p.name.toLowerCase().includes(q) ||
+				p.owner.toLowerCase().includes(q) ||
+				String(p.id).includes(q)
+			);
+			updateSidebar();
+			draw();
+		});
+
+		function updateSidebar() {
+			listDiv.innerHTML = '';
+			for (const p of filtered) {
+				const div = document.createElement('div');
+				div.className = 'property-item';
+				div.textContent = `#${p.id} ${p.name || '(no name)'}`;
+				div.onclick = () => focusProperty(p);
+				listDiv.appendChild(div);
+			}
+		}
+
+		function focusProperty(p) {
+			const [ix, iy] = worldToImage(p.x, p.y, img.width);
+			const px = ix - img.width / 2;
+			const py = iy - img.height / 2;
+			offsetX = width / 2 - px * scale;
+			offsetY = height / 2 - py * scale;
+			draw();
+
+			tooltip.style.display = "block";
+			tooltip.style.left = "280px";
+			tooltip.style.top = "20px";
+			tooltip.innerHTML = `
+    <b>#${p.id}</b> ${p.name}<br>
+    Type: ${p.type}<br>
+    Owner: ${p.owner}<br>
+    <small>(${p.x.toFixed(0)}, ${p.y.toFixed(0)})</small>
+  `;
+		}
+	</script>
+</body>
+
+</html>

@@ -87,16 +87,6 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"properties"	TEXT,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
-CREATE TABLE IF NOT EXISTS "tiki_prizes" (
-	"id"	INTEGER NOT NULL,
-	"name"	TEXT,
-	"comment"	INTEGER,
-	"coord_x"	INTEGER NOT NULL DEFAULT 0.0,
-	"coord_y"	INTEGER NOT NULL DEFAULT 0.0,
-	"coord_z"	INTEGER NOT NULL DEFAULT 0.0,
-	"hidden"	INTEGER NOT NULL DEFAULT 0,
-	PRIMARY KEY("id")
-);
 CREATE TABLE IF NOT EXISTS "truck_type" (
 	"id"	INTEGER NOT NULL,
 	"name"	TEXT,
@@ -204,4 +194,21 @@ CREATE TABLE IF NOT EXISTS "atm_coords" (
 	"z"	REAL NOT NULL,
 	"comment"	TEXT,
 	PRIMARY KEY("id")
+);
+CREATE TABLE IF NOT EXISTS "prize_types" (
+	"id"	INTEGER,
+	"name"	TEXT,
+	PRIMARY KEY("id")
+);
+CREATE TABLE IF NOT EXISTS "prize_coords" (
+	"id"	INTEGER NOT NULL,
+	"type"	INTEGER NOT NULL DEFAULT 0,
+	"name"	TEXT,
+	"comment"	TEXT,
+	"x"	INTEGER NOT NULL DEFAULT 0.0,
+	"y"	INTEGER NOT NULL DEFAULT 0.0,
+	"z"	INTEGER NOT NULL DEFAULT 0.0,
+	"hidden"	INTEGER NOT NULL DEFAULT 0,
+	PRIMARY KEY("id"),
+	FOREIGN KEY("type") REFERENCES "prize_types"("id")
 );

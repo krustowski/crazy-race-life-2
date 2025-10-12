@@ -170,6 +170,7 @@ public OnGameModeInit()
 	//
 
 	InitDB();
+	InitBankLocations();
 	InitDrugValues();
 	InitTeams();
 

@@ -2,53 +2,42 @@
 
 new gBankPickups[MAX_ATM_PICKUPS];
 
-new Float: gBankLocation[][4] = 
+new Float: gBankLocation[19][4];
+
+stock InitBankLocations()
 {
-	// LV
-	{1519.4808, 1053.7301, 10.8203, 15.0},
-	{1481.1512, 2158.1211, 11.0234, 15.0},
-	{2074.4917, 2295.2041, 10.8203, 15.0},
+	new query[128];
 
-	// SF
-	{-1553.97, 1061.80, 6.81, 15.0},
-	{-1940.25, 511.79, 34.79, 15.0},
-	{-1972.70, -851.47, 31.79, 15.0},
+	format(query, sizeof(query), "SELECT id, x, y, z FROM atm_coords");
 
-	// LS
-	{824.43, -1353.66, 13.10, 15.0},
-	{1380.42, -1088.84, 26.94, 15.0},
-	{2748.44, -1466.40, 30.01, 15.0},
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) 
+	{
+		printf("Database error: cannot list ATM coords!");
+		print(query);
 
-	// Bayside near SF
-	{-2477.54, 2323.47, 4.81, 15.0},
+		return 0;
+	}
 
-	// Fort Carson Desert
-	{-178.05, 1110.06, 19.57, 15.0},
+	new i = 0;
 
-	// Las Payasadas Desert
-	{-229.02, 2709.20, 62.54, 15.0},
+	do
+	{
+		gBankLocation[i][0] = DB_GetFieldFloatByName(result, "x");
+		gBankLocation[i][1] = DB_GetFieldFloatByName(result, "y");
+		gBankLocation[i][2] = DB_GetFieldFloatByName(result, "z");
+		gBankLocation[i][3] = 15.0;
 
-	// El Quebrados Desert 
-	{-1509.22, 2593.82, 55.40, 15.0},
+		i++;
+	}
+	while (DB_SelectNextRow(result));
 
-	// Montgomery
-	{1307.16, 307.68, 19.55, 15.0},
+	DB_FreeResultSet(result);
 
-	// Dillymore
-	{648.01, -521.63, 15.90, 15.0},
+	printf("ATM location coords initialized!");
 
-	// Blueberry
-	{191.33, -203.81, 1.28, 15.0},
-
-	// Angel Pine
-	{-2164.11, -2419.21, 30.62, 15.0},
-
-	// Las Barrancas
-	{-827.84, 1503.30, 19.68, 15.0},
-
-	// Palomino Creek
-	{2302.73, -20.05, 26.25, 15.0}
-};
+	return 1;
+}
 
 forward CheckPlayerBankLocation(playerid);
 

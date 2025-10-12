@@ -74,6 +74,19 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
 
 *^ Detail of a detached trailer (decomposing in the sea waters). Custom information text is shown until the trailer is reattached back to the truck registered for the mission.*
 
+### MapUI
+
+MapUI is an util to parse and visualize the database data (coords) on the high-res GTA SA map (source: [reddit](https://www.reddit.com/r/sanandreas/comments/9856u1/high_resolution_map_for_grand_theft_auto_san/)). To run it, go to `utils/mapui` and just run it in console like this:
+
+```shell
+go run main.go
+```
+
+The MapUI tool is the available at [http://localhost:3000](http://localhost:3000).
+
+![](.github/img/crl2_mapui_detail.jpg)
+
+*^ Detailed tooltip for a commercial property in the MapUI util.*
 
 ## How to build
 

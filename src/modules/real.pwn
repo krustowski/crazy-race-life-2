@@ -3,7 +3,7 @@
 //  Real Estate stuff
 //
 
-#define MAX_PROPERTIES		128
+#define MAX_PROPERTIES		256
 #define MAX_PLAYER_PROPERTIES	5
 #define MAX_PROPERTY_SKINS	5
 #define MAX_PROPERTY_PICKUPS	32

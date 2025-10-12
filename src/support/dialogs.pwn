@@ -397,7 +397,7 @@ stock ShowTruckingPointListDialog(playerid)
 
 stock ShowPropertyEditorListPerDialog(playerid)
 {
-	new stringToPrint[2048] = "Property Name\tID";
+	new stringToPrint[3048] = "Property Name\tID";
 
 	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
@@ -416,7 +416,7 @@ stock ShowPropertyEditorListPerDialog(playerid)
 
 stock ShowPropertyEditorListComDialog(playerid)
 {
-	new stringToPrint[2048] = "Property Name\tID";
+	new stringToPrint[3048] = "Property Name\tID";
 
 	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{

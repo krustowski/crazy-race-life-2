@@ -102,7 +102,7 @@ public InitPickups()
 	//  Drugz. Mostly SF.
 	//
 
-	gCocainePackage[0] = EnsurePickupCreated(1575, PICKUP_TYPE_RESPAWN_30_SECONDS, -2117.20, 220.44, 35.22);
+	/*gCocainePackage[0] = EnsurePickupCreated(1575, PICKUP_TYPE_RESPAWN_30_SECONDS, -2117.20, 220.44, 35.22);
 	gCocainePackage[1] = EnsurePickupCreated(1575, PICKUP_TYPE_RESPAWN_30_SECONDS, -2555.85, 23.78, 12.60);
 	gCocainePackage[2] = EnsurePickupCreated(1575, PICKUP_TYPE_RESPAWN_30_SECONDS, -2040.96, 837.46, 55.10);
 	gCocainePackage[3] = EnsurePickupCreated(1575, PICKUP_TYPE_RESPAWN_30_SECONDS, -1807.20, 1334.54, 7.18);
@@ -138,7 +138,7 @@ public InitPickups()
 	gTHCPackage[6] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, 1355.74, 489.17, 20.21);
 	gTHCPackage[7] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, -753.29, -13.55, 65.82);
 	gTHCPackage[8] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, -2186.08, -2321.65, 30.62);
-	gTHCPackage[9] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, -253.64, -2187.54, 28.91);
+	gTHCPackage[9] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, -253.64, -2187.54, 28.91);*/
 
 	switch (random(2))
 	{

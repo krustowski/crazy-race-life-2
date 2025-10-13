@@ -13,6 +13,7 @@
 #include "db/sql.pwn"
 #include "support/dialogs.pwn"
 #include "support/pickups.pwn"
+#include "support/helpers.pwn"
 
 // Exterior pickups
 enum 
@@ -96,14 +97,6 @@ enum
 	FIELD_VEHICLE_COMPONENTS
 }
 
-enum Coords
-{
-       	Float: CoordX,
-       	Float: CoordY,
-       	Float: CoordZ,
-        Float: CoordR
-}
-
 enum PropertyPickup
 {
 	PropertyPoint: PickupType,
@@ -150,7 +143,7 @@ enum Property
 	Menu[5],
 	Pickups[MAX_PROPERTY_PICKUPS],
 
-	Drugs[MAX_DRUGS],
+	Drugs[MAX_DRUG_TYPES],
 	Skins[MAX_PROPERTY_SKINS]
 }
 
@@ -1958,7 +1951,7 @@ stock ShowPlayerDrugzDialog(playerid)
 {
 	new stringToPrint[512] = "Substance/stuff\tIn pockets\tAt home";
 
-	for (new i = 0; i < MAX_DRUGS; i++)
+	for (new i = 0; i < MAX_DRUG_TYPES; i++)
 	{
 		new partial[64], propertyID = gPlayerInteriors[playerid][PropertyArrayID];
 

@@ -262,7 +262,7 @@ dcmd_deal(playerid, const params[])
 
 		SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Drug and stuff list:");
 
-		for (new i = 0; i < MAX_DRUGS; i++)
+		for (new i = 0; i < MAX_DRUG_TYPES; i++)
 		{
 			format(stringToPrint, sizeof(stringToPrint), "-> [ID %2d]: %s (got %d g/pcs)", i, gDrugz[i][DrugName], gPlayers[playerid][Drugs][i]);
 			SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);

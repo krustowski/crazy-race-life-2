@@ -94,6 +94,7 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 #include "modules/auth.pwn"
 #include "modules/real.pwn"
 
+
 //
 //  Trucking subsystem.
 //
@@ -172,6 +173,8 @@ public OnGameModeInit()
 	InitDB();
 	InitBankLocations();
 	InitDrugValues();
+	InitDrugPickups();
+
 	InitTeams();
 
 	InitRealEstateProperties();

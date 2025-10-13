@@ -6,6 +6,14 @@
 #define RC_TANK    	564
 #define RC_CAM      	594
 
+enum Coords
+{
+	Float: CoordX,
+       	Float: CoordY,
+       	Float: CoordZ,
+       	Float: CoordR
+}
+
 new const GAMEMODE_CREDITS[] = "krusty, kompry, DRaGsTeR, amdulka";
 
 forward AutosaveData();

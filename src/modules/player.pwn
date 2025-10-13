@@ -54,7 +54,7 @@ enum Player
 	bool: DialogShown,
 	bool: Listening,
 
-	Drugs[MAX_DRUGS],
+	Drugs[MAX_DRUG_TYPES],
 	Properties[MAX_PLAYER_PROPERTIES],
 
 	Temp,
@@ -441,6 +441,38 @@ stock SetPlayerVehicleNitro(playerid, targetid)
 
 	SendClientMessage(playerid, COLOR_GREY, "[ i ] The Nitrous component installed for the player!");
 	SendClientMessage(targetid, COLOR_LIGHTGREEN, stringToPrint);
+
+	return 1;
+}
+
+stock DepositMoneyToBankAccount(playerid, amount)
+{
+	if (amount > GetPlayerMoney(playerid))
+		return SendClientMessage(playerid, COLOR_RED, "[ ATM ] Invalid amount!");
+
+	gPlayers[playerid][Bank] += amount;
+	GivePlayerMoney(playerid, -amount);
+
+	new stringToPrint[256];
+
+	format(stringToPrint, sizeof(stringToPrint), "[ ATM ] Cash deposit: $%d! Account balance: $%d!", amount, gPlayers[playerid][Bank]);
+	SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
+
+	return 1;
+}
+
+stock WithdrawMoneyFromBankAccount(playerid, amount)
+{
+	if (amount > gPlayers[playerid][Bank])
+		return SendClientMessage(playerid, COLOR_RED, "[ ATM ] Invalid amount!");
+
+	gPlayers[playerid][Bank] -= amount;
+	GivePlayerMoney(playerid, amount);
+
+	new stringToPrint[256];
+
+	format(stringToPrint, sizeof(stringToPrint), "[ ATM ] Cash withdrawal: $%d! Account balance: $%d!", amount, gPlayers[playerid][Bank]);
+	SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
 
 	return 1;
 }

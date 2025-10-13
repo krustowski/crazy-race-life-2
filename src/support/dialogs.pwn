@@ -291,7 +291,7 @@ stock ShowPlayerPocketDrugzDialog(playerid)
 {
 	new stringToPrint[512] = "Substance/stuff\tIn pockets";
 
-	for (new i = 0; i < MAX_DRUGS; i++)
+	for (new i = 0; i < MAX_DRUG_TYPES; i++)
 	{
 		new partial[64];
 

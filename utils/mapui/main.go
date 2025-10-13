@@ -180,6 +180,33 @@ func main() {
 
 		rows.Close()
 
+		// Teams
+		rows, err = db.Query("SELECT c.id AS id, t.name AS name, c.X, c.Y FROM team_coords AS c JOIN teams AS t ON t.id = c.team_id")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		for rows.Next() {
+			var p Property
+			if err := rows.Scan(&p.ID, &p.Name, &p.X, &p.Y); err != nil {
+				log.Println(err)
+				continue
+			}
+
+			if p.ID == 0 {
+				continue
+			}
+
+			p.ID += 600
+			p.Name = fmt.Sprint("Team: ", p.Name)
+			p.Type = 8
+
+			props = append(props, p)
+		}
+
+		rows.Close()
+
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(props)
 	})

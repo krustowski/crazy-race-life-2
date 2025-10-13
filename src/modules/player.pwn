@@ -476,3 +476,23 @@ stock WithdrawMoneyFromBankAccount(playerid, amount)
 
 	return 1;
 }
+
+stock CheckDrugzPickup(playerid, pickupid)
+{
+	for (new i = 0; i < MAX_DRUG_PICKUPS; i++)
+	{
+		if (pickupid != gDrugPickups[i][Pickup])
+		{
+			continue;
+		}
+
+		new amount = random(10), type = _: gDrugPickups[i][Type], stringToPrint[128];
+
+		gPlayers[playerid][Drugs][type - 1] += amount;
+
+		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Just found %d g of %s.", amount, gDrugz[type - 1][DrugName]);
+		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
+	}
+
+	return 1;
+}

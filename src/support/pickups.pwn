@@ -42,14 +42,6 @@ new gHackerzMoneyBag;
 new gAdminDoorDown;
 new gAdminDoorUp;
 
-// Drugz
-new gHeroinPackage[5];
-new gCocainePackage[5];
-new gMethPackage[6];
-new gFentPackage[2];
-new gPCPPackage;
-new gTHCPackage[10];
-
 new gDruggery;
 new gDruggeryEntrance;
 new gDruggeryExit;
@@ -99,46 +91,8 @@ public InitPickups()
 	}
 
 	//
-	//  Drugz. Mostly SF.
+	//  Drugz.
 	//
-
-	/*gCocainePackage[0] = EnsurePickupCreated(1575, PICKUP_TYPE_RESPAWN_30_SECONDS, -2117.20, 220.44, 35.22);
-	gCocainePackage[1] = EnsurePickupCreated(1575, PICKUP_TYPE_RESPAWN_30_SECONDS, -2555.85, 23.78, 12.60);
-	gCocainePackage[2] = EnsurePickupCreated(1575, PICKUP_TYPE_RESPAWN_30_SECONDS, -2040.96, 837.46, 55.10);
-	gCocainePackage[3] = EnsurePickupCreated(1575, PICKUP_TYPE_RESPAWN_30_SECONDS, -1807.20, 1334.54, 7.18);
-	gCocainePackage[4] = EnsurePickupCreated(1575, PICKUP_TYPE_RESPAWN_30_SECONDS, -2045.62, 975.51, 54.24);
-
-	gHeroinPackage[0] = EnsurePickupCreated(1577, PICKUP_TYPE_RESPAWN_30_SECONDS, -1664.19, 1010.74, 7.49);
-	gHeroinPackage[1] = EnsurePickupCreated(1577, PICKUP_TYPE_RESPAWN_30_SECONDS, -2457.18, -96.09, 25.99);
-	gHeroinPackage[2] = EnsurePickupCreated(1577, PICKUP_TYPE_RESPAWN_30_SECONDS, -1955.88, 766.31, 55.72);
-	gHeroinPackage[3] = EnsurePickupCreated(1577, PICKUP_TYPE_RESPAWN_30_SECONDS, -1725.84, 1243.85, 7.54);
-	gHeroinPackage[4] = EnsurePickupCreated(1577, PICKUP_TYPE_RESPAWN_30_SECONDS, -2708.04, 1459.45, 6.68);
-
-	gMethPackage[0] = EnsurePickupCreated(1579, PICKUP_TYPE_RESPAWN_30_SECONDS, -97.97, -1587.09, 2.61);
-	gMethPackage[1] = EnsurePickupCreated(1579, PICKUP_TYPE_RESPAWN_30_SECONDS, -2515.70, 300.41, 28.97);
-	gMethPackage[2] = EnsurePickupCreated(1579, PICKUP_TYPE_RESPAWN_30_SECONDS, -2563.58, 324.83, 10.56);
-	gMethPackage[3] = EnsurePickupCreated(1579, PICKUP_TYPE_RESPAWN_30_SECONDS, -2186.31, 695.96, 53.89);
-	gMethPackage[4] = EnsurePickupCreated(1579, PICKUP_TYPE_RESPAWN_30_SECONDS, -2449.87, 968.84, 44.86);
-	gMethPackage[5] = EnsurePickupCreated(1579, PICKUP_TYPE_RESPAWN_30_SECONDS, 1297.00, 352.67, 19.12);
-
-	gFentPackage[0] = EnsurePickupCreated(1580, PICKUP_TYPE_RESPAWN_30_SECONDS, -2213.43, 109.71, 35.32);
-	gFentPackage[1] = EnsurePickupCreated(1580, PICKUP_TYPE_RESPAWN_30_SECONDS, -2720.09, 75.78, 4.33);
-
-	gPCPPackage = EnsurePickupCreated(1576, PICKUP_TYPE_RESPAWN_30_SECONDS, -2635.15, 957.42, 70.21);
-
-	// Venkov (farmy a mala mesta)
-	gTHCPackage[0] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, -1110.3, -1678.59, 76.37);
-	gTHCPackage[1] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, -369.97, -1417.48, 25.72);
-	gTHCPackage[2] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, -80.83, -1212.65, 2.70);
-	// Blueberry
-	gTHCPackage[3] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, 203.83, 36.10, 2.57);
-	// Palomino Creeks 
-	gTHCPackage[4] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, 2317.25, -68.27, 26.48);
-	gTHCPackage[5] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, 2243.21, -86.33, 26.49);
-	gTHCPackage[6] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, 1355.74, 489.17, 20.21);
-	gTHCPackage[7] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, -753.29, -13.55, 65.82);
-	gTHCPackage[8] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, -2186.08, -2321.65, 30.62);
-	gTHCPackage[9] = EnsurePickupCreated(1578, PICKUP_TYPE_RESPAWN_30_SECONDS, -253.64, -2187.54, 28.91);*/
 
 	switch (random(2))
 	{

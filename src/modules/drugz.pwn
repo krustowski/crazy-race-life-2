@@ -155,3 +155,4 @@ stock InitDrugPickups()
 	}
 	while(DB_SelectNextRow(result));
 }
+

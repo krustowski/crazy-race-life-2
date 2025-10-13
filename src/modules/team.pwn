@@ -66,9 +66,9 @@ forward InitTeams();
 
 public InitTeams()
 {
-	new i = 1, query[512];
+	new i = 0, query[512];
 
-	gTeams[0] = gTeamNone;
+	//gTeams[0] = gTeamNone;
 
 	format(query, sizeof(query), "SELECT id,name,color,skins,weapons,ammu,salary_base_dollars,salary_volatile_dollars FROM teams");
 

@@ -116,33 +116,46 @@ public InitPickups()
 	//  Jobs/Teams.
 	//
 
-	new Float: teamPickups[][3] = 
-	{
-		{0.0, 0.0, 0.0},
-		{2252.11, 1285.30, 19.17},
-		{2304.43, 1151.95, 85.94},
-		{2290.73, 2429.61, 10.82},
-		{2637.36, 1127.04, 11.18},
-		{2620.14, 1195.76, 10.81},
-		{2892.8, -2127.9, 3.2},
-		{2101.70, -1810.05, 13.55},
-		{2838.10, -2130.26, 0.19},
-		{2582.10, -956.28, 81.02}
-	};
+	new query[256];
 
-	for (new i = 0; i < MAX_TEAMS; i++)
+	format(query, sizeof(query), "SELECT c.team_id, c.x, c.y, c.z FROM team_coords AS c JOIN teams AS t ON t.id = c.team_id");
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) 
 	{
-		gTeams[i][Pickups][0] = PICKUP: EnsurePickupCreated(1581, 1, Float:teamPickups[i][0], Float:teamPickups[i][1], Float:teamPickups[i][2]);
+		printf("Database error: cannot list team coords");
+		print(query);
+
+		return 0;
+	}
+
+	new i = 0;
+
+	do
+	{
+		new name[64],
+			Float: X,
+			Float: Y,
+			Float: Z;
+
+		X = DB_GetFieldFloatByName(result, "x");
+		Y = DB_GetFieldFloatByName(result, "y");
+		Z = DB_GetFieldFloatByName(result, "z");
+
+		DB_GetFieldStringByName(result, "name", name, sizeof(name));
+
+		gTeams[i][Pickups][0] = PICKUP: EnsurePickupCreated(1581, 1, X, Y, Z);
 		gTeams[i][Menus][0] = CreateMenu(gTeams[i][TeamName], 1, 150.0, 100.0, 250.0, 150.0);
 
-		new menuItem[64];
-
-		format(menuItem, sizeof(menuItem), "%s", gTeams[i][TeamName]);
-
-		AddMenuItem(gTeams[i][Menus][0], 0, menuItem);
+		AddMenuItem(gTeams[i][Menus][0], 0, "Join team");
 		AddMenuItem(gTeams[i][Menus][0], 0, "Leave team");
 		AddMenuItem(gTeams[i][Menus][0], 0, "Cancel");
+		
+		i++;
 	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
 
 	/*NEMOVITOSTI*/
 
@@ -171,6 +184,8 @@ public InitPickups()
  	CreatePickup(1318,1,-1899.01,486.52,35.17); //do baraku
 
 	/*NEMOVITOSTI*/
+
+	return 1;
 }
 
 //

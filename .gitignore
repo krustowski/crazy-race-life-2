@@ -6,3 +6,4 @@ samp-npc
 server.cfg
 plugins/*
 log-core.so
+*/*/crl2_data.db

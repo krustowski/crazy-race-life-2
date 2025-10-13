@@ -153,6 +153,33 @@ func main() {
 
 		rows.Close()
 
+		// Drugz
+		rows, err = db.Query("SELECT c.id AS id, p.name AS name, c.type AS type, c.x, c.y FROM drug_coords AS c JOIN drug_prices AS p ON p.id = c.type ")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		for rows.Next() {
+			var p Property
+			if err := rows.Scan(&p.ID, &p.Name, &p.Type, &p.X, &p.Y); err != nil {
+				log.Println(err)
+				continue
+			}
+
+			if p.ID == 0 {
+				continue
+			}
+
+			p.ID += 500
+			p.Name = fmt.Sprint("Drugz: ", p.Name)
+			p.Type = 7
+
+			props = append(props, p)
+		}
+
+		rows.Close()
+
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(props)
 	})

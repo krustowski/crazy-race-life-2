@@ -226,3 +226,12 @@ CREATE TABLE IF NOT EXISTS "drug_coords" (
 	PRIMARY KEY("id"),
 	FOREIGN KEY("type") REFERENCES "drug_types"("id")
 );
+CREATE TABLE IF NOT EXISTS "team_coords" (
+	"id"	INTEGER,
+	"team_id"	INTEGER NOT NULL,
+	"x"	REAL,
+	"y"	REAL,
+	"z"	REAL,
+	PRIMARY KEY("id"),
+	FOREIGN KEY("team_id") REFERENCES "teams"("id")
+);

@@ -361,7 +361,7 @@ public OnPlayerSpawn(playerid)
 
 	if (gPlayers[playerid][TeamID])
 	{
-		SetPlayerColor(playerid, gTeams[ gPlayers[playerid][TeamID] ][Color]);
+		SetPlayerColor(playerid, gTeams[ gPlayers[playerid][TeamID] - 1 ][Color]);
 	}
 
 	if (gPlayers[playerid][InsideProperty])
@@ -526,7 +526,7 @@ public OnPlayerText(playerid, text[])
 		for (new i = 0; i < MAX_PLAYERS; i++)
 		{
 			if (IsPlayerConnected(i) && gPlayers[i][TeamID] == gPlayers[playerid][TeamID])
-				SendClientMessage(i, gTeams[ gPlayers[i][TeamID] ][Color], stringToPrint);
+				SendClientMessage(i, gTeams[ gPlayers[i][TeamID] - 1 ][Color], stringToPrint);
 		}
 
 		return 0;
@@ -2011,11 +2011,14 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	//  Various jobs/teams pickups.
 	//
 
-	for (new i = 0; i < sizeof(gTeams); i++)
+	for (new i = 0; i < MAX_TEAMS; i++)
 	{
-		if (pickupid == _: gTeams[i][Pickups][0])
+		for (new j = 0; i < MAX_TEAM_PICKUPS; j++)
 		{
-			ShowMenuForPlayer(Menu:gTeams[i][Menus][0], playerid);
+			if (pickupid == _: gTeams[i][Pickups][j])
+			{
+				ShowMenuForPlayer(Menu:gTeams[i][Menus][0], playerid);
+			}
 		}
 	}
 

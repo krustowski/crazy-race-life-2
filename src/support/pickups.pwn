@@ -28,6 +28,7 @@
 #define PICKUP_HOUSE_RED 			19522
 
 #include "modules/bank.pwn"
+#include "modules/team.pwn"
 
 //
 //  Global static team objects.
@@ -118,7 +119,7 @@ public InitPickups()
 
 	new query[256];
 
-	format(query, sizeof(query), "SELECT c.team_id, c.x, c.y, c.z FROM team_coords AS c JOIN teams AS t ON t.id = c.team_id");
+	format(query, sizeof(query), "SELECT c.team_id, c.x, c.y, c.z FROM team_coords AS c JOIN teams AS t ON t.id = c.team_id ORDER BY c.team_id ASC");
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
@@ -129,11 +130,12 @@ public InitPickups()
 		return 0;
 	}
 
-	new i = 0;
+	new team_id = 0, pickupid = 0;
 
 	do
 	{
-		new name[64],
+		new id = 0, 
+		    name[64],
 			Float: X,
 			Float: Y,
 			Float: Z;
@@ -142,16 +144,28 @@ public InitPickups()
 		Y = DB_GetFieldFloatByName(result, "y");
 		Z = DB_GetFieldFloatByName(result, "z");
 
+		id = DB_GetFieldIntByName(result, "team_id");
+
 		DB_GetFieldStringByName(result, "name", name, sizeof(name));
 
-		gTeams[i][Pickups][0] = PICKUP: EnsurePickupCreated(1581, 1, X, Y, Z);
-		gTeams[i][Menus][0] = CreateMenu(gTeams[i][TeamName], 1, 150.0, 100.0, 250.0, 150.0);
+		if (id == team_id)
+		{
+			pickupid++;
+		}
+		else
+		{
+			pickupid = 0;
+		}
 
-		AddMenuItem(gTeams[i][Menus][0], 0, "Join team");
-		AddMenuItem(gTeams[i][Menus][0], 0, "Leave team");
-		AddMenuItem(gTeams[i][Menus][0], 0, "Cancel");
-		
-		i++;
+		gTeams[id - 1][Pickups][pickupid] = PICKUP: EnsurePickupCreated(1581, 1, X, Y, Z);
+		gTeams[id - 1][Menus][0] = CreateMenu(gTeams[id - 1][TeamName], 1, 150.0, 100.0, 250.0, 150.0);
+
+		AddMenuItem(gTeams[id - 1][Menus][0], 0, "Join team");
+		AddMenuItem(gTeams[id - 1][Menus][0], 0, "Leave team");
+		AddMenuItem(gTeams[id - 1][Menus][0], 0, "Cancel");
+
+		team_id = id;
+
 	}
 	while (DB_SelectNextRow(result));
 

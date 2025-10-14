@@ -207,6 +207,33 @@ func main() {
 
 		rows.Close()
 
+		// Pumpkin prizes
+		rows, err = db.Query("SELECT id, x, y FROM prize_coords WHERE type = 2")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		for rows.Next() {
+			var p Property
+			if err := rows.Scan(&p.ID, &p.X, &p.Y); err != nil {
+				log.Println(err)
+				continue
+			}
+
+			if p.ID == 0 {
+				continue
+			}
+
+			p.ID += 700
+			p.Name = fmt.Sprint("Pumpkin: ", p.Name)
+			p.Type = 9
+
+			props = append(props, p)
+		}
+
+		rows.Close()
+
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(props)
 	})

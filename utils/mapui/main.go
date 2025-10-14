@@ -35,7 +35,8 @@ type User struct {
 }
 
 type Claims struct {
-	UserID int `json:"user_id"`
+	UserID     int `json:"user_id"`
+	AdminLevel int `json:"admin_level"`
 	jwt.RegisteredClaims
 }
 
@@ -126,6 +127,12 @@ func withAuth(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		claims := token.Claims.(*Claims)
+
+		if claims.AdminLevel < 4 {
+			http.Error(w, "Admin level too low", http.StatusLocked)
+			return
+		}
+
 		r.Header.Set("X-User-ID", string(rune(claims.UserID)))
 		next(w, r)
 	}
@@ -138,10 +145,11 @@ func hashPassword(password, salt string) string {
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	var (
-		creds User
-		id    int
-		hash  string
-		salt  string
+		creds    User
+		id       int
+		hash     string
+		salt     string
+		adminLvl int
 	)
 	json.NewDecoder(r.Body).Decode(&creds)
 
@@ -150,8 +158,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := db.QueryRow("SELECT id, pwdhash, salt FROM users WHERE nickname = ?", creds.Nickname).
-		Scan(&id, &hash, &salt); err != nil {
+	if err := db.QueryRow("SELECT id, pwdhash, salt, adminlvl FROM users WHERE nickname = ?", creds.Nickname).
+		Scan(&id, &hash, &salt, &adminLvl); err != nil {
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
@@ -163,7 +171,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 	expiration := time.Now().Add(time.Hour * 2)
 	token := jwt.NewWithClaims(jwt.SigningMethodES256, Claims{
-		UserID: id,
+		UserID:     id,
+		AdminLevel: adminLvl,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiration),
 		},

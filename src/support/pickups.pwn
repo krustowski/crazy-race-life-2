@@ -277,12 +277,13 @@ stock UpdatePrize(playerid, prizeid)
 	{
 		case PRIZE_TIKI:
 			{
-				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TIKI ] You have found the tiki prize ($10M)! Cg");
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ PRIZE ] You have found the tiki prize ($10M)! Cg");
 				GivePlayerMoney(playerid, 10000000);
 			}
 		case PRIZE_PUMPKIN:
 			{
-				//
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ PRIZE ] You have found the pumpkin prize ($1.5M)! Cg");
+				GivePlayerMoney(playerid, 1500000);
 			}
 	}
 

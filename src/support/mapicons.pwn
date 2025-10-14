@@ -151,7 +151,38 @@ public AddMapicons(playerid)
 				{
 					SetPlayerMapIcon(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_PIZZA, 0, MAPICON_LOCAL);
 				}
+			case TEAM_DEALERS:
+				{
+					SetPlayerMapIcon(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_MADD_DOGG, 0, MAPICON_LOCAL);
+				}
 		}
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	// Trucking.
+
+	format(query, sizeof(query), "SELECT x, y, z FROM trucking_coords WHERE type = 2");
+
+	result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		printf("Database error: cannot list trucking points for mapicons!");
+		print(query);
+
+		return 0;
+	}
+
+	do 
+	{
+		new Float: X, Float: Y, Float: Z;
+
+		X = DB_GetFieldFloatByName(result, "x");
+		Y = DB_GetFieldFloatByName(result, "y");
+		Z = DB_GetFieldFloatByName(result, "z");
+
+		SetPlayerMapIcon(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
 	}
 	while (DB_SelectNextRow(result));
 

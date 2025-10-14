@@ -520,13 +520,15 @@ public OnPlayerText(playerid, text[])
 	{
 		new stringToPrint[256];
 
-		text[0] = '\0';
-		format(stringToPrint, sizeof(stringToPrint), "%s [Team Chat]: %s", gPlayers[playerid][Name], text);
+		text[0] = ' ';
+		format(stringToPrint, sizeof(stringToPrint), "%s [Team Chat]:%s", gPlayers[playerid][Name], text);
 
 		for (new i = 0; i < MAX_PLAYERS; i++)
 		{
 			if (IsPlayerConnected(i) && gPlayers[i][TeamID] == gPlayers[playerid][TeamID])
+			{
 				SendClientMessage(i, gTeams[ gPlayers[i][TeamID] - 1 ][Color], stringToPrint);
+			}
 		}
 
 		return 0;

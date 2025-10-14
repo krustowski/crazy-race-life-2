@@ -5,7 +5,7 @@
 #define PICKUP_TYPE_RESPAWN_AFTER_DEATH		3
 #define PICKUP_TYPE_NO_RESPAWN			19 
 
-#define MAX_TIKI_PRIZES 			5
+#define MAX_PRIZES 				16
 
 #define PICKUP_INFO				1239
 #define PICKUP_HEART				1240
@@ -15,7 +15,7 @@
 #define PICKUP_HOUSE_GREEN			1273
 #define PICKUP_DOLLAR				1274
 #define PICKUP_SHIRT				1275
-#define PICUKP_TIKI				1276
+#define PICKUP_TIKI				1276
 #define PICKUP_ARROW				1318
 #define PICKUP_DRUG_WHITE			1575
 #define PICKUP_DRUG_ORANGE			1576
@@ -52,13 +52,21 @@ new gPlayerMoneyPickupAmount[MAX_PLAYERS];
 
 //new gPlayerWeaponPickup[MAX_PLAYERS];
 
-enum Tiki
+enum PrizeType
+{
+	PRIZE_NONE,
+	PRIZE_TIKI,
+	PRIZE_PUMPKIN
+}
+
+enum Prize
 {
 	ID,
+	PrizeType: Type,
 	PICKUP: Pickup
 }
 
-new gTikiPrizes[MAX_TIKI_PRIZES][Tiki];
+new gPrizes[MAX_PRIZES][Prize];
 
 //
 //
@@ -68,7 +76,7 @@ forward InitPickups();
 
 public InitPickups()
 {
-	InitTikiPrizes();
+	InitPrizes();
 
 	gAdminRoomHealth = EnsurePickupCreated(1240, 1, 2302.85, 1155.93, 85.94);
 
@@ -206,16 +214,15 @@ public InitPickups()
 //
 //
 
-stock InitTikiPrizes()
+stock InitPrizes()
 {
 	new i = 0, query[256];
 
-	// Type 1 = TIKI
-	format(query, sizeof(query), "SELECT id, x, y, z FROM prize_coords WHERE type = 1 AND hidden = 0");
+	format(query, sizeof(query), "SELECT id, type, x, y, z FROM prize_coords WHERE hidden = 0");
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
-		print("Database error: cannot load tiki coords!");
+		print("Database error: cannot load prize coords!");
 		return 0;
 	}
 
@@ -227,35 +234,57 @@ stock InitTikiPrizes()
 		Y = DB_GetFieldFloatByName(result, "y");
 		Z = DB_GetFieldFloatByName(result, "z");
 
-		gTikiPrizes[i][ID] = DB_GetFieldIntByName(result, "id");
-		gTikiPrizes[i][Pickup] = PICKUP: EnsurePickupCreated(1276, PICKUP_TYPE_NO_RESPAWN, X, Y, Z);
+		gPrizes[i][ID] = DB_GetFieldIntByName(result, "id");
+		gPrizes[i][Type] = PrizeType: DB_GetFieldIntByName(result, "type");
+
+		switch (gPrizes[i][Type])
+		{
+			case PRIZE_TIKI:
+				{
+					gPrizes[i][Pickup] = PICKUP: EnsurePickupCreated(PICKUP_TIKI, PICKUP_TYPE_NO_RESPAWN, X, Y, Z);
+				}
+			case PRIZE_PUMPKIN:
+				{
+					gPrizes[i][Pickup] = PICKUP: EnsurePickupCreated(PICKUP_PUMPKIN, PICKUP_TYPE_NO_RESPAWN, X, Y, Z);
+				}
+		}
 
 		i++;
 	}
 	while (DB_SelectNextRow(result));
 
 	DB_FreeResultSet(result);
-	print("Tiki prizes initialized!");
+	print("Prizes initialized!");
 
 	return 1;
 }
 
-stock UpdateTikiPrize(playerid, tikiid)
+stock UpdatePrize(playerid, prizeid)
 {
 	new query[128];
 
-	format(query, sizeof(query), "UPDATE tiki_prizes SET hidden = 1 WHERE id = %d", gTikiPrizes[tikiid][ID]);
+	format(query, sizeof(query), "UPDATE prize_coords SET hidden = 1 WHERE id = %d", gPrizes[prizeid][ID]);
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
-		print("Database error: cannot write tiki update!");
+		print("Database error: cannot write prize update!");
 		return 0;
 	}
 
 	DB_FreeResultSet(result);
 
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TIKI ] You have found the tiki prize ($10M)! Cg");
-	GivePlayerMoney(playerid, 10000000);
+	switch (gPrizes[prizeid][Type])
+	{
+		case PRIZE_TIKI:
+			{
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TIKI ] You have found the tiki prize ($10M)! Cg");
+				GivePlayerMoney(playerid, 10000000);
+			}
+		case PRIZE_PUMPKIN:
+			{
+				//
+			}
+	}
 
 	return 1;
 }

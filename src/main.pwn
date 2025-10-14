@@ -2058,11 +2058,11 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		SetPlayerPos(playerid, dX, dY, dZ);
 	}
 
-	for (new i = 0; i < MAX_TIKI_PRIZES; i++)
+	for (new i = 0; i < MAX_PRIZES; i++)
 	{
-		if (PICKUP: pickupid == gTikiPrizes[i][Pickup])
+		if (PICKUP: pickupid == gPrizes[i][Pickup])
 		{
-			UpdateTikiPrize(playerid, i);
+			UpdatePrize(playerid, i);
 			break;
 		}
 	}

@@ -20,6 +20,13 @@
 			cursor: grab;
 		}
 
+		input,
+		button {
+			width: 100%;
+			margin-bottom: 8px;
+			padding: 6px;
+		}
+
 		#tooltip {
 			position: absolute;
 			background: rgba(0, 0, 0, 0.8);
@@ -76,9 +83,19 @@
 	<canvas id="map"></canvas>
 	<div id="tooltip"></div>
 	<div id="sidebar">
-		<h2>Points of Interest</h2>
-		<input id="search" placeholder="Search by name, owner, ID...">
-		<div id="list"></div>
+		<div id="login">
+			<h3>Login</h3>
+			<input id="username" placeholder="Username">
+			<input id="password" type="password" placeholder="Password">
+			<button onclick="login()">Login</button>
+			<p id="loginMsg"></p>
+		</div>
+
+		<div id="properties" style="display: none;">
+			<h2>Points of Interest</h2>
+			<input id="search" placeholder="Search by name, owner, ID...">
+			<div id="list"></div>
+		</div>
 	</div>
 
 	<script>
@@ -105,13 +122,15 @@
 		let isDragging = false;
 		let lastX, lastY;
 
-		img.onload = async () => {
-			const res = await fetch('/data');
+		/*img.onload = async () => {
+			const res = await fetch('/api/data');
+			if (!res.ok) return alert('Not authorized.');
+
 			properties = await res.json();
 			filtered = properties;
 			updateSidebar();
 			draw();
-		};
+		};*/
 
 		function worldToImage(x, y, imgSize) {
 			const scale = imgSize / 6000.0;
@@ -283,6 +302,33 @@
     Owner: ${p.owner}<br>
     <small>(${p.x.toFixed(0)}, ${p.y.toFixed(0)})</small>
   `;
+
+		}
+		async function login() {
+			const username = document.getElementById('username').value;
+			const password = document.getElementById('password').value;
+			const res = await fetch('/api/login', {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({username, password})
+			});
+			if (res.ok) {
+				document.getElementById('login').style.display = 'none';
+				document.getElementById('properties').style.display = 'block';
+				loadProperties();
+			} else {
+				document.getElementById('loginMsg').innerText = 'Invalid credentials.';
+			}
+		}
+
+		async function loadProperties() {
+			const res = await fetch('/api/data');
+			if (!res.ok) return alert('Not authorized.');
+
+			properties = await res.json();
+			filtered = properties;
+			updateSidebar();
+			draw();
 		}
 	</script>
 </body>

@@ -1,15 +1,43 @@
 package main
 
 import (
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
+	"crypto/sha256"
+	"crypto/x509"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
+	"encoding/pem"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strings"
+	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	_ "modernc.org/sqlite"
 )
+
+var (
+	db        *sql.DB
+	signKey   *ecdsa.PrivateKey
+	verifyKey *ecdsa.PublicKey
+)
+
+type User struct {
+	ID       int    `json:"id"`
+	Nickname string `json:"username"`
+	Password string `json:"password"`
+	Salt     string `json:"salt"`
+}
+
+type Claims struct {
+	UserID int `json:"user_id"`
+	jwt.RegisteredClaims
+}
 
 type Property struct {
 	ID       int     `json:"id"`
@@ -22,221 +50,19 @@ type Property struct {
 }
 
 func main() {
-	db, err := sql.Open("sqlite", "crl2_data.db")
+	var err error
+
+	db, err = sql.Open("sqlite", "crl2_data.db")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
+	loadOrGenerateKeys()
+
 	http.Handle("/", http.FileServer(http.Dir("./static")))
-
-	http.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
-		// Properties
-		rows, err := db.Query(`SELECT p.id AS id, p.type AS type, p.name AS name, p.occupied AS occupied, u.nickname AS nickname, c.primary_x, c.primary_y FROM properties AS p JOIN property_coords AS c ON c.property_id = p.id JOIN users AS u ON u.id = p.user_id WHERE c.type = 8 ORDER BY p.id`)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		var props []Property
-		for rows.Next() {
-			var p Property
-			if err := rows.Scan(&p.ID, &p.Type, &p.Name, &p.Occupied, &p.Owner, &p.X, &p.Y); err != nil {
-				log.Println(err)
-				continue
-			}
-			props = append(props, p)
-		}
-
-		rows.Close()
-
-		// Trucking Points
-		rows, err = db.Query("SELECT p.id AS id, p.type AS type, p.name AS name, c.x, c.y FROM trucking_points AS p JOIN trucking_coords AS c ON c.trucking_id = p.id WHERE c.type = 2")
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		for rows.Next() {
-			var p Property
-			if err := rows.Scan(&p.ID, &p.Type, &p.Name, &p.X, &p.Y); err != nil {
-				log.Println(err)
-				continue
-			}
-
-			if p.ID == 0 {
-				continue
-			}
-
-			p.ID += 100
-			p.Type = 3
-
-			props = append(props, p)
-		}
-
-		rows.Close()
-
-		// ATMs
-		rows, err = db.Query("SELECT id, x, y, comment FROM atm_coords")
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		for rows.Next() {
-			var p Property
-			if err := rows.Scan(&p.ID, &p.X, &p.Y, &p.Name); err != nil {
-				log.Println(err)
-				continue
-			}
-
-			p.ID += 200
-			p.Name = fmt.Sprint("ATM: ", p.Name)
-			p.Type = 4
-
-			props = append(props, p)
-		}
-
-		rows.Close()
-
-		// Races
-		rows, err = db.Query("SELECT id, name, start_x, start_y FROM races")
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		for rows.Next() {
-			var p Property
-			if err := rows.Scan(&p.ID, &p.Name, &p.X, &p.Y); err != nil {
-				log.Println(err)
-				continue
-			}
-
-			if p.ID == 0 {
-				continue
-			}
-
-			p.ID += 300
-			p.Name = fmt.Sprint("Race: ", p.Name)
-			p.Type = 5
-
-			props = append(props, p)
-		}
-
-		rows.Close()
-
-		// Tiki prizes
-		rows, err = db.Query("SELECT id, x, y FROM prize_coords WHERE type = 1")
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		for rows.Next() {
-			var p Property
-			if err := rows.Scan(&p.ID, &p.X, &p.Y); err != nil {
-				log.Println(err)
-				continue
-			}
-
-			if p.ID == 0 {
-				continue
-			}
-
-			p.ID += 400
-			p.Name = fmt.Sprint("Tiki: ", p.Name)
-			p.Type = 6
-
-			props = append(props, p)
-		}
-
-		rows.Close()
-
-		// Drugz
-		rows, err = db.Query("SELECT c.id AS id, p.name AS name, c.type AS type, c.x, c.y FROM drug_coords AS c JOIN drug_prices AS p ON p.id = c.type ")
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		for rows.Next() {
-			var p Property
-			if err := rows.Scan(&p.ID, &p.Name, &p.Type, &p.X, &p.Y); err != nil {
-				log.Println(err)
-				continue
-			}
-
-			if p.ID == 0 {
-				continue
-			}
-
-			p.ID += 500
-			p.Name = fmt.Sprint("Drugz: ", p.Name)
-			p.Type = 7
-
-			props = append(props, p)
-		}
-
-		rows.Close()
-
-		// Teams
-		rows, err = db.Query("SELECT c.id AS id, t.name AS name, c.X, c.Y FROM team_coords AS c JOIN teams AS t ON t.id = c.team_id")
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		for rows.Next() {
-			var p Property
-			if err := rows.Scan(&p.ID, &p.Name, &p.X, &p.Y); err != nil {
-				log.Println(err)
-				continue
-			}
-
-			if p.ID == 0 {
-				continue
-			}
-
-			p.ID += 600
-			p.Name = fmt.Sprint("Team: ", p.Name)
-			p.Type = 8
-
-			props = append(props, p)
-		}
-
-		rows.Close()
-
-		// Pumpkin prizes
-		rows, err = db.Query("SELECT id, x, y FROM prize_coords WHERE type = 2")
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		for rows.Next() {
-			var p Property
-			if err := rows.Scan(&p.ID, &p.X, &p.Y); err != nil {
-				log.Println(err)
-				continue
-			}
-
-			if p.ID == 0 {
-				continue
-			}
-
-			p.ID += 700
-			p.Name = fmt.Sprint("Pumpkin: ", p.Name)
-			p.Type = 9
-
-			props = append(props, p)
-		}
-
-		rows.Close()
-
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(props)
-	})
+	http.HandleFunc("/api/login", loginHandler)
+	http.HandleFunc("/api/data", withAuth(gameDataHandler))
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -245,4 +71,321 @@ func main() {
 
 	log.Printf("Server started at http://localhost:%s", port)
 	http.ListenAndServe(":"+port, nil)
+}
+
+func loadOrGenerateKeys() {
+	if _, err := os.Stat("ecdsa_private.pem"); err == nil {
+		fmt.Println("Loading existing ECDSA keypair...")
+		loadKeysFromDisk()
+		return
+	}
+
+	fmt.Println("Generating new ECDSA keypair...")
+	priv, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	signKey = priv
+	verifyKey = &priv.PublicKey
+
+	saveKeysToDisk()
+}
+
+func saveKeysToDisk() {
+	privBytes, _ := x509.MarshalECPrivateKey(signKey)
+	privPem := pem.EncodeToMemory(&pem.Block{Type: "EC PRIVATE KEY", Bytes: privBytes})
+	os.WriteFile("ecdsa_private.pem", privPem, 0600)
+
+	pubBytes, _ := x509.MarshalPKIXPublicKey(verifyKey)
+	pubPem := pem.EncodeToMemory(&pem.Block{Type: "PUBLIC KEY", Bytes: pubBytes})
+	os.WriteFile("ecdsa_public.pem", pubPem, 0644)
+}
+
+func loadKeysFromDisk() {
+	privPem, _ := os.ReadFile("ecdsa_private.pem")
+	block, _ := pem.Decode(privPem)
+	priv, _ := x509.ParseECPrivateKey(block.Bytes)
+	signKey = priv
+	verifyKey = &priv.PublicKey
+}
+
+func withAuth(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie("token")
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		token, err := jwt.ParseWithClaims(cookie.Value, &Claims{}, func(t *jwt.Token) (any, error) {
+			if _, ok := t.Method.(*jwt.SigningMethodECDSA); !ok {
+				return nil, fmt.Errorf("Unexpected signing method: %v", t.Header["alg"])
+			}
+			return verifyKey, nil
+		})
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		claims := token.Claims.(*Claims)
+		r.Header.Set("X-User-ID", string(rune(claims.UserID)))
+		next(w, r)
+	}
+}
+
+func hashPassword(password, salt string) string {
+	h := sha256.Sum256([]byte(password + salt))
+	return strings.ToUpper(hex.EncodeToString(h[:]))
+}
+
+func loginHandler(w http.ResponseWriter, r *http.Request) {
+	var (
+		creds User
+		id    int
+		hash  string
+		salt  string
+	)
+	json.NewDecoder(r.Body).Decode(&creds)
+
+	if creds.Nickname == "" {
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		return
+	}
+
+	if err := db.QueryRow("SELECT id, pwdhash, salt FROM users WHERE nickname = ?", creds.Nickname).
+		Scan(&id, &hash, &salt); err != nil {
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		return
+	}
+
+	if hashPassword(creds.Password, salt) != hash {
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		return
+	}
+
+	expiration := time.Now().Add(time.Hour * 2)
+	token := jwt.NewWithClaims(jwt.SigningMethodES256, Claims{
+		UserID: id,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expiration),
+		},
+	})
+	tokenString, err := token.SignedString(signKey)
+	if err != nil {
+		http.Error(w, "JWT Signing Error: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    tokenString,
+		Path:     "/",
+		HttpOnly: true,
+	})
+}
+
+func gameDataHandler(w http.ResponseWriter, r *http.Request) {
+	// Properties
+	rows, err := db.Query(`SELECT p.id AS id, p.type AS type, p.name AS name, p.occupied AS occupied, u.nickname AS nickname, c.primary_x, c.primary_y FROM properties AS p JOIN property_coords AS c ON c.property_id = p.id JOIN users AS u ON u.id = p.user_id WHERE c.type = 8 ORDER BY p.id`)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var props []Property
+	for rows.Next() {
+		var p Property
+		if err := rows.Scan(&p.ID, &p.Type, &p.Name, &p.Occupied, &p.Owner, &p.X, &p.Y); err != nil {
+			log.Println(err)
+			continue
+		}
+		props = append(props, p)
+	}
+
+	rows.Close()
+
+	// Trucking Points
+	rows, err = db.Query("SELECT p.id AS id, p.type AS type, p.name AS name, c.x, c.y FROM trucking_points AS p JOIN trucking_coords AS c ON c.trucking_id = p.id WHERE c.type = 2")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for rows.Next() {
+		var p Property
+		if err := rows.Scan(&p.ID, &p.Type, &p.Name, &p.X, &p.Y); err != nil {
+			log.Println(err)
+			continue
+		}
+
+		if p.ID == 0 {
+			continue
+		}
+
+		p.ID += 100
+		p.Type = 3
+
+		props = append(props, p)
+	}
+
+	rows.Close()
+
+	// ATMs
+	rows, err = db.Query("SELECT id, x, y, comment FROM atm_coords")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for rows.Next() {
+		var p Property
+		if err := rows.Scan(&p.ID, &p.X, &p.Y, &p.Name); err != nil {
+			log.Println(err)
+			continue
+		}
+
+		p.ID += 200
+		p.Name = fmt.Sprint("ATM: ", p.Name)
+		p.Type = 4
+
+		props = append(props, p)
+	}
+
+	rows.Close()
+
+	// Races
+	rows, err = db.Query("SELECT id, name, start_x, start_y FROM races")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for rows.Next() {
+		var p Property
+		if err := rows.Scan(&p.ID, &p.Name, &p.X, &p.Y); err != nil {
+			log.Println(err)
+			continue
+		}
+
+		if p.ID == 0 {
+			continue
+		}
+
+		p.ID += 300
+		p.Name = fmt.Sprint("Race: ", p.Name)
+		p.Type = 5
+
+		props = append(props, p)
+	}
+
+	rows.Close()
+
+	// Tiki prizes
+	rows, err = db.Query("SELECT id, x, y FROM prize_coords WHERE type = 1")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for rows.Next() {
+		var p Property
+		if err := rows.Scan(&p.ID, &p.X, &p.Y); err != nil {
+			log.Println(err)
+			continue
+		}
+
+		if p.ID == 0 {
+			continue
+		}
+
+		p.ID += 400
+		p.Name = fmt.Sprint("Tiki: ", p.Name)
+		p.Type = 6
+
+		props = append(props, p)
+	}
+
+	rows.Close()
+
+	// Drugz
+	rows, err = db.Query("SELECT c.id AS id, p.name AS name, c.type AS type, c.x, c.y FROM drug_coords AS c JOIN drug_prices AS p ON p.id = c.type ")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for rows.Next() {
+		var p Property
+		if err := rows.Scan(&p.ID, &p.Name, &p.Type, &p.X, &p.Y); err != nil {
+			log.Println(err)
+			continue
+		}
+
+		if p.ID == 0 {
+			continue
+		}
+
+		p.ID += 500
+		p.Name = fmt.Sprint("Drugz: ", p.Name)
+		p.Type = 7
+
+		props = append(props, p)
+	}
+
+	rows.Close()
+
+	// Teams
+	rows, err = db.Query("SELECT c.id AS id, t.name AS name, c.X, c.Y FROM team_coords AS c JOIN teams AS t ON t.id = c.team_id")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for rows.Next() {
+		var p Property
+		if err := rows.Scan(&p.ID, &p.Name, &p.X, &p.Y); err != nil {
+			log.Println(err)
+			continue
+		}
+
+		if p.ID == 0 {
+			continue
+		}
+
+		p.ID += 600
+		p.Name = fmt.Sprint("Team: ", p.Name)
+		p.Type = 8
+
+		props = append(props, p)
+	}
+
+	rows.Close()
+
+	// Pumpkin prizes
+	rows, err = db.Query("SELECT id, x, y FROM prize_coords WHERE type = 2")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for rows.Next() {
+		var p Property
+		if err := rows.Scan(&p.ID, &p.X, &p.Y); err != nil {
+			log.Println(err)
+			continue
+		}
+
+		if p.ID == 0 {
+			continue
+		}
+
+		p.ID += 700
+		p.Name = fmt.Sprint("Pumpkin: ", p.Name)
+		p.Type = 9
+
+		props = append(props, p)
+	}
+
+	rows.Close()
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(props)
 }

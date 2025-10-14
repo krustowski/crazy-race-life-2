@@ -2136,7 +2136,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		return 1;
 	}
 
-	for (new i = 0; i < sizeof(gTeams); i++)
+	for (new i = 0; i < MAX_TEAMS; i++)
 	{
 		if (currentMenu == gTeams[i][Menus][0])
 		{

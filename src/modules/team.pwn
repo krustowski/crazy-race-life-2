@@ -11,7 +11,7 @@
 enum 
 {
 	TEAM_NONE,
-	TEAM_LAMES,
+	TEAM_MECHANICS,
 	TEAM_ADMINZ,
 	TEAM_POLICE,
 	TEAM_TRUCKERS,
@@ -38,7 +38,7 @@ enum Team
 
 new gTeams[MAX_TEAMS][Team];
 
-new gTeamNone[Team] = 
+/*new gTeamNone[Team] = 
 {
 	0,
 	"Blank team (stub)",
@@ -48,7 +48,7 @@ new gTeamNone[Team] =
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	0,
 	0
-};
+};*/
 
 enum 
 {

@@ -72,13 +72,15 @@ forward AddMapicons(playerid);
 
 public AddMapicons(playerid)
 {
+	new mapiconid = 0;
+
 	// The very global spawn point in LV.
-	SetPlayerMapIcon(playerid, 0, 2323.73, 1283.18, 97.60, E_MAPICON_ID_ENEMY_ATTACK, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, mapiconid++, 2323.73, 1283.18, 97.60, E_MAPICON_ID_ENEMY_ATTACK, 0, MAPICON_LOCAL);
 
 	// ATMs.
 	for (new i = 0; i < sizeof(gBankLocation); i++)
 	{
-		SetPlayerMapIcon(playerid, i+1, Float:gBankLocation[i][0], Float:gBankLocation[i][1], Float:gBankLocation[i][2], E_MAPICON_ID_ROBBERY, 0, MAPICON_LOCAL);
+		SetPlayerMapIcon(playerid, mapiconid++, Float:gBankLocation[i][0], Float:gBankLocation[i][1], Float:gBankLocation[i][2], E_MAPICON_ID_ROBBERY, 0, MAPICON_LOCAL);
 	}
 
 	// Race start points.
@@ -92,31 +94,76 @@ public AddMapicons(playerid)
 			Float: pY = gRaces[i][Start][E_RACE_COORD_Y],
 			Float: pZ = gRaces[i][Start][E_RACE_COORD_Z];
 
-		SetPlayerMapIcon(playerid, 50 + i - 1, pX, pY, pZ, E_MAPICON_ID_RACE_TOURNAMENT, 0, MAPICON_LOCAL);
+		SetPlayerMapIcon(playerid, mapiconid++, pX, pY, pZ, E_MAPICON_ID_RACE_TOURNAMENT, 0, MAPICON_LOCAL);
 	}
 
 	// Housing.
 
 	// Las Barrancas
-	SetPlayerMapIcon(playerid, 30, -846.13, 1567.15, 24.63, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, mapiconid++, -846.13, 1567.15, 24.63, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
 
 	// Octane Springs
-	SetPlayerMapIcon(playerid, 31, 776.62, 1986.97, 5.33, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, mapiconid++, 776.62, 1986.97, 5.33, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
 
-	SetPlayerMapIcon(playerid, 32, -2686.03, 205.63, 3.96, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, 33, -1497.76, 2671.87, 55.25, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, 34, 756.10, 332.78, 19.99, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, 35, 730.69, -538.99, 16.33, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, 36, -2803.74, -127.57, 6.84, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, 37, 248.99, -294.65, 1.34, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, 38, -210.51, 2751.34, 62.20, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, mapiconid++, -2686.03, 205.63, 3.96, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, mapiconid++, -1497.76, 2671.87, 55.25, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, mapiconid++, 756.10, 332.78, 19.99, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, mapiconid++, 730.69, -538.99, 16.33, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, mapiconid++, -2803.74, -127.57, 6.84, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, mapiconid++, 248.99, -294.65, 1.34, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, mapiconid++, -210.51, 2751.34, 62.20, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
 
 	// Jobs.
-	SetPlayerMapIcon(playerid, 40, 970.7, 2155.0, 10.8, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, 41, 2287.1, 2426.7, 10.8, E_MAPICON_ID_POLICE, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, 42, -91.76, -305.44, 1.42, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, 43, -81.32, -1135.79, 0.91, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
+
+	new query[256];
+
+	format(query, sizeof(query), "SELECT c.team_id, c.x, c.y, c.z FROM team_coords AS c JOIN teams AS t ON t.id = c.team_id ORDER BY c.team_id ASC");
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) 
+	{
+		printf("Database error: cannot list team coords");
+		print(query);
+
+		return 0;
+	}
+
+	do
+	{
+		new Float: X, Float: Y, Float: Z, team_id;
+
+		X = DB_GetFieldFloatByName(result, "x");
+		Y = DB_GetFieldFloatByName(result, "y");
+		Z = DB_GetFieldFloatByName(result, "z");
+		team_id = DB_GetFieldIntByName(result, "team_id");
+
+		switch (team_id)
+		{
+			case TEAM_MECHANICS:
+				{
+					SetPlayerMapIcon(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_PAY_N_SPRAY, 0, MAPICON_LOCAL);
+				}
+			case TEAM_POLICE:
+				{
+					SetPlayerMapIcon(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_POLICE, 0, MAPICON_LOCAL);
+				}
+			case TEAM_PIZZAGUYS:
+				{
+					SetPlayerMapIcon(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_PIZZA, 0, MAPICON_LOCAL);
+				}
+		}
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	/*SetPlayerMapIcon(playerid, 40, 970.7, 2155.0, 10.8, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
+	  SetPlayerMapIcon(playerid, 41, 2287.1, 2426.7, 10.8, E_MAPICON_ID_POLICE, 0, MAPICON_LOCAL);
+	  SetPlayerMapIcon(playerid, 42, -91.76, -305.44, 1.42, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
+	  SetPlayerMapIcon(playerid, 43, -81.32, -1135.79, 0.91, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);*/
 
 	// Airports.
-	SetPlayerMapIcon(playerid, 60, 414.3, 2528.1, 16.6, E_MAPICON_ID_AIRYARD, 0, MAPICON_LOCAL);
+	//SetPlayerMapIcon(playerid, 60, 414.3, 2528.1, 16.6, E_MAPICON_ID_AIRYARD, 0, MAPICON_LOCAL);
+
+	return 1;
 }

@@ -2013,7 +2013,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 	for (new i = 0; i < MAX_TEAMS; i++)
 	{
-		for (new j = 0; i < MAX_TEAM_PICKUPS; j++)
+		for (new j = 0; j < MAX_TEAM_PICKUPS; j++)
 		{
 			if (pickupid == _: gTeams[i][Pickups][j])
 			{
@@ -2040,6 +2040,12 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	//
 
 	CheckRealEstatePickup(playerid, pickupid);
+
+	//
+	//  Drugz.
+	//
+
+	CheckDrugzPickup(playerid, pickupid);
 
 	//
 	//  Other pickups --- entries,  baggies etc.
@@ -2087,12 +2093,6 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	{
 		SetPlayerPos(playerid, 981.84, -1158.15, 23.86);
 	}
-
-	//
-	//  Drugz.
-	//
-
-	CheckDrugzPickup(playerid, pickupid);
 
 	//
 	//  Death pickups.

@@ -154,5 +154,7 @@ stock InitDrugPickups()
 		i++;
 	}
 	while(DB_SelectNextRow(result));
+
+	print("Drug pickups initialized!");
 }
 

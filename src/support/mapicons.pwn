@@ -147,6 +147,10 @@ public AddMapicons(playerid)
 				{
 					SetPlayerMapIcon(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_POLICE, 0, MAPICON_LOCAL);
 				}
+			case TEAM_TAXIMEN:
+				{
+					SetPlayerMapIcon(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_CAR_IMPOUND, 0, MAPICON_LOCAL);
+				}
 			case TEAM_PIZZAGUYS:
 				{
 					SetPlayerMapIcon(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_PIZZA, 0, MAPICON_LOCAL);

@@ -4,6 +4,34 @@ forward InitVehicles();
 
 public InitVehicles()
 {
+	// Taxi SF 
+	AddStaticVehicle(420, -1986.96, 120.03, 27.38, 0.0, -1, -1);
+	AddStaticVehicle(420, -1987.37, 128.51, 27.39, 0.0, -1, -1);
+	AddStaticVehicle(420, -1987.45, 136.94, 27.39, 0.0, -1, -1);
+	
+	AddStaticVehicle(420, -1423.44, -296.03, 13.85, 49.02, -1, -1);
+	AddStaticVehicle(420, -1430.25, -290.73, 13.85, 53.78, -1, -1);
+
+	// Taxi LV
+	AddStaticVehicle(420, 1429.19, 2609.62, 10.52, 111.12, -1, -1);
+	AddStaticVehicle(420, 1439.24, 2609.41, 10.52, 111.12, -1, -1);
+
+	AddStaticVehicle(420, 2833.63, 1258.51, 10.77, 0.0, -1, -1);
+	AddStaticVehicle(420, 2833.47, 1265.94, 10.78, 0.0, -1, -1);
+
+	AddStaticVehicle(420, 1716.28, 1472.79, 10.52, 258.99, -1, -1);
+	AddStaticVehicle(420, 1719.37, 1482.69, 10.52, 258.99, -1, -1);
+
+	// Taxi LS
+	AddStaticVehicle(420, 1670.27, -2248.74, 13.24, 172.99, -1, -1);
+	AddStaticVehicle(420, 1661.39, -2249.57, 13.21, 172.99, -1, -1);
+
+	AddStaticVehicle(420, 1774.76, -1914.67, 13.24, 225.46, -1, -1);
+	AddStaticVehicle(420, 1774.78, -1909.17, 13.24, 225.46, -1, -1);
+
+	AddStaticVehicle(420, 823.28, -1332.25, 13.24, 225.46, -1, -1);
+	AddStaticVehicle(420, 832.52, -1332.17, 13.26, 225.46, -1, -1);
+
 	// El Quebrados desert cart race
 	AddStaticVehicle(568, -1498.64, 1972.45, 48.42, 273.59, -1, -1);
 	AddStaticVehicle(568, -1498.40, 1975.67, 48.42, 271.60, -1, -1);

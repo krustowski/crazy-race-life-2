@@ -32,6 +32,9 @@ public InitVehicles()
 	AddStaticVehicle(420, 823.28, -1332.25, 13.24, 225.46, -1, -1);
 	AddStaticVehicle(420, 832.52, -1332.17, 13.26, 225.46, -1, -1);
 
+	// Tram SF 
+	AddStaticVehicle(449, -2006.57, 150.48, 27.10, 334.54, -1, -1);
+
 	// El Quebrados desert cart race
 	AddStaticVehicle(568, -1498.64, 1972.45, 48.42, 273.59, -1, -1);
 	AddStaticVehicle(568, -1498.40, 1975.67, 48.42, 271.60, -1, -1);

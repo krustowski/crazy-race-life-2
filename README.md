@@ -21,7 +21,7 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
     + Hidden on pick up automatically
 + Racing
     + Custom races all across the map
-    + Air and ground
+    + Air, ground and naval
     + Stunts
 + Real Estate
     + Custom spawn point

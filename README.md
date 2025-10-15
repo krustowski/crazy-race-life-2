@@ -33,6 +33,7 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
     + Custom salary per team 
     + Special commands available
     + Custom weapons
+    + Team chat using the exclamation mark at the beginning of a message (e.g. `!message`)
 + Trucking
     + 15+ trucking points (petrol stations etc)
     + Custom missions

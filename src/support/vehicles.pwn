@@ -36,7 +36,8 @@ public InitVehicles()
 	AddStaticVehicle(449, -2006.57, 150.48, 27.10, 334.54, -1, -1);
 
 	// Bayside boat race 
-	AddStaticVehicle(452, -2227.32, 2402.30, -0.66, 271.84, -1, -1);
+	AddStaticVehicle(452, -2227.32, 2402.30, 0.00, 42.27, -1, -1);
+	AddStaticVehicle(452, -2251.92, 2427.81, 0.00, 225.45, -1, -1);
 
 	// El Quebrados desert cart race
 	AddStaticVehicle(568, -1498.64, 1972.45, 48.42, 273.59, -1, -1);

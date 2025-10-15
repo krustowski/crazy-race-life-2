@@ -304,7 +304,7 @@ stock ShowPlayerPocketDrugzDialog(playerid)
 
 stock ShowRaceListDialog(playerid)
 {
-	new stringToPrint[512] = "Race ID and Name\tCost ($)\tPrize ($)";
+	new stringToPrint[1024] = "Race ID and Name\tCost ($)\tPrize ($)";
 
 	for (new i = 1; i < MAX_RACE_COUNT; i++)
 	{

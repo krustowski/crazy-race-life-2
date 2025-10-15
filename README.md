@@ -18,7 +18,7 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
     + Call a service (car mechanic, pizza delivery, taxi ride, ...)
 + Prizes
     + Tiki ($10M) and Pumpkin ($1.5M) pickups
-    + Hidden on pickups automatically
+    + Hidden on pick up automatically
 + Racing
     + Custom races all across the map
     + Air and ground

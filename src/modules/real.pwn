@@ -578,35 +578,36 @@ stock LoadPlayerProperties(playerid)
 
 stock IsPlayerOwner(playerid, propertyId)
 {
-	/*new query[256];
+	new query[256];
 
-	  format(query, sizeof(query), "SELECT vehicle_id FROM properties WHERE user_id = %d AND occupied = 1 AND id = %d", 
-	  gPlayers[playerid][OrmID], 
-	  propertyId
-	  );
+	format(query, sizeof(query), "SELECT occupied FROM properties WHERE user_id = %d AND occupied = 1 AND id = %d", 
+			gPlayers[playerid][OrmID], 
+			propertyId
+	      );
 
-	  new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	  if (!result) 
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) 
+	{
+		printf("Database error: cannot verify property ownership (ID: %d)!", propertyId);
+		return false;
+	}
+
+	if (DB_GetRowCount(result))
+	{
+		DB_FreeResultSet(result);
+		return true;
+	}
+
+	DB_FreeResultSet(result);
+	return false;
+
+	/*for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
 	  {
-	  printf("Database error: cannot verify property ownership (ID: %d)!", propertyId);
-	  return false;
-	  }
-
-	  if (DB_GetRowCount(result))
-	  {
-	  DB_FreeResultSet(result);
+	  if (gPlayers[playerid][Properties][i] == propertyId)
 	  return true;
 	  }
 
-	  DB_FreeResultSet(result);*/
-
-	for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
-	{
-		if (gPlayers[playerid][Properties][i] == propertyId)
-			return true;
-	}
-
-	return false;
+	  return false;*/
 }
 
 stock SaveRealEstateData()
@@ -1018,7 +1019,7 @@ stock RentProperty(playerid, propertyID)
 	format(query, sizeof(query), "UPDATE properties SET user_id = %d, occupied = 1 WHERE id = %d",
 			gPlayers[playerid][OrmID],
 			propertyID
-		);
+	      );
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
@@ -1580,7 +1581,7 @@ stock CheckRealEstatePickup(playerid, pickupid)
 				case OFFER_POINT:
 					{
 						if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
-								return 1;
+							return 1;
 
 						switch (gProperties[i][Type])
 						{
@@ -1593,7 +1594,9 @@ stock CheckRealEstatePickup(playerid, pickupid)
 									}
 
 									if (!IsPlayerOwner(playerid, gProperties[i][ID]))
+									{
 										return SendClientMessage(playerid, COLOR_RED, "[ REAL ] This property has been already sold.");
+									}
 
 									format(stringToPrint, sizeof(stringToPrint), "Property '%s' is owned by you.\n\nCurrent value: $%d (%.2f mio)\n\n\nProperty code: %d\n\nThe selling fee is set to 10% of the property value.\nEnter its code to sell this property:", gProperties[i][Label], gProperties[i][Cost], float(gProperties[i][Cost]) / 1000000, gProperties[i][ID]);
 									return ShowPlayerDialog(playerid, DIALOG_PROPERTY_SELL, DIALOG_STYLE_INPUT, "Real Estate", stringToPrint, "Sell", "Cancel");
@@ -1606,8 +1609,15 @@ stock CheckRealEstatePickup(playerid, pickupid)
 										return ShowPlayerDialog(playerid, DIALOG_PROPERTY_RENT, DIALOG_STYLE_INPUT, "Real Estate (Commercial)", stringToPrint, "Rent", "Cancel");
 									}
 
+									if (IsPlayerOwner(playerid, gProperties[i][ID]))
+									{
+										return SendClientMessage(playerid, COLOR_YELLOW, "[ REAL ] You have already rented this property!");
+									}
+
 									if (gProperties[i][LockedUntilTime] > gettime())
+									{
 										return SendClientMessage(playerid, COLOR_RED, "[ REAL ] This property is locked until the date shown in the pickup text.");
+									}
 
 									new playerName[MAX_PLAYER_NAME];
 									GetOwnerName(gProperties[i][UserID], playerName);
@@ -1744,11 +1754,13 @@ stock AttachVehicleToProperty(playerid, propertyid)
 			DestroyVehicle(gProperties[i][Vehicle][ID]);
 		}
 
-		new 
-			Float: pX = gPropertyCoords[i][vehiclePickupID][Primary][CoordX],
-			Float: pY = gPropertyCoords[i][vehiclePickupID][Primary][CoordY],
-			Float: pZ = gPropertyCoords[i][vehiclePickupID][Primary][CoordZ],
-			Float: pR = gPropertyCoords[i][vehiclePickupID][Primary][CoordR];
+		new Float: pX, Float: pY, Float: pZ, Float: pR;
+
+		pX = gPropertyCoords[i][vehiclePickupID][Primary][CoordX],
+		pY = gPropertyCoords[i][vehiclePickupID][Primary][CoordY],
+		pZ = gPropertyCoords[i][vehiclePickupID][Primary][CoordZ],
+		pR = gPropertyCoords[i][vehiclePickupID][Primary][CoordR];
+
 
 		gProperties[i][Vehicle][ID] = CreateVehicle(modelId, pX, pY, pZ, pR, colour1, colour2, -1);
 
@@ -1884,6 +1896,17 @@ stock DeletePropertySkin(playerid, skinid)
 			gProperties[arrayid][ID],
 			gProperties[arrayid][Skins][skinid]
 	      );
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) {
+		SendClientMessage(playerid, COLOR_RED, "[ REAL ] Database error!");
+		printf("Database error: cannot write property data)!");
+		print(query);
+
+		return 0;
+	}
+
+	DB_FreeResultSet(result);
 
 	gProperties[arrayid][Skins][skinid] = 0;
 	return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] Selected skin model deleted successfully!");

@@ -701,9 +701,20 @@ stock ShowPlayerAccountDialog(playerid)
 {
 	new stringToPrint[256];
 
+	new team_name[64];
+
+	if (gPlayers[playerid][TeamID])
+	{
+		format(team_name, sizeof(team_name), "%s", gTeams[ gPlayers[playerid][TeamID] - 1 ][TeamName]);
+	}
+	else
+	{
+		team_name = "None";
+	}
+
 	format(stringToPrint, sizeof(stringToPrint), "Account details:\n\n{FFFFFF}Cash: \t\t{00FF00}${FFD700}%d{FFFFFF}\nTeam: \t\t{FFD700}%s{FFFFFF} (ID: {FFD700}%d{FFFFFF})\nSkin ID:\t\t{FFD700}%d{FFFFFF}\nAdmin level: \t{FFD700}%d{FFFFFF}\nWanted level: \t{FFD700}%d{FFFFFF}",
 			GetPlayerMoney(playerid),
-			gTeams[ gPlayers[playerid][TeamID] - 1 ][TeamName],
+			team_name,
 			gPlayers[playerid][TeamID],
 			GetPlayerSkin(playerid),
 			gPlayers[playerid][AdminLevel],

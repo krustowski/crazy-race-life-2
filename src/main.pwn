@@ -2009,6 +2009,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 {
 	CheckRaceCheckpoint(playerid);
 	CheckTruckingCheckpoint(playerid);
+	CheckTaxiMissionCheckpoint(playerid);
 
 	return 1;
 }

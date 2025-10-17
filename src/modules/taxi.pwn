@@ -181,7 +181,7 @@ stock SetTaxiMissionCheckpoint(playerid)
 
 stock SetTaxiMissionCustomer(playerid)
 {
-	if (gTaxiMission[playerid][NPCid])
+	if (gTaxiMission[playerid][NPCid] > -1)
 	{
 		return 1;
 	}
@@ -231,6 +231,7 @@ stock SetPlayerTaxiMission(playerid)
 	SetTaxiMissionCustomer(playerid);
 
 	gTaxiMission[playerid][Active] = true;
+	gTaxiMission[playerid][NPCid] = -1;
 	gTaxiMission[playerid][TimerCheckNearNPC] = SetTimerEx("CheckTaxiNearNPC", 1500, true, "i", playerid);
 	gTaxiMission[playerid][TimerUpdate] = SetTimerEx("UpdateTaxiMissionInfoText", 1000, true, "i", playerid);
 
@@ -266,6 +267,7 @@ stock AbortPlayerTaxiMission(playerid)
 	gTaxiMission[playerid][Earned] = 0;
 	gTaxiMission[playerid][TimeElapsed] = 0;
 
+	DisablePlayerRaceCheckpoint(playerid);
 	TextDrawHideForPlayer(playerid, gTaxiMission[playerid][InfoText]);
 
 	GameTextForPlayer(playerid, "~w~Taxi Mission ~r~Aborted", 3000, 3); 

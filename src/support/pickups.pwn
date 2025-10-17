@@ -45,6 +45,8 @@ new gAdminDoorUp;
 
 new gDruggery;
 new gDruggeryEntrance;
+
+#pragma unused gDruggeryExit
 new gDruggeryExit;
 
 new gPlayerMoneyPickup[MAX_PLAYERS];

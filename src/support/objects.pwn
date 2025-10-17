@@ -2,7 +2,6 @@
 //  Global static objects.
 //
 
-new gAdminAuto;
 new gAdminElevator;
 
 //

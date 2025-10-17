@@ -38,7 +38,7 @@ public EnterVehicleTimer(npcid)
 		return 1;
 	}
 
-	if (GetVehicleModel(vehicleid) != 420)
+	if (GetVehicleModel(vehicleid) != 420 && GetVehicleModel(vehicleid) != 438)
 	{
 		return 1;
 	}
@@ -52,24 +52,16 @@ public EnterVehicleTimer(npcid)
 		return 1;
 	}
 
-	new Float: dX, Float: dY, Float: dZ, Float: veolcity[3];
+	KillTimer(gTaxiEnterTimer[npcid]);
 
-	GetPlayerPos(driverid, dX, dY, dZ);
-	GetVehicleVelocity(vehicleid, veolcity[0], veolcity[1], veolcity[2]);
+	NPC_EnterVehicle(npcid, vehicleid, 3, NPC_MOVE_TYPE: 1);
 
-	if (IsPlayerInSphere(gTaxiMission[driverid][NPCid], dX, dY, dZ, 10.0) && veolcity[0] == 0.0 && veolcity[1] == 0.0)
+	while (NPC_IsEnteringVehicle(npcid))
+	{}
+
+	if (!SetTaxiMissionCheckpoint(driverid))
 	{
-		KillTimer(gTaxiEnterTimer[npcid]);
-
-		NPC_EnterVehicle(npcid, vehicleid, 3, NPC_MOVE_TYPE: 1);
-
-		while (NPC_IsEnteringVehicle(npcid))
-		{}
-
-		if (!SetTaxiMissionCheckpoint(driverid))
-		{
-			return SendClientMessage(driverid, COLOR_RED, "[ TAXI ] Error setting new taxi mission!");
-		}
+		return SendClientMessage(driverid, COLOR_RED, "[ TAXI ] Error setting new taxi mission!");
 	}
 
 	return 1;
@@ -77,7 +69,7 @@ public EnterVehicleTimer(npcid)
 
 public ExitVehicleTimer(npcid)
 {
-	NPC_Spawn(npcid);
+	//NPC_Spawn(npcid);
 
 	return 1;
 }
@@ -107,6 +99,8 @@ public CheckTaxiNearNPC(playerid)
 
 		SendClientMessage(playerid, COLOR_YELLOW, "[ TAXI ] Telling NPC to enter the vehicle...");
 		SetPVarInt(gTaxiMission[playerid][NPCid], "VehicleToEnter", vehicleid);
+
+		gTaxiEnterTimer[gTaxiMission[playerid][NPCid]] = SetTimerEx("EnterVehicleTimer", 1000, true, "i", gTaxiMission[playerid][NPCid]);
 	}
 
 	return 1;
@@ -125,7 +119,7 @@ public UpdateTaxiMissionInfoText(playerid)
 			{}
 
 		default:
-			format(stringToPrint, sizeof(stringToPrint), "~w~Done:___________~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:______~b~%2d~y~:~b~%2d", gTaxiMission[playerid][DoneCount], gTaxiMission[playerid][Earned], floatround(floatround(gTaxiMission[playerid][TimeElapsed] / 1000) / 60), floatround(gTaxiMission[playerid][TimeElapsed] / 1000) % 60);
+			format(stringToPrint, sizeof(stringToPrint), "~w~Done:_____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:___~b~%2d~y~:~b~%2d", gTaxiMission[playerid][DoneCount], gTaxiMission[playerid][Earned], floatround(floatround(gTaxiMission[playerid][TimeElapsed] / 1000) / 60), floatround(gTaxiMission[playerid][TimeElapsed] / 1000) % 60);
 	}
 
 	TextDrawSetString(gTaxiMission[playerid][InfoText], stringToPrint);
@@ -154,6 +148,7 @@ stock CheckTaxiMissionCheckpoint(playerid)
 	gTaxiMission[playerid][TimeElapsed] = 0;
 
 	SetTaxiMissionCustomer(playerid);
+
 	gTaxiMission[playerid][TimerCheckNearNPC] = SetTimerEx("CheckTaxiNearNPC", 1500, true, "i", playerid);
 
 	return 1;
@@ -161,20 +156,72 @@ stock CheckTaxiMissionCheckpoint(playerid)
 
 stock SetTaxiMissionCheckpoint(playerid)
 {
-	new Float: X, Float: Y, Float: Z;
+	new Float: X, Float: Y, Float: Z, query[128] = "SELECT primary_x, primary_y, primary_z FROM property_coords WHERE type = 8 ORDER BY random() LIMIT 1";
 
-	// TODO: get random coordinate from database
-
-	X = -2413.08;
-	Y = 329.24;
-	Z = 34.74;
-
-	if (IsPlayerInSphere(playerid, X, Y, Z, 10.0))
+	for (;;)
 	{
-		return 0;
+		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result) 
+		{
+			SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Database read error!");
+			print("Database error: cannot get random row from property_coords!");
+			print(query);
+			return 0;
+		}
+
+		X = DB_GetFieldFloatByName(result, "primary_x");
+		Y = DB_GetFieldFloatByName(result, "primary_y");
+		Z = DB_GetFieldFloatByName(result, "primary_z");
+
+		DB_FreeResultSet(result);
+
+		if (IsPlayerInSphere(playerid, X, Y, Z, 75.0))
+		{
+			continue;
+		}
+
+		break;
 	}
 
-	SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, X, Y, Z, X, Y, Z, 10.0);
+	SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, X, Y, Z, X, Y, Z, 15.0);
+
+	return 1;
+}
+
+stock SetTaxiMissionCustomerPos(playerid)
+{
+	new Float: X, Float: Y, Float: Z, query[128] = "SELECT primary_x, primary_y, primary_z FROM property_coords WHERE type = 8 ORDER BY random() LIMIT 1";
+
+	// Set iteration limit to 150, so the last is used if not anything closer appears...
+	for (new i = 0; i < 150; i++)
+	{
+		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result) 
+		{
+			SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Database read error!");
+			print("Database error: cannot get random row from property_coords!");
+			print(query);
+			return 0;
+		}
+
+		X = DB_GetFieldFloatByName(result, "primary_x");
+		Y = DB_GetFieldFloatByName(result, "primary_y");
+		Z = DB_GetFieldFloatByName(result, "primary_z");
+
+		DB_FreeResultSet(result);
+
+		if (!IsPlayerInSphere(playerid, X, Y, Z, 75.0))
+		{
+			continue;
+		}
+
+		break;
+	}
+
+	NPC_SetPos(gTaxiMission[playerid][NPCid], X, Y, Z);
+
+	NPC_SetSkin(gTaxiMission[playerid][NPCid], random(311) + 1);
+	SetPlayerMarkerForPlayer(playerid, gTaxiMission[playerid][NPCid], COLOR_YELLOW);
 
 	return 1;
 }
@@ -183,7 +230,7 @@ stock SetTaxiMissionCustomer(playerid)
 {
 	if (gTaxiMission[playerid][NPCid] > -1)
 	{
-		return 1;
+		return SetTaxiMissionCustomerPos(playerid);
 	}
 
 	new npcs[10];
@@ -218,7 +265,7 @@ stock SetTaxiMissionCustomer(playerid)
 
 	gTaxiMission[playerid][NPCid] = npcid;
 
-	return 1;
+	return SetTaxiMissionCustomerPos(playerid);
 }
 
 stock SetPlayerTaxiMission(playerid)
@@ -228,10 +275,17 @@ stock SetPlayerTaxiMission(playerid)
 		return AbortPlayerTaxiMission(playerid);
 	}
 
+	new modelid = GetVehicleModel(GetPlayerVehicleID(playerid));
+
+	if (modelid != 420 && modelid != 438)
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Must be driving a taxi cab!");
+	}
+
+	gTaxiMission[playerid][NPCid] = -1;
 	SetTaxiMissionCustomer(playerid);
 
 	gTaxiMission[playerid][Active] = true;
-	gTaxiMission[playerid][NPCid] = -1;
 	gTaxiMission[playerid][TimerCheckNearNPC] = SetTimerEx("CheckTaxiNearNPC", 1500, true, "i", playerid);
 	gTaxiMission[playerid][TimerUpdate] = SetTimerEx("UpdateTaxiMissionInfoText", 1000, true, "i", playerid);
 

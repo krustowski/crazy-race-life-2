@@ -329,6 +329,8 @@ public OnPlayerDisconnect(playerid, reason)
 	KillTimer(_: gPlayerMissions[playerid][TimerElapsed]);
 	KillTimer(_: gPlayerMissions[playerid][TimerAttachedCheck]);
 
+	AbortPlayerTaxiMission(playerid);
+
 	// Save player's data and set such player to unauthorized.
 	if (reason == 1)
 		SavePlayerData(playerid);
@@ -372,12 +374,10 @@ public OnPlayerSpawn(playerid)
 	if (IsPlayerNPC(playerid))
 	{
 		NPC_SetSkin(playerid, 89);
-		NPC_SetPos(playerid, -1992.57, 154.28, 27.31);
 		NPC_SetInvulnerable(playerid, false);
 
-		SetPlayerColor(playerid, COLOR_YELLOW);
-
-		gTaxiEnterTimer[playerid] = SetTimerEx("EnterVehicleTimer", 1500, true, "i", playerid);
+		// Hide the marker for others
+		SetPlayerColor(playerid, 0xFFFFFF00);
 
 		return 1;
 	}

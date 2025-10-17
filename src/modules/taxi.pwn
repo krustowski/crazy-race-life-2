@@ -52,16 +52,32 @@ public EnterVehicleTimer(npcid)
 		return 1;
 	}
 
-	KillTimer(gTaxiEnterTimer[npcid]);
+	new Float: dX, Float: dY, Float: dZ, Float: veolcity[3];
 
-	NPC_EnterVehicle(npcid, vehicleid, 3, NPC_MOVE_TYPE: 1);
+	GetPlayerPos(driverid, dX, dY, dZ);
+	GetVehicleVelocity(vehicleid, veolcity[0], veolcity[1], veolcity[2]);
+
+	if (IsPlayerInSphere(gTaxiMission[driverid][NPCid], dX, dY, dZ, 10.0) && veolcity[0] == 0.0 && veolcity[1] == 0.0)
+	{
+		KillTimer(gTaxiEnterTimer[npcid]);
+
+		NPC_EnterVehicle(npcid, vehicleid, 3, NPC_MOVE_TYPE: 1);
+
+		while (NPC_IsEnteringVehicle(npcid))
+		{}
+
+		if (!SetTaxiMissionCheckpoint(driverid))
+		{
+			return SendClientMessage(driverid, COLOR_RED, "[ TAXI ] Error setting new taxi mission!");
+		}
+	}
 
 	return 1;
 }
 
 public ExitVehicleTimer(npcid)
 {
-	NPC_Destroy(npcid);
+	NPC_Spawn(npcid);
 
 	return 1;
 }
@@ -128,14 +144,17 @@ stock CheckTaxiMissionCheckpoint(playerid)
 
 	DisablePlayerRaceCheckpoint(playerid);
 
+	SetVehicleVelocity(GetPlayerVehicleID(playerid), 0.0, 0.0, 0.0);
+
 	NPC_ExitVehicle(gTaxiMission[playerid][NPCid]);
 
-	gTaxiMission[playerid][TimerNPCExit] = SetTimerEx("ExitVehicleTimer", 2500, false, "i", gTaxiMission[playerid][NPCid]);
+	gTaxiMission[playerid][TimerNPCExit] = SetTimerEx("ExitVehicleTimer", 3000, false, "i", gTaxiMission[playerid][NPCid]);
 
-	if (!SetTaxiMissionCheckpoint(playerid))
-	{
-		return SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Error setting new taxi mission!");
-	}
+	gTaxiMission[playerid][DoneCount]++;
+	gTaxiMission[playerid][TimeElapsed] = 0;
+
+	SetTaxiMissionCustomer(playerid);
+	gTaxiMission[playerid][TimerCheckNearNPC] = SetTimerEx("CheckTaxiNearNPC", 1500, true, "i", playerid);
 
 	return 1;
 }
@@ -160,11 +179,11 @@ stock SetTaxiMissionCheckpoint(playerid)
 	return 1;
 }
 
-stock SetPlayerTaxiMission(playerid)
+stock SetTaxiMissionCustomer(playerid)
 {
-	if (gTaxiMission[playerid][Active])
+	if (gTaxiMission[playerid][NPCid])
 	{
-		return AbortPlayerTaxiMission(playerid);
+		return 1;
 	}
 
 	new npcs[10];
@@ -197,8 +216,21 @@ stock SetPlayerTaxiMission(playerid)
 
 	NPC_Spawn(npcid);
 
-	gTaxiMission[playerid][Active] = true;
 	gTaxiMission[playerid][NPCid] = npcid;
+
+	return 1;
+}
+
+stock SetPlayerTaxiMission(playerid)
+{
+	if (gTaxiMission[playerid][Active])
+	{
+		return AbortPlayerTaxiMission(playerid);
+	}
+
+	SetTaxiMissionCustomer(playerid);
+
+	gTaxiMission[playerid][Active] = true;
 	gTaxiMission[playerid][TimerCheckNearNPC] = SetTimerEx("CheckTaxiNearNPC", 1500, true, "i", playerid);
 	gTaxiMission[playerid][TimerUpdate] = SetTimerEx("UpdateTaxiMissionInfoText", 1000, true, "i", playerid);
 
@@ -208,11 +240,6 @@ stock SetPlayerTaxiMission(playerid)
 	TextDrawSetOutline(gTaxiMission[playerid][InfoText], 1);
 
 	GameTextForPlayer(playerid, "~w~Taxi Mission ~g~Started!", 3000, 3); 
-
-	if (!SetTaxiMissionCheckpoint(playerid))
-	{
-		return SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Error setting new taxi mission!");
-	}
 
 	return 1;
 }
@@ -224,14 +251,20 @@ stock AbortPlayerTaxiMission(playerid)
 		return 1;
 	}
 
+	KillTimer(gTaxiMission[playerid][TimerCheckNearNPC]);
+	KillTimer(gTaxiMission[playerid][TimerUpdate]);
+
+	if (gTaxiMission[playerid][NPCid])
+	{
+		KillTimer(gTaxiEnterTimer[ gTaxiMission[playerid][NPCid] ]);
+		NPC_Destroy(gTaxiMission[playerid][NPCid]);
+	}
+
 	gTaxiMission[playerid][Active] = false;
 	gTaxiMission[playerid][NPCid] = -1;
 	gTaxiMission[playerid][DoneCount] = 0;
 	gTaxiMission[playerid][Earned] = 0;
 	gTaxiMission[playerid][TimeElapsed] = 0;
-
-	KillTimer(gTaxiMission[playerid][TimerCheckNearNPC]);
-	KillTimer(gTaxiMission[playerid][TimerUpdate]);
 
 	TextDrawHideForPlayer(playerid, gTaxiMission[playerid][InfoText]);
 

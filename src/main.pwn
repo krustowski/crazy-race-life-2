@@ -31,6 +31,7 @@
 #include <float>
 #include <file>
 #include <string>
+#include "npc/omp_npcs.inc"
 
 #pragma tabsize 8
 
@@ -365,12 +366,33 @@ public OnPlayerDisconnect(playerid, reason)
 	return 0;
 }
 
+new gTaxiEnterTimer[MAX_PLAYERS];
+
+forward EnterVehicleTimer(npcid);
+public EnterVehicleTimer(npcid)
+{
+	new vehicleid = GetPVarInt(npcid, "VehicleToEnter");
+
+	if (vehicleid)
+	{
+		new stringToPrint[48];
+		format(stringToPrint, sizeof(stringToPrint), "[ NPC ] Entering the vehicle ID: %d", vehicleid);
+
+		KillTimer(gTaxiEnterTimer[npcid]);
+		NPC_EnterVehicle(npcid, vehicleid, 3, NPC_MOVE_TYPE: 1);
+	}
+
+	return 1;
+}
+
 public OnPlayerSpawn(playerid)
 {
 	if (IsPlayerNPC(playerid))
 	{
-		SetPlayerSkin(playerid, 89);
-		SetPlayerPos(playerid, -1992.57, 154.28, 27.31);
+		NPC_SetSkin(playerid, 89);
+		NPC_SetPos(playerid, -1992.57, 154.28, 27.31);
+
+		gTaxiEnterTimer[playerid] = SetTimerEx("EnterVehicleTimer", 1500, true, "i", playerid);
 
 		return 1;
 	}
@@ -612,11 +634,6 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 
 public OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstate)
 {
-	if (IsPlayerNPC(playerid))
-	{
-		return 1;
-	}
-
 	// Hide the velocity meter on vehicle exit.
 	if ((oldstate == PLAYER_STATE_DRIVER || oldstate == PLAYER_STATE_PASSENGER) && newstate == PLAYER_STATE_ONFOOT)
 	{
@@ -636,7 +653,13 @@ public OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstat
 		TextDrawShowForPlayer(playerid, gVehicleStatesText[playerid]);
 	}
 
-	if (newstate == PLAYER_STATE_DRIVER && GetPlayerVehicleID(playerid) == gAdminAuto)
+	if (IsPlayerNPC(playerid) || NPC_IsValid(playerid))
+	{
+		TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
+		return 1;
+	}
+
+	/*if (newstate == PLAYER_STATE_DRIVER && GetPlayerVehicleID(playerid) == gAdminAuto)
 	{
 		if (!IsPlayerAdmin(playerid))
 		{
@@ -649,7 +672,7 @@ public OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstat
 			SendClientMessage(playerid, COLOR_CYAN, "[ ADMIN CAR ] Armoured mode enabled");
 			SetVehicleHealth(GetPlayerVehicleID(playerid), 99999 * 1000);
 		}
-	}
+	}*/
 
 	return 1;
 }

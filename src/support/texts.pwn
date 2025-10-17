@@ -28,6 +28,11 @@ public InitTexts()
 
 public AddTexts(playerid)
 {
+	if (NPC_IsValid(playerid))
+	{
+		return 1;
+	}
+
 	gRaceInfoText[playerid] = TextDrawCreate(460.0, 400.0, "");
 	gMissionInfoText[playerid] = TextDrawCreate(460.0, 400.0, "");
 	gDeathmatchText[playerid] = TextDrawCreate(400.0, 400, "");
@@ -47,4 +52,6 @@ public AddTexts(playerid)
 	// Show the game clock.
 	TextDrawShowForPlayer(playerid, gClockText);
 	TextDrawShowForPlayer(playerid, gGameModeText);
+
+	return 1;
 }

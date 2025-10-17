@@ -767,7 +767,8 @@ dcmd_taxi(playerid, const params[])
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4) 
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
-	ConnectNPC("[NPC]picus", "taxi");
+	new npcid = NPC_Create("[NPC]picus");
+	NPC_Spawn(npcid);
 
 	gTaxiCheckTimer[playerid] = SetTimerEx("CheckTaxiNearNPC", 1500, true, "i", playerid);
 

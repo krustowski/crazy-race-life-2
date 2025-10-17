@@ -55,7 +55,7 @@ public AntiFlood()
 {
 	for (new i = 0; i <= GetMaxPlayers(); i++)
 	{
-		if (IsPlayerConnected(i) && GetPlayerPing(i) == 0)
+		if (IsPlayerConnected(i) && GetPlayerPing(i) == 0 && !IsPlayerNPC(i))
 		{
 			new ipAddress[128], stringToPrint[128];
 

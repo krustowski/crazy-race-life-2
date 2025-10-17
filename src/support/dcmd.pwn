@@ -719,67 +719,13 @@ dcmd_skydive(playerid, const params[])
 	return 1;
 }
 
-new gTaxiCheckTimer[MAX_PLAYERS];
-
-forward CheckTaxiNearNPC(playerid);
-public CheckTaxiNearNPC(playerid)
-{
-	for (new i = 0; i < MAX_PLAYERS; i++)
-	{
-		if (!IsPlayerNPC(i) || !IsPlayerConnected(i))
-		{
-			continue;
-		}
-
-		if (!IsPlayerInAnyVehicle(playerid))
-		{
-			continue;
-		}
-
-		new vehicleid = GetPlayerVehicleID(playerid);
-
-		if (GetVehicleModel(vehicleid) != 420)
-		{
-			SendClientMessage(playerid, COLOR_GREY, "[ TAXI ] Not a taxi car");
-			continue;
-		}
-
-		new Float: pX, Float: pY, Float: pZ, Float: veolcity[3];
-
-		GetPlayerPos(playerid, pX, pY, pZ);
-		GetVehicleVelocity(vehicleid, veolcity[0], veolcity[1], veolcity[2]);
-
-		if (IsPlayerInSphere(i, pX, pY, pZ, 10.0) && veolcity[0] == 0.0 && veolcity[1] == 0.0)
-		{
-			KillTimer(gTaxiCheckTimer[playerid]);
-
-			SendClientMessage(playerid, COLOR_GREY, "[ TAXI ] Telling NPC to enter the vehicle...");
-			SetPVarInt(i, "VehicleToEnter", vehicleid);
-		}
-	}
-}
-
-//new gTaxiPassenger[MAX_PLAYERS];
-
 dcmd_taxi(playerid, const params[])
 {
 #pragma unused params
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4) 
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
-	new npcid = NPC_Create("[NPC]picus");
-	NPC_Spawn(npcid);
-
-	gTaxiCheckTimer[playerid] = SetTimerEx("CheckTaxiNearNPC", 1500, true, "i", playerid);
-
-	/*gTaxiPassenger[playerid] = CreateActor(89, -1992.57, 154.28, 27.31, 0.0);
-
-	new Float: X, Float: Y, Float: Z;
-	GetVehiclePos(GetPlayerVehicleID(playerid), X, Y, Z);
-
-	SetActorPos(gTaxiPassenger[playerid], X, Y, Z + 0.5);*/
-
-	return 1;
+	return SetPlayerTaxiMission(playerid);
 }
 
 dcmd_text(playerid, const params[])

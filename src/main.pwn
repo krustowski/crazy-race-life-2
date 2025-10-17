@@ -93,6 +93,7 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 #include "modules/team.pwn"
 #include "modules/auth.pwn"
 #include "modules/real.pwn"
+#include "modules/taxi.pwn"
 
 
 //
@@ -366,31 +367,15 @@ public OnPlayerDisconnect(playerid, reason)
 	return 0;
 }
 
-new gTaxiEnterTimer[MAX_PLAYERS];
-
-forward EnterVehicleTimer(npcid);
-public EnterVehicleTimer(npcid)
-{
-	new vehicleid = GetPVarInt(npcid, "VehicleToEnter");
-
-	if (vehicleid)
-	{
-		new stringToPrint[48];
-		format(stringToPrint, sizeof(stringToPrint), "[ NPC ] Entering the vehicle ID: %d", vehicleid);
-
-		KillTimer(gTaxiEnterTimer[npcid]);
-		NPC_EnterVehicle(npcid, vehicleid, 3, NPC_MOVE_TYPE: 1);
-	}
-
-	return 1;
-}
-
 public OnPlayerSpawn(playerid)
 {
 	if (IsPlayerNPC(playerid))
 	{
 		NPC_SetSkin(playerid, 89);
 		NPC_SetPos(playerid, -1992.57, 154.28, 27.31);
+		NPC_SetInvulnerable(playerid, false);
+
+		SetPlayerColor(playerid, COLOR_YELLOW);
 
 		gTaxiEnterTimer[playerid] = SetTimerEx("EnterVehicleTimer", 1500, true, "i", playerid);
 
@@ -426,6 +411,15 @@ public OnPlayerSpawn(playerid)
 
 	// Default location to spawrn a player (LV pyramid).
 	SetPlayerPos(playerid, 2323.73, 1283.18, 97.60);
+
+	return 1;
+}
+
+public OnNPCDeath(npcid, killerid, reason)
+{
+	NPC_Destroy(npcid);
+
+	AbortPlayerTaxiMission(killerid);
 
 	return 1;
 }

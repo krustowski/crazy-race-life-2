@@ -223,8 +223,16 @@ Greater zone IDs:
 5 - Los Santos
 ```
 
-## omp for Linux
+## Development
+
+### omp for Linux
 
 ```
 -h "95.216.7.113" -p "39876" -n "krusty" -g "C:\\Program Files (x86)\\Rockstar Games\\GTA San Andreas\\"
+```
+
+### Manual NPC Connect
+
+```
+./samp-npc -h "127.0.0.1" -p "39876" -n "[NPC]taxi" -m "taxi"
 ```

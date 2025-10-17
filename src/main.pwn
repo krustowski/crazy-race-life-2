@@ -25,7 +25,6 @@
 //  Generic includes.
 //
 
-//#include <a_samp>
 #include <open.mp>
 #include <a_mysql>
 #include <core>
@@ -284,9 +283,15 @@ public OnPlayerConnect(playerid)
 
 	// Fetch player's name and print it out to outhers online.
 	GetPlayerName(playerid, playerName, sizeof(playerName));
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s joined the game!", playerName);
-
 	gPlayers[playerid][Name] = playerName;
+
+	if (IsPlayerNPC(playerid))
+	{
+		SpawnPlayer(playerid);
+		return 1;
+	}
+
+	format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s joined the game!", playerName);
 	SendClientMessageToAll(COLOR_GREY, stringToPrint);
 
 	SendMessageToWebhook(playerid, "connected");
@@ -305,6 +310,11 @@ public OnPlayerConnect(playerid)
 
 public OnPlayerDisconnect(playerid, reason)
 {
+	if (IsPlayerNPC(playerid))
+	{
+		return 1;
+	}
+
 	StopAudioStreamForPlayer(playerid);
 	gPlayers[playerid][Listening] = false;
 	gPlayers[playerid][AFK] = false;
@@ -357,6 +367,14 @@ public OnPlayerDisconnect(playerid, reason)
 
 public OnPlayerSpawn(playerid)
 {
+	if (IsPlayerNPC(playerid))
+	{
+		SetPlayerSkin(playerid, 89);
+		SetPlayerPos(playerid, -1992.57, 154.28, 27.31);
+
+		return 1;
+	}
+
 	SetPlayerSkin(playerid, gPlayers[playerid][Skin]);
 
 	if (gPlayers[playerid][TeamID])
@@ -564,6 +582,11 @@ public OnPlayerCommandText(playerid, cmdtext[])
 
 public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 {
+	if (IsPlayerNPC(playerid))
+	{
+		return 1;
+	}
+
 	if (gTrucking[playerid] && vehicleid == gPlayerMissions[playerid][VehicleID])
 	{
 		SetVehicleParamsForPlayer(vehicleid, playerid, false, false);
@@ -589,6 +612,11 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 
 public OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstate)
 {
+	if (IsPlayerNPC(playerid))
+	{
+		return 1;
+	}
+
 	// Hide the velocity meter on vehicle exit.
 	if ((oldstate == PLAYER_STATE_DRIVER || oldstate == PLAYER_STATE_PASSENGER) && newstate == PLAYER_STATE_ONFOOT)
 	{
@@ -1025,7 +1053,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 
 				/*if (!CheckPlayerRaceState(playerid))
-					return 1;*/
+				  return 1;*/
 
 				if (SetPlayerRaceStartPos(playerid))
 					return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ RACE ] Warp near the race start used successfully");
@@ -2233,7 +2261,7 @@ public OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 								GetPlayerPos(playerid, X, Y, Z);
 
 								new coord_no = gPlayerRaceEdit[playerid][EditTrackCoordNo];
-									
+
 								gPlayerRaceEditTrackCoords[playerid][coord_no][E_RACE_COORD_X] = X;
 								gPlayerRaceEditTrackCoords[playerid][coord_no][E_RACE_COORD_Y] = Y;
 								gPlayerRaceEditTrackCoords[playerid][coord_no][E_RACE_COORD_Z] = Z;

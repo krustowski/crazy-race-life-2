@@ -8,6 +8,8 @@ enum TaxiMission
 	NPCid,
 	bool: Active,
 
+	Float: CommissionCoef,
+
 	TimeElapsed,
 	Earned,
 	DoneCount,
@@ -120,7 +122,7 @@ public UpdateTaxiMissionInfoText(playerid)
 			{}
 
 		default:
-			format(stringToPrint, sizeof(stringToPrint), "~w~Done:_____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:___~b~%2d~y~:~b~%2d", gTaxiMission[playerid][DoneCount], gTaxiMission[playerid][Earned], floatround(floatround(gTaxiMission[playerid][TimeElapsed] / 1000) / 60), floatround(gTaxiMission[playerid][TimeElapsed] / 1000) % 60);
+			format(stringToPrint, sizeof(stringToPrint), "~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:___~b~%2d~y~:~b~%2d", gTaxiMission[playerid][DoneCount], gTaxiMission[playerid][Earned], floatround(floatround(gTaxiMission[playerid][TimeElapsed] / 1000) / 60), floatround(gTaxiMission[playerid][TimeElapsed] / 1000) % 60);
 	}
 
 	TextDrawSetString(gTaxiMission[playerid][InfoText], stringToPrint);
@@ -138,14 +140,20 @@ stock CheckTaxiMissionCheckpoint(playerid)
 	}
 
 	DisablePlayerRaceCheckpoint(playerid);
-
 	SetVehicleVelocity(GetPlayerVehicleID(playerid), 0.0, 0.0, 0.0);
 
-	NPC_ExitVehicle(gTaxiMission[playerid][NPCid]);
+	new commission = 8000 + (floatround(gTaxiMission[playerid][CommissionCoef] * (random(++gTaxiMission[playerid][DoneCount]) + 1) * 4000));
+	GivePlayerMoney(playerid, commission);
+	gTaxiMission[playerid][Earned] += commission;
 
+	new stringToPrint[128];
+	format(stringToPrint, sizeof(stringToPrint), "[ TAXI ] Commission earned: $%d", commission);
+	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
+
+	NPC_ExitVehicle(gTaxiMission[playerid][NPCid]);
 	gTaxiMission[playerid][TimerNPCExit] = SetTimerEx("ExitVehicleTimer", 2000, false, "i", playerid);
 
-	gTaxiMission[playerid][DoneCount]++;
+	//gTaxiMission[playerid][DoneCount]++;
 	gTaxiMission[playerid][TimeElapsed] = 0;
 
 	return 1;
@@ -179,6 +187,11 @@ stock SetTaxiMissionCheckpoint(playerid)
 
 		break;
 	}
+
+	new Float: pX, Float: pY, Float: pZ;
+	GetPlayerPos(playerid, pX, pY, pZ);
+
+	gTaxiMission[playerid][CommissionCoef] = (floatabs(pX - X) / 3000 + floatabs(pY - Y) / 3000) / 2;
 
 	SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, X, Y, Z, X, Y, Z, 15.0);
 

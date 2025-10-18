@@ -26,7 +26,7 @@ new gTaxiEnterTimer[MAX_PLAYERS];
 forward UpdateTaxiMissionInfoText(playerid);
 forward CheckTaxiNearNPC(playerid);
 forward EnterVehicleTimer(npcid);
-forward ExitVehicleTimer(npcid);
+forward ExitVehicleTimer(playerid);
 
 // For NPC to enter vehicle.
 public EnterVehicleTimer(npcid)
@@ -67,9 +67,10 @@ public EnterVehicleTimer(npcid)
 	return 1;
 }
 
-public ExitVehicleTimer(npcid)
+public ExitVehicleTimer(playerid)
 {
 	//NPC_Spawn(npcid);
+	SetTaxiMissionCustomerPos(playerid);
 
 	return 1;
 }
@@ -142,14 +143,10 @@ stock CheckTaxiMissionCheckpoint(playerid)
 
 	NPC_ExitVehicle(gTaxiMission[playerid][NPCid]);
 
-	gTaxiMission[playerid][TimerNPCExit] = SetTimerEx("ExitVehicleTimer", 3000, false, "i", gTaxiMission[playerid][NPCid]);
+	gTaxiMission[playerid][TimerNPCExit] = SetTimerEx("ExitVehicleTimer", 2000, false, "i", playerid);
 
 	gTaxiMission[playerid][DoneCount]++;
 	gTaxiMission[playerid][TimeElapsed] = 0;
-
-	SetTaxiMissionCustomer(playerid);
-
-	gTaxiMission[playerid][TimerCheckNearNPC] = SetTimerEx("CheckTaxiNearNPC", 1500, true, "i", playerid);
 
 	return 1;
 }
@@ -185,6 +182,8 @@ stock SetTaxiMissionCheckpoint(playerid)
 
 	SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, X, Y, Z, X, Y, Z, 15.0);
 
+	gTaxiMission[playerid][TimerCheckNearNPC] = SetTimerEx("CheckTaxiNearNPC", 2000, true, "i", playerid);
+
 	return 1;
 }
 
@@ -210,7 +209,7 @@ stock SetTaxiMissionCustomerPos(playerid)
 
 		DB_FreeResultSet(result);
 
-		if (!IsPlayerInSphere(playerid, X, Y, Z, 75.0))
+		if (!IsPlayerInSphere(playerid, X, Y, Z, 175.0))
 		{
 			continue;
 		}
@@ -219,7 +218,6 @@ stock SetTaxiMissionCustomerPos(playerid)
 	}
 
 	NPC_SetPos(gTaxiMission[playerid][NPCid], X, Y, Z);
-
 	NPC_SetSkin(gTaxiMission[playerid][NPCid], random(311) + 1);
 	SetPlayerMarkerForPlayer(playerid, gTaxiMission[playerid][NPCid], COLOR_YELLOW);
 

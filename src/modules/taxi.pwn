@@ -198,8 +198,6 @@ stock SetTaxiMissionCheckpoint(playerid)
 
 	SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, X, Y, Z, X, Y, Z, 15.0);
 
-	gTaxiMission[playerid][TimerCheckNearNPC] = SetTimerEx("CheckTaxiNearNPC", 2000, true, "i", playerid);
-
 	return 1;
 }
 
@@ -207,8 +205,8 @@ stock SetTaxiMissionCustomerPos(playerid)
 {
 	new Float: X, Float: Y, Float: Z, query[128] = "SELECT primary_x, primary_y, primary_z FROM property_coords WHERE type = 8 ORDER BY random() LIMIT 1";
 
-	// Set iteration limit to 150, so the last is used if not anything closer appears...
-	for (new i = 0; i < 150; i++)
+	// Set iteration limit to 250, so the last is used if not anything closer appears...
+	for (new i = 0; i < 250; i++)
 	{
 		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result) 
@@ -236,6 +234,8 @@ stock SetTaxiMissionCustomerPos(playerid)
 	NPC_SetPos(gTaxiMission[playerid][NPCid], X, Y, Z);
 	NPC_SetSkin(gTaxiMission[playerid][NPCid], random(311) + 1);
 	SetPlayerMarkerForPlayer(playerid, gTaxiMission[playerid][NPCid], COLOR_YELLOW);
+
+	gTaxiMission[playerid][TimerCheckNearNPC] = SetTimerEx("CheckTaxiNearNPC", 2000, true, "i", playerid);
 
 	return 1;
 }
@@ -300,7 +300,7 @@ stock SetPlayerTaxiMission(playerid)
 	SetTaxiMissionCustomer(playerid);
 
 	gTaxiMission[playerid][Active] = true;
-	gTaxiMission[playerid][TimerCheckNearNPC] = SetTimerEx("CheckTaxiNearNPC", 1500, true, "i", playerid);
+	//gTaxiMission[playerid][TimerCheckNearNPC] = SetTimerEx("CheckTaxiNearNPC", 1500, true, "i", playerid);
 	gTaxiMission[playerid][TimerUpdate] = SetTimerEx("UpdateTaxiMissionInfoText", 1000, true, "i", playerid);
 
 	gTaxiMission[playerid][InfoText] = TextDrawCreate(460.0, 400.0, "");

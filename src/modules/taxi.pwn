@@ -103,7 +103,10 @@ public CheckTaxiNearNPC(playerid)
 		SendClientMessage(playerid, COLOR_YELLOW, "[ TAXI ] Telling NPC to enter the vehicle...");
 		SetPVarInt(gTaxiMission[playerid][NPCid], "VehicleToEnter", vehicleid);
 
-		gTaxiEnterTimer[gTaxiMission[playerid][NPCid]] = SetTimerEx("EnterVehicleTimer", 1000, true, "i", gTaxiMission[playerid][NPCid]);
+		if (!IsValidTimer(gTaxiEnterTimer[ gTaxiMission[playerid][NPCid] ]))
+		{
+			gTaxiEnterTimer[gTaxiMission[playerid][NPCid]] = SetTimerEx("EnterVehicleTimer", 1000, true, "i", gTaxiMission[playerid][NPCid]);
+		}
 	}
 
 	return 1;

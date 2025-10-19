@@ -19,8 +19,8 @@ public InitVehicles()
 	AddStaticVehicle(420, 2833.63, 1258.51, 10.77, 0.0, -1, -1);
 	AddStaticVehicle(420, 2833.47, 1265.94, 10.78, 0.0, -1, -1);
 
-	AddStaticVehicle(420, 1716.28, 1472.79, 10.52, 258.99, -1, -1);
-	AddStaticVehicle(420, 1719.37, 1482.69, 10.52, 258.99, -1, -1);
+	AddStaticVehicle(420, 1716.28, 1472.79, 10.52, 358.99, -1, -1);
+	AddStaticVehicle(420, 1719.37, 1482.69, 10.52, 358.99, -1, -1);
 
 	// Taxi LS
 	AddStaticVehicle(420, 1670.27, -2248.74, 13.24, 172.99, -1, -1);

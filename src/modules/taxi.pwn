@@ -96,12 +96,13 @@ public CheckTaxiNearNPC(playerid)
 	GetPlayerPos(playerid, pX, pY, pZ);
 	GetVehicleVelocity(vehicleid, veolcity[0], veolcity[1], veolcity[2]);
 
-	if (IsPlayerInSphere(gTaxiMission[playerid][NPCid], pX, pY, pZ, 10.0) && veolcity[0] == 0.0 && veolcity[1] == 0.0)
+	if (IsPlayerInSphere(gTaxiMission[playerid][NPCid], pX, pY, pZ, 15.0) && veolcity[0] == 0.0 && veolcity[1] == 0.0)
 	{
 		KillTimer(gTaxiMission[playerid][TimerCheckNearNPC]);
 
 		SendClientMessage(playerid, COLOR_YELLOW, "[ TAXI ] Telling NPC to enter the vehicle...");
 		SetPVarInt(gTaxiMission[playerid][NPCid], "VehicleToEnter", vehicleid);
+		PlayerPlaySound(playerid, 1147, 0, 0, 0);
 
 		if (!IsValidTimer(gTaxiEnterTimer[ gTaxiMission[playerid][NPCid] ]))
 		{

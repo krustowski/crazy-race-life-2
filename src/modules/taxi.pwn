@@ -86,7 +86,7 @@ public CheckTaxiVehicle(playerid)
 	{
 		SetVehicleParamsForPlayer(gTaxiMission[playerid][VehicleID], playerid, true, false);
 
-		GameTextForPlayer(playerid, "~w~Return to the taxi cab to continue the mission!", 1000, 3); 
+		return GameTextForPlayer(playerid, "~w~Return to the ~y~taxi cab ~w~to continue the ~y~mission!", 1000, 3); 
 	}
 
 	SetVehicleParamsForPlayer(gTaxiMission[playerid][VehicleID], playerid, false, false);

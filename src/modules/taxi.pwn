@@ -6,6 +6,7 @@
 enum TaxiMission
 {
 	NPCid,
+	VehicleID,
 	bool: Active,
 
 	Float: CommissionCoef,
@@ -18,7 +19,8 @@ enum TaxiMission
 
 	TimerNPCExit,
 	TimerUpdate,
-	TimerCheckNearNPC
+	TimerCheckNearNPC,
+	TimerCheckVehicle
 }
 
 new gTaxiMission[MAX_PLAYERS][TaxiMission];
@@ -29,6 +31,7 @@ forward UpdateTaxiMissionInfoText(playerid);
 forward CheckTaxiNearNPC(playerid);
 forward EnterVehicleTimer(npcid);
 forward ExitVehicleTimer(playerid);
+forward CheckTaxiVehicle(playerid);
 
 // For NPC to enter vehicle.
 public EnterVehicleTimer(npcid)
@@ -73,6 +76,20 @@ public ExitVehicleTimer(playerid)
 {
 	//NPC_Spawn(npcid);
 	SetTaxiMissionCustomerPos(playerid);
+
+	return 1;
+}
+
+public CheckTaxiVehicle(playerid)
+{
+	if (!IsPlayerInAnyVehicle(playerid) || GetPlayerVehicleID(playerid) != gTaxiMission[playerid][VehicleID])
+	{
+		SetVehicleParamsForPlayer(gTaxiMission[playerid][VehicleID], playerid, true, false);
+
+		GameTextForPlayer(playerid, "~w~Return to the taxi cab to continue the mission!", 1000, 3); 
+	}
+
+	SetVehicleParamsForPlayer(gTaxiMission[playerid][VehicleID], playerid, false, false);
 
 	return 1;
 }
@@ -297,11 +314,14 @@ stock SetPlayerTaxiMission(playerid)
 		return SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Must be driving a taxi cab!");
 	}
 
+	gTaxiMission[playerid][VehicleID] = GetPlayerVehicleID(playerid);
+
 	gTaxiMission[playerid][NPCid] = -1;
 	SetTaxiMissionCustomer(playerid);
 
 	gTaxiMission[playerid][Active] = true;
 	//gTaxiMission[playerid][TimerCheckNearNPC] = SetTimerEx("CheckTaxiNearNPC", 1500, true, "i", playerid);
+	gTaxiMission[playerid][TimerCheckVehicle] = SetTimerEx("CheckTaxiVehicle", 1500, true, "i", playerid);
 	gTaxiMission[playerid][TimerUpdate] = SetTimerEx("UpdateTaxiMissionInfoText", 1000, true, "i", playerid);
 
 	gTaxiMission[playerid][InfoText] = TextDrawCreate(460.0, 400.0, "");
@@ -322,6 +342,7 @@ stock AbortPlayerTaxiMission(playerid)
 	}
 
 	KillTimer(gTaxiMission[playerid][TimerCheckNearNPC]);
+	KillTimer(gTaxiMission[playerid][TimerCheckVehicle]);
 	KillTimer(gTaxiMission[playerid][TimerUpdate]);
 
 	if (gTaxiMission[playerid][NPCid])
@@ -330,8 +351,11 @@ stock AbortPlayerTaxiMission(playerid)
 		NPC_Destroy(gTaxiMission[playerid][NPCid]);
 	}
 
+	SetVehicleParamsForPlayer(gTaxiMission[playerid][VehicleID], playerid, false, false);
+
 	gTaxiMission[playerid][Active] = false;
 	gTaxiMission[playerid][NPCid] = -1;
+	gTaxiMission[playerid][VehicleID] = -1;
 	gTaxiMission[playerid][DoneCount] = 0;
 	gTaxiMission[playerid][Earned] = 0;
 	gTaxiMission[playerid][TimeElapsed] = 0;

@@ -15,6 +15,9 @@ enum TaxiMission
 	Earned,
 	DoneCount,
 
+	Checkpoint[Coords],
+	bool: CheckpointDisabled,
+
 	Text: InfoText,
 
 	TimerNPCExit,
@@ -86,7 +89,16 @@ public CheckTaxiVehicle(playerid)
 	{
 		SetVehicleParamsForPlayer(gTaxiMission[playerid][VehicleID], playerid, true, false);
 
+		DisablePlayerRaceCheckpoint(playerid);
+		gTaxiMission[playerid][CheckpointDisabled] = true;
+
 		return GameTextForPlayer(playerid, "~w~Return to the ~y~taxi cab ~w~to continue the ~y~mission!", 1000, 3); 
+	}
+
+	if (gTaxiMission[playerid][CheckpointDisabled] && gTaxiMission[playerid][Checkpoint][CoordX] != 0.0 && gTaxiMission[playerid][Checkpoint][CoordY] != 0.0)
+	{
+		SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, gTaxiMission[playerid][Checkpoint][CoordX], gTaxiMission[playerid][Checkpoint][CoordY], gTaxiMission[playerid][Checkpoint][CoordZ], 0.0, 0.0, 0.0, 15.0);
+		gTaxiMission[playerid][CheckpointDisabled] = false;
 	}
 
 	SetVehicleParamsForPlayer(gTaxiMission[playerid][VehicleID], playerid, false, false);
@@ -174,7 +186,10 @@ stock CheckTaxiMissionCheckpoint(playerid)
 	NPC_ExitVehicle(gTaxiMission[playerid][NPCid]);
 	gTaxiMission[playerid][TimerNPCExit] = SetTimerEx("ExitVehicleTimer", 2000, false, "i", playerid);
 
-	//gTaxiMission[playerid][DoneCount]++;
+	gTaxiMission[playerid][Checkpoint][CoordX] = 0.0;
+	gTaxiMission[playerid][Checkpoint][CoordY] = 0.0;
+	gTaxiMission[playerid][Checkpoint][CoordZ] = 0.0;
+
 	gTaxiMission[playerid][TimeElapsed] = 0;
 
 	return 1;
@@ -213,6 +228,10 @@ stock SetTaxiMissionCheckpoint(playerid)
 	GetPlayerPos(playerid, pX, pY, pZ);
 
 	gTaxiMission[playerid][CommissionCoef] = (floatabs(pX - X) / 3000 + floatabs(pY - Y) / 3000) / 2;
+
+	gTaxiMission[playerid][Checkpoint][CoordX] = X;
+	gTaxiMission[playerid][Checkpoint][CoordY] = Y;
+	gTaxiMission[playerid][Checkpoint][CoordZ] = Z;
 
 	SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, X, Y, Z, X, Y, Z, 15.0);
 

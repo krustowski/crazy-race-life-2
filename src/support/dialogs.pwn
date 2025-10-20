@@ -927,7 +927,7 @@ stock ShowPrizesInfoDialog(playerid)
 {
 	new stringToPrint[512];
 
-	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Tiki Pickups{FFFFFF}\n\nTiki prizes have form of a small green sculpture pickup (Tiki).\nThese pickups are placed in the Los Santos area.\n\nPrize: ${00FF00}10M{FFFFFF} + a potential to recieve the Admin level\n\n{FFD700}Pumpkin Pickups{FFFFFF}\n\nPumpkin prizes have form of a orange pumpkin pickups.\nThese are located mainly in the Bone County (desert) area.\n\nPrize: ${00FF00}1.5M{FFFFFF}");
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Tiki Pickups{FFFFFF}\n\nTiki prizes have form of a small green sculpture pickup (Tiki).\nThese pickups are placed in the Los Santos area.\n\nPrize: ${00FF00}10M{FFFFFF} + a potential to receive the Admin level\n\n{FFD700}Pumpkin Pickups{FFFFFF}\n\nPumpkin prizes have form of a orange pumpkin pickups.\nThese are located mainly in the Bone County (desert) area.\n\nPrize: ${00FF00}1.5M{FFFFFF}");
 		
 	return ShowPlayerDialog(playerid, DIALOG_PRIZE_LIST, DIALOG_STYLE_MSGBOX, "Prizes Info", stringToPrint, "Close", "");
 }

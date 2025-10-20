@@ -172,14 +172,15 @@ The examples above are shown respectively to the config file names mentioned.
     /phone      --- shows the phone call menu
 	/pm         --- sends the private message to other player
 	/port       --- enables to warp to special locations on map
+	/prizes     --- dumps the information about Tiki and Pumpkin prizes
 	/property   --- lists subcommands for property handling
 	/race       --- lists subcommands for racing module
 	/rules      --- dumps the server rules information
 	/scores     --- shows the High Scores table
 	/search     --- special command for Policemen
 	/skydive    --- enables to skydive from random locations
+	/taxi       --- starts a Taxi mission
 	/text       --- sends a public message to other player
-	/tiki       --- dumps the information about Tiki prizes
 	/truck      --- enables/disables the Trucking missions
 	/unlock     --- unlocks the player's vehicle
 	/wanted     --- shows the wanted list of online players

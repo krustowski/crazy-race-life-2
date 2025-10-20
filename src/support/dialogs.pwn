@@ -152,7 +152,7 @@ stock ShowAdminCommandsDialog(playerid)
 	if (gPlayers[playerid][AdminLevel] < 1)
 		return 1;
 
-	format(stringToPrint, sizeof(stringToPrint), "Level 1\n\n%s%s%s%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Level 1{FFFFFF}\n\n%s%s%s%s%s%s",
 			"/acmd\t\t\tshows admin commands per level\n",
 			"/admincol ID\t\tchanges the admin color according to color ID\n",
 			"/clear\t\t\tflushes the chat\n",
@@ -164,7 +164,7 @@ stock ShowAdminCommandsDialog(playerid)
 	if (gPlayers[playerid][AdminLevel] < 2)
 		return ShowPlayerDialog(playerid, DIALOG_ADMIN_CMDS, DIALOG_STYLE_MSGBOX, "Admin Commands", stringToPrint, "Close", "");
 
-	format(stringToPrint, sizeof(stringToPrint), "%s\nLevel 2\n\n%s%s%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s\n{FFD700}Level 2{FFFFFF}\n\n%s%s%s%s%s",
 			stringToPrint,
 			"/cam ID\t\t\tsets the camera view to a specific place in LV\n",
 			"/countdown SEC\tsets the seconds to start the countdown\n",
@@ -176,7 +176,7 @@ stock ShowAdminCommandsDialog(playerid)
 	if (gPlayers[playerid][AdminLevel] < 3)
 		return ShowPlayerDialog(playerid, DIALOG_ADMIN_CMDS, DIALOG_STYLE_MSGBOX, "Admin Commands", stringToPrint, "Close", "");
 
-	format(stringToPrint, sizeof(stringToPrint), "%s\nLevel 3\n\n%s%s%s%s%s%s%s%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s\n{FFD700}Level 3{FFFFFF}\n\n%s%s%s%s%s%s%s%s%s%s",
 			stringToPrint,
 			"/crime ID\t\tplays the crime sound (Police T-Code), experimental\n",
 			"/drunk ID\t\tsets the drunk level to a player ID, experimental\n",
@@ -193,7 +193,7 @@ stock ShowAdminCommandsDialog(playerid)
 	if (gPlayers[playerid][AdminLevel] < 4)
 		return ShowPlayerDialog(playerid, DIALOG_ADMIN_CMDS, DIALOG_STYLE_MSGBOX, "Admin Commands", stringToPrint, "Close", "");
 
-	format(stringToPrint, sizeof(stringToPrint), "%s\nLevel 4\n\n%s%s%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s\n{FFD700}Level 4{FFFFFF}\n\n%s%s%s%s%s",
 			stringToPrint,
 			"/ban ID\t\t\tbans the player ID (via IP)\n",
 			"/edit\t\t\tshows a dialog window with all common editors\n",
@@ -209,7 +209,7 @@ stock ShowCommonCommandsDialog(playerid)
 {
 	new stringToPrint[2048];
 
-	format(stringToPrint, sizeof(stringToPrint), "Common Commands\n\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Common Commands{FFFFFF}\n\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
     			"/acc\t\t\tgame account info dump\n",
 			"/admins\t\t\tlists admins online\n",
 			"/afk\t\t\t(un)sets the Away-From-Keyboard state\n",
@@ -246,7 +246,7 @@ stock ShowCommonCommandsDialog(playerid)
 			"/truck\t\t\tenables/disables the Trucking missions\n",
 			"/unlock\t\t\tunlocks the player's vehicle\n",
 			//
-			"\nSpecial Team-related Commands\n\n",
+			"\n{FFD700}Special Team-related Commands{FFFFFF}\n\n",
 			//
 			"/deal ID\t\t\tlists subcommands for dealerz\n",
 			"/hide\t\t\t(un)hides the player on map\n",
@@ -276,7 +276,7 @@ stock ShowAdminsOnlineDialog(playerid)
 			if (gPlayers[i][AdminLevel] > 0) 
 			{
 				GetPlayerName(i, adminName, sizeof(adminName));
-				format(stringToPrint, sizeof(stringToPrint), "%s[ID: %2d]\t%24s \t\tLevel: %d\n", stringToPrint, i, adminName, gPlayers[i][AdminLevel]);
+				format(stringToPrint, sizeof(stringToPrint), "{FFFFFF}%s[ID: %2d]\t{FFD700}%24s{FFFFFF} \t\tLevel: {00FF00}%d{FFFFFF}\n", stringToPrint, i, adminName, gPlayers[i][AdminLevel]);
 			}
 		}
 	}

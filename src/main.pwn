@@ -1990,6 +1990,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if (!response)
 				{
 					gPlayers[playerid][Temp] = -1;
+					return 1;
 				}
 
 				if (gPlayers[playerid][Temp] > 9)

@@ -20,7 +20,6 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(deathmatch, 10, cmdtext);	  //all
 	dcmd(drugz, 5, cmdtext); 	  //all
 	dcmd(dwarp, 5, cmdtext); 	  //all
-	//dcmd(enter, 5, cmdtext);	  //NPC
 	dcmd(fix, 3, cmdtext); 		  //all
 	dcmd(givecash, 8, cmdtext);       //all
 	dcmd(help, 4, cmdtext);           //all
@@ -32,6 +31,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(phone, 5, cmdtext);	  //all
 	dcmd(pm, 2, cmdtext);		  //all
 	dcmd(port, 4, cmdtext); 	  //all
+	dcmd(prizes, 6, cmdtext); 	  //all
 	dcmd(property, 8, cmdtext);	  //all
 	dcmd(race, 4, cmdtext);		  //all
 	dcmd(rules, 5, cmdtext); 	  //all
@@ -40,7 +40,6 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(skydive, 7, cmdtext);        //all
 	dcmd(taxi, 4, cmdtext);           //all
 	dcmd(text, 4, cmdtext);           //all
-	dcmd(tiki, 4, cmdtext); 	  //all
 	dcmd(truck, 5, cmdtext); 	  //all
 	dcmd(unlock, 6, cmdtext);         //all
 	dcmd(wanted, 6, cmdtext);	  //all
@@ -308,19 +307,6 @@ dcmd_dwarp(playerid, const params[])
 	return 1;
 }
 
-/*dcmd_enter(playerid, const params[])
-{
-	if (!IsPlayerNPC(playerid) || !IsNumeric(params))
-	{
-		return 1;
-	}
-
-	new vehicleid = strval(params);
-	PutPlayerInVehicle(playerid, vehicleid, 1);
-
-	return 1;
-}*/
-
 dcmd_fix(playerid, const params[])
 {
 #pragma unused params
@@ -512,6 +498,12 @@ dcmd_port(playerid, const params[])
 		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Leave the property to be able to use such command!");
 
 	return ShowPortListDialog(playerid);
+}
+
+dcmd_prizes(playerid, const params[])
+{
+#pragma unused params
+	return ShowPrizesInfoDialog(playerid);
 }
 
 dcmd_property(playerid, const params[])
@@ -722,9 +714,6 @@ dcmd_skydive(playerid, const params[])
 dcmd_taxi(playerid, const params[])
 {
 #pragma unused params
-	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4) 
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
-
 	return SetPlayerTaxiMission(playerid);
 }
 
@@ -749,16 +738,6 @@ dcmd_text(playerid, const params[])
 	format(stringToPrint, sizeof(stringToPrint), "Player %s says to player %s: %s", playerName, targetName, token2);
 
 	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
-
-	return 1;
-}
-
-dcmd_tiki(playerid, const params[])
-{
-#pragma unused params
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TIKI ] Tiki pickups");
-	SendClientMessage(playerid, COLOR_YELLOW, "-> Located in Los Santos area");
-	SendClientMessage(playerid, COLOR_YELLOW, "-> Prize $10M in cash + a potential Admin level");
 
 	return 1;
 }

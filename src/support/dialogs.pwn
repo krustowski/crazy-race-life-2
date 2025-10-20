@@ -62,7 +62,8 @@ enum
 	DIALOG_RACE_EDITOR_COST,
 	DIALOG_RACE_EDITOR_PRIZE,
 	DIALOG_PROPERTY_SKIN_MAIN,
-	DIALOG_PROPERTY_SKIN_LIST
+	DIALOG_PROPERTY_SKIN_LIST,
+	DIALOG_PRIZE_LIST
 };
 
 #include "modules/real.pwn"
@@ -208,7 +209,7 @@ stock ShowCommonCommandsDialog(playerid)
 {
 	new stringToPrint[2048];
 
-	format(stringToPrint, sizeof(stringToPrint), "Common Commands\n\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "Common Commands\n\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
     			"/acc\t\t\tgame account info dump\n",
 			"/admins\t\t\tlists admins online\n",
 			"/afk\t\t\t(un)sets the Away-From-Keyboard state\n",
@@ -233,14 +234,15 @@ stock ShowCommonCommandsDialog(playerid)
 			"/pm ID TEXT\t\tsends the private message to other player ($10)\n",
 			"/port\t\t\tenables to warp to special locations on map\n",
 
+			"/prizes\t\t\tdumps the information about available prizes\n",
 			"/property\t\tlists subcommands for property ID handling\n",
 			"/race\t\t\tlists subcommands for racing module\n",
 			"/rules\t\t\tdumps the server rules information\n",
 			"/scores\t\t\tshows the High Scores table\n",
-			"/skydive\t\tenables to skydive from random locations\n",
 
+			"/skydive\t\tenables to skydive from random locations\n",
 			"/text ID TEXT\t\tsends a public message to other player\n",
-			"/tiki\t\t\tdumps the information about Tiki prizes\n",
+			"/taxi\t\t\tstarts a Taxi mission\n",
 			"/truck\t\t\tenables/disables the Trucking missions\n",
 			"/unlock\t\t\tunlocks the player's vehicle\n",
 			//
@@ -919,4 +921,13 @@ stock ShowPropertySkinListDialog(playerid)
 	}
 
 	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_SKIN_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Property Skins", stringToPrint, "Select", "Cancel");
+}
+
+stock ShowPrizesInfoDialog(playerid)
+{
+	new stringToPrint[512];
+
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Tiki Pickups{FFFFFF}\n\nTiki prizes have form of a small green sculpture pickup (Tiki).\nThese pickups are placed in the Los Santos area.\n\nPrize: ${00FF00}10M{FFFFFF} + a potential to recieve the Admin level\n\n{FFD700}Pumpkin Pickups{FFFFFF}\n\nPumpkin prizes have form of a orange pumpkin pickups.\nThese are located mainly in the Bone County (desert) area.\n\nPrize: ${00FF00}1.5M{FFFFFF}");
+		
+	return ShowPlayerDialog(playerid, DIALOG_PRIZE_LIST, DIALOG_STYLE_MSGBOX, "Prizes Info", stringToPrint, "Close", "");
 }

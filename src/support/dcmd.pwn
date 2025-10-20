@@ -616,19 +616,7 @@ dcmd_rules(playerid, const params[])
 dcmd_scores(playerid, const params[])
 {
 #pragma unused params
-	/*for (new i = 0; i < MAX_RACE_COUNT; i++)
-	{
-		if (!strcmp(gRaces[i][Name], ""))
-		{
-			continue;
-		}
-
-		SortScores(gHighScores, i);
-	}*/
-
-	ShowHighScoresDialog(playerid);
-
-	return 1;
+	return ShowHighScoresDialog(playerid, 0);
 }
 
 dcmd_search(playerid, const params[]) 

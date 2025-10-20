@@ -1985,6 +1985,24 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 				}
 			}
+		case DIALOG_HIGH_SCORES_MAIN:
+			{
+				if (!response)
+				{
+					gPlayers[playerid][Temp] = -1;
+				}
+
+				if (gPlayers[playerid][Temp] > 9)
+				{
+					gPlayers[playerid][Temp] += 10;
+				}
+				else
+				{
+					gPlayers[playerid][Temp] = 10;
+				}
+
+				return ShowHighScoresDialog(playerid, gPlayers[playerid][Temp]);
+			}
 
 		default: 
 			return 0; // dialog ID was not found, search in other scripts

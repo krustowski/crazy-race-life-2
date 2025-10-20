@@ -68,13 +68,18 @@ enum
 
 #include "modules/real.pwn"
 
-stock ShowHighScoresDialog(playerid)
+stock ShowHighScoresDialog(playerid, offset)
 {
 	new stringToPrint[1024];
 	format(stringToPrint, sizeof(stringToPrint), "");
 	
-	for (new i = 0; i < MAX_RACE_COUNT; i++)
+	for (new i = offset; i < MAX_RACE_COUNT; i++)
 	{
+		if (i == offset + 10)
+		{
+			break;
+		}
+
 		if (gHighScores[i][Time][0] == 0 || !strcmp(gRaces[i][Name], ""))
 		{
 			continue;
@@ -91,7 +96,7 @@ stock ShowHighScoresDialog(playerid)
 			format(highScoreTimeSec, sizeof(highScoreTimeSec), "%2d", (gHighScores[i][Time][0] / 1000) % 60);
 		}
 
-		format(stringToPrint, sizeof(stringToPrint), "%s\nRace No. %d\n\n1st\t%d:%s min\t%s\t(model %d)\n", 
+		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFD700}Race No. %d{FFFFFF}\n\n1st\t%d:%s min\t%s\t(model %d)\n", 
 				stringToPrint, 
 				i, 
 				(gHighScores[i][Time][0] / 1000) / 60,
@@ -141,7 +146,7 @@ stock ShowHighScoresDialog(playerid)
 		}
 	}
 
-	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_MAIN, DIALOG_STYLE_MSGBOX, "High Scores", stringToPrint, "Close", "");
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_MAIN, DIALOG_STYLE_MSGBOX, "High Scores", stringToPrint, "Next page", "Close");
 }
 
 stock ShowAdminCommandsDialog(playerid)

@@ -254,6 +254,7 @@ public OnPlayerConnect(playerid)
 
 	// Reset the auth status for a new player.
 	gPlayers[playerid][IsLogged] = false;
+	gPlayers[playerid][TeamID] = 0;
 
 	// Reset the deathmatch states.
 	gDeathmatch[playerid][IsRegistered] = false;

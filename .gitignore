@@ -7,3 +7,9 @@ server.cfg
 plugins/*
 log-core.so
 */*/crl2_data.db
+crl2_data.db
+logs/ 
+npcmodes/
+scriptfiles/
+server_log.txt
+*/*/*.pem

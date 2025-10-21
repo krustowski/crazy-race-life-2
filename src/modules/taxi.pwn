@@ -1,3 +1,8 @@
+#if defined _CRL2_TAXI
+	#endinput
+#endif
+#define _CRL2_TAXI
+
 //
 //  taxi.pwn
 //  Taxi-related module
@@ -339,7 +344,7 @@ stock SetPlayerTaxiMission(playerid)
 	SetTaxiMissionCustomer(playerid);
 
 	gTaxiMission[playerid][Active] = true;
-	//gTaxiMission[playerid][TimerCheckNearNPC] = SetTimerEx("CheckTaxiNearNPC", 1500, true, "i", playerid);
+
 	gTaxiMission[playerid][TimerCheckVehicle] = SetTimerEx("CheckTaxiVehicle", 1500, true, "i", playerid);
 	gTaxiMission[playerid][TimerUpdate] = SetTimerEx("UpdateTaxiMissionInfoText", 1000, true, "i", playerid);
 

@@ -1,3 +1,8 @@
+#if defined _CRL2_HELPERS
+	#endinput
+#endif
+#define _CRL2_HELPERS
+
 #define RC_BANDIT   	441
 #define RC_BARON    	464
 #define RC_GOBLIN  	501

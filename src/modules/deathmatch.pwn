@@ -1,3 +1,8 @@
+#if defined _CRL2_DEATHMATCH
+	#endinput
+#endif
+#define _CRL2_DEATHMATCH
+
 //
 //  deathmatch.pwn
 //

@@ -1,3 +1,8 @@
+#if defined _CRL2_HTTP
+	#endinput
+#endif
+#define _CRL2_HTTP
+
 forward WebhookResponse(index, response_code, data[]);
 
 public WebhookResponse(index, response_code, data[])

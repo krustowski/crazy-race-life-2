@@ -1,3 +1,8 @@
+#if defined _CRL2_PLAYER
+	#endinput
+#endif
+#define _CRL2_PLAYER
+
 //
 //  player.pwn
 //

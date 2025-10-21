@@ -1,3 +1,8 @@
+#if defined _CRL2_OBJECTS
+	#endinput
+#endif
+#define _CRL2_OBJECTS
+
 //
 //  Global static objects.
 //

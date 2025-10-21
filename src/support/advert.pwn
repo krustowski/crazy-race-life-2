@@ -1,3 +1,8 @@
+#if defined _CRL2_ADVERT
+	#endinput
+#endif
+#define _CRL2_ADVERT
+
 forward ShowAdvert();
 
 public ShowAdvert()

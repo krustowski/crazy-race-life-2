@@ -1,3 +1,8 @@
+#if defined _CRL2_TRUCKING
+	#endinput
+#endif
+#define _CRL2_TRUCKING
+
 //
 //  trucking.pwn
 //

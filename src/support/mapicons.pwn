@@ -1,3 +1,8 @@
+#if defined _CRL2_MAPICONS
+	#endinput
+#endif
+#define _CRL2_MAPICONS
+
 #include "modules/race.pwn"
 
 enum

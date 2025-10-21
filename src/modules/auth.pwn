@@ -1,3 +1,8 @@
+#if defined _CRL2_AUTH
+	#endinput
+#endif
+#define _CRL2_AUTH
+
 //
 //  auth.pwn
 //

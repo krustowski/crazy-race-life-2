@@ -1,3 +1,8 @@
+#if defined _CRL2_PICKUPS
+	#endinput
+#endif
+#define _CRL2_PICKUPS
+
 // https://www.open.mp/docs/scripting/resources/pickuptypes
 #define PICKUP_TYPE_NONE			0
 #define PICKUP_TYPE_ALWAYS			1

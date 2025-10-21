@@ -1,3 +1,8 @@
+#if defined _CRL2_DIALOGS
+	#endinput
+#endif
+#define _CRL2_DIALOGS
+
 //
 //  Everything dialogs.
 //

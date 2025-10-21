@@ -1,3 +1,8 @@
+#if defined _CRL2_DRUGZ
+	#endinput
+#endif
+#define _CRL2_DRUGZ
+
 //
 //  drugz.pwn
 //

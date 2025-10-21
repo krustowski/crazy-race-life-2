@@ -1,3 +1,8 @@
+#if defined _CRL2_NET
+	#endinput
+#endif
+#define _CRL2_NET
+
 //
 //  net.pwn
 //

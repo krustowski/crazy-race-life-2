@@ -1,3 +1,8 @@
+#if defined _CRL2_TEAM
+	#endinput
+#endif
+#define _CRL2_TEAM
+
 //
 //  team.pwn
 //

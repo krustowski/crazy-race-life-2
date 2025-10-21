@@ -1,3 +1,8 @@
+#if defined _CRL2_CLOCK
+	#endinput
+#endif
+#define _CRL2_CLOCK
+
 // The very game clock's text
 new Text:gClockText;
 

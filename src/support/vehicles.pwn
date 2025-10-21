@@ -1,3 +1,8 @@
+#if defined _CRL2_VEHICLES
+	#endinput
+#endif
+#define _CRL2_VEHICLES
+
 new const VEHICLE_PLATE[] = "--CRL2--";
 
 forward InitVehicles();

@@ -1,3 +1,8 @@
+#if defined _CRL2_ANTICHEAT
+	#endinput
+#endif
+#define _CRL2_ANTICHEAT
+
 forward AntiCheatWeapon();
 forward AntiFlood();
 forward AntiJetPack();

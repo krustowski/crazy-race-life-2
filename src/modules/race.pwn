@@ -1,3 +1,8 @@
+#if defined _CRL2_RACE
+	#endinput
+#endif
+#define _CRL2_RACE
+
 #define MAX_RACE_NAME		64
 #define MAX_RACE_CP		99
 #define MAX_RACE_COORD		3

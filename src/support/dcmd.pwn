@@ -1,3 +1,8 @@
+#if defined _CRL2_DCMD
+	#endinput
+#endif
+#define _CRL2_DCMD
+
 //
 //  dcmd.pwn
 //

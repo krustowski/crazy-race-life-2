@@ -1,3 +1,8 @@
+#if defined _CRL2_REAL
+	#endinput
+#endif
+#define _CRL2_REAL
+
 // 
 //  real.pwn
 //  Real Estate stuff

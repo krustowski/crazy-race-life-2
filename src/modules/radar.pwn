@@ -1,3 +1,8 @@
+#if defined _CRL2_RADAR
+	#endinput
+#endif
+#define _CRL2_RADAR
+
 new RADAR_FEE = 500;
 
 enum E_POSITION

@@ -1,3 +1,8 @@
+#if defined _CRL2_BANK
+	#endinput
+#endif
+#define _CRL2_BANK
+
 #define MAX_ATM_PICKUPS 20
 
 new gBankPickups[MAX_ATM_PICKUPS];

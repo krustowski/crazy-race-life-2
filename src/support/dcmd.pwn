@@ -58,6 +58,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(cam, 3, cmdtext); 		  //rcon + 
 	dcmd(ccmd, 4, cmdtext);           //rcon + lvl 1
 	dcmd(clear, 5, cmdtext);          //rcon +
+	dcmd(combat, 6, cmdtext);	  //rcon + lvl 4
 	dcmd(countdown, 9, cmdtext);      //rcon + 
 	dcmd(crime, 5, cmdtext);	  //rcon
 	dcmd(drunk, 5, cmdtext);          //rcon +
@@ -1018,6 +1019,43 @@ dcmd_clear(playerid, const params[])
 	format(stringToPrint, sizeof(stringToPrint), "[ CLEAR ] Chat history flushed");
 
 	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+
+	return 1;
+}
+
+new gCombatNPC[MAX_PLAYERS];
+
+dcmd_combat(playerid, const params[])
+{
+#pragma unused params
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4) 
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+
+	new Float: X, Float: Y, Float: Z;
+	GetPlayerPos(playerid, X, Y, Z);
+	
+	if (!NPC_IsValid(gCombatNPC[playerid]))
+	{
+		gCombatNPC[playerid] = NPC_Create("[NPC]combat_test");
+	}
+	else
+	{
+		NPC_Destroy(gCombatNPC[playerid]);
+		return 1;
+	}
+
+	new npcid = gCombatNPC[playerid];
+
+	NPC_Spawn(npcid);
+	NPC_SetPos(npcid, X + 5, Y + 5, Z);
+
+	NPC_SetWeapon(npcid, 29);
+	NPC_SetAmmo(npcid, 1000);
+	NPC_EnableInfiniteAmmo(npcid, true);
+	NPC_SetWeaponAccuracy(npcid, 29, 0.1);
+
+	NPC_AimAtPlayer(npcid, playerid, true, 0, true, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+	NPC_Shoot(npcid, 29, playerid, 0, X, Y, Z, 0.0, 0.0, 0.0, true);
 
 	return 1;
 }

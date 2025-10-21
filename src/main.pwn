@@ -1557,6 +1557,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							return ShowServerRulesDialog(playerid);
 						}
+					case 3:
+						{
+							return ShowCreditsDialog(playerid);
+						}
 				}
 			}
 		case DIALOG_EDITOR_LIST:

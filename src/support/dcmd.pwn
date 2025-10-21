@@ -20,6 +20,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(animoff, 7, cmdtext);        //all
 	dcmd(bank, 4, cmdtext);		  //all
 	dcmd(cmd, 3, cmdtext);            //all
+	dcmd(credits, 7, cmdtext);        //all
 	dcmd(dance, 5, cmdtext);	  //all
 	dcmd(deal, 4, cmdtext);	  	  //all
 	dcmd(deathmatch, 10, cmdtext);	  //all
@@ -195,6 +196,12 @@ dcmd_cmd(playerid, const params[])
 {
 #pragma unused params
 	return ShowCommonCommandsDialog(playerid);
+}
+
+dcmd_credits(playerid, const params[])
+{
+#pragma unused params
+	return ShowCreditsDialog(playerid);
 }
 
 dcmd_dance(playerid, const params[])

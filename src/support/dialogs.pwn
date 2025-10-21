@@ -68,7 +68,8 @@ enum
 	DIALOG_RACE_EDITOR_PRIZE,
 	DIALOG_PROPERTY_SKIN_MAIN,
 	DIALOG_PROPERTY_SKIN_LIST,
-	DIALOG_PRIZE_LIST
+	DIALOG_PRIZE_LIST,
+	DIALOG_CREDITS
 };
 
 #include "modules/real.pwn"
@@ -739,19 +740,20 @@ stock ShowPlayerAccountDialog(playerid)
 stock ShowServerHelpListDialog(playerid)
 {
 	new stringToPrint[256];
-	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s",
 			"Show Player Commands",
 			"Show Admin Commands",
-			"Show Server Rules"
+			"Show Server Rules",
+			"Show Gamemode Credits"
 		);
 
-	return ShowPlayerDialog(playerid, DIALOG_HELP_LIST, DIALOG_STYLE_LIST, "Server Help List", stringToPrint, "Select", "Close");
+	return ShowPlayerDialog(playerid, DIALOG_HELP_LIST, DIALOG_STYLE_LIST, "Server Help", stringToPrint, "Select", "Close");
 }
 
 stock ShowServerRulesDialog(playerid)
 {
 	new stringToPrint[512];
-	format(stringToPrint, sizeof(stringToPrint), "Game Server Rules\n\n1. No Carkill, Helikill, or Bikekill\n2. No Minigun or Jetpack usage\n3. No Cheating\n\nAnti-Cheat filterscript enabled (cheating => kick, or ban)");
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Game Server Rules{FFFFFF}\n\n1. No Carkill, Helikill, or Bikekill\n2. No Minigun or Jetpack usage\n3. No Cheating\n\nAnti-Cheat filterscript enabled (cheating => kick, or ban)");
 
 	return ShowPlayerDialog(playerid, DIALOG_SERVER_RULES, DIALOG_STYLE_MSGBOX, "Server Rules", stringToPrint, "Close", "");
 }
@@ -940,4 +942,23 @@ stock ShowPrizesInfoDialog(playerid)
 	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Tiki Pickups{FFFFFF}\n\nTiki prizes have form of a small green sculpture pickup (Tiki).\nThese pickups are placed in the Los Santos area.\n\nPrize: ${00FF00}10M{FFFFFF} + a potential to receive the Admin level\n\n{FFD700}Pumpkin Pickups{FFFFFF}\n\nPumpkin prizes have form of a orange pumpkin pickups.\nThese are located mainly in the Bone County (desert) area.\n\nPrize: ${00FF00}1.5M{FFFFFF}");
 		
 	return ShowPlayerDialog(playerid, DIALOG_PRIZE_LIST, DIALOG_STYLE_MSGBOX, "Prizes Info", stringToPrint, "Close", "");
+}
+
+#include "crazy_race_life_2_version.inc"
+
+stock ShowCreditsDialog(playerid)
+{
+	new stringToPrint[1024];
+
+	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%d.%d.%d",
+			"{FFD700}CrazyRaceLife2{FFFFFF} (CRL2)\n\n",
+			"Credits: {00FF00}",
+			GAMEMODE_CREDITS,
+			"{FFFFFF} (2008-2010, 2025){FFFFFF}\nVersion: {FFD700}",
+		       	CRAZY_RACE_LIFE_2_VERSION_MAJOR,
+			CRAZY_RACE_LIFE_2_VERSION_MINOR,
+			CRAZY_RACE_LIFE_2_VERSION_PATCH
+	      );
+
+	return ShowPlayerDialog(playerid, DIALOG_CREDITS, DIALOG_STYLE_MSGBOX, "Gamemode Credits", stringToPrint, "Close", "");
 }

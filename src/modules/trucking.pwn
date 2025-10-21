@@ -86,6 +86,9 @@ enum MissionStats
 	TimeElapsed,
 	Earned,
 
+	Checkpoint[Coords],
+	bool: CheckpointDisabled,
+
 	TimerElapsed,
 	TimerAttachedCheck
 }
@@ -171,14 +174,32 @@ public CheckPlayerTrailerAttached(playerid)
 		trailerid = gPlayerMissions[playerid][TrailerID],
 		vehicleid = gPlayerMissions[playerid][VehicleID];
 
-	if (IsTrailerAttachedToVehicle(vehicleid))
+	if (IsTrailerAttachedToVehicle(vehicleid) && IsPlayerInVehicle(playerid, vehicleid))
 	{
+		SetVehicleParamsForPlayer(vehicleid, playerid, false, false);
 		SetVehicleParamsForPlayer(trailerid, playerid, false, false);
+
+		if (gPlayerMissions[playerid][CheckpointDisabled] && gPlayerMissions[playerid][Checkpoint][CoordX] != 0.0 && gPlayerMissions[playerid][Checkpoint][CoordY] != 0.0)
+		{
+			SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, gPlayerMissions[playerid][Checkpoint][CoordX], gPlayerMissions[playerid][Checkpoint][CoordY], gPlayerMissions[playerid][Checkpoint][CoordZ], 0.0, 0.0, 0.0, 12.0);
+			gPlayerMissions[playerid][CheckpointDisabled] = false;
+		}
+
+		return 1;
+	}
+
+	DisablePlayerRaceCheckpoint(playerid);
+	gPlayerMissions[playerid][CheckpointDisabled] = true;
+
+	if (!IsPlayerInVehicle(playerid, vehicleid))
+	{
+		SetVehicleParamsForPlayer(vehicleid, playerid, true, false);
+
+		GameTextForPlayer(playerid, "~w~Return to ~y~the truck ~w~to continue ~y~the mission!", 1000, 3); 
 		return 1;
 	}
 
 	SetVehicleParamsForPlayer(trailerid, playerid, true, false);
-	//SendClientMessage(playerid, COLOR_ORANGE, "[ TRUCK ] The trailer has just detached from the cab, reatach it to continue the mission");
 
 	GameTextForPlayer(playerid, "~w~Trailer ~r~Detached! ~w~Reattach to continue!", 1000, 3); 
 
@@ -225,9 +246,13 @@ stock SetPlayerTruckingMission(playerid, MissionType: missionType)
 	y0 = gTruckingPoints[pointId][LocationCheckpoint][CoordY];
 	z0 = gTruckingPoints[pointId][LocationCheckpoint][CoordZ];
 
+	gPlayerMissions[playerid][Checkpoint][CoordX] = x0;
+	gPlayerMissions[playerid][Checkpoint][CoordY] = y0;
+	gPlayerMissions[playerid][Checkpoint][CoordZ] = z0;
+
 	gPlayerMissions[playerid][ProvisionBonusWeight] = (floatabs(X - x0) / 3000 + floatabs(Y - y0) / 3000) / 2;
 
-	SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, Float:x0, Float:y0, Float:z0, Float:x0, Float:y0, Float:z0, 10.0);
+	SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, Float:x0, Float:y0, Float:z0, Float:x0, Float:y0, Float:z0, 12.0);
 
 	return 1;
 }

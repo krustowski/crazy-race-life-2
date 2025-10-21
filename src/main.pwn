@@ -2248,7 +2248,14 @@ public OnPlayerSelectedMenuRow(playerid, row)
 	{
 		if (currentMenu == gTeams[i][Menus][0])
 		{
-			GivePlayerWeapon(playerid, t_WEAPON: gTeams[i][Weapons][0], gTeams[i][Ammu][0]);
+			for (new j = 0; j < MAX_TEAM_WEAPONS; j++)
+			{
+				if (gTeams[i][Weapons][j])
+				{
+					GivePlayerWeapon(playerid, t_WEAPON: gTeams[i][Weapons][j], gTeams[i][Ammu][j]);
+				}
+			}
+
 			SetPlayerColor(playerid, gTeams[i][Color]);
 			SetPlayerSkin(playerid, gTeams[i][Skins][0]);
 			SetPlayerTeam(playerid, gTeams[i][ID]);

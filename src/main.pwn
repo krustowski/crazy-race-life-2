@@ -304,6 +304,11 @@ public OnPlayerConnect(playerid)
 	SendClientMessageLocalized(playerid, I18N_WELCOME_MESSAGE);
 	SendClientMessage(playerid, COLOR_INVISIBLE, "");
 
+	if (!IsPlayerUsingOmp(playerid))
+	{
+		SendClientMessage(playerid, COLOR_RED, "[ CLIENT ] You don't seem to use the openMP launcher, some game features may not be available for you. Please visit https://open.mp to get it.");
+	}
+
 	// Ask the user to login/register.
 	gPlayers[playerid][LoginAttempts] = 0;
 	ShowAuthDialog(playerid);

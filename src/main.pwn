@@ -2135,6 +2135,27 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		}
 	}
 
+	if (pickupid == gPickupSFCentrumEnter)
+	{
+		SetPlayerPos(playerid, -1898.89, 486.52, 21.93); 
+		return 1;
+	}
+	else if (pickupid == gPickupSFCentrumExit)
+	{
+		SetPlayerPos(playerid, -1902.57, 486.75, 35.17);
+		return 1;
+	}
+	else if (pickupid == gPickupBankLSEnter)
+	{
+		SetPlayerPos(playerid, 1483.94, -1783.11, 6.70);
+		return 1;
+	}
+	else if (pickupid == gPickupBankLSExit)
+	{
+		SetPlayerPos(playerid, 1481.15, -1765.18, 18.79);
+		return 1;
+	}
+
 	if (pickupid == gAdminRoomHealth)
 	{
 		SetPlayerHealth(playerid, 100.0);

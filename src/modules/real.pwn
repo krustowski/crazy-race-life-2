@@ -1102,6 +1102,8 @@ stock BuyPlayerProperty(playerid, propertyID)
 	//  Ok, proceed with the transaction.
 	//
 
+	gProperties[arrayID][UserID] = gPlayers[playerid][OrmID];
+
 	for (new i = 0; i < MAX_PROPERTY_PICKUPS; i++)
 	{
 		if (gPropertyCoords[arrayID][i][PickupType] == OFFER_POINT)
@@ -1128,13 +1130,12 @@ stock BuyPlayerProperty(playerid, propertyID)
 	}
 
 	gProperties[arrayID][Occupied] = true;
-	gProperties[arrayID][UserID] = gPlayers[playerid][OrmID];
 	gPlayers[playerid][Properties][freeSlot] = propertyID;
 
 	GivePlayerMoney(playerid, -gProperties[arrayID][Cost]);
 
 	// Play property bought theme sound
-	PlayerPlaySound(playerid, 182, 0.0, 0.0, 0.0);
+	//PlayerPlaySound(playerid, 182, 0.0, 0.0, 0.0);
 
 	return SendClientMessageLocalized(playerid, I18N_REAL_PROPERTY_ACQ);
 }

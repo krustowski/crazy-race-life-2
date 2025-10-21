@@ -392,7 +392,17 @@ public OnPlayerSpawn(playerid)
 
 	if (gPlayers[playerid][TeamID])
 	{
-		SetPlayerColor(playerid, gTeams[ gPlayers[playerid][TeamID] - 1 ][Color]);
+		new teamid = gPlayers[playerid][TeamID] - 1;
+
+		SetPlayerColor(playerid, gTeams[teamid][Color]);
+
+		for (new i = 0; i < MAX_TEAM_WEAPONS; i++)
+		{
+			if (gTeams[ gPlayers[playerid][TeamID] -1 ][Weapons][i])
+			{
+				GivePlayerWeapon(playerid, t_WEAPON: gTeams[teamid][Weapons][i], gTeams[teamid][Ammu][i]);
+			}
+		}
 	}
 
 	if (gPlayers[playerid][InsideProperty])
@@ -2247,6 +2257,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 
 			format(stringToPrint, sizeof(stringToPrint), "[ TEAM ] Player %s joined the %s team!", gPlayers[playerid][Name], gTeams[i][TeamName]);
 			SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+			break;
 		}
 	}
 

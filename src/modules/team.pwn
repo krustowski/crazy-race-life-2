@@ -10,6 +10,7 @@
 #define MAX_TEAMS		10
 #define MAX_TEAM_PICKUPS	16
 #define MAX_TEAM_MENUS		16
+#define MAX_TEAM_WEAPONS	11
 
 #include "db/sql.pwn"
 

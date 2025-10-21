@@ -390,6 +390,13 @@ public OnPlayerSpawn(playerid)
 
 	SetPlayerSkin(playerid, gPlayers[playerid][Skin]);
 
+	// Set the player back to the deathmatch area if is set in game.
+	if (gDeathmatch[playerid][InGame])
+	{
+		ResetPlayerDeathmatchState(playerid);
+		return 1;
+	}
+
 	if (gPlayers[playerid][TeamID])
 	{
 		new teamid = gPlayers[playerid][TeamID] - 1;
@@ -409,13 +416,6 @@ public OnPlayerSpawn(playerid)
 	{
 		DestroyPropertyInterior(playerid);
 		gPlayers[playerid][InsideProperty] = false;
-	}
-
-	// Set the player back to the deathmatch area if is set in game.
-	if (gDeathmatch[playerid][InGame])
-	{
-		ResetPlayerDeathmatchState(playerid);
-		return 1;
 	}
 
 	// Respawn at player(s house.

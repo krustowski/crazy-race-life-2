@@ -53,6 +53,8 @@ public StartDeathmatch()
 		gDeathmatch[i][IsRegistered] = false;
 		gDeathmatch[i][InGame] = true;
 
+		HideGameTextForPlayer(i, 3);
+
 		gDeathmatchGangZone[i] = CreatePlayerGangZone(i, -1433, -2373, -1293, -2229);
 		PlayerGangZoneShow(i, gDeathmatchGangZone[i], 0xFFD700FF);
 		UsePlayerGangZoneCheck(i, gDeathmatchGangZone[i], true);
@@ -182,6 +184,8 @@ stock RegisterToDeathmatch(playerid)
 		gDeathmatchTimers[Start] = Timer: SetTimer("StartDeathmatch", 45 * 1000, false);
 	}
 
+	GameTextForPlayer(playerid, "~w~Waiting for others to join", 45000, 3); 
+
 	return 1;
 }
 
@@ -201,12 +205,14 @@ stock LeaveDeathmatch(playerid)
 		PlayerGangZoneDestroy(playerid, gDeathmatchGangZone[playerid]);
 
 		TextDrawHideForPlayer(playerid, gDeathmatchText[playerid]);
+		HideGameTextForPlayer(playerid, 3);
 
 		gDeathmatch[playerid][IsRegistered] = false;
 		gDeathmatch[playerid][InGame] = false;
 
 		TogglePlayerControllable(playerid, true);
 		ResetPlayerWeapons(playerid);
+
 		SpawnPlayer(playerid);
 	}
 

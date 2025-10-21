@@ -34,10 +34,13 @@ enum Team
 	TeamName[64],
 	Color,
 	Skins[5],
-	Weapons[11],
-	Ammu[11],
+
+	Weapons[MAX_TEAM_WEAPONS],
+	Ammu[MAX_TEAM_WEAPONS],
+
 	SalaryBase,
 	SalaryVolatile,
+
 	PICKUP: Pickups[MAX_TEAM_PICKUPS],
 	Menu: Menus[MAX_TEAM_MENUS]
 }

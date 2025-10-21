@@ -28,6 +28,8 @@ new gDeathmatch[MAX_PLAYERS][Deathmatch];
 new gDeathmatchTimers[DeathmatchTimers];
 new Text: gDeathmatchText[MAX_PLAYERS];
 
+new gDeathmatchGangZone[MAX_PLAYERS];
+
 forward StartDeathmatch();
 forward UpdateDeathmatchScoreboard();
 forward EndDeathmatch();
@@ -50,6 +52,10 @@ public StartDeathmatch()
 
 		gDeathmatch[i][IsRegistered] = false;
 		gDeathmatch[i][InGame] = true;
+
+		gDeathmatchGangZone[i] = CreatePlayerGangZone(i, -1433, -2373, -1293, -2229);
+		PlayerGangZoneShow(i, gDeathmatchGangZone[i], 0xFFD700FF);
+		UsePlayerGangZoneCheck(i, gDeathmatchGangZone[i], true);
 
 		ResetPlayerDeathmatchState(i);
 		TogglePlayerControllable(i, true);
@@ -189,6 +195,10 @@ stock LeaveDeathmatch(playerid)
 
 		format(stringToPrint, sizeof(stringToPrint), "[ DEATHMATCH ] Player %s left the /deathmatch!", playerName);
 		SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+
+		PlayerGangZoneHide(playerid, gDeathmatchGangZone[playerid]);
+		UsePlayerGangZoneCheck(playerid, gDeathmatchGangZone[playerid], false);
+		PlayerGangZoneDestroy(playerid, gDeathmatchGangZone[playerid]);
 
 		TextDrawHideForPlayer(playerid, gDeathmatchText[playerid]);
 

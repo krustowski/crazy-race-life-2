@@ -398,7 +398,7 @@ public OnPlayerSpawn(playerid)
 
 		for (new i = 0; i < MAX_TEAM_WEAPONS; i++)
 		{
-			if (gTeams[ gPlayers[playerid][TeamID] -1 ][Weapons][i])
+			if (gTeams[teamid][Weapons][i])
 			{
 				GivePlayerWeapon(playerid, t_WEAPON: gTeams[teamid][Weapons][i], gTeams[teamid][Ammu][i]);
 			}
@@ -2626,6 +2626,18 @@ public OnPlayerEditAttachedObject(playerid, EDIT_RESPONSE:response, index, model
 				SendClientMessage(playerid, COLOR_GREY, stringToPrint);
 				ClearAnimations(playerid);
 			}
+	}
+
+	return 1;
+}
+
+public OnPlayerLeavePlayerGangZone(playerid, zoneid)
+{
+	if (zoneid == gDeathmatchGangZone[playerid])
+	{
+		new stringToPrint[64];
+		format(stringToPrint, sizeof(stringToPrint), "[ DEATHMATCH ] Get back to the arena!");
+		SendClientMessage(playerid, COLOR_RED, stringToPrint);
 	}
 
 	return 1;

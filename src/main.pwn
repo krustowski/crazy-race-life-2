@@ -462,7 +462,7 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 
 	if (gCombatMission[playerid][Active])
 	{
-		return AbortCombatMission(playerid);
+		return AbortCombatMission(playerid, false);
 	}
 
 	if (gTrucking[playerid])
@@ -2054,6 +2054,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 	CheckRaceCheckpoint(playerid);
 	CheckTruckingCheckpoint(playerid);
 	CheckTaxiMissionCheckpoint(playerid);
+	CheckCombatCheckpoint(playerid);
 
 	return 1;
 }

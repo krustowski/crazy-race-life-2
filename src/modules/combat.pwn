@@ -7,28 +7,37 @@
 //  combat.pwn
 //
 
-#define MAX_COMBAT_NPCS		10
-#define MAX_COMBAT_PICKUPS	10
+#define MAX_COMBAT_NPCS		25
+#define MAX_COMBAT_PICKUPS	20
+#define MAX_COMBAT_VEHICLES	5
 
 enum 
 {
 	COMBAT_COORD_NONE,
 	COMBAT_COORD_BRIEFCASE,
 	COMBAT_COORD_NPC,
-	COMBAT_COORD_HEALTH
+	COMBAT_COORD_HEALTH,
+	COMBAT_COORD_HELI,
+	COMBAT_COORD_EXIT,
+	COMBAT_COORD_ROOF,
+	COMBAT_COORD_CP,
+	COMBAT_COORD_NPC_MAN
 }
 
 enum CombatPickupType
 {
 	TYPE_NONE,
 	TYPE_BRIEFCASE,
-	TYPE_HEALTH
+	TYPE_HEALTH,
+	TYPE_EXIT,
+	TYPE_CP
 }
 
 enum CombatPickup
 {
 	Pickup,
-	CombatPickupType: Type
+	CombatPickupType: Type,
+	Point[Coords]
 }
 
 enum CombatMission
@@ -39,14 +48,41 @@ enum CombatMission
 	Text: InfoText,
 
 	TimeElapsed,
-	Timer: TimerUpdate
+	Timer: TimerUpdate,
+	Timer: TimerBriefcaseMan
 }
 
 new gCombatNPC[MAX_COMBAT_NPCS];
 new gCombatMission[MAX_PLAYERS][CombatMission];
 new gCombatPickups[MAX_COMBAT_PICKUPS][CombatPickup];
+new gCombatVehicles[MAX_COMBAT_VEHICLES];
 
+forward CheckBriefcaseManProximity(playerid, npcid);
 forward UpdateCombatMissionInfoText(playerid);
+
+public CheckBriefcaseManProximity(playerid, npcid)
+{
+	new Float: pX, Float: pY, Float: pZ;
+
+	GetPlayerPos(npcid, pX, pY, pZ);
+	new interior = GetPlayerInterior(playerid);
+
+	if (interior == 0 && IsPlayerInSphere(playerid, pX, pY, pZ, 5.0))
+	{
+		KillTimer(_: gCombatMission[playerid][TimerBriefcaseMan]);
+
+		new prize = gCombatMission[playerid][BriefcaseCount] * 500000, stringToPrint[128];
+		format(stringToPrint, sizeof(stringToPrint), "[ COMBAT ] Briefcases exchanged for money ($%d)!", prize);
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint); 
+
+		GivePlayerMoney(playerid, prize);
+		PlayerPlaySound(playerid, 1147, 0, 0, 0);
+
+		AbortCombatMission(playerid, true);
+	}
+
+	return 1;
+}
 
 public UpdateCombatMissionInfoText(playerid)
 {
@@ -70,6 +106,19 @@ public UpdateCombatMissionInfoText(playerid)
 	return 1;
 }
 
+stock CheckCombatCheckpoint(playerid)
+{
+	if (!gCombatMission[playerid][Active])
+	{
+		return 1;
+	}
+
+	DisablePlayerRaceCheckpoint(playerid);
+
+	SendClientMessage(playerid, COLOR_ORANGE, "[ COMBAT ] Follow the yellow marker on map to give the briefcase man the briefcases!");
+
+	return 1;
+}
 
 stock CheckCombatPickup(playerid, pickupid)
 {
@@ -94,6 +143,22 @@ stock CheckCombatPickup(playerid, pickupid)
 				{
 					SetPlayerHealth(playerid, 100.0);
 				}
+			case TYPE_EXIT:
+				{
+					SetPlayerInterior(playerid, 0);
+					SetPlayerPos(playerid, gCombatPickups[i][Point][CoordX], gCombatPickups[i][Point][CoordY], gCombatPickups[i][Point][CoordZ]);
+
+					for (new j = 0; j < MAX_COMBAT_PICKUPS; j++)
+					{
+						if (gCombatPickups[j][Type] != TYPE_CP)
+						{
+							continue;
+						}
+
+						SendClientMessage(playerid, COLOR_ORANGE, "[ COMBAT ] Take the helicopter and follow the checkpoint on the minimap!");
+						SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, gCombatPickups[j][Point][CoordX], gCombatPickups[j][Point][CoordY], gCombatPickups[j][Point][CoordZ], 0.0, 0.0, 0.0, 10.0);
+					}
+				}
 		}
 	}
 
@@ -114,6 +179,7 @@ stock PrepareCombatInterior(playerid)
 
 	new npcid = 0;
 	new pickupid = 0;
+	new vehicleid = 0;
 
 	do
 	{
@@ -161,6 +227,60 @@ stock PrepareCombatInterior(playerid)
 					gCombatPickups[pickupid][Type] = TYPE_HEALTH;
 					pickupid++;
 				}
+			case COMBAT_COORD_HELI:
+				{
+					gCombatVehicles[vehicleid] = CreateVehicle(487, X, Y, Z, 0.0, 12, 0, -1);
+					vehicleid++;
+				}
+			case COMBAT_COORD_EXIT:
+				{
+					gCombatPickups[pickupid][Pickup] = EnsurePickupCreated(PICKUP_ARROW, 1, X, Y, Z);
+					gCombatPickups[pickupid][Type] = TYPE_EXIT;
+					pickupid++;
+				}
+			case COMBAT_COORD_ROOF:
+				{
+					for (new j = 0; j < MAX_COMBAT_PICKUPS; j++)
+					{
+						if (gCombatPickups[j][Type] != TYPE_EXIT)
+						{
+							continue;
+						}
+
+						gCombatPickups[j][Point][CoordX] = X;
+						gCombatPickups[j][Point][CoordY] = Y;
+						gCombatPickups[j][Point][CoordZ] = Z;
+					}
+				}
+			case COMBAT_COORD_CP:
+				{
+					gCombatPickups[pickupid][Type] = TYPE_CP;
+					gCombatPickups[pickupid][Point][CoordX] = X;
+					gCombatPickups[pickupid][Point][CoordY] = Y;
+					gCombatPickups[pickupid][Point][CoordZ] = Z;
+					pickupid++;
+				}
+			case COMBAT_COORD_NPC_MAN:
+				{
+					new npc_name[MAX_PLAYER_NAME];
+					format(npc_name, sizeof(npc_name), "[NPC]bcman%d", npcid);
+					gCombatNPC[npcid] = NPC_Create(npc_name);
+
+					NPC_Spawn(gCombatNPC[npcid]);
+					NPC_SetInterior(gCombatNPC[npcid], 0);
+					NPC_SetPos(gCombatNPC[npcid], X, Y, Z);
+
+					NPC_SetWeapon(gCombatNPC[npcid], 29);
+					NPC_SetAmmo(gCombatNPC[npcid], 1000);
+					NPC_EnableInfiniteAmmo(gCombatNPC[npcid], true);
+					NPC_SetWeaponAccuracy(gCombatNPC[npcid], 29, 0.1);
+
+					SetPlayerMarkerForPlayer(playerid, gCombatNPC[npcid], COLOR_YELLOW);
+
+					gCombatMission[playerid][TimerBriefcaseMan] = Timer: SetTimerEx("CheckBriefcaseManProximity", 2000, true, "i,i", playerid, gCombatNPC[npcid]);
+
+					npcid++;
+				}
 		}
 	}
 	while (DB_SelectNextRow(result));
@@ -174,7 +294,7 @@ stock SetCombatMission(playerid)
 {
 	if (gCombatMission[playerid][Active])
 	{
-		return AbortCombatMission(playerid);
+		return AbortCombatMission(playerid, false);
 	}
 
 	if (!PrepareCombatInterior(playerid))
@@ -183,14 +303,15 @@ stock SetCombatMission(playerid)
 	}
 
 	gCombatMission[playerid][Active] = true;
+	gCombatMission[playerid][TimeElapsed] = 0;
 	gCombatMission[playerid][BriefcaseCount] = 0;
-
-	gCombatMission[playerid][TimerUpdate] = Timer: SetTimerEx("UpdateCombatMissionInfoText", 1000, true, "i", playerid);
 
 	gCombatMission[playerid][InfoText] = TextDrawCreate(460.0, 400.0, "");
 	TextDrawLetterSize(gCombatMission[playerid][InfoText], 0.5, 1.5);
 	TextDrawFont(gCombatMission[playerid][InfoText], t_TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gCombatMission[playerid][InfoText], 1);
+
+	gCombatMission[playerid][TimerUpdate] = Timer: SetTimerEx("UpdateCombatMissionInfoText", 1000, true, "i", playerid);
 
 	GameTextForPlayer(playerid, "~w~Combat Mission ~g~Started", 3000, 3); 
 
@@ -200,9 +321,10 @@ stock SetCombatMission(playerid)
 	return 1;
 }
 
-stock AbortCombatMission(playerid)
+stock AbortCombatMission(playerid, bool: success)
 {
 	gCombatMission[playerid][Active] = false;
+	gCombatMission[playerid][TimeElapsed] = 0;
 	gCombatMission[playerid][BriefcaseCount] = 0;
 
 	for (new i = 0; i < MAX_COMBAT_PICKUPS; i++)
@@ -215,10 +337,21 @@ stock AbortCombatMission(playerid)
 		NPC_Destroy(i);
 	}
 
+	DisablePlayerRaceCheckpoint(playerid);
+
 	KillTimer(_: gCombatMission[playerid][TimerUpdate]);
+	KillTimer(_: gCombatMission[playerid][TimerBriefcaseMan]);
 
 	TextDrawHideForPlayer(playerid, gCombatMission[playerid][InfoText]);
-	GameTextForPlayer(playerid, "~w~Combat Mission ~r~Aborted", 3000, 3); 
+
+	if (success)
+	{
+		GameTextForPlayer(playerid, "~w~Combat Mission ~g~Done", 3000, 3); 
+	}
+	else
+	{
+		GameTextForPlayer(playerid, "~w~Combat Mission ~r~Aborted", 3000, 3); 
+	}
 
 	SetPlayerInterior(playerid, 0);
 	SpawnPlayer(playerid);

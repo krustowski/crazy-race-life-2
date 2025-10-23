@@ -455,6 +455,11 @@ dcmd_lock(playerid, const params[])
 		return 1;
 	}
 
+	if (gTaxiMission[playerid][Active])
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ LOCK ] You cannot lock this car!");
+	}
+
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if (i != playerid)
@@ -524,50 +529,6 @@ dcmd_property(playerid, const params[])
 #pragma unused params
 
 	return ShowPropertyListDialog(playerid);
-
-	/*new token1[32], token2[32];
-	SplitIntoTwo(params, token1, token2, sizeof(token1));
-
-	if (!strlen(params) || (strcmp(token1, "buy") && strcmp(token1, "sell") && strcmp(token1, "list") && strcmp(token1, "spawn") && strcmp(token1, "vehicle")) || (strcmp(token1, "list") && !IsNumeric(token2)))
-	{
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /property buy [property ID]");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /property sell [property ID]");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /property list");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /property spawn [property ID]");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /property vehicle [property ID]");
-
-		return 1;
-	}
-
-	if (!strval(token2) && strcmp(token1, "list"))
-		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Invalid property ID");
-
-	if (!strcmp(token1, "buy"))
-	{
-		BuyPlayerProperty(playerid, strval(token2));
-	}
-	else if (!strcmp(token1, "sell"))
-	{
-		SellPlayerProperty(playerid, strval(token2));
-	}
-	else if (!strcmp(token1, "list"))
-	{
-		return ShowPropertyListDialog(playerid);
-	}
-	else if (!strcmp(token1, "spawn"))
-	{
-		new propertyID = strval(token2);
-
-		return SetSpawnPointAtProperty(playerid, propertyID);
-	}
-	else if (!strcmp(token1, "vehicle"))
-	{
-		new propertyID = strval(token2);
-
-		return AttachVehicleToProperty(playerid, propertyID);
-	}
-
-	return 1;*/
 }
 
 dcmd_race(playerid, const params[])
@@ -580,44 +541,6 @@ dcmd_race(playerid, const params[])
 		return ShowRaceListDialog(playerid);
 
 	return ShowRaceOptionsDialog(playerid, raceid);
-
-	/*new token1[32], token2[32];
-	SplitIntoTwo(params, token1, token2, sizeof(token1));
-
-	if (!strlen(params) || (strcmp(token1, "join") && strcmp(token1, "exit") && strcmp(token1, "list") && strcmp(token1, "warp")) || (!strcmp(token1, "join") && !IsNumeric(token2)))
-	{
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /race join [ID zavodu]");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /race exit");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /race list");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /race warp");
-
-		return 1;
-	}
-
-	if (!strcmp(token1, "join"))
-	{
-		new raceId = strval(token2);
-
-		SetPlayerRaceState(playerid, raceId);
-	}
-	else if (!strcmp(token1, "exit"))
-	{
-		ResetPlayerRaceState(playerid, 0, false);
-	}
-	else if (!strcmp(token1, "list"))
-	{
-		return ShowRaceListDialog(playerid);
-	}
-	else if (!strcmp(token1, "warp"))
-	{
-		if (gPlayers[playerid][InsideProperty])
-			return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Leave the property to be able to use such command!");
-
-		if (SetPlayerRaceStartPos(playerid))
-			return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ RACE ] Warp near the race start used successfully");
-	}
-
-	return 1;*/
 }
 
 dcmd_rules(playerid, const params[])

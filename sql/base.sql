@@ -235,3 +235,17 @@ CREATE TABLE IF NOT EXISTS "team_coords" (
 	PRIMARY KEY("id"),
 	FOREIGN KEY("team_id") REFERENCES "teams"("id")
 );
+CREATE TABLE IF NOT EXISTS "combat_coord_types" (
+	"id"	INTEGER,
+	"name"	TEXT,
+	PRIMARY KEY("id")
+);
+CREATE TABLE IF NOT EXISTS "combat_coords" (
+	"id"	INTEGER,
+	"type"	INTEGER NOT NULL DEFAULT 0,
+	"x"	REAL NOT NULL,
+	"y"	REAL NOT NULL,
+	"z"	REAL NOT NULL,
+	PRIMARY KEY("id"),
+	FOREIGN KEY("type") REFERENCES "combat_coord_types"("id")
+);

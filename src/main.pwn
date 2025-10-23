@@ -94,6 +94,7 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 #include "modules/auth.pwn"
 #include "modules/real.pwn"
 #include "modules/taxi.pwn"
+#include "modules/combat.pwn"
 
 
 //
@@ -159,7 +160,7 @@ public OnGameModeInit()
 	SetGameModeText(GAMEMODE_NAME);
 
 	AllowAdminTeleport(true);
-	AllowInteriorWeapons(false);
+	AllowInteriorWeapons(true);
 	DisableInteriorEnterExits();
 	EnableStuntBonusForAll(true);  
 	EnableZoneNames(true);
@@ -403,7 +404,7 @@ public OnPlayerSpawn(playerid)
 
 		SetPlayerColor(playerid, gTeams[teamid][Color]);
 
-		for (new i = 0; i < MAX_TEAM_WEAPONS; i++)
+		/*for (new i = 0; i < MAX_TEAM_WEAPONS; i++)
 		{
 			if (!gTeams[teamid][Weapons][i])
 			{
@@ -411,7 +412,7 @@ public OnPlayerSpawn(playerid)
 			}
 
 			GivePlayerWeapon(playerid, t_WEAPON: gTeams[teamid][Weapons][i], gTeams[teamid][Ammu][i]);
-		}
+		}*/
 	}
 
 	if (gPlayers[playerid][InsideProperty])
@@ -456,10 +457,12 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 		// Increment the killer's score.
 		gDeathmatch[killerid][Score]++;
 
-		//UpdateDeathmatchScoreboard();
+		return ResetPlayerDeathmatchState(playerid);
+	}
 
-		ResetPlayerDeathmatchState(playerid);
-		return 1;
+	if (gCombatMission[playerid][Active])
+	{
+		return AbortCombatMission(playerid);
 	}
 
 	if (gTrucking[playerid])
@@ -2106,10 +2109,16 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		{
 			if (pickupid == _: gTeams[i][Pickups][j])
 			{
-				ShowMenuForPlayer(Menu:gTeams[i][Menus][0], playerid);
+				return ShowMenuForPlayer(Menu:gTeams[i][Menus][0], playerid);
 			}
 		}
 	}
+
+	//
+	//  Combat pickups
+	//
+
+	CheckCombatPickup(playerid, pickupid);
 
 	//
 	//  Trucking pickups.

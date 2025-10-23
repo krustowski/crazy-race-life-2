@@ -369,6 +369,7 @@ stock OnPlayerPrivMsg(playerid, receiverid, text[])
 }
 
 #include "modules/deathmatch.pwn"
+#include "modules/combat.pwn"
 
 stock MovePlayerToPlayer(playerid, targetid, bool: reversed)
 {
@@ -379,6 +380,7 @@ stock MovePlayerToPlayer(playerid, targetid, bool: reversed)
 		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Cannot use get/goto for the player!");
 
 	new 
+		interior,
 		portedid,
 		Float: X, 
 		Float: Y, 
@@ -387,22 +389,24 @@ stock MovePlayerToPlayer(playerid, targetid, bool: reversed)
 	if (!reversed)
 	{
 		GetPlayerPos(targetid, X, Y, Z);
+		interior = GetPlayerInterior(targetid);
 		portedid = playerid;
 	}
 	else
 	{
 		GetPlayerPos(playerid, X, Y, Z);
+		interior = GetPlayerInterior(playerid);
 		portedid = targetid;
 	}
 
-	if (gDeathmatch[portedid][IsRegistered] || gDeathmatch[portedid][InGame])
+	if (gDeathmatch[portedid][IsRegistered] || gDeathmatch[portedid][InGame] || gCombatMission[playerid][Active])
 	{
 		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Target ID is playing a minigame!");
 	}
 
 	new portedPlayerState = GetPlayerState(portedid), portedVehicleId = GetPlayerVehicleID(portedid);
 
-	SetPlayerInterior(portedid, 0);
+	SetPlayerInterior(portedid, interior);
 
 	switch (portedPlayerState)
 	{

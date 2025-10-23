@@ -14,11 +14,15 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
 + Combat Missions (experimental)
     + Business robbery with numerous NPC shooters
     + Briefcase picking for money exchange ($0.5M per Briefcase) at the mission end
++ Deathmatch Minigame
+    + Custom arena in the woods
+    + "Legal" player killing, no wanted level added per kill
+    + 4-minute long matches, 45-second interval before a match for players to join
 + Personal cellphone
     + Accessed easily via the `KEY_YES` key (Y usually)
     + Send private messages directly to a player
     + Check bank account balance
-    + Call a service (car mechanic, pizza delivery, taxi ride, ...)
+    + Call a service (car mechanic, pizza delivery, a taxi ride, ...)
 + Prizes
     + Tiki ($10M) and Pumpkin ($1.5M) pickups
     + Hidden on pick up automatically
@@ -41,10 +45,10 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
     + Special commands available
     + Custom weapons
     + Team chat using the exclamation mark at the beginning of a message (e.g. `!message`)
-+ Trucking
++ Trucking Missions
     + 15+ trucking points (petrol stations etc)
     + Custom missions
-    + Weighted provision/bonus per done mission/delivery
+    + Weighted commission/bonus per done mission/delivery
 
 
 ## Preview

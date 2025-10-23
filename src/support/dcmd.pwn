@@ -1031,23 +1031,36 @@ dcmd_combat(playerid, const params[])
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4) 
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
-	new Float: X, Float: Y, Float: Z;
-	GetPlayerPos(playerid, X, Y, Z);
-	
 	if (!NPC_IsValid(gCombatNPC[playerid]))
 	{
 		gCombatNPC[playerid] = NPC_Create("[NPC]combat_test");
+
+		SetPlayerInterior(playerid, 3);
+		SetPlayerPos(playerid, 374.6708, 173.8050, 1008.3893);
 	}
 	else
 	{
 		NPC_Destroy(gCombatNPC[playerid]);
+
+		SetPlayerInterior(playerid, 0);
+		SpawnPlayer(playerid);
 		return 1;
 	}
 
 	new npcid = gCombatNPC[playerid];
 
+	if (npcid == -1)
+	{
+		return 1;
+	}
+
+	new Float: X, Float: Y, Float: Z;
+	GetPlayerPos(playerid, X, Y, Z);
+	
 	NPC_Spawn(npcid);
-	NPC_SetPos(npcid, X + 5, Y + 5, Z);
+	//NPC_SetPos(npcid, X - 10, Y, Z);
+	SetPlayerInterior(npcid, 3);
+	NPC_SetPos(npcid, 356.41, 173.69, 1008.38);
 
 	NPC_SetWeapon(npcid, 29);
 	NPC_SetAmmo(npcid, 1000);

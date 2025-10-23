@@ -405,10 +405,12 @@ public OnPlayerSpawn(playerid)
 
 		for (new i = 0; i < MAX_TEAM_WEAPONS; i++)
 		{
-			if (gTeams[teamid][Weapons][i])
+			if (!gTeams[teamid][Weapons][i])
 			{
-				GivePlayerWeapon(playerid, t_WEAPON: gTeams[teamid][Weapons][i], gTeams[teamid][Ammu][i]);
+				continue;
 			}
+
+			GivePlayerWeapon(playerid, t_WEAPON: gTeams[teamid][Weapons][i], gTeams[teamid][Ammu][i]);
 		}
 	}
 

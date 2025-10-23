@@ -11,6 +11,9 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
     + Granularity for commands
 + ATM for banking services
     + At least one ATM per city/town/village
++ Combat Missions (experimental)
+    + Business robbery with numerous NPC shooters
+    + Briefcase picking for money exchange ($0.5M per Briefcase) at the mission end
 + Personal cellphone
     + Accessed easily via the `KEY_YES` key (Y usually)
     + Send private messages directly to a player

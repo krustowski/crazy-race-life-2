@@ -28,6 +28,7 @@ enum TaxiMission
 	TimerNPCExit,
 	TimerUpdate,
 	TimerCheckNearNPC,
+	TimerCheckNPCInVehicle,
 	TimerCheckVehicle
 }
 
@@ -40,6 +41,7 @@ forward CheckTaxiNearNPC(playerid);
 forward EnterVehicleTimer(npcid);
 forward ExitVehicleTimer(playerid);
 forward CheckTaxiVehicle(playerid);
+forward CheckNPCInVehicle(playerid);
 
 // For NPC to enter vehicle.
 public EnterVehicleTimer(npcid)
@@ -69,13 +71,7 @@ public EnterVehicleTimer(npcid)
 
 	NPC_EnterVehicle(npcid, vehicleid, 3, NPC_MOVE_TYPE: 1);
 
-	while (NPC_IsEnteringVehicle(npcid))
-	{}
-
-	if (!SetTaxiMissionCheckpoint(driverid))
-	{
-		return SendClientMessage(driverid, COLOR_RED, "[ TAXI ] Error setting new taxi mission!");
-	}
+       	gTaxiMission[driverid][TimerCheckNPCInVehicle] = SetTimerEx("CheckNPCInVehicle", 2000, true, "i", driverid);
 
 	return 1;
 }
@@ -147,6 +143,28 @@ public CheckTaxiNearNPC(playerid)
 	return 1;
 }
 
+public CheckNPCInVehicle(playerid)
+{
+	new npcid = gTaxiMission[playerid][NPCid];
+
+	if (NPC_IsEnteringVehicle(npcid))
+	{
+		return 1;
+	}
+
+	if (IsPlayerInAnyVehicle(npcid) && NPC_GetVehicleID(npcid) == gTaxiMission[playerid][VehicleID])
+	{
+		KillTimer(gTaxiMission[playerid][TimerCheckNPCInVehicle]);
+
+		if (!SetTaxiMissionCheckpoint(playerid))
+		{
+			return SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Error setting new taxi mission!");
+		}
+	}
+
+	return 1;
+}
+
 public UpdateTaxiMissionInfoText(playerid)
 {
 	new stringToPrint[256];
@@ -202,7 +220,7 @@ stock CheckTaxiMissionCheckpoint(playerid)
 
 stock SetTaxiMissionCheckpoint(playerid)
 {
-	new Float: X, Float: Y, Float: Z, query[128] = "SELECT primary_x, primary_y, primary_z FROM property_coords WHERE type = 8 ORDER BY random() LIMIT 1";
+	new name[64], Float: X, Float: Y, Float: Z, query[256] = "SELECT c.primary_x, c.primary_y, c.primary_z, p.name FROM property_coords as c JOIN properties as p ON c.property_id = p.id WHERE c.type = 8 ORDER BY random() LIMIT 1";
 
 	for (;;)
 	{
@@ -218,6 +236,7 @@ stock SetTaxiMissionCheckpoint(playerid)
 		X = DB_GetFieldFloatByName(result, "primary_x");
 		Y = DB_GetFieldFloatByName(result, "primary_y");
 		Z = DB_GetFieldFloatByName(result, "primary_z");
+		DB_GetFieldStringByName(result, "name", name, sizeof(name));
 
 		DB_FreeResultSet(result);
 
@@ -238,6 +257,10 @@ stock SetTaxiMissionCheckpoint(playerid)
 	gTaxiMission[playerid][Checkpoint][CoordY] = Y;
 	gTaxiMission[playerid][Checkpoint][CoordZ] = Z;
 
+	new gameString[128];
+	format(gameString, sizeof(gameString), "~w~Next destination: ~y~%s", name);
+
+	GameTextForPlayer(playerid, gameString, 4000, 3); 
 	SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, X, Y, Z, X, Y, Z, 15.0);
 
 	return 1;

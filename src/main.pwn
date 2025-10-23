@@ -301,7 +301,7 @@ public OnPlayerConnect(playerid)
 	format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s joined the game!", playerName);
 	SendClientMessageToAll(COLOR_GREY, stringToPrint);
 
-	SendMessageToWebhook(playerid, "connected");
+	SendMessageToWebhook(playerid, "connected", -1);
 
 	// Send a welcome text to the connecting new player.
 	SendClientMessage(playerid, COLOR_INVISIBLE, "");
@@ -349,7 +349,7 @@ public OnPlayerDisconnect(playerid, reason)
 
 	SendDeathMessage(playerid, INVALID_PLAYER_ID, 201);
 
-	SendMessageToWebhook(playerid, "disconnected");
+	SendMessageToWebhook(playerid, "disconnected", reason);
 
 	new stringToPrint[128];
 
@@ -1591,6 +1591,22 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 5:
 						{
 							return ShowTruckingHelpDialog(playerid);
+						}
+					case 6:
+						{
+							return ShowCombatHelpDialog(playerid);
+						}
+					case 7:
+						{
+							return ShowPropertyHelpDialog(playerid);
+						}
+					case 8:
+						{
+							return ShowRaceHelpDialog(playerid);
+						}
+					case 9:
+						{
+							return ShowPrizesInfoDialog(playerid);
 						}
 				}
 			}

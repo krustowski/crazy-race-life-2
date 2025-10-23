@@ -72,7 +72,10 @@ enum
 	DIALOG_CREDITS,
 	DIALOG_WANTED_LIST,
 	DIALOG_TAXI_HELP,
-	DIALOG_TRUCKING_HELP
+	DIALOG_TRUCKING_HELP,
+	DIALOG_COMBAT_HELP,
+	DIALOG_PROPERTY_HELP,
+	DIALOG_RACE_HELP
 };
 
 #include "modules/real.pwn"
@@ -743,13 +746,17 @@ stock ShowPlayerAccountDialog(playerid)
 stock ShowServerHelpListDialog(playerid)
 {
 	new stringToPrint[512];
-	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s\n%s\n%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
 			"Show Player Commands",
 			"Show Admin Commands",
 			"Show Server Rules",
 			"Show Gamemode Credits",
 			"Taxi Missions Info",
-			"Trucking Missions Info"
+			"Trucking Missions Info",
+			"Combat Missions Info",
+			"Properties Info",
+			"Racing Info",
+			"Prizes Info"
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_HELP_LIST, DIALOG_STYLE_LIST, "Server Help", stringToPrint, "Select", "Close");
@@ -987,14 +994,35 @@ stock ShowWantedListDialog(playerid)
 
 stock ShowTaxiHelpDialog(playerid)
 {
-	new stringToPrint[1024] = "{FFD700}Taxi Missions{FFFFFF}\n\nA mission can be invoked using the /taxi command.\nFor the mission to start, player needs to be in any taxi cab.\nThese vehicles are located at train stations and at airports all across the map.\n\n{FFD700}Commissions{FFFFFF}\n\nA commission is calculated using the done missions count and using a special distance coefficient:\nthe more missions driven and the more distance between a start and destination point, the more the commission.";
+	new stringToPrint[1024] = "{FFD700}Taxi Missions{FFFFFF}\n\nA mission can be invoked using the {FFD700}/taxi{FFFFFF} command.\nFor the mission to start, player needs to be in any taxi cab.\nThese vehicles are located at train stations and at airports all across the map.\n\n{FFD700}Commissions{FFFFFF}\n\nA commission is calculated using the done missions count and using a special distance coefficient:\nthe more missions driven and the more distance between a start and destination point, the more the commission.";
 
 	return ShowPlayerDialog(playerid, DIALOG_TAXI_HELP, DIALOG_STYLE_MSGBOX, "Taxi Missions", stringToPrint, "Close", "");
 }
 
 stock ShowTruckingHelpDialog(playerid)
 {
-	new stringToPrint[1024] = "{FFD700}Trucking Missions{FFFFFF}\n\nA mission can be started using the /truck command.\nTo start the mission properly, player needs to drive a truck with a proper trailer attached.\nTrucks and trailers are usually located at petrol stations all across the map.\nA mission cannot be done without a trailer, so it needs to be attached the whole time.\n\n{FFD700}Commissions{FFFFFF}\n\nA trucking mission commission is calculated the similar way as at the taxi missions:\nthere is a base ($10k) and bonus taken from the mission done count and distance between the start and destination points.";
+	new stringToPrint[1024] = "{FFD700}Trucking Missions{FFFFFF}\n\nA mission can be started using the {FFD700}/truck{FFFFFF} command.\nTo start the mission properly, player needs to drive a truck with a proper trailer attached.\nTrucks and trailers are usually located at petrol stations all across the map.\nA mission cannot be done without a trailer, so it needs to be attached the whole time.\n\n{FFD700}Commissions{FFFFFF}\n\nA trucking mission commission is calculated the similar way as at the taxi missions:\nthere is a base ($10k) and bonus taken from the mission done count and distance between the start and destination points.";
 
 	return ShowPlayerDialog(playerid, DIALOG_TRUCKING_HELP, DIALOG_STYLE_MSGBOX, "Trucking Missions", stringToPrint, "Close", "");
+}
+
+stock ShowCombatHelpDialog(playerid)
+{
+	new stringToPrint[1024] = "{FFD700}Combat Missions{FFFFFF}\n\nA combat mission cna be invoked using the {FFD700}/combat{FFFFFF} command.\nCurrent settings spawn around 21 NPCs inside the LV Planning Centre interior.\nThe goal is to pick up as many briefcases as possible before leaving the interior at the top of the interior.\nThen, using a helicopter, a player is to carry the briefcases to the docks in LS to exchange them with money ($0.5M per briefcases).";
+
+	return ShowPlayerDialog(playerid, DIALOG_COMBAT_HELP, DIALOG_STYLE_MSGBOX, "Combat Missions", stringToPrint, "Close", "");
+}
+
+stock ShowPropertyHelpDialog(playerid)
+{
+	new stringToPrint[2048] = "{FFD700}Properties{FFFFFF}\n\nA property is a special type of building that can be either bought (a personal property), or rented (a commercial one).\n\n{FFD700}Personal properties{FFFFFF}\n\nA personal property can be bought using a custom dialog window that is shown to player when enterying a green house pickup.\nThe cost of the personal property is set a bit high, but according to other costs/commissions in the game it is still affordabele.\nThe perosnal property has a common private interior with a palette of pickups (health, skins, drugz and the exit pickup).\nThe property can be sold too, but a 10% commission is taken by the real estate broker.\nA list of personal properties can be invoked using the {FFD700}/property{FFFFFF} command.\nThe personal property can be used as a spawn point and a custom vehicle can be attached to it as well.\n\n{FFD700}Commercial properties{FFFFFF}\n\nA commercial property is for rent only. It is usually a business located all across the map.\nWhen a player rents this type of property, a rent-lock is activated. This means that no player can rent it away from such player for 3 days.\nThe rented property generates a periodic commission, which is given to player in cash with a custom salary altogether.";
+
+	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_HELP, DIALOG_STYLE_MSGBOX, "Properties Info", stringToPrint, "Close", "");
+}
+
+stock ShowRaceHelpDialog(playerid)
+{
+	new stringToPrint[2048] = "{FFD700}Racing{FFFFFF}\n\nThis gamemode introduces a variety of racing options. A list of all races available can be invoked using the {FFD700}/race{FFFFFF} command.\nEach race has its start/register cost and a prize in dollars.\nThere are 3 types of races: air, ground and naval.\nBefore selecting a race, a player has to be inside any (suitable) vehicle as a driver.\nWhen a race is selected, the player is ported/warped to the starting point of such race.\nThe race starts when a player reaches the first race checkpoint.\nTo finish a race, all checkpoints have to be reached.\nDuring a race, the vehicle cannot be fixed using the {FFD700}/fix{FFFFFF} command, but a car mechanic can repair the vehicle though (so consider taking one with you when racing).\nThere is no limitation for vehicles (yet), this means that the race can be finished on foot too (after leaving a vehicle after a player registers themselves to the race).\nA race can be left prematurely by the {FFD700}/race{FFFFFF} command too.\n\n{FFD700}High Scores{FFFFFF}\n\nEach race being finished is listed in the high scores table: try the {FFD700}/scores{FFFFFF} command to invoke it.\nEach table shows the first 3 positions of racers ordered by the time elapsed when finishing such race (the lower, the better).";
+
+	return ShowPlayerDialog(playerid, DIALOG_RACE_HELP, DIALOG_STYLE_MSGBOX, "Racing Info", stringToPrint, "Close", "");
 }

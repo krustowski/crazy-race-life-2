@@ -262,3 +262,11 @@ Greater zone IDs:
 ```
 ./samp-npc -h "127.0.0.1" -p "39876" -n "[NPC]taxi" -m "taxi"
 ```
+
+### Webhook to Telegram
+
+Fetch Go binary from [https://github.com/adnanh/webhook](https://github.com/adnanh/webhook). Then fill Telegram (TG) bot token and chat ID to `configs/webhook.sh` and run it in background using:
+
+```
+webhook -hooks configs/webhook.json -verbose &
+```

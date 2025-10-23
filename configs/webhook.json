@@ -1,0 +1,27 @@
+[
+	{
+		"id": "samp-webhook-player",
+		"execute-command": "/home/user/configs/webhook.sh",
+		"command-working-directory": "/tmp",
+		"pass-arguments-to-command": [
+			{
+				"source": "payload",
+				"name": "payload.nickname"
+			},
+			{
+				"source": "payload",
+				"name": "payload.state"
+			},
+			{
+				"source": "payload",
+				"name": "payload.reason"
+			}
+		],
+		"parse-parameters-as-json": [
+			{
+				"source": "payload",
+				"name": "payload"
+			}
+		]
+	}
+]

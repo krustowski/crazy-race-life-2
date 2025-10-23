@@ -334,7 +334,7 @@ stock AbortCombatMission(playerid, bool: success)
 
 	for (new i = 0; i < MAX_COMBAT_NPCS; i++)
 	{
-		NPC_Destroy(i);
+		NPC_Destroy(gCombatNPC[i]);
 	}
 
 	DisablePlayerRaceCheckpoint(playerid);
@@ -354,7 +354,14 @@ stock AbortCombatMission(playerid, bool: success)
 	}
 
 	SetPlayerInterior(playerid, 0);
-	SpawnPlayer(playerid);
+
+	new Float: health;
+	GetPlayerHealth(playerid, health);
+
+	if (health != 0.0)
+	{
+		SpawnPlayer(playerid);
+	}
 
 	return 1;
 }

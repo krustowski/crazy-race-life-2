@@ -279,6 +279,9 @@ public OnPlayerConnect(playerid)
 		gPlayerRace[playerid][i] = 0;
 	}
 
+	// Combat mission
+	gCombatMission[playerid][Active] = false;
+
 	// Draw mapicons for the user.
 	AddMapicons(playerid);
 

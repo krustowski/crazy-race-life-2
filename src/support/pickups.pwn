@@ -12,6 +12,7 @@
 
 #define MAX_PRIZES 				16
 
+#define PICKUP_BRIEFCASE			1210
 #define PICKUP_INFO				1239
 #define PICKUP_HEART				1240
 #define PICKUP_PILL				1241

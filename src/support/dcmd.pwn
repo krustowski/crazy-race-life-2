@@ -1023,54 +1023,13 @@ dcmd_clear(playerid, const params[])
 	return 1;
 }
 
-new gCombatNPC[MAX_PLAYERS];
-
 dcmd_combat(playerid, const params[])
 {
 #pragma unused params
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4) 
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
-	if (!NPC_IsValid(gCombatNPC[playerid]))
-	{
-		gCombatNPC[playerid] = NPC_Create("[NPC]combat_test");
-
-		SetPlayerInterior(playerid, 3);
-		SetPlayerPos(playerid, 374.6708, 173.8050, 1008.3893);
-	}
-	else
-	{
-		NPC_Destroy(gCombatNPC[playerid]);
-
-		SetPlayerInterior(playerid, 0);
-		SpawnPlayer(playerid);
-		return 1;
-	}
-
-	new npcid = gCombatNPC[playerid];
-
-	if (npcid == -1)
-	{
-		return 1;
-	}
-
-	new Float: X, Float: Y, Float: Z;
-	GetPlayerPos(playerid, X, Y, Z);
-	
-	NPC_Spawn(npcid);
-	//NPC_SetPos(npcid, X - 10, Y, Z);
-	SetPlayerInterior(npcid, 3);
-	NPC_SetPos(npcid, 356.41, 173.69, 1008.38);
-
-	NPC_SetWeapon(npcid, 29);
-	NPC_SetAmmo(npcid, 1000);
-	NPC_EnableInfiniteAmmo(npcid, true);
-	NPC_SetWeaponAccuracy(npcid, 29, 0.1);
-
-	NPC_AimAtPlayer(npcid, playerid, true, 0, true, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-	NPC_Shoot(npcid, 29, playerid, 0, X, Y, Z, 0.0, 0.0, 0.0, true);
-
-	return 1;
+	return SetCombatMission(playerid);
 }
 
 dcmd_countdown(playerid, const params[])

@@ -1584,6 +1584,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							return ShowCreditsDialog(playerid);
 						}
+					case 4:
+						{
+							return ShowTaxiHelpDialog(playerid);
+						}
+					case 5:
+						{
+							return ShowTruckingHelpDialog(playerid);
+						}
 				}
 			}
 		case DIALOG_EDITOR_LIST:

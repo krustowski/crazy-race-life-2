@@ -70,7 +70,9 @@ enum
 	DIALOG_PROPERTY_SKIN_LIST,
 	DIALOG_PRIZE_LIST,
 	DIALOG_CREDITS,
-	DIALOG_WANTED_LIST
+	DIALOG_WANTED_LIST,
+	DIALOG_TAXI_HELP,
+	DIALOG_TRUCKING_HELP
 };
 
 #include "modules/real.pwn"
@@ -740,12 +742,14 @@ stock ShowPlayerAccountDialog(playerid)
 
 stock ShowServerHelpListDialog(playerid)
 {
-	new stringToPrint[256];
-	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s",
+	new stringToPrint[512];
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s\n%s\n%s",
 			"Show Player Commands",
 			"Show Admin Commands",
 			"Show Server Rules",
-			"Show Gamemode Credits"
+			"Show Gamemode Credits",
+			"Taxi Missions Info",
+			"Trucking Missions Info"
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_HELP_LIST, DIALOG_STYLE_LIST, "Server Help", stringToPrint, "Select", "Close");
@@ -979,4 +983,18 @@ stock ShowWantedListDialog(playerid)
 	}
 
 	return ShowPlayerDialog(playerid, DIALOG_WANTED_LIST, DIALOG_STYLE_MSGBOX, "Wanted List", stringToPrint, "Close", "");
+}
+
+stock ShowTaxiHelpDialog(playerid)
+{
+	new stringToPrint[1024] = "{FFD700}Taxi Missions{FFFFFF}\n\nA mission can be invoked using the /taxi command.\nFor the mission to start, player needs to be in any taxi cab.\nThese vehicles are located at train stations and at airports all across the map.\n\n{FFD700}Commissions{FFFFFF}\n\nA commission is calculated using the done missions count and using a special distance coefficient:\nthe more missions driven and the more distance between a start and destination point, the more the commission.";
+
+	return ShowPlayerDialog(playerid, DIALOG_TAXI_HELP, DIALOG_STYLE_MSGBOX, "Taxi Missions", stringToPrint, "Close", "");
+}
+
+stock ShowTruckingHelpDialog(playerid)
+{
+	new stringToPrint[1024] = "{FFD700}Trucking Missions{FFFFFF}\n\nA mission can be started using the /truck command.\nTo start the mission properly, player needs to drive a truck with a proper trailer attached.\nTrucks and trailers are usually located at petrol stations all across the map.\nA mission cannot be done without a trailer, so it needs to be attached the whole time.\n\n{FFD700}Commissions{FFFFFF}\n\nA trucking mission commission is calculated the similar way as at the taxi missions:\nthere is a base ($10k) and bonus taken from the mission done count and distance between the start and destination points.";
+
+	return ShowPlayerDialog(playerid, DIALOG_TRUCKING_HELP, DIALOG_STYLE_MSGBOX, "Trucking Missions", stringToPrint, "Close", "");
 }

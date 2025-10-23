@@ -850,20 +850,7 @@ dcmd_wanted(playerid, const params[])
 	if (gPlayers[playerid][TeamID] != TEAM_POLICE && !IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1)
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Police team-related command!");
 
-	new playerName[MAX_PLAYER_NAME], stringToPrint[128];
-
-	for (new i = 0; i < MAX_PLAYERS; i++)
-	{
-		if (GetPlayerWantedLevel(i) == 0)
-			continue;
-
-		GetPlayerName(i, playerName, sizeof(playerName));
-
-		format(stringToPrint, sizeof(stringToPrint), "-> %s [ID: %d] => WANTED level %d", playerName, i, GetPlayerWantedLevel(i));
-		SendClientMessage(playerid, COLOR_WHITE, stringToPrint);
-	}
-
-	return 1;
+	return ShowWantedListDialog(playerid);
 }
 
 //

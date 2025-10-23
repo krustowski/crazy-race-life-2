@@ -69,7 +69,8 @@ enum
 	DIALOG_PROPERTY_SKIN_MAIN,
 	DIALOG_PROPERTY_SKIN_LIST,
 	DIALOG_PRIZE_LIST,
-	DIALOG_CREDITS
+	DIALOG_CREDITS,
+	DIALOG_WANTED_LIST
 };
 
 #include "modules/real.pwn"
@@ -961,4 +962,21 @@ stock ShowCreditsDialog(playerid)
 	      );
 
 	return ShowPlayerDialog(playerid, DIALOG_CREDITS, DIALOG_STYLE_MSGBOX, "Gamemode Credits", stringToPrint, "Close", "");
+}
+
+stock ShowWantedListDialog(playerid)
+{
+	new playerName[MAX_PLAYER_NAME], stringToPrint[256];
+
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (GetPlayerWantedLevel(i) == 0)
+			continue;
+
+		GetPlayerName(i, playerName, sizeof(playerName));
+
+		format(stringToPrint, sizeof(stringToPrint), "%s{FFD700}%24s{FFFFFF} [ID: %2d]\t\tWanted Level: {00FF00}%2d{FFFFFF}\n", stringToPrint, playerName, i, GetPlayerWantedLevel(i));
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_WANTED_LIST, DIALOG_STYLE_MSGBOX, "Wanted List", stringToPrint, "Close", "");
 }

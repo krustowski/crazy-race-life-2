@@ -43,6 +43,7 @@ enum CombatPickup
 enum CombatMission
 {
 	bool: Active,
+	bool: Dead,
 	BriefcaseCount,
 
 	Text: InfoText,
@@ -360,15 +361,13 @@ stock AbortCombatMission(playerid, bool: success)
 		GameTextForPlayer(playerid, "~w~Combat Mission ~r~Aborted", 3000, 3); 
 	}
 
-	SetPlayerInterior(playerid, 0);
-
-	new Float: health;
-	GetPlayerHealth(playerid, health);
-
-	if (health != 0.0)
+	if (!gCombatMission[playerid][Dead])
 	{
+		SetPlayerInterior(playerid, 0);
 		SpawnPlayer(playerid);
 	}
+
+	gCombatMission[playerid][Dead] = false;
 
 	return 1;
 }

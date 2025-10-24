@@ -469,6 +469,7 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 
 	if (gCombatMission[playerid][Active])
 	{
+		gCombatMission[playerid][Dead] = true;
 		return AbortCombatMission(playerid, false);
 	}
 

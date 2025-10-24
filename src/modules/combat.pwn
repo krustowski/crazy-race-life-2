@@ -122,6 +122,12 @@ stock CheckCombatCheckpoint(playerid)
 
 stock CheckCombatPickup(playerid, pickupid)
 {
+	
+	if (!gCombatMission[playerid][Active])
+	{
+		return 1;
+	}
+
 	for (new i = 0; i < MAX_COMBAT_PICKUPS; i++)
 	{
 		if (gCombatPickups[i][Pickup] != pickupid)

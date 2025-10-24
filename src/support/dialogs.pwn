@@ -718,7 +718,7 @@ stock ShowPhonePMTextDialog(playerid, clickedplayerid)
 
 stock ShowPlayerAccountDialog(playerid)
 {
-	new stringToPrint[256];
+	new stringToPrint[512];
 
 	new team_name[64];
 
@@ -731,13 +731,17 @@ stock ShowPlayerAccountDialog(playerid)
 		team_name = "None";
 	}
 
-	format(stringToPrint, sizeof(stringToPrint), "Account details:\n\n{FFFFFF}Cash: \t\t{00FF00}${FFD700}%d{FFFFFF}\nTeam: \t\t{FFD700}%s{FFFFFF} (ID: {FFD700}%d{FFFFFF})\nSkin ID:\t\t{FFD700}%d{FFFFFF}\nAdmin level: \t{FFD700}%d{FFFFFF}\nWanted level: \t{FFD700}%d{FFFFFF}",
+	new version[16];
+	GetPlayerVersion(playerid, version, sizeof(version));
+
+	format(stringToPrint, sizeof(stringToPrint), "Account details:\n\n{FFFFFF}Cash: \t\t{00FF00}${FFD700}%d{FFFFFF}\nTeam: \t\t{FFD700}%s{FFFFFF} (ID: {FFD700}%d{FFFFFF})\nSkin ID:\t\t{FFD700}%d{FFFFFF}\nAdmin level: \t{FFD700}%d{FFFFFF}\nWanted level: \t{FFD700}%d{FFFFFF}\n\nClient version: \t{FFD700}%s{FFFFFF}",
 			GetPlayerMoney(playerid),
 			team_name,
 			gPlayers[playerid][TeamID],
 			GetPlayerSkin(playerid),
 			gPlayers[playerid][AdminLevel],
-			GetPlayerWantedLevel(playerid)
+			GetPlayerWantedLevel(playerid),
+			version
 	      );
 
 	return ShowPlayerDialog(playerid, DIALOG_PLAYER_ACCOUNT, DIALOG_STYLE_MSGBOX, "Player Account Info", stringToPrint, "Close", "");

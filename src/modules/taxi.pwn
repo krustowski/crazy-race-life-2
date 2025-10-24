@@ -87,7 +87,7 @@ public EnterVehicleTimer(npcid)
 
 public ExitVehicleTimer(playerid)
 {
-	//NPC_Spawn(npcid);
+	TogglePlayerControllable(playerid, true);
 	SetTaxiMissionCustomerPos(playerid);
 
 	return 1;
@@ -214,6 +214,8 @@ stock CheckTaxiMissionCheckpoint(playerid)
 	new stringToPrint[128];
 	format(stringToPrint, sizeof(stringToPrint), "[ TAXI ] Commission earned: $%d", commission);
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
+
+	TogglePlayerControllable(playerid, false);
 
 	NPC_ExitVehicle(gTaxiMission[playerid][NPCid]);
 	gTaxiMission[playerid][TimerNPCExit] = SetTimerEx("ExitVehicleTimer", 2000, false, "i", playerid);

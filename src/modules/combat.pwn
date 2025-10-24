@@ -67,7 +67,7 @@ public CheckBriefcaseManProximity(playerid, npcid)
 	GetPlayerPos(npcid, pX, pY, pZ);
 	new interior = GetPlayerInterior(playerid);
 
-	if (interior == 0 && IsPlayerInSphere(playerid, pX, pY, pZ, 5.0))
+	if (interior == 0 && IsPlayerInSphere(playerid, pX, pY, pZ, 4.0))
 	{
 		KillTimer(_: gCombatMission[playerid][TimerBriefcaseMan]);
 
@@ -230,6 +230,7 @@ stock PrepareCombatInterior(playerid)
 			case COMBAT_COORD_HELI:
 				{
 					gCombatVehicles[vehicleid] = CreateVehicle(487, X, Y, Z, 0.0, 12, 0, -1);
+					SetVehicleParamsForPlayer(gCombatVehicles[vehicleid], playerid, true, false);
 					vehicleid++;
 				}
 			case COMBAT_COORD_EXIT:

@@ -37,9 +37,10 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
     + Up to 5 properties per player
     + Save custom skins (up to 5 per property)
 + Taxi Missions
-    + Ad-hoc NPC spawned for a player.
-    + Randomized customer locations and targets.
-    + Increased commissions for the taxi rides with done count.
+    + Ad-hoc NPC spawned for a player
+    + Randomized customer locations and targets
+    + Increased commissions for the taxi rides with done count
+    + Areas of operation: LV, SF, LS, or whole map
 + Teams
     + Custom salary per team 
     + Special commands available
@@ -167,6 +168,7 @@ The examples above are shown respectively to the config file names mentioned.
     /animoff    --- clears all animations
 	/bank       --- lists banking subcommands
 	/cmd        --- lists available commands for player
+    /credits    --- shows gamemode credits and version
 	/dance      --- enables special animations (dancing)
 	/deal       --- lists subcommands for dealerz 
 	/deathmatch --- lists subcommands for the deathmatch module

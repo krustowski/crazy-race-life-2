@@ -227,26 +227,6 @@ public OnGameModeExit()
 	return 1;
 }
 
-public OnPlayerRequestClass(playerid, classid)
-{
-	//SetPlayerPos(playerid, 2323.73, 1283.18, 97.60);
-	/*SetPlayerPos(playerid, 1966.1, 1936.1, 127.5);
-	SetPlayerCameraPos(playerid, 1871.3, 1933.6, 127.5);
-	SetPlayerCameraLookAt(playerid, 1966.1, 1936.1, 127.5);*/
-
-	return 1;
-}
-
-public OnPlayerRequestSpawn(playerid)
-{
-	if (!gPlayers[playerid][IsLogged])
-		return 0;
-
-	SpawnPlayer(playerid);
-
-	return 1;
-}
-
 public OnPlayerConnect(playerid)
 {
 	new playerName[MAX_PLAYER_NAME], stringToPrint[128];
@@ -379,6 +359,29 @@ public OnPlayerDisconnect(playerid, reason)
 	return 0;
 }
 
+public OnPlayerRequestClass(playerid, classid)
+{
+	//SetPlayerPos(playerid, 2323.73, 1283.18, 97.60);
+	/*SetPlayerPos(playerid, 1966.1, 1936.1, 127.5);
+	SetPlayerCameraPos(playerid, 1871.3, 1933.6, 127.5);
+	SetPlayerCameraLookAt(playerid, 1966.1, 1936.1, 127.5);*/
+
+	if (!gPlayers[playerid][IsLogged])
+		return 0;
+
+	return 1;
+}
+
+public OnPlayerRequestSpawn(playerid)
+{
+	if (!gPlayers[playerid][IsLogged])
+		return 0;
+
+	SpawnPlayer(playerid);
+
+	return 1;
+}
+
 public OnPlayerSpawn(playerid)
 {
 	if (IsPlayerNPC(playerid))
@@ -407,14 +410,15 @@ public OnPlayerSpawn(playerid)
 
 		SetPlayerColor(playerid, gTeams[teamid][Color]);
 
+		ResetPlayerWeapons(playerid);
+
 		for (new i = 0; i < MAX_TEAM_WEAPONS; i++)
 		{
-			if (!gTeams[teamid][Weapons][i])
+			if (gTeams[teamid][Weapons][i] && gTeams[teamid][Ammo][i])
 			{
-				continue;
+				//printf("Giving weapon ID: %d, Ammo: %d", gTeams[teamid][Weapons][i], gTeams[teamid][Ammo][i]);
+				GivePlayerWeapon(playerid, t_WEAPON: gTeams[teamid][Weapons][i], gTeams[teamid][Ammo][i]);
 			}
-
-			GivePlayerWeapon(playerid, t_WEAPON: gTeams[teamid][Weapons][i], gTeams[teamid][Ammu][i]);
 		}
 	}
 
@@ -2300,7 +2304,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 			{
 				if (gTeams[i][Weapons][j])
 				{
-					GivePlayerWeapon(playerid, t_WEAPON: gTeams[i][Weapons][j], gTeams[i][Ammu][j]);
+					GivePlayerWeapon(playerid, WEAPON: gTeams[i][Weapons][j], gTeams[i][Ammo][j]);
 				}
 			}
 

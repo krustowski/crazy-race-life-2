@@ -8,10 +8,19 @@
 //  Taxi-related module
 //
 
+enum
+{
+	AREA_LV,
+	AREA_SF,
+	AREA_LS,
+	AREA_ALL
+}
+
 enum TaxiMission
 {
 	NPCid,
 	VehicleID,
+	AreaID,
 	bool: Active,
 
 	Float: CommissionCoef,
@@ -220,7 +229,29 @@ stock CheckTaxiMissionCheckpoint(playerid)
 
 stock SetTaxiMissionCheckpoint(playerid)
 {
-	new name[64], Float: X, Float: Y, Float: Z, query[256] = "SELECT c.primary_x, c.primary_y, c.primary_z, p.name FROM property_coords as c JOIN properties as p ON c.property_id = p.id WHERE c.type = 8 ORDER BY random() LIMIT 1";
+	new area[24], name[64], Float: X, Float: Y, Float: Z, query[256];
+
+	switch (gTaxiMission[playerid][AreaID])
+	{
+		case AREA_LV:
+			{
+				area = "AND p.name LIKE 'LV:%'";
+			}
+		case AREA_SF:
+			{
+				area = "AND p.name LIKE 'SF:%'";
+			}
+		case AREA_LS:
+			{
+				area = "AND p.name LIKE 'LS:%'";
+			}
+		case AREA_ALL:
+			{
+				area = "";
+			}
+	}
+
+	format(query, sizeof(query), "SELECT c.primary_x, c.primary_y, c.primary_z, p.name FROM property_coords as c JOIN properties as p ON c.property_id = p.id WHERE c.type = 8 %s ORDER BY random() LIMIT 1", area);
 
 	for (;;)
 	{
@@ -268,7 +299,29 @@ stock SetTaxiMissionCheckpoint(playerid)
 
 stock SetTaxiMissionCustomerPos(playerid)
 {
-	new Float: X, Float: Y, Float: Z, query[128] = "SELECT primary_x, primary_y, primary_z FROM property_coords WHERE type = 8 ORDER BY random() LIMIT 1";
+	new area[24], Float: X, Float: Y, Float: Z, query[256];
+	
+	switch (gTaxiMission[playerid][AreaID])
+	{
+		case AREA_LV:
+			{
+				area = "AND p.name LIKE 'LV:%'";
+			}
+		case AREA_SF:
+			{
+				area = "AND p.name LIKE 'SF:%'";
+			}
+		case AREA_LS:
+			{
+				area = "AND p.name LIKE 'LS:%'";
+			}
+		case AREA_ALL:
+			{
+				area = "";
+			}
+	}
+
+	format(query, sizeof(query), "SELECT c.primary_x, c.primary_y, c.primary_z FROM property_coords AS c JOIN properties AS p ON c.property_id = p.id WHERE c.type = 8 %s ORDER BY random() LIMIT 1", area);
 
 	// Set iteration limit to 250, so the last is used if not anything closer appears...
 	for (new i = 0; i < 250; i++)
@@ -347,7 +400,7 @@ stock SetTaxiMissionCustomer(playerid)
 	return SetTaxiMissionCustomerPos(playerid);
 }
 
-stock SetPlayerTaxiMission(playerid)
+stock SetPlayerTaxiMission(playerid, areaid)
 {
 	if (gTaxiMission[playerid][Active])
 	{
@@ -361,6 +414,7 @@ stock SetPlayerTaxiMission(playerid)
 		return SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Must be driving a taxi cab!");
 	}
 
+	gTaxiMission[playerid][AreaID] = areaid;
 	gTaxiMission[playerid][VehicleID] = GetPlayerVehicleID(playerid);
 
 	gTaxiMission[playerid][NPCid] = -1;

@@ -639,7 +639,12 @@ dcmd_skydive(playerid, const params[])
 dcmd_taxi(playerid, const params[])
 {
 #pragma unused params
-	return SetPlayerTaxiMission(playerid);
+	if (gTaxiMission[playerid][Active])
+	{
+		return SetPlayerTaxiMission(playerid, 0);
+	}
+
+	return ShowTaxiMissionOptionsDialog(playerid);
 }
 
 dcmd_text(playerid, const params[])

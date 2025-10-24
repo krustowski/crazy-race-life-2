@@ -2056,6 +2056,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				return ShowHighScoresDialog(playerid, gPlayers[playerid][Temp]);
 			}
+		case DIALOG_TAXI_OPTIONS:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				return SetPlayerTaxiMission(playerid, listitem);
+			}
 
 		default: 
 			return 0; // dialog ID was not found, search in other scripts

@@ -75,7 +75,8 @@ enum
 	DIALOG_TRUCKING_HELP,
 	DIALOG_COMBAT_HELP,
 	DIALOG_PROPERTY_HELP,
-	DIALOG_RACE_HELP
+	DIALOG_RACE_HELP,
+	DIALOG_TAXI_OPTIONS
 };
 
 #include "modules/real.pwn"
@@ -1029,4 +1030,17 @@ stock ShowRaceHelpDialog(playerid)
 	new stringToPrint[2048] = "{FFD700}Racing{FFFFFF}\n\nThis gamemode introduces a variety of racing options. A list of all races available can be invoked using the {FFD700}/race{FFFFFF} command.\nEach race has its start/register cost and a prize in dollars.\nThere are 3 types of races: air, ground and naval.\nBefore selecting a race, a player has to be inside any (suitable) vehicle as a driver.\nWhen a race is selected, the player is ported/warped to the starting point of such race.\nThe race starts when a player reaches the first race checkpoint.\nTo finish a race, all checkpoints have to be reached.\nDuring a race, the vehicle cannot be fixed using the {FFD700}/fix{FFFFFF} command, but a car mechanic can repair the vehicle though (so consider taking one with you when racing).\nThere is no limitation for vehicles (yet), this means that the race can be finished on foot too (after leaving a vehicle after a player registers themselves to the race).\nA race can be left prematurely by the {FFD700}/race{FFFFFF} command too.\n\n{FFD700}High Scores{FFFFFF}\n\nEach race being finished is listed in the high scores table: try the {FFD700}/scores{FFFFFF} command to invoke it.\nEach table shows the first 3 positions of racers ordered by the time elapsed when finishing such race (the lower, the better).";
 
 	return ShowPlayerDialog(playerid, DIALOG_RACE_HELP, DIALOG_STYLE_MSGBOX, "Racing Info", stringToPrint, "Close", "");
+}
+
+stock ShowTaxiMissionOptionsDialog(playerid)
+{
+	new stringToPrint[256];
+	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s",
+			"Las Venturas\n",
+			"San Fierro\n",
+			"Los Santos\n",
+			"Whole Map"
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_TAXI_OPTIONS, DIALOG_STYLE_LIST, "Taxi Mission", stringToPrint, "Select", "Close");
 }

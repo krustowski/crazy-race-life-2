@@ -407,7 +407,7 @@ public OnPlayerSpawn(playerid)
 
 		SetPlayerColor(playerid, gTeams[teamid][Color]);
 
-		/*for (new i = 0; i < MAX_TEAM_WEAPONS; i++)
+		for (new i = 0; i < MAX_TEAM_WEAPONS; i++)
 		{
 			if (!gTeams[teamid][Weapons][i])
 			{
@@ -415,7 +415,7 @@ public OnPlayerSpawn(playerid)
 			}
 
 			GivePlayerWeapon(playerid, t_WEAPON: gTeams[teamid][Weapons][i], gTeams[teamid][Ammu][i]);
-		}*/
+		}
 	}
 
 	if (gPlayers[playerid][InsideProperty])

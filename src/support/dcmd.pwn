@@ -1355,6 +1355,7 @@ dcmd_skin(playerid, const params[])
 	if (!IsPlayerConnected(targetId))
 		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] No such player online!");
 
+	gPlayers[targetId][Skin] = targetSkin;
 	SetPlayerSkin(targetId, targetSkin);
 
 	return 1;

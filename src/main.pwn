@@ -621,6 +621,11 @@ public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
 
 public OnPlayerCommandText(playerid, cmdtext[])
 {
+	if (!gPlayers[playerid][IsLogged])
+	{
+		return 1;
+	}
+
 	// See src/support/dcmd.pwn
 	return LoadDcmdAll(playerid, cmdtext);
 }

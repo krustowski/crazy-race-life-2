@@ -10,7 +10,7 @@
 #define MAX_COMBAT_NPCS		25
 #define MAX_COMBAT_PICKUPS	20
 #define MAX_COMBAT_VEHICLES	5
-#define COMBAT_ACCURACY		0.3
+#define COMBAT_ACCURACY		0.15
 
 enum 
 {
@@ -329,7 +329,7 @@ stock SetCombatMission(playerid)
 	GameTextForPlayer(playerid, "~w~Combat Mission ~g~Started", 3000, 3); 
 
 	SetPlayerInterior(playerid, 3);
-	SetPlayerPos(playerid, 374.6708, 173.8050, 1008.3893);
+	SetPlayerPos(playerid, 376.27, 186.46, 1008.38);
 
 	return 1;
 }

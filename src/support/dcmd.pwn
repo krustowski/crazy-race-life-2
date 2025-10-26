@@ -552,8 +552,7 @@ dcmd_rules(playerid, const params[])
 dcmd_scores(playerid, const params[])
 {
 #pragma unused params
-	gPlayers[playerid][Temp] = 0;
-	return ShowHighScoresDialog(playerid, 0);
+	return ShowHighScoresOptionsDialog(playerid);
 }
 
 dcmd_search(playerid, const params[]) 

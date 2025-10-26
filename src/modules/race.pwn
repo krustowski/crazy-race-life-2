@@ -410,7 +410,7 @@ stock InitHighScores()
 {
 	new query[512];
 
-	format(query, sizeof(query), "select race_id, nickname, time, car_model from ( select race_id, nickname, time, car_model, row_number() over ( PARTITION by race_id ORDER by time ASC ) as rank from high_scores ) ranked where rank <= 3 order by race_id, rank;");
+	format(query, sizeof(query), "select race_id, nickname, time, car_model from ( select race_id, nickname, time, car_model, row_number() over ( PARTITION by race_id ORDER by time ASC ) as rank from high_scores_races ) ranked where rank <= 3 order by race_id, rank;");
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
@@ -459,7 +459,7 @@ stock SaveNewScore(raceId, playerid, time, vehicleModel)
 	GetPlayerName(playerid, nickname);
 
 	new query[256];
-	format(query, sizeof(query), "INSERT INTO high_scores (race_id, nickname, time, car_model) VALUES (%d, '%s', %d, %d)", raceId, nickname, time, vehicleModel);
+	format(query, sizeof(query), "INSERT INTO high_scores_races (race_id, nickname, time, car_model) VALUES (%d, '%s', %d, %d)", raceId, nickname, time, vehicleModel);
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {

@@ -2042,7 +2042,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 				}
 			}
-		case DIALOG_HIGH_SCORES_MAIN:
+		case DIALOG_HIGH_SCORES_RACES:
 			{
 				if (!response)
 				{
@@ -2059,7 +2059,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					gPlayers[playerid][Temp] = 10;
 				}
 
-				return ShowHighScoresDialog(playerid, gPlayers[playerid][Temp]);
+				return ShowHighScoresRacesDialog(playerid, gPlayers[playerid][Temp]);
 			}
 		case DIALOG_TAXI_OPTIONS:
 			{
@@ -2069,6 +2069,25 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 
 				return SetPlayerTaxiMission(playerid, listitem);
+			}
+		case DIALOG_HIGH_SCORES_OPTIONS:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				switch (listitem)
+				{
+					case 0:
+						{
+							gPlayers[playerid][Temp] = 0;
+							return ShowHighScoresRacesDialog(playerid, 0);
+						}
+					case 1:
+						{}
+				}
+
 			}
 
 		default: 

@@ -22,7 +22,7 @@ enum
 	DIALOG_PROPERTY_EDIT_TYPE,
 	DIALOG_PROPERTY_EDIT_COST,
 	DIALOG_TRUCKING_INFO,
-	DIALOG_HIGH_SCORES_MAIN,
+	DIALOG_HIGH_SCORES_RACES,
 	DIALOG_ADMIN_CMDS,
 	DIALOG_COMMON_CMDS,
 	DIALOG_ADMINS_ONLINE,
@@ -76,12 +76,13 @@ enum
 	DIALOG_COMBAT_HELP,
 	DIALOG_PROPERTY_HELP,
 	DIALOG_RACE_HELP,
-	DIALOG_TAXI_OPTIONS
+	DIALOG_TAXI_OPTIONS,
+	DIALOG_HIGH_SCORES_OPTIONS
 };
 
 #include "modules/real.pwn"
 
-stock ShowHighScoresDialog(playerid, offset)
+stock ShowHighScoresRacesDialog(playerid, offset)
 {
 	new stringToPrint[1024];
 	format(stringToPrint, sizeof(stringToPrint), "");
@@ -159,7 +160,7 @@ stock ShowHighScoresDialog(playerid, offset)
 		}
 	}
 
-	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_MAIN, DIALOG_STYLE_MSGBOX, "High Scores", stringToPrint, "Next page", "Close");
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_RACES, DIALOG_STYLE_MSGBOX, "High Scores", stringToPrint, "Next page", "Close");
 }
 
 stock ShowAdminCommandsDialog(playerid)
@@ -1044,3 +1045,16 @@ stock ShowTaxiMissionOptionsDialog(playerid)
 
 	return ShowPlayerDialog(playerid, DIALOG_TAXI_OPTIONS, DIALOG_STYLE_LIST, "Taxi Mission", stringToPrint, "Select", "Close");
 }
+
+stock ShowHighScoresOptionsDialog(playerid)
+{
+	new stringToPrint[256];
+	format(stringToPrint, sizeof(stringToPrint), "%s%s%s",
+			"Races\n",
+			"Deathmatch\n",
+			"Missions"
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_OPTIONS, DIALOG_STYLE_LIST, "High Scores", stringToPrint, "Select", "Close");
+}
+

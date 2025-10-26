@@ -2085,7 +2085,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							return ShowHighScoresRacesDialog(playerid, 0);
 						}
 					case 1:
-						{}
+						{
+							return ShowHighScoresDeathmatchDialog(playerid);
+						}
+					case 2:
+						{
+							return 1;
+						}
 				}
 
 			}

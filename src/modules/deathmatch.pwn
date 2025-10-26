@@ -85,6 +85,8 @@ public StartDeathmatch()
 
 public EndDeathmatch()
 {
+	SaveScores();
+
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if (!IsPlayerConnected(i))
@@ -152,6 +154,52 @@ public UpdateDeathmatchScoreboard()
 		if (gDeathmatchTimers[TimeElapsed])
 			SendClientMessageToAll(COLOR_GREY, "[ DEATHMATCH ] No players in game, resetting the minigame.");
 	}
+
+	return 1;
+}
+
+stock SaveScores()
+{
+	new topScore = 0, topPlayerID;
+
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!gDeathmatch[i][InGame])
+		{
+			continue;
+		}
+
+		if (topScore <= gDeathmatch[i][Score])
+		{
+			topScore = gDeathmatch[i][Score];
+			topPlayerID = gPlayers[i][OrmID];
+		}
+	}
+
+	// Don't write nil scores
+	if (!topScore)
+	{
+		return 1;
+	}
+
+	new query[256];
+
+	format(query, sizeof(query), "INSERT INTO high_scores (type, spec_id, value, user_id) VALUES (%d, '%d', %d, %d)",
+			1,
+			1,
+			topScore,
+			topPlayerID
+	      );
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot write high scores data!");
+		print(query);
+		return 0;
+	}
+
+	DB_FreeResultSet(result);
 
 	return 1;
 }

@@ -77,7 +77,8 @@ enum
 	DIALOG_PROPERTY_HELP,
 	DIALOG_RACE_HELP,
 	DIALOG_TAXI_OPTIONS,
-	DIALOG_HIGH_SCORES_OPTIONS
+	DIALOG_HIGH_SCORES_OPTIONS,
+	DIALOG_HIGH_SCORES_DEATHMATCH
 };
 
 #include "modules/real.pwn"
@@ -160,7 +161,7 @@ stock ShowHighScoresRacesDialog(playerid, offset)
 		}
 	}
 
-	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_RACES, DIALOG_STYLE_MSGBOX, "High Scores", stringToPrint, "Next page", "Close");
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_RACES, DIALOG_STYLE_MSGBOX, "High Scores: Races", stringToPrint, "Next page", "Close");
 }
 
 stock ShowAdminCommandsDialog(playerid)
@@ -1058,3 +1059,33 @@ stock ShowHighScoresOptionsDialog(playerid)
 	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_OPTIONS, DIALOG_STYLE_LIST, "High Scores", stringToPrint, "Select", "Close");
 }
 
+stock ShowHighScoresDeathmatchDialog(playerid)
+{
+	new query[512] = "SELECT value, nickname FROM ( SELECT type, value, nickname, row_number() OVER ( PARTITION by type ORDER by value ASC ) AS rank FROM ( SELECT s.type, s.value, s.user_id, u.nickname FROM high_scores AS s JOIN users AS u ON u.id = s.user_id)) ranked WHERE rank <= 5 AND type = 2 ORDER BY value, rank";
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for deathmatch!");
+		print(query);
+		return 0;
+	}
+
+	new i = 1, stringToPrint[512];
+
+	do
+	{
+		new nickname[MAX_PLAYER_NAME], value;
+
+		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+		value = DB_GetFieldIntByName(result, "value");
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {FFD700}%24s     {00FF00}%3d{FFFFFF}", stringToPrint, i, nickname, value);
+		i++;
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_DEATHMATCH, DIALOG_STYLE_MSGBOX, "High Scores: Deathmatch", stringToPrint, "Close", "");
+}

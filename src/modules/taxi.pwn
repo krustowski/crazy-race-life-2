@@ -456,6 +456,8 @@ stock AbortPlayerTaxiMission(playerid)
 
 	SetVehicleParamsForPlayer(gTaxiMission[playerid][VehicleID], playerid, false, false);
 
+	SaveTaxiMissionScore(playerid);
+
 	gTaxiMission[playerid][Active] = false;
 	gTaxiMission[playerid][NPCid] = -1;
 	gTaxiMission[playerid][VehicleID] = -1;
@@ -467,6 +469,35 @@ stock AbortPlayerTaxiMission(playerid)
 	TextDrawHideForPlayer(playerid, gTaxiMission[playerid][InfoText]);
 
 	GameTextForPlayer(playerid, "~w~Taxi Mission ~r~Aborted", 3000, 3); 
+
+	return 1;
+}
+
+stock SaveTaxiMissionScore(playerid)
+{
+	if (!gTaxiMission[playerid][DoneCount])
+	{
+		return 1;
+	}
+
+	new query[256];
+
+	format(query, sizeof(query), "INSERT INTO high_scores (type, spec_id, value, user_id) VALUES (%d, '%d', %d, %d)",
+			3,
+			gTaxiMission[playerid][AreaID],
+			gTaxiMission[playerid][DoneCount],
+			gPlayers[playerid][OrmID]
+	      );
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot write high scores data!");
+		print(query);
+		return 0;
+	}
+
+	DB_FreeResultSet(result);
 
 	return 1;
 }

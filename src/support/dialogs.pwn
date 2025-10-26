@@ -1073,7 +1073,7 @@ stock ShowHighScoresDeathmatchDialog(playerid)
 		return 0;
 	}
 
-	new i = 1, stringToPrint[512];
+	new i = 1, stringToPrint[512] = "Top 5 Deathmatch winners:\n";
 
 	do
 	{

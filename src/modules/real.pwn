@@ -1746,9 +1746,10 @@ stock AttachVehicleToProperty(playerid, propertyid)
 
 		gProperties[i][Vehicle][Model] = modelId;
 
-		new colour1, colour2;
+		new colour1, colour2, paintjob;
 
 		GetVehicleColours(vehicleId, colour1, colour2);
+		paintjob = GetVehiclePaintjob(vehicleId);
 
 		gProperties[i][Vehicle][Colours][0] = colour1;
 		gProperties[i][Vehicle][Colours][1] = colour2;
@@ -1772,11 +1773,14 @@ stock AttachVehicleToProperty(playerid, propertyid)
 
 
 		gProperties[i][Vehicle][ID] = CreateVehicle(modelId, pX, pY, pZ, pR, colour1, colour2, -1);
+		ChangeVehiclePaintjob(vehicleid, paintjob);
 
 		for (new j = 0; j < 16; j++)
 		{
 			if (gProperties[i][Vehicle][Components][j])
+			{
 				AddVehicleComponent(gProperties[i][Vehicle][ID], gProperties[i][Vehicle][Components][j]);
+			}
 		}
 
 		return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] This vehicle has been attached to your property successfully");

@@ -988,8 +988,10 @@ stock ShowWantedListDialog(playerid)
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if (GetPlayerWantedLevel(i) == 0)
+		if (GetPlayerWantedLevel(i) == 0 || IsPlayerNPC(i))
+		{
 			continue;
+		}
 
 		GetPlayerName(i, playerName, sizeof(playerName));
 

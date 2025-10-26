@@ -1773,7 +1773,7 @@ stock AttachVehicleToProperty(playerid, propertyid)
 
 
 		gProperties[i][Vehicle][ID] = CreateVehicle(modelId, pX, pY, pZ, pR, colour1, colour2, -1);
-		ChangeVehiclePaintjob(vehicleid, paintjob);
+		ChangeVehiclePaintjob(gProperties[i][Vehicle][ID], paintjob);
 
 		for (new j = 0; j < 16; j++)
 		{

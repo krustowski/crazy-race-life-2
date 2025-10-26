@@ -1136,6 +1136,7 @@ stock BuyPlayerProperty(playerid, propertyID)
 
 	// Play property bought theme sound
 	//PlayerPlaySound(playerid, 182, 0.0, 0.0, 0.0);
+	SaveRealEstateData();
 
 	return SendClientMessageLocalized(playerid, I18N_REAL_PROPERTY_ACQ);
 }
@@ -1202,6 +1203,7 @@ stock SellPlayerProperty(playerid, propertyID)
 	/*gProperties[arrayID][Pickups][PICKUP_TYPE_OFFER] = EnsurePickupCreated(1273, 1, Float:gProperties[arrayID][LocationOffer][CoordX], Float:gProperties[arrayID][LocationOffer][CoordY], Float:gProperties[arrayID][LocationOffer][CoordZ]);*/
 
 	GivePlayerMoney(playerid, floatround(float(gProperties[arrayID][Cost]) * 0.9));
+	SaveRealEstateData();
 
 	return SendClientMessageLocalized(playerid, I18N_REAL_SELL_SUCCESS);
 }

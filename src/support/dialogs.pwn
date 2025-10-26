@@ -78,7 +78,8 @@ enum
 	DIALOG_RACE_HELP,
 	DIALOG_TAXI_OPTIONS,
 	DIALOG_HIGH_SCORES_OPTIONS,
-	DIALOG_HIGH_SCORES_DEATHMATCH
+	DIALOG_HIGH_SCORES_DEATHMATCH,
+	DIALOG_HIGH_SCORES_MISSIONS
 };
 
 #include "modules/real.pwn"
@@ -1063,7 +1064,7 @@ stock ShowHighScoresOptionsDialog(playerid)
 
 stock ShowHighScoresDeathmatchDialog(playerid)
 {
-	new query[512] = "SELECT s.value, u.nickname FROM ( SELECT type, value, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value ASC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 3 AND s.type = 2 ORDER BY s.value DESC, s.rank";
+	new query[512] = "SELECT s.value, u.nickname FROM ( SELECT type, value, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value ASC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 2 ORDER BY s.value DESC, s.rank";
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
@@ -1091,3 +1092,93 @@ stock ShowHighScoresDeathmatchDialog(playerid)
 
 	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_DEATHMATCH, DIALOG_STYLE_MSGBOX, "High Scores: Deathmatch", stringToPrint, "Close", "");
 }
+
+#include "modules/taxi.pwn"
+
+stock ShowHighScoresMissionsDialog(playerid)
+{
+	new query[512] = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value ASC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 3 ORDER BY s.value DESC, s.rank";
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for taxi missions!");
+		print(query);
+		return 0;
+	}
+
+	new i = 1, stringToPrint[1024] = "{FFD700}Top 5 Taxi Mission players{FFFFFF}\n";
+
+	do
+	{
+		new nickname[MAX_PLAYER_NAME], areaid, area[32], value;
+
+		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+		value = DB_GetFieldIntByName(result, "value");
+		areaid = DB_GetFieldIntByName(result, "spec_id");
+
+		switch (areaid)
+		{
+			case AREA_LV:
+				{
+					area = "Las Venturas";
+				}
+			case AREA_SF:
+				{
+					area = "San Fierro";
+				}
+			case AREA_LS:
+				{
+					area = "Los Santos";
+				}
+			case AREA_ALL:
+				{
+					area = "Whole map";
+				}
+		}
+
+		if (value)
+		{
+			format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {FFD700}%24s     {00FF00}%3d{FFFFFF} (%s)", stringToPrint, i, nickname, value, area);
+			i++;
+		}
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	// Trucking
+
+	query = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value ASC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 4 ORDER BY s.value DESC, s.rank";
+
+	result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for trucking missions!");
+		print(query);
+		return 0;
+	}
+
+	i = 1;
+	format(stringToPrint, sizeof(stringToPrint), "%s\n\n\n{FFD700}Top 5 Trucking Mission players{FFFFFF}\n", stringToPrint);
+
+	do
+	{
+		new nickname[MAX_PLAYER_NAME], value;
+
+		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+		value = DB_GetFieldIntByName(result, "value");
+
+		if (value)
+		{
+			format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {FFD700}%24s     {00FF00}%3d{FFFFFF}", stringToPrint, i, nickname, value);
+			i++;
+		}
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_MISSIONS, DIALOG_STYLE_MSGBOX, "High Scores: Missions", stringToPrint, "Close", "");
+}
+

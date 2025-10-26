@@ -2095,7 +2095,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 					case 2:
 						{
-							return 1;
+							return ShowHighScoresMissionsDialog(playerid);
 						}
 				}
 

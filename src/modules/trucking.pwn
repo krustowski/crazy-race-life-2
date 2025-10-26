@@ -532,6 +532,34 @@ stock SetTruckingPoint(playerid)
 	return 1;
 }
 
+stock SaveTruckingMissionScore(playerid)
+{
+	if (!gPlayerMissions[playerid][DoneCount])
+	{
+		return 1;
+	}
+
+	new query[256];
+
+	format(query, sizeof(query), "INSERT INTO high_scores (type, spec_id, value, user_id) VALUES (%d, '%d', %d, %d)",
+			4,
+			1,
+			gPlayerMissions[playerid][DoneCount],
+			gPlayers[playerid][OrmID]
+	      );
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot write high scores data!");
+		print(query);
+		return 0;
+	}
+
+	DB_FreeResultSet(result);
+
+	return 1;
+}
 stock AbortTruckingMission(playerid)
 {
 	gTrucking[playerid] = false;
@@ -543,6 +571,8 @@ stock AbortTruckingMission(playerid)
 
 	SetVehicleParamsForPlayer(gPlayerMissions[playerid][VehicleID], playerid, false, false);
 	SetVehicleParamsForPlayer(gPlayerMissions[playerid][TrailerID], playerid, false, false);
+
+	SaveTruckingMissionScore(playerid);
 
 	GameTextForPlayer(playerid, "~w~Trucking Mission ~r~Aborted", 3000, 3); 
 

@@ -1558,13 +1558,14 @@ stock CheckRealEstatePickup(playerid, pickupid)
 					}
 				case EXIT_POINT:
 					{
+						gPlayers[playerid][InsideProperty] = false;
+
 						// Make the player exit the property interior, which is then destroyed
 						SetPlayerPos(playerid, gPropertyCoords[i][j][Secondary][CoordX], gPropertyCoords[i][j][Secondary][CoordY], gPropertyCoords[i][j][Secondary][CoordZ]);
 
 						if (!gProperties[i][CustomInterior])
 							DestroyPropertyInterior(playerid);
 
-						gPlayers[playerid][InsideProperty] = false;
 						return 1;
 					}
 				case ENTRANCE_POINT:

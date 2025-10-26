@@ -1063,7 +1063,7 @@ stock ShowHighScoresOptionsDialog(playerid)
 
 stock ShowHighScoresDeathmatchDialog(playerid)
 {
-	new query[512] = "SELECT value, nickname FROM ( SELECT type, value, nickname, row_number() OVER ( PARTITION by type ORDER by value ASC ) AS rank FROM ( SELECT s.type, s.value, s.user_id, u.nickname FROM high_scores AS s JOIN users AS u ON u.id = s.user_id)) ranked WHERE rank <= 5 AND type = 2 ORDER BY value, rank";
+	new query[512] = "SELECT s.value, u.nickname FROM ( SELECT type, value, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value ASC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 3 AND s.type = 2 ORDER BY s.type, s.rank";
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)

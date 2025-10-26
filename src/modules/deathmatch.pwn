@@ -185,7 +185,7 @@ stock SaveScores()
 	new query[256];
 
 	format(query, sizeof(query), "INSERT INTO high_scores (type, spec_id, value, user_id) VALUES (%d, '%d', %d, %d)",
-			1,
+			2,
 			1,
 			topScore,
 			topPlayerID

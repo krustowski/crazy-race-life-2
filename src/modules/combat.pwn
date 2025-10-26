@@ -10,6 +10,7 @@
 #define MAX_COMBAT_NPCS		25
 #define MAX_COMBAT_PICKUPS	20
 #define MAX_COMBAT_VEHICLES	5
+#define COMBAT_ACCURACY		0.3
 
 enum 
 {
@@ -218,7 +219,7 @@ stock PrepareCombatInterior(playerid)
 					NPC_SetWeapon(gCombatNPC[npcid], 29);
 					NPC_SetAmmo(gCombatNPC[npcid], 1000);
 					NPC_EnableInfiniteAmmo(gCombatNPC[npcid], true);
-					NPC_SetWeaponAccuracy(gCombatNPC[npcid], 29, 0.1);
+					NPC_SetWeaponAccuracy(gCombatNPC[npcid], 29, COMBAT_ACCURACY);
 
 					new Float: pX, Float: pY, Float: pZ;
 					GetPlayerPos(playerid, pX, pY, pZ);
@@ -281,7 +282,7 @@ stock PrepareCombatInterior(playerid)
 					NPC_SetWeapon(gCombatNPC[npcid], 29);
 					NPC_SetAmmo(gCombatNPC[npcid], 1000);
 					NPC_EnableInfiniteAmmo(gCombatNPC[npcid], true);
-					NPC_SetWeaponAccuracy(gCombatNPC[npcid], 29, 0.1);
+					NPC_SetWeaponAccuracy(gCombatNPC[npcid], 29, COMBAT_ACCURACY);
 
 					SetPlayerMarkerForPlayer(playerid, gCombatNPC[npcid], COLOR_YELLOW);
 

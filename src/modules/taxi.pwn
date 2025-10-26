@@ -390,7 +390,7 @@ stock SetTaxiMissionCustomer(playerid)
 
 	new npcid = NPC_Create(npc_name);
 
-	if (!npcid)
+	if (npcid < 1)
 	{
 		return SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Too many customers in game, try again later!");
 	}

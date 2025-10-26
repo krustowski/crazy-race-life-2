@@ -34,7 +34,8 @@ enum DeathmatchPickup
 enum DeathmatchPickupType
 {
 	TYPE_NONE,
-	TYPE_HEALTH
+	TYPE_HEALTH,
+	TYPE_ARMOUR
 }
 
 new gDeathmatch[MAX_PLAYERS][Deathmatch];
@@ -47,7 +48,7 @@ new gDeathmatchGangZone[MAX_PLAYERS];
 new Float: deathmatchPickups[6][3] = {
         { -1380.62, -2346.69, 35.01 },
         { -1334.16, -2352.38, 36.00 },
-        { -1307.00, -2352.38, 36.00 },
+        { -1307.00, -2308.74, 35.17 },
         { -1314.60, -2255.89, 31.37 },
         { -1361.84, -2235.61, 32.44 },
         { -1412.34, -2243.93, 34.35 }
@@ -112,8 +113,16 @@ stock SetDeathmatchPickups()
 {
 	for (new i = 0; i < sizeof(deathmatchPickups); i++)
 	{
-		gDeathmatchPickups[i][Pickup] = EnsurePickupCreated(PICKUP_HEART, PICKUP_TYPE_RESPAWN_30_SECONDS, deathmatchPickups[i][0], deathmatchPickups[i][1], deathmatchPickups[i][2]);
-		gDeathmatchPickups[i][Type] = DeathmatchPickupType: TYPE_HEALTH;
+		if (i % 2)
+		{
+			gDeathmatchPickups[i][Pickup] = EnsurePickupCreated(PICKUP_HEART, PICKUP_TYPE_RESPAWN_30_SECONDS, deathmatchPickups[i][0], deathmatchPickups[i][1], deathmatchPickups[i][2]);
+			gDeathmatchPickups[i][Type] = DeathmatchPickupType: TYPE_HEALTH;
+		}
+		else
+		{
+			gDeathmatchPickups[i][Pickup] = EnsurePickupCreated(PICKUP_ARMOUR, PICKUP_TYPE_RESPAWN_30_SECONDS, deathmatchPickups[i][0], deathmatchPickups[i][1], deathmatchPickups[i][2]);
+			gDeathmatchPickups[i][Type] = DeathmatchPickupType: TYPE_ARMOUR;
+		}
 	}
 }
 
@@ -129,10 +138,15 @@ stock CheckDeathmatchPickups(playerid, pickupid)
 		switch (gDeathmatchPickups[i][Type])
 		{
 			case (DeathmatchPickupType: TYPE_HEALTH):
-				{
-					SetPlayerHealth(playerid, 100.0);
-					break;
-				}
+						    {
+							    SetPlayerHealth(playerid, 100.0);
+							    break;
+						    }
+			case TYPE_ARMOUR:
+						    {
+							    SetPlayerArmour(playerid, 100.0);
+							    break;
+						    }
 		}
 	}
 }

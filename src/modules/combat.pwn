@@ -320,6 +320,10 @@ stock SetCombatMission(playerid)
 	TextDrawFont(gCombatMission[playerid][InfoText], t_TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gCombatMission[playerid][InfoText], 1);
 
+	ResetPlayerWeapons(playerid);
+	GivePlayerWeapon(playerid, t_WEAPON: 26, 200);
+	GivePlayerWeapon(playerid, t_WEAPON: 31, 500);
+
 	gCombatMission[playerid][TimerUpdate] = Timer: SetTimerEx("UpdateCombatMissionInfoText", 1000, true, "i", playerid);
 
 	GameTextForPlayer(playerid, "~w~Combat Mission ~g~Started", 3000, 3); 

@@ -8,6 +8,7 @@
 //
 
 #define DEATHMATCH_TIME_SECONDS 240
+#define MAX_DEATHMATCH_PICKUPS	10
 
 enum Deathmatch
 {
@@ -24,11 +25,33 @@ enum DeathmatchTimers
 	TimeElapsed
 }
 
+enum DeathmatchPickup
+{
+	DeathmatchPickupType: Type,
+	Pickup
+}
+
+enum DeathmatchPickupType
+{
+	TYPE_NONE,
+	TYPE_HEALTH
+}
+
 new gDeathmatch[MAX_PLAYERS][Deathmatch];
 new gDeathmatchTimers[DeathmatchTimers];
+new gDeathmatchPickups[MAX_DEATHMATCH_PICKUPS][DeathmatchPickup];
 new Text: gDeathmatchText[MAX_PLAYERS];
 
 new gDeathmatchGangZone[MAX_PLAYERS];
+
+new Float: deathmatchPickups[6][3] = {
+        { -1380.62, -2346.69, 35.01 },
+        { -1334.16, -2352.38, 36.00 },
+        { -1307.00, -2352.38, 36.00 },
+        { -1314.60, -2255.89, 31.37 },
+        { -1361.84, -2235.61, 32.44 },
+        { -1412.34, -2243.93, 34.35 }
+};
 
 forward StartDeathmatch();
 forward UpdateDeathmatchScoreboard();
@@ -73,6 +96,8 @@ public StartDeathmatch()
 		gDeathmatchTimers[Game] = Timer: SetTimer("EndDeathmatch", DEATHMATCH_TIME_SECONDS * 1000, false);
 		gDeathmatchTimers[Elapsed] = Timer: SetTimer("UpdateDeathmatchScoreboard", 1000, true);
 		gDeathmatchTimers[TimeElapsed] = DEATHMATCH_TIME_SECONDS * 1000;
+
+		SetDeathmatchPickups();
 	}
 	else
 	{
@@ -81,6 +106,35 @@ public StartDeathmatch()
 	}
 
 	return 1;
+}
+
+stock SetDeathmatchPickups()
+{
+	for (new i = 0; i < sizeof(deathmatchPickups); i++)
+	{
+		gDeathmatchPickups[i][Pickup] = EnsurePickupCreated(PICKUP_HEART, PICKUP_TYPE_RESPAWN_30_SECONDS, deathmatchPickups[i][0], deathmatchPickups[i][1], deathmatchPickups[i][2]);
+		gDeathmatchPickups[i][Type] = DeathmatchPickupType: TYPE_HEALTH;
+	}
+}
+
+stock CheckDeathmatchPickups(playerid, pickupid)
+{
+	for (new i = 0; i < MAX_DEATHMATCH_PICKUPS; i++)
+	{
+		if (gDeathmatchPickups[i][Pickup] != pickupid)
+		{
+			continue;
+		}
+
+		switch (gDeathmatchPickups[i][Type])
+		{
+			case (DeathmatchPickupType: TYPE_HEALTH):
+				{
+					SetPlayerHealth(playerid, 100.0);
+					break;
+				}
+		}
+	}
 }
 
 public EndDeathmatch()
@@ -97,6 +151,14 @@ public EndDeathmatch()
 		if (gDeathmatch[i][InGame] || gDeathmatch[i][IsRegistered])
 		{
 			LeaveDeathmatch(i);
+		}
+	}
+
+	for (new i = 0; i < MAX_DEATHMATCH_PICKUPS; i++)
+	{
+		if (gDeathmatchPickups[i][Pickup])
+		{
+			DestroyPickup(gDeathmatchPickups[i][Pickup]);
 		}
 	}
 
@@ -140,7 +202,7 @@ public UpdateDeathmatchScoreboard()
 			continue;
 		}
 
-		format(stringToPrint, sizeof(stringToPrint), "~w~Players:_~g~%d~n~~w~Leader:__~y~%s:_~g~%2d~n~~w~Time:____~b~%d~y~:~b~%2d", totalPlayers, topPlayerName, topScore, floatround(floatround(gDeathmatchTimers[TimeElapsed] / 1000) / 60), floatround(gDeathmatchTimers[TimeElapsed] / 1000) % 60);
+		format(stringToPrint, sizeof(stringToPrint), "~w~Players:_~g~%d~n~~w~Lead:_~y~%s:_~g~%d~n~~w~Time:____~b~%d~y~:~b~%2d", totalPlayers, topPlayerName, topScore, floatround(floatround(gDeathmatchTimers[TimeElapsed] / 1000) / 60), floatround(gDeathmatchTimers[TimeElapsed] / 1000) % 60);
 
 		TextDrawSetString(gDeathmatchText[i], stringToPrint);
 		TextDrawShowForPlayer(i, gDeathmatchText[i]);

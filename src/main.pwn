@@ -2191,6 +2191,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	//
 
 	CheckCombatPickup(playerid, pickupid);
+	CheckDeathmatchPickups(playerid, pickupid);
 
 	//
 	//  Trucking pickups.

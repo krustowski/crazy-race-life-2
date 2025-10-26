@@ -147,7 +147,7 @@ stock CheckCombatPickup(playerid, pickupid)
 					format(stringToPrint, sizeof(stringToPrint), "[ COMBAT ] You found a briefcase no. %d", gCombatMission[playerid][BriefcaseCount]);
 					SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 				}
-			case TYPE_HEALTH:
+			case (CombatPickupType: TYPE_HEALTH):
 				{
 					SetPlayerHealth(playerid, 100.0);
 				}
@@ -232,7 +232,7 @@ stock PrepareCombatInterior(playerid)
 			case COMBAT_COORD_HEALTH:
 				{
 					gCombatPickups[pickupid][Pickup] = EnsurePickupCreated(PICKUP_HEART, PICKUP_TYPE_RESPAWN_30_SECONDS, X, Y, Z);
-					gCombatPickups[pickupid][Type] = TYPE_HEALTH;
+					gCombatPickups[pickupid][Type] = CombatPickupType: TYPE_HEALTH;
 					pickupid++;
 				}
 			case COMBAT_COORD_HELI:
@@ -244,7 +244,7 @@ stock PrepareCombatInterior(playerid)
 			case COMBAT_COORD_EXIT:
 				{
 					gCombatPickups[pickupid][Pickup] = EnsurePickupCreated(PICKUP_ARROW, 1, X, Y, Z);
-					gCombatPickups[pickupid][Type] = TYPE_EXIT;
+					gCombatPickups[pickupid][Type] = CombatPickupType: TYPE_EXIT;
 					pickupid++;
 				}
 			case COMBAT_COORD_ROOF:

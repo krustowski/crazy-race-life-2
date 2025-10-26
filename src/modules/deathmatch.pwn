@@ -208,7 +208,9 @@ stock ResetPlayerDeathmatchState(playerid)
 {
 	ResetPlayerWeapons(playerid);
 	SetPlayerPos(playerid, Float: -1365.1, Float: -2307.0, Float: 39.1);
-	GivePlayerWeapon(playerid, t_WEAPON: 29, 999);
+
+	GivePlayerWeapon(playerid, t_WEAPON: 30, 999);
+	GivePlayerWeapon(playerid, t_WEAPON: 34, 999);
 
 	return 1;
 }

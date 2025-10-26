@@ -940,7 +940,7 @@ dcmd_clear(playerid, const params[])
 dcmd_combat(playerid, const params[])
 {
 #pragma unused params
-	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4) 
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3) 
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
 
 	return SetCombatMission(playerid);

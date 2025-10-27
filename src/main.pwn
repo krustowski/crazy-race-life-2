@@ -1151,6 +1151,21 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							SetPlayerPos(playerid, 1896.13, -2393.53, 13.11);
 							SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] Los Santos Airport");
 						}
+					case 3: 
+						{
+							SetPlayerPos(playerid, -2366.65, 1538.78, 2.11);
+							SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] San Fierro Ship Parkour Park");
+						}
+					case 4: 
+						{
+							SetPlayerPos(playerid, -281.000000, 2170.899900, 112.100000);
+							SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] Bone County Parkour");
+						}
+					case 5: 
+						{
+							SetCombatMission(playerid, 2);
+							//SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] Combat #2");
+						}
 				}
 
 				return 1;

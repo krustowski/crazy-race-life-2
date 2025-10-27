@@ -7,10 +7,11 @@
 //  combat.pwn
 //
 
-#define MAX_COMBAT_NPCS		25
-#define MAX_COMBAT_PICKUPS	20
-#define MAX_COMBAT_VEHICLES	5
-#define COMBAT_ACCURACY		0.15
+#define MAX_COMBAT_NPCS			25
+#define MAX_COMBAT_PICKUPS		20
+#define MAX_COMBAT_VEHICLES		5
+#define COMBAT_ACCURACY			0.15
+#define COMPAT_BRIEFCASE_DOLLARS	50000
 
 enum 
 {
@@ -22,7 +23,9 @@ enum
 	COMBAT_COORD_EXIT,
 	COMBAT_COORD_ROOF,
 	COMBAT_COORD_CP,
-	COMBAT_COORD_NPC_MAN
+	COMBAT_COORD_NPC_MAN,
+	COMBAT_COORD_DOOR,
+	COMBAT_COORD_SPAWN
 }
 
 enum CombatPickupType
@@ -31,7 +34,8 @@ enum CombatPickupType
 	TYPE_BRIEFCASE,
 	TYPE_HEALTH,
 	TYPE_EXIT,
-	TYPE_CP
+	TYPE_CP,
+	TYPE_DOOR
 }
 
 enum CombatPickup
@@ -73,7 +77,7 @@ public CheckBriefcaseManProximity(playerid, npcid)
 	{
 		KillTimer(_: gCombatMission[playerid][TimerBriefcaseMan]);
 
-		new prize = gCombatMission[playerid][BriefcaseCount] * 500000, stringToPrint[128];
+		new prize = gCombatMission[playerid][BriefcaseCount] * COMPAT_BRIEFCASE_DOLLARS, stringToPrint[128];
 		format(stringToPrint, sizeof(stringToPrint), "[ COMBAT ] Briefcases exchanged for money ($%d)!", prize);
 		SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint); 
 
@@ -173,9 +177,16 @@ stock CheckCombatPickup(playerid, pickupid)
 	return 1;
 }
 
-stock PrepareCombatInterior(playerid)
+stock PrepareCombatInterior(playerid, missionid)
 {
-	new query[256] = "SELECT type, x, y, z FROM combat_coords";
+	if (!missionid)
+	{
+		print("Combat mission ID 0!");
+		return 0;
+	}
+
+	new query[256];
+	format(query, sizeof(query), "SELECT type, x, y, z FROM combat_coords WHERE mission_id = %d", missionid);
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
@@ -290,6 +301,12 @@ stock PrepareCombatInterior(playerid)
 
 					npcid++;
 				}
+			case COMBAT_COORD_DOOR:
+				{
+					gCombatPickups[pickupid][Pickup] = EnsurePickupCreated(PICKUP_ARROW, 1, X, Y, Z);
+					gCombatPickups[pickupid][Type] = CombatPickupType: TYPE_DOOR;
+					pickupid++;
+				}
 		}
 	}
 	while (DB_SelectNextRow(result));
@@ -299,14 +316,14 @@ stock PrepareCombatInterior(playerid)
 	return 1;
 }
 
-stock SetCombatMission(playerid)
+stock SetCombatMission(playerid, missionid)
 {
 	if (gCombatMission[playerid][Active])
 	{
 		return AbortCombatMission(playerid, false);
 	}
 
-	if (!PrepareCombatInterior(playerid))
+	if (!PrepareCombatInterior(playerid, missionid))
 	{
 		return SendClientMessage(playerid, COLOR_RED, "[ COMBAT ] Error setting new combat mission!");
 	}
@@ -328,8 +345,18 @@ stock SetCombatMission(playerid)
 
 	GameTextForPlayer(playerid, "~w~Combat Mission ~g~Started", 3000, 3); 
 
-	SetPlayerInterior(playerid, 3);
-	SetPlayerPos(playerid, 376.27, 186.46, 1008.38);
+	switch (missionid)
+	{
+		case 1:
+			{
+				SetPlayerInterior(playerid, 3);
+				SetPlayerPos(playerid, 376.27, 186.46, 1008.38);
+			}
+		case 2:
+			{
+				SetPlayerPos(playerid, 20.900000, 2233.000000, 101.100000);
+			}
+	}
 
 	return 1;
 }

@@ -7,11 +7,9 @@
 //  Global static objects.
 //
 
-new gAdminElevator;
+#include "support/parkour.pwn"
 
-//
-//
-//
+new gAdminElevator;
 
 forward InitObjects();
 
@@ -514,4 +512,6 @@ public InitObjects()
 	CreateObject(2191,-1890.470,499.671,20.930,0.0,0.0,0.0);
 	CreateObject(2197,-1884.672,488.098,20.918,0.0,0.0,0.0);
 	CreateObject(2199,-1883.680,489.210,21.125,0.0,0.0,0.0);
+
+	InitParkour();
 }

@@ -79,7 +79,8 @@ enum
 	DIALOG_TAXI_OPTIONS,
 	DIALOG_HIGH_SCORES_OPTIONS,
 	DIALOG_HIGH_SCORES_DEATHMATCH,
-	DIALOG_HIGH_SCORES_MISSIONS
+	DIALOG_HIGH_SCORES_MISSIONS,
+	DIALOG_HIGH_SCORES_COMBAT
 };
 
 #include "modules/real.pwn"
@@ -1027,10 +1028,11 @@ stock ShowTaxiMissionOptionsDialog(playerid)
 stock ShowHighScoresOptionsDialog(playerid)
 {
 	new stringToPrint[256];
-	format(stringToPrint, sizeof(stringToPrint), "%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s",
 			"Races\n",
 			"Deathmatch\n",
-			"Missions"
+			"Missions\n",
+			"Combat"
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_OPTIONS, DIALOG_STYLE_LIST, "High Scores", stringToPrint, "Select", "Close");
@@ -1148,6 +1150,63 @@ stock ShowHighScoresMissionsDialog(playerid)
 			format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}%3d{FFFFFF}\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, value, nickname);
 			i++;
 		}
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_MISSIONS, DIALOG_STYLE_MSGBOX, "High Scores: Missions", stringToPrint, "Close", "");
+}
+
+stock ShowHighScoresCombatDialog(playerid)
+{
+	new query[512] = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value ASC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 5 ORDER BY s.value DESC, s.rank", stringToPrint[1024];
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for combat missions!");
+		print(query);
+		return 0;
+	}
+
+	new i = 1, s = 0;
+	do
+	{
+		new nickname[MAX_PLAYER_NAME], value, missionid;
+
+		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+		missionid = DB_GetFieldIntByName(result, "spec_id");
+		value = DB_GetFieldIntByName(result, "value");
+
+		if (!missionid)
+		{
+			i = 0;
+		}
+
+		if (s != missionid)
+		{
+			i = 1;
+		}
+		s = missionid;
+
+		switch (i)
+		{
+			case 1:
+				{
+					format(stringToPrint, sizeof(stringToPrint), "%s\n\n{FFD700}Combat Mission No. %2d{FFFFFF}\n\n", stringToPrint, missionid);
+					format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}1st: {00FF00}%2d{FFD700}\t\%s\n", stringToPrint, value, nickname);
+				}
+			case 2:
+				{
+					format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}2nd: {00FF00}%2d{FFD700}\t\%s\n", stringToPrint, value, nickname);
+				}
+			case 3:
+				{
+					format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}3rd: {00FF00}%2d{FFD700}\t\%s\n", stringToPrint, value, nickname);
+				}
+		}
+		i++;
 	}
 	while (DB_SelectNextRow(result));
 

@@ -2113,6 +2113,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							return ShowHighScoresMissionsDialog(playerid);
 						}
+					case 3:
+						{
+							return ShowHighScoresCombatDialog(playerid);
+						}
 				}
 
 			}

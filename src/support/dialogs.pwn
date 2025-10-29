@@ -86,7 +86,7 @@ enum
 
 stock ShowHighScoresRacesDialog(playerid, offset)
 {
-	new stringToPrint[1024];
+	new stringToPrint[2048];
 	format(stringToPrint, sizeof(stringToPrint), "");
 	
 	for (new i = offset; i < MAX_RACE_COUNT; i++)
@@ -101,41 +101,21 @@ stock ShowHighScoresRacesDialog(playerid, offset)
 			continue;
 		}
 
-		new highScoreTimeSec[8];
-
-		if ((gHighScores[i][Time][0] / 1000) % 60 < 10)
-		{
-			format(highScoreTimeSec, sizeof(highScoreTimeSec), "%d%d", 0, (gHighScores[i][Time][0] / 1000) % 60);
-		}
-		else
-		{
-			format(highScoreTimeSec, sizeof(highScoreTimeSec), "%2d", (gHighScores[i][Time][0] / 1000) % 60);
-		}
-
-		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFD700}Race No. %d{FFFFFF}\n\n1st\t%d:%s min\t%s\t(model %d)\n", 
+		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFD700}Race No. %d{FFFFFF}\n\n1st\t{00FF00}%d:%0d{FFFFFF} min\t{FFD700}%s{FFFFFF}\t(model %d)\n", 
 				stringToPrint, 
 				i, 
 				(gHighScores[i][Time][0] / 1000) / 60,
-				highScoreTimeSec,
+				(gHighScores[i][Time][0] / 1000) % 60,
 				gHighScores[i][Nickname1], 
 				gHighScores[i][VehicleModel][0]
 		      );
 
 		if (gHighScores[i][Time][1] != 0)
 		{
-			if ((gHighScores[i][Time][1] / 1000) % 60 < 10)
-			{
-				format(highScoreTimeSec, sizeof(highScoreTimeSec), "%d%d", 0, (gHighScores[i][Time][1] / 1000) % 60);
-			}
-			else
-			{
-				format(highScoreTimeSec, sizeof(highScoreTimeSec), "%d", (gHighScores[i][Time][1] / 1000) % 60);
-			}
-
-			format(stringToPrint, sizeof(stringToPrint), "%s2nd\t%d:%s min\t%s\t(model %d)\n", 
+			format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}2nd\t{00FF00}%d:%0d{FFFFFF} min\t{FFD700}%s{FFFFFF}\t(model %d)\n", 
 					stringToPrint,
 					(gHighScores[i][Time][1] / 1000) / 60,
-					highScoreTimeSec,
+					(gHighScores[i][Time][1] / 1000) % 60,
 					gHighScores[i][Nickname2], 
 					gHighScores[i][VehicleModel][1]
 			      );
@@ -143,19 +123,10 @@ stock ShowHighScoresRacesDialog(playerid, offset)
 
 		if (gHighScores[i][Time][2] != 0)
 		{
-			if ((gHighScores[i][Time][2] / 1000) % 60 < 10)
-			{
-				format(highScoreTimeSec, sizeof(highScoreTimeSec), "%d%d", 0, (gHighScores[i][Time][2] / 1000) % 60);
-			}
-			else
-			{
-				format(highScoreTimeSec, sizeof(highScoreTimeSec), "%d", (gHighScores[i][Time][2] / 1000) % 60);
-			}
-
-			format(stringToPrint, sizeof(stringToPrint), "%s3rd\t%d:%s min\t%s\t(model %d)\n", 
+			format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}3rd\t{00FF00}%d:%0d{FFFFFF} min\t{FFD700}%s{FFFFFF}\t(model %d)\n", 
 					stringToPrint,
 					(gHighScores[i][Time][2] / 1000) / 60,
-					highScoreTimeSec,
+					(gHighScores[i][Time][2] / 1000) % 60,
 					gHighScores[i][Nickname3], 
 					gHighScores[i][VehicleModel][2]
 			      );
@@ -1077,7 +1048,7 @@ stock ShowHighScoresDeathmatchDialog(playerid)
 		return 0;
 	}
 
-	new i = 1, stringToPrint[512] = "Top 5 Deathmatch winners:\n";
+	new i = 1, stringToPrint[512] = "{FFD700}Top 5 Deathmatch winners:{FFFFFF}\n";
 
 	do
 	{
@@ -1086,7 +1057,7 @@ stock ShowHighScoresDeathmatchDialog(playerid)
 		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
 		value = DB_GetFieldIntByName(result, "value");
 
-		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {FFD700}%24s     {00FF00}%3d{FFFFFF}", stringToPrint, i, nickname, value);
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%d: {00FF00}%3d\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, value, nickname);
 		i++;
 	}
 	while (DB_SelectNextRow(result));
@@ -1124,25 +1095,25 @@ stock ShowHighScoresMissionsDialog(playerid)
 		{
 			case AREA_LV:
 				{
-					area = "Las Venturas";
+					area = "(Las Venturas)";
 				}
 			case AREA_SF:
 				{
-					area = "San Fierro";
+					area = "(San Fierro)";
 				}
 			case AREA_LS:
 				{
-					area = "Los Santos";
+					area = "(Los Santos)";
 				}
 			case AREA_ALL:
 				{
-					area = "Whole map";
+					area = "(Whole map)";
 				}
 		}
 
 		if (value)
 		{
-			format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {FFD700}%24s     {00FF00}%3d{FFFFFF} (%s)", stringToPrint, i, nickname, value, area);
+			format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}%3d{FFFFFF} %16s\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, value, area, nickname);
 			i++;
 		}
 	}
@@ -1174,7 +1145,7 @@ stock ShowHighScoresMissionsDialog(playerid)
 
 		if (value)
 		{
-			format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {FFD700}%24s     {00FF00}%3d{FFFFFF}", stringToPrint, i, nickname, value);
+			format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}%3d{FFFFFF}\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, value, nickname);
 			i++;
 		}
 	}

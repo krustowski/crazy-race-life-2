@@ -320,7 +320,7 @@ public OnPlayerDisconnect(playerid, reason)
 	KillTimer(_: gPlayerMissions[playerid][TimerAttachedCheck]);
 
 	AbortPlayerTaxiMission(playerid);
-	AbortCombatMission(playerid);
+	AbortCombatMission(playerid, false);
 
 	// Save player's data and set such player to unauthorized.
 	if (reason == 1)

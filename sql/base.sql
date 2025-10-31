@@ -120,16 +120,6 @@ CREATE TABLE IF NOT EXISTS "trucking_facility_types" (
 	"name"	TEXT NOT NULL,
 	PRIMARY KEY("id")
 );
-CREATE TABLE IF NOT EXISTS "high_scores" (
-	"id"	INTEGER,
-	"race_id"	INTEGER NOT NULL,
-	"nickname"	TEXT NOT NULL,
-	"time"	INTEGER NOT NULL,
-	"car_model"	INTEGER NOT NULL,
-	PRIMARY KEY("id" AUTOINCREMENT),
-	FOREIGN KEY("nickname") REFERENCES "users"("nickname"),
-	FOREIGN KEY("race_id") REFERENCES "races"("id")
-);
 CREATE TABLE IF NOT EXISTS "property_coord_types" (
 	"id"	INTEGER NOT NULL,
 	"name"	TEXT,
@@ -240,12 +230,46 @@ CREATE TABLE IF NOT EXISTS "combat_coord_types" (
 	"name"	TEXT,
 	PRIMARY KEY("id")
 );
+CREATE TABLE IF NOT EXISTS "high_scores_races" (
+	"id"	INTEGER,
+	"race_id"	INTEGER NOT NULL,
+	"nickname"	TEXT NOT NULL,
+	"time"	INTEGER NOT NULL,
+	"car_model"	INTEGER NOT NULL,
+	PRIMARY KEY("id" AUTOINCREMENT),
+	FOREIGN KEY("nickname") REFERENCES "users"("nickname"),
+	FOREIGN KEY("race_id") REFERENCES "races"("id")
+);
+CREATE TABLE IF NOT EXISTS "high_scores_types" (
+	"id"	INTEGER,
+	"name"	TEXT,
+	PRIMARY KEY("id")
+);
+CREATE TABLE IF NOT EXISTS "combat_mission" (
+	"id"	INTEGER,
+	"name"	TEXT,
+	PRIMARY KEY("id")
+);
 CREATE TABLE IF NOT EXISTS "combat_coords" (
 	"id"	INTEGER,
 	"type"	INTEGER NOT NULL DEFAULT 0,
+	"mission_id"	INTEGER,
 	"x"	REAL NOT NULL,
 	"y"	REAL NOT NULL,
 	"z"	REAL NOT NULL,
 	PRIMARY KEY("id"),
+	FOREIGN KEY("mission_id") REFERENCES "combat_mission"("id"),
 	FOREIGN KEY("type") REFERENCES "combat_coord_types"("id")
+);
+CREATE TABLE IF NOT EXISTS "high_scores" (
+	"id"	INTEGER,
+	"type"	INTEGER,
+	"spec_id"	INTEGER,
+	"value"	INTEGER NOT NULL,
+	"user_id"	INTEGER NOT NULL,
+	"time"	INTEGER,
+	"vehicle_model"	INTEGER,
+	PRIMARY KEY("id"),
+	FOREIGN KEY("type") REFERENCES "high_scores_types"("id"),
+	FOREIGN KEY("user_id") REFERENCES "users"("id")
 );

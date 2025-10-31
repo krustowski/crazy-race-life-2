@@ -49,6 +49,7 @@ enum CombatMission
 {
 	bool: Active,
 	bool: Dead,
+	MissionID,
 	BriefcaseCount,
 
 	Text: InfoText,
@@ -331,6 +332,7 @@ stock SetCombatMission(playerid, missionid)
 	gCombatMission[playerid][Active] = true;
 	gCombatMission[playerid][TimeElapsed] = 0;
 	gCombatMission[playerid][BriefcaseCount] = 0;
+	gCombatMission[playerid][MissionID] = missionid;
 
 	gCombatMission[playerid][InfoText] = TextDrawCreate(460.0, 400.0, "");
 	TextDrawLetterSize(gCombatMission[playerid][InfoText], 0.5, 1.5);
@@ -361,6 +363,35 @@ stock SetCombatMission(playerid, missionid)
 	return 1;
 }
 
+stock SaveCombatMissionScore(playerid)
+{
+	if (!gCombatMission[playerid][BriefcaseCount])
+	{
+		return 1;
+	}
+
+	new query[256];
+
+	format(query, sizeof(query), "INSERT INTO high_scores (type, spec_id, value, user_id) VALUES (%d, '%d', %d, %d)",
+			5,
+			gCombatMission[playerid][MissionID],
+			gCombatMission[playerid][BriefcaseCount],
+			gPlayers[playerid][OrmID]
+	      );
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot write high scores data for combat!");
+		print(query);
+		return 0;
+	}
+
+	DB_FreeResultSet(result);
+
+	return 1;
+}
+
 stock AbortCombatMission(playerid, bool: success)
 {
 	gCombatMission[playerid][Active] = false;
@@ -387,6 +418,7 @@ stock AbortCombatMission(playerid, bool: success)
 	if (success)
 	{
 		GameTextForPlayer(playerid, "~w~Combat Mission ~g~Done", 3000, 3); 
+		SaveCombatMissionScore(playerid);
 	}
 	else
 	{

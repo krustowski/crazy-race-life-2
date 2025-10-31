@@ -560,6 +560,7 @@ stock SaveTruckingMissionScore(playerid)
 
 	return 1;
 }
+
 stock AbortTruckingMission(playerid)
 {
 	gTrucking[playerid] = false;

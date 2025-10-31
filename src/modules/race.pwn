@@ -459,7 +459,14 @@ stock SaveNewScore(raceId, playerid, time, vehicleModel)
 	GetPlayerName(playerid, nickname);
 
 	new query[256];
-	format(query, sizeof(query), "INSERT INTO high_scores_races (race_id, nickname, time, car_model) VALUES (%d, '%s', %d, %d)", raceId, nickname, time, vehicleModel);
+	format(query, sizeof(query), "INSERT INTO high_scores (type, spec_id, user_id, value, vehicle_model, time) VALUES (%d, %d, %d, %d, %d, %d, %d)", 
+			1,
+			raceId, 
+			gPlayers[playerid][OrmID], 
+			time, 
+			vehicleModel,
+			time
+		);
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {

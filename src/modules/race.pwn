@@ -410,7 +410,7 @@ stock InitHighScores()
 {
 	new query[512];
 
-	format(query, sizeof(query), "select race_id, nickname, time, car_model from ( select race_id, nickname, time, car_model, row_number() over ( PARTITION by race_id ORDER by time ASC ) as rank from high_scores_races ) ranked where rank <= 3 order by race_id, rank;");
+	format(query, sizeof(query), "select spec_id, nickname, value, vehicle_model from ( select spec_id, u.nickname, value, vehicle_model, row_number() over ( PARTITION by spec_id ORDER by value ASC ) as rank from high_scores join users as u on u.id = user_id where type = 1 ) ranked where rank <= 3 order by spec_id, rank;");
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
@@ -422,7 +422,7 @@ stock InitHighScores()
 
 	do
 	{
-		new raceId = DB_GetFieldIntByName(result, "race_id");
+		new raceId = DB_GetFieldIntByName(result, "spec_id");
 
 		new i = raceIds[raceId];
 
@@ -439,8 +439,8 @@ stock InitHighScores()
 				gHighScores[raceId][Nickname3] = name;
 		}
 
-		gHighScores[raceId][Time][i] = DB_GetFieldIntByName(result, "time");
-		gHighScores[raceId][VehicleModel][i] = DB_GetFieldIntByName(result, "car_model");
+		gHighScores[raceId][Time][i] = DB_GetFieldIntByName(result, "value");
+		gHighScores[raceId][VehicleModel][i] = DB_GetFieldIntByName(result, "vehicle_model");
 
 		raceIds[raceId]++;
 	}

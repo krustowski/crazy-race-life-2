@@ -372,7 +372,7 @@ stock SaveCombatMissionScore(playerid)
 
 	new query[256];
 
-	format(query, sizeof(query), "INSERT INTO high_scores (type, spec_id, value, user_id) VALUES (%d, '%d', %d, %d)",
+	format(query, sizeof(query), "INSERT INTO high_scores (type, spec_id, value, user_id) VALUES (%d, %d, %d, %d)",
 			5,
 			gCombatMission[playerid][MissionID],
 			gCombatMission[playerid][BriefcaseCount],
@@ -394,10 +394,6 @@ stock SaveCombatMissionScore(playerid)
 
 stock AbortCombatMission(playerid, bool: success)
 {
-	gCombatMission[playerid][Active] = false;
-	gCombatMission[playerid][TimeElapsed] = 0;
-	gCombatMission[playerid][BriefcaseCount] = 0;
-
 	for (new i = 0; i < MAX_COMBAT_PICKUPS; i++)
 	{
 		DestroyPickup(gCombatPickups[i][Pickup]);
@@ -424,6 +420,10 @@ stock AbortCombatMission(playerid, bool: success)
 	{
 		GameTextForPlayer(playerid, "~w~Combat Mission ~r~Aborted", 3000, 3); 
 	}
+
+	gCombatMission[playerid][Active] = false;
+	gCombatMission[playerid][TimeElapsed] = 0;
+	gCombatMission[playerid][BriefcaseCount] = 0;
 
 	if (!gCombatMission[playerid][Dead])
 	{

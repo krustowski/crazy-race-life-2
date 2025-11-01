@@ -1073,7 +1073,7 @@ stock ShowHighScoresDeathmatchDialog(playerid)
 
 stock ShowHighScoresMissionsDialog(playerid)
 {
-	new query[512] = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value ASC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 3 ORDER BY s.value DESC, s.rank";
+	new query[512] = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 3 ORDER BY s.value DESC, s.rank";
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
@@ -1125,7 +1125,7 @@ stock ShowHighScoresMissionsDialog(playerid)
 
 	// Trucking
 
-	query = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value ASC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 4 ORDER BY s.value DESC, s.rank";
+	query = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 4 ORDER BY s.value DESC, s.rank";
 
 	result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
@@ -1160,7 +1160,7 @@ stock ShowHighScoresMissionsDialog(playerid)
 
 stock ShowHighScoresCombatDialog(playerid)
 {
-	new query[512] = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value ASC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 5 ORDER BY s.value DESC, s.rank", stringToPrint[1024];
+	new query[512] = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 5 ORDER BY s.value DESC, s.rank", stringToPrint[1024];
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)

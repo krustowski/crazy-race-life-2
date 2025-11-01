@@ -367,13 +367,13 @@ stock SetTaxiMissionCustomer(playerid)
 		return SetTaxiMissionCustomerPos(playerid);
 	}
 
-	new npcs[10];
+	new npcs[25];
 	NPC_GetAll(npcs, sizeof(npcs));
 
 	new preid = -1;
-	for (new i = 0; i < 10; i++)
+	for (new i = 0; i < 25; i++)
 	{
-		if (!NPC_IsValid(i))
+		if (!NPC_IsValid(npcs[i]))
 		{
 			preid = i;
 			break;
@@ -386,12 +386,13 @@ stock SetTaxiMissionCustomer(playerid)
 	}
 
 	new npc_name[MAX_PLAYER_NAME];
-	format(npc_name, sizeof(npc_name), "[NPC]taxi_customer%d", preid);
+	format(npc_name, sizeof(npc_name), "[NPC]taxi_cust%d", preid);
 
 	new npcid = NPC_Create(npc_name);
 
-	if (npcid < 1)
+	if (npcid == INVALID_NPC_ID)
 	{
+		print(npc_name);
 		return SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Too many customers in game, try again later!");
 	}
 

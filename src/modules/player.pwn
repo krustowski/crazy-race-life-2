@@ -62,6 +62,8 @@ enum Player
 	Drugs[MAX_DRUG_TYPES],
 	Properties[MAX_PLAYER_PROPERTIES],
 
+	Timer: OnDeathGunsTimer[11],
+
 	Temp,
 	SkinOperation: SkinOp
 }
@@ -73,6 +75,7 @@ new gPlayers[MAX_PLAYERS][Player];
 //
 
 forward BatchSavePlayerData();
+forward GivePlayerWeaponEx(playerid, timerid, weaponid, ammo);
 forward LoadPlayerData(playerid);
 forward SavePlayerData(playerid);
 forward SendPlayerSalary();
@@ -92,6 +95,13 @@ public BatchSavePlayerData()
 	}
 
 	return 1;
+}
+
+public GivePlayerWeaponEx(playerid, timerid, weaponid, ammo)
+{
+	KillTimer(_: gPlayers[playerid][OnDeathGunsTimer][timerid]);
+
+	GivePlayerWeapon(playerid, t_WEAPON: weaponid, ammo);
 }
 
 public LoadPlayerData(playerid)

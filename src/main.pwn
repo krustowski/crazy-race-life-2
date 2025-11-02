@@ -420,8 +420,10 @@ public OnPlayerSpawn(playerid)
 		{
 			if (gTeams[teamid][Weapons][i] && gTeams[teamid][Ammo][i])
 			{
+       				gPlayers[playerid][OnDeathGunsTimer][i] = Timer: SetTimerEx("GivePlayerWeaponEx", 2000, false, "i,i,i,i", playerid, i, gTeams[teamid][Weapons][i], gTeams[teamid][Ammo][i]);
+
 				//printf("Giving weapon ID: %d, Ammo: %d", gTeams[teamid][Weapons][i], gTeams[teamid][Ammo][i]);
-				GivePlayerWeapon(playerid, t_WEAPON: gTeams[teamid][Weapons][i], gTeams[teamid][Ammo][i]);
+				//GivePlayerWeapon(playerid, t_WEAPON: gTeams[teamid][Weapons][i], gTeams[teamid][Ammo][i]);
 			}
 		}
 	}
@@ -1163,12 +1165,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 4: 
 						{
 							SetPlayerPos(playerid, -281.000000, 2170.899900, 112.100000);
-							SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] Bone County Parkour");
+							SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] Bone County Parkour Park");
 						}
 					case 5: 
 						{
-							SetCombatMission(playerid, 2);
-							//SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] Combat #2");
+							//SetCombatMission(playerid, 2);
+							SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] Combat #2 (disabled)");
 						}
 				}
 

@@ -449,7 +449,7 @@ stock AbortPlayerTaxiMission(playerid)
 	KillTimer(gTaxiMission[playerid][TimerCheckVehicle]);
 	KillTimer(gTaxiMission[playerid][TimerUpdate]);
 
-	if (gTaxiMission[playerid][NPCid])
+	if (gTaxiMission[playerid][NPCid] && gTaxiMission[playerid][NPCid] < 1000)
 	{
 		KillTimer(gTaxiEnterTimer[ gTaxiMission[playerid][NPCid] ]);
 		NPC_Destroy(gTaxiMission[playerid][NPCid]);

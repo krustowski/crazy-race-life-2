@@ -262,6 +262,9 @@ public OnPlayerConnect(playerid)
 	// Combat mission
 	gCombatMission[playerid][Active] = false;
 
+	// Taxi mission
+	gTaxiMission[playerid][Active] = false;
+
 	// Draw mapicons for the user.
 	AddMapicons(playerid);
 

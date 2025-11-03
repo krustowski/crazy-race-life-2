@@ -43,6 +43,7 @@ enum TruckingEditorType
 // Mission types
 enum MissionType
 {
+	MT_NONE,
 	MT_FREIGHT,
 	MT_PETROL
 }
@@ -212,39 +213,46 @@ public CheckPlayerTrailerAttached(playerid)
 
 stock SetPlayerTruckingMission(playerid, MissionType: missionType)
 {
-	new Float: x0, Float: y0, Float: z0, pointId = -1, iter;
 	const MAX_ITERATIONS = 50;
 
-	while (pointId < 0)
+	new query[256];
+	format(query, sizeof(query), "select p.name, c.x, c.y, c.z from trucking_points as p join trucking_coords as c on c.trucking_id = p.id where c.type = 1 and p.type = %d order by random() limit 1", _: missionType);
+
+	new Float: x0, Float: y0, Float: z0, name[64];
+
+	for (new i = 0; i < MAX_ITERATIONS; i++)
 	{
-		pointId = GetRandomDestination();
-
-		// Prevent generating the same checkpoint twice for current position
-		if (IsPlayerInSphere(playerid, gTruckingPoints[pointId][LocationCheckpoint][CoordX], gTruckingPoints[pointId][LocationCheckpoint][CoordY], gTruckingPoints[pointId][LocationCheckpoint][CoordZ], 50.0))
+		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result)
 		{
-			pointId = -1;
-			continue;
-		}
-
-		if (MissionType: gTruckingPoints[pointId][Type] == missionType)
-		{
-			break;
-		}
-
-		if (++iter == MAX_ITERATIONS)
-		{
+			print("Database error: cannot fetch random trucking point!");
+			print(query);
 			return 0;
 		}
 
-		pointId = -1;
+		if (!DB_GetRowCount(result))
+		{
+			print("Database warning: no rows for given query!");
+			print(query);
+			return 0;
+		}
+
+		x0 = DB_GetFieldFloatByName(result, "x");
+		y0 = DB_GetFieldFloatByName(result, "y");
+		z0 = DB_GetFieldFloatByName(result, "z");
+		DB_GetFieldStringByName(result, "name", name, sizeof(name));
+
+		DB_FreeResultSet(result);
+
+		// Prevent generating the same checkpoint twice for current position
+		if (!IsPlayerInSphere(playerid, x0, y0, z0, 50.0))
+		{
+			break;
+		}
 	}
 
 	new Float: X, Float: Y, Float: Z;
 	GetPlayerPos(playerid, X, Y, Z);
-
-	x0 = gTruckingPoints[pointId][LocationCheckpoint][CoordX];
-	y0 = gTruckingPoints[pointId][LocationCheckpoint][CoordY];
-	z0 = gTruckingPoints[pointId][LocationCheckpoint][CoordZ];
 
 	gPlayerMissions[playerid][Checkpoint][CoordX] = x0;
 	gPlayerMissions[playerid][Checkpoint][CoordY] = y0;
@@ -252,7 +260,11 @@ stock SetPlayerTruckingMission(playerid, MissionType: missionType)
 
 	gPlayerMissions[playerid][ProvisionBonusWeight] = (floatabs(X - x0) / 3000 + floatabs(Y - y0) / 3000) / 2;
 
-	SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, Float:x0, Float:y0, Float:z0, Float:x0, Float:y0, Float:z0, 12.0);
+	new gameString[128];
+	format(gameString, sizeof(gameString), "~w~Next destination: ~y~%s", name);
+
+	GameTextForPlayer(playerid, gameString, 4000, 3); 
+	SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, x0, y0, z0, x0, y0, z0, 12.0);
 
 	return 1;
 }

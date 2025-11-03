@@ -230,16 +230,6 @@ CREATE TABLE IF NOT EXISTS "combat_coord_types" (
 	"name"	TEXT,
 	PRIMARY KEY("id")
 );
-CREATE TABLE IF NOT EXISTS "high_scores_races" (
-	"id"	INTEGER,
-	"race_id"	INTEGER NOT NULL,
-	"nickname"	TEXT NOT NULL,
-	"time"	INTEGER NOT NULL,
-	"car_model"	INTEGER NOT NULL,
-	PRIMARY KEY("id" AUTOINCREMENT),
-	FOREIGN KEY("nickname") REFERENCES "users"("nickname"),
-	FOREIGN KEY("race_id") REFERENCES "races"("id")
-);
 CREATE TABLE IF NOT EXISTS "high_scores_types" (
 	"id"	INTEGER,
 	"name"	TEXT,

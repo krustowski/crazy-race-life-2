@@ -2125,6 +2125,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 
 			}
+		case DIALOG_COMBAT_LIST:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				return SetCombatMission(playerid, listitem + 1);
+			}
 
 		default: 
 			return 0; // dialog ID was not found, search in other scripts

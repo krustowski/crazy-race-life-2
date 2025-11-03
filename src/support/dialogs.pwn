@@ -80,7 +80,8 @@ enum
 	DIALOG_HIGH_SCORES_OPTIONS,
 	DIALOG_HIGH_SCORES_DEATHMATCH,
 	DIALOG_HIGH_SCORES_MISSIONS,
-	DIALOG_HIGH_SCORES_COMBAT
+	DIALOG_HIGH_SCORES_COMBAT,
+	DIALOG_COMBAT_LIST
 };
 
 #include "modules/real.pwn"
@@ -1215,3 +1216,30 @@ stock ShowHighScoresCombatDialog(playerid)
 	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_MISSIONS, DIALOG_STYLE_MSGBOX, "High Scores: Missions", stringToPrint, "Close", "");
 }
 
+stock ShowCombatListDialog(playerid)
+{
+	new stringToPrint[512], query[256] = "select id, name from combat_mission where id > 0";
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot fetch combat mission list");
+		print(query);
+		return 1;
+	}
+
+	do
+	{
+		new id, name[64];
+
+		id = DB_GetFieldIntByName(result, "id");
+		DB_GetFieldStringByName(result, "name", name, sizeof(name));
+
+		format(stringToPrint, sizeof(stringToPrint), "%s%2d: %s\n", stringToPrint, id, name);
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	return ShowPlayerDialog(playerid, DIALOG_COMBAT_LIST, DIALOG_STYLE_LIST, "Combat Missions", stringToPrint, "Select", "Close");
+}

@@ -187,7 +187,7 @@ public UpdateTaxiMissionInfoText(playerid)
 			{}
 
 		default:
-			format(stringToPrint, sizeof(stringToPrint), "~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:___~b~%2d~y~:~b~%2d", gTaxiMission[playerid][DoneCount], gTaxiMission[playerid][Earned], floatround(floatround(gTaxiMission[playerid][TimeElapsed] / 1000) / 60), floatround(gTaxiMission[playerid][TimeElapsed] / 1000) % 60);
+			format(stringToPrint, sizeof(stringToPrint), "~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%2d", gTaxiMission[playerid][DoneCount], gTaxiMission[playerid][Earned], floatround(floatround(gTaxiMission[playerid][TimeElapsed] / 1000) / 60), floatround(gTaxiMission[playerid][TimeElapsed] / 1000) % 60);
 	}
 
 	TextDrawSetString(gTaxiMission[playerid][InfoText], stringToPrint);

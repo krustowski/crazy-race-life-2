@@ -1074,7 +1074,7 @@ stock ShowHighScoresDeathmatchDialog(playerid)
 
 stock ShowHighScoresMissionsDialog(playerid)
 {
-	new query[512] = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 3 ORDER BY s.value DESC, s.rank";
+	new query[512] = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 10 AND s.type = 3 ORDER BY s.value DESC, s.rank";
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
@@ -1084,7 +1084,7 @@ stock ShowHighScoresMissionsDialog(playerid)
 		return 0;
 	}
 
-	new i = 1, stringToPrint[1024] = "{FFD700}Top 5 Taxi Mission players{FFFFFF}\n";
+	new i = 1, stringToPrint[2048] = "{FFD700}Top 10 Taxi Mission players{FFFFFF}\n";
 
 	do
 	{

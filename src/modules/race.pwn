@@ -459,7 +459,7 @@ stock SaveNewScore(raceId, playerid, time, vehicleModel)
 	GetPlayerName(playerid, nickname);
 
 	new query[256];
-	format(query, sizeof(query), "INSERT INTO high_scores (type, spec_id, user_id, value, vehicle_model, time) VALUES (%d, %d, %d, %d, %d, %d, %d)", 
+	format(query, sizeof(query), "INSERT INTO high_scores (type, spec_id, user_id, value, vehicle_model, time) VALUES (%d, %d, %d, %d, %d, %d)", 
 			1,
 			raceId, 
 			gPlayers[playerid][OrmID], 

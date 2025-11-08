@@ -315,21 +315,33 @@ stock ShowRaceListDialog(playerid)
 
 stock ShowPropertyListDialog(playerid)
 {
-	new stringToPrint[256] = "Property Name\tID";
+	new stringToPrint[256] = "Property Name\tID", query[128];
+	format(query, sizeof(query), "select id, name from properties where user_id = %d and type = 1 LIMIT 5", gPlayers[playerid][OrmID]);
 
-	for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
 	{
-		new arrayId = GetPropertyArrayIDfromID(gPlayers[playerid][Properties][i]);
+		print(query);
+		print("Database error: cannot fetch player's properties");
+	}
 
-		if (arrayId <= 0 || !gPlayers[playerid][Properties][i]) 
-			continue;
+	do 
+	{
+		new propertyid = DB_GetFieldIntByName(result, "id");
+		new name[64];
+
+		DB_GetFieldStringByName(result, "name", name, sizeof(name));
 
 		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%5d", 
 				stringToPrint,
-				gProperties[arrayId][Label], 
-				gPlayers[playerid][Properties][i]
+				name,
+				propertyid
 		      );
+
 	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
 
 	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Property List", stringToPrint, "Select", "Cancel");
 }

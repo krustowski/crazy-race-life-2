@@ -626,7 +626,8 @@ stock SaveRealEstateData()
 		if (!gProperties[i][ID])
 			continue;
 
-		if (gProperties[i][Vehicle][Model]) {
+		if (gProperties[i][Vehicle][Model])
+		{
 			vehicle_id = gProperties[i][ID];
 
 			new componentsString[128];
@@ -1131,6 +1132,7 @@ stock BuyPlayerProperty(playerid, propertyID)
 
 	gProperties[arrayID][Occupied] = true;
 	gPlayers[playerid][Properties][freeSlot] = propertyID;
+	gProperties[arrayID][UserID] = gPlayers[playerid][OrmID];
 
 	GivePlayerMoney(playerid, -gProperties[arrayID][Cost]);
 
@@ -1193,6 +1195,7 @@ stock SellPlayerProperty(playerid, propertyID)
 	}
 
 	gProperties[arrayID][Occupied] = false;
+	gProperties[arrayID][UserID] = 0;
 
 	/*DestroyPickup(gProperties[arrayID][Pickups][PICKUP_TYPE_OFFER]);
 	  gProperties[arrayID][Pickups][PICKUP_TYPE_OFFER] = 0;
@@ -1635,8 +1638,6 @@ stock CheckRealEstatePickup(playerid, pickupid)
 									return ShowPlayerDialog(playerid, DIALOG_PROPERTY_RENT, DIALOG_STYLE_INPUT, "Real Estate (Commercial)", stringToPrint, "Rent", "Cancel");
 								}
 						}
-
-						//
 
 					}
 			}

@@ -216,7 +216,6 @@ stock ShowCommonCommandsDialog(playerid)
 			"/drugz\t\t\tlists substances in pockets\n",
 			"/dwarp\t\t\tteleports the player in vehicle to racing the common location\n",
 
-			"/fix\t\t\trepairs the player's vehicle\n",
 			"/givecash ID CASH\tsends cash to other player\n",
 			"/help\t\t\tlists helper information\n",
 			"/kill\t\t\tto commit suicide\n",
@@ -243,6 +242,7 @@ stock ShowCommonCommandsDialog(playerid)
 			"\n{FFD700}Special Team-related Commands{FFFFFF}\n\n",
 			//
 			"/deal ID\t\t\tlists subcommands for dealerz\n",
+			"/fix ID\t\t\trepairs the player's vehicle\n",
 			"/hide\t\t\t(un)hides the player on map\n",
 			"/search ID SUBCMD\tspecial command for Policemen to search and pre-jail a player by ID\n",
 			"/wanted\t\t\tshows the wanted list of online players\n"

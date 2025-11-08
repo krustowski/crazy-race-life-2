@@ -56,6 +56,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(admincol, 8, cmdtext);       //rcon +
 	dcmd(ban, 3, cmdtext);            //rcon + lvl 4
 	dcmd(cam, 3, cmdtext); 		  //rcon + 
+	dcmd(casino, 6, cmdtext);	  ///    + lvl 3
 	dcmd(ccmd, 4, cmdtext);           //rcon + lvl 1
 	dcmd(clear, 5, cmdtext);          //rcon +
 	dcmd(combat, 6, cmdtext);	  //rcon + lvl 4
@@ -943,6 +944,15 @@ dcmd_cam(playerid, const params[])
 				SendClientMessage(playerid, COLOR_BLUE, "[ CAM ] Camera dettached [/ccmd]");
 			}
 	}
+
+	return 1;
+}
+
+dcmd_casino(playerid, const params[])
+{
+#pragma unused params
+	SetPlayerInterior(playerid, 10);
+	SetPlayerPos(playerid, 2016.11, 1017.15, 996.87);
 
 	return 1;
 }

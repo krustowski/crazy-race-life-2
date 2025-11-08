@@ -1144,26 +1144,31 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					case 0:
 						{
+							SetPlayerInterior(playerid, 10);
 							SetPlayerPos(playerid, 1958.3783, 1343.1572, 15.3746);
 							SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] Las Venturas Escalators");
 						}
 					case 1:
 						{
+							SetPlayerInterior(playerid, 10);
 							SetPlayerPos(playerid, -1951.58, 296.77, 41.04);
 							SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] San Fierro WangCars");
 						}
 					case 2:
 						{
+							SetPlayerInterior(playerid, 10);
 							SetPlayerPos(playerid, 1896.13, -2393.53, 13.11);
 							SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] Los Santos Airport");
 						}
 					case 3: 
 						{
+							SetPlayerInterior(playerid, 10);
 							SetPlayerPos(playerid, -2366.65, 1538.78, 2.11);
 							SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] San Fierro Ship Parkour Park");
 						}
 					case 4: 
 						{
+							SetPlayerInterior(playerid, 10);
 							SetPlayerPos(playerid, -281.000000, 2170.899900, 112.100000);
 							SendClientMessage(playerid, COLOR_YELLOW, "[ PORT ] Bone County Parkour Park");
 						}

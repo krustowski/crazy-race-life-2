@@ -322,16 +322,52 @@ dcmd_dwarp(playerid, const params[])
 
 dcmd_fix(playerid, const params[])
 {
-#pragma unused params
-	if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER) 
-		return SendClientMessage(playerid, COLOR_RED, "[ FIX ] Must be riding/driving a vehicle!");
+	if (gPlayers[playerid][TeamID] != TEAM_MECHANICS)
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Mechanis team-related command!");
+	}
 
-	if (CheckPlayerRaceState(playerid))
-		return SendClientMessage(playerid, COLOR_RED, "[ FIX ] Cannot fix your vehicle during a race!");
+	if (!IsNumeric(params))
+	{
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /fix [playerID]");
+	}
 
-	SetVehicleHealth(GetPlayerVehicleID(playerid), 1000.0);
-	RepairVehicle(GetPlayerVehicleID(playerid));
+	new targetid = strval(params);
 
+	if (!IsPlayerConnected(targetid))
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Player with that ID is not connected!");
+	}
+
+	if (!IsPlayerInAnyVehicle(targetid) || GetPlayerState(targetid) != PLAYER_STATE_DRIVER)
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ FIX ] Player with that ID is not riding/driving a vehicle");
+	}
+
+	new Float: vehicleHealth;
+	GetVehicleHealth(GetPlayerVehicleID(targetid), vehicleHealth);
+
+	if (vehicleHealth >= 1000.0)
+	{
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ FIX ] No need to repair this car");
+	}
+
+	new Float: pX, Float: pY, Float: pZ;
+	GetPlayerPos(playerid, pX, pY, pZ);
+
+	if (!IsPlayerInSphere(targetid, pX, pY, pZ, 10.0))
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ FIX ] Target vehicle is too far");
+	}
+	
+	SetVehicleHealth(GetPlayerVehicleID(targetid), 1000.0);
+	RepairVehicle(GetPlayerVehicleID(targetid));
+
+	new commission = 1500 + random(1000), stringToPrint[128];
+
+	format(stringToPrint, sizeof(stringToPrint), "[ FIX ] Vehicle fixed, commission earned: $%d", commission);
+
+	SendClientMessage(targetid, COLOR_YELLOW, "[ FIX ] Vehicle fixed!");
 	SendClientMessage(playerid, COLOR_YELLOW, "[ FIX ] Vehicle fixed!");
 
 	return 1;

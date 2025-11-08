@@ -25,7 +25,7 @@ public ShowAdvert()
 		"[ TIP ] Bored? Try any of the loaded races from the /race list",
 		"[ TIP ] Stuck in the race? Try /race again to exit the race",
 		"[ TIP ] List High Scores using /scores",
-		"[ GAME ] You cannot use the /fix command to repair your vehicle during a /race, ask a Mechanic instead",
+		"[ GAME ] In a race and in need of the vehilce repair? Take a mechanic on the journey with you!",
 		// Drugz.
 		"[ GAME ] In San Fierro there have been some random substances placed. But beware the policemen, they can stop and /search anybody!",
 		//"[ GAME ] To /deal any substance or stuff, one has to join the Dealerz team",

@@ -324,11 +324,18 @@ dcmd_fix(playerid, const params[])
 {
 	if (gPlayers[playerid][TeamID] != TEAM_MECHANICS)
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Mechanis team-related command!");
+		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Mechanics team-related command!");
 	}
 
-	if (!IsNumeric(params))
+	if (!strlen(params))
 	{
+		if (gPlayers[playerid][TeamID] == TEAM_MECHANICS && IsPlayerInAnyVehicle(playerid))
+		{
+			SetVehicleHealth(GetPlayerVehicleID(playerid), 1000.0);
+			RepairVehicle(GetPlayerVehicleID(playerid));
+
+			return SendClientMessage(playerid, COLOR_YELLOW, "[ FIX ] Vehicle fixed");
+		}
 		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /fix [playerID]");
 	}
 
@@ -364,11 +371,12 @@ dcmd_fix(playerid, const params[])
 	RepairVehicle(GetPlayerVehicleID(targetid));
 
 	new commission = 1500 + random(1000), stringToPrint[128];
+	GivePlayerMoney(playerid, commission);
 
 	format(stringToPrint, sizeof(stringToPrint), "[ FIX ] Vehicle fixed, commission earned: $%d", commission);
 
 	SendClientMessage(targetid, COLOR_YELLOW, "[ FIX ] Vehicle fixed!");
-	SendClientMessage(playerid, COLOR_YELLOW, "[ FIX ] Vehicle fixed!");
+	SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
 
 	return 1;
 }

@@ -34,6 +34,8 @@
 #define PICKUP_PUMPKIN				19320
 #define PICKUP_HOUSE_RED 			19522
 
+#define MAX_DEATH_MONEY_PICKUPS			128
+
 #include "modules/bank.pwn"
 #include "modules/team.pwn"
 
@@ -55,9 +57,6 @@ new gDruggeryEntrance;
 
 #pragma unused gDruggeryExit
 new gDruggeryExit;
-
-new gPlayerMoneyPickup[MAX_PLAYERS];
-new gPlayerMoneyPickupAmount[MAX_PLAYERS];
 
 //new gPlayerWeaponPickup[MAX_PLAYERS];
 
@@ -299,12 +298,31 @@ stock UpdatePrize(playerid, prizeid)
 	return 1;
 }
 
-stock AddPlayerDeathPickups(playerid, Float:X, Float:Y, Float:Z)
+enum DeathMoneyPickup
+{
+	PickupID,
+	Amount
+}
+
+new gDeathMoneyPickups[MAX_DEATH_MONEY_PICKUPS][DeathMoneyPickup];
+new gDeathMoneyPickupsPointer = 0;
+
+stock CreateDeathMoneyPickup(playerid)
 {
 	if (GetPlayerMoney(playerid) > 0)
 	{
-		gPlayerMoneyPickup[playerid] = EnsurePickupCreated(1212, 19, Float:X, Float:Y, Float:Z);
-		gPlayerMoneyPickupAmount[playerid] = GetPlayerMoney(playerid);
+		new Float: X, Float: Y, Float: Z;
+		GetPlayerPos(playerid, X, Y, Z);
+
+		if (gDeathMoneyPickupsPointer == MAX_DEATH_MONEY_PICKUPS)
+		{
+			gDeathMoneyPickupsPointer = 0;
+		}
+
+		gDeathMoneyPickups[gDeathMoneyPickupsPointer][PickupID] = EnsurePickupCreated(PICKUP_DOLLAR, 19, Float:X, Float:Y, Float:Z);
+		gDeathMoneyPickups[gDeathMoneyPickupsPointer][Amount] = GetPlayerMoney(playerid);
+
+		gDeathMoneyPickupsPointer++;
 
 		SendClientMessageLocalized(playerid, I18N_DEATH_MONEY_LOCALITY);
 	}
@@ -312,3 +330,19 @@ stock AddPlayerDeathPickups(playerid, Float:X, Float:Y, Float:Z)
 	return 1;
 }
 
+stock CheckDeathMoneyPickup(playerid, pickupid)
+{
+	for (new i = 0; i < MAX_DEATH_MONEY_PICKUPS; i++)
+	{
+		if (gDeathMoneyPickups[i][PickupID] != pickupid)
+		{
+			continue;
+		}
+
+		DestroyPickup(gDeathMoneyPickups[i][PickupID]);
+		gDeathMoneyPickups[i][PickupID] = -1;
+
+		GivePlayerMoney(playerid, gDeathMoneyPickups[i][Amount]);
+		gDeathMoneyPickups[i][Amount] = 0;
+	}
+}

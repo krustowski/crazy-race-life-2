@@ -491,16 +491,7 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 		ResetPlayerRaceState(playerid, raceid, false);
 	}
 
-	// Drop all money at the spot of death
-	if (GetPlayerMoney(playerid) > 0)
-	{
-		new Float: X, Float: Y, Float: Z;
-
-		GetPlayerPos(playerid, X, Y, Z);
-		AddPlayerDeathPickups(playerid, Float:X, Float:Y, Float:Z);
-
-		ResetPlayerMoney(playerid);
-	}
+	CreateDeathMoneyPickup(playerid);
 
 	// Adjust the wanted level
 	gPlayers[killerid][WantedLevel]++;
@@ -2329,20 +2320,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	//  Death pickups.
 	//
 
-	for (new i = 0; i < MAX_PLAYERS; i++)
-	{
-		/*if (!IsPlayerConnected(i) || gPlayerMoneyPickup[i] == -1)
-		  continue;*/
-
-		if (pickupid != gPlayerMoneyPickup[i])
-			continue;
-
-		DestroyPickup(gPlayerMoneyPickup[i]);
-		gPlayerMoneyPickup[i] = -1;
-
-		GivePlayerMoney(playerid, gPlayerMoneyPickupAmount[i]);
-		gPlayerMoneyPickupAmount[i] = 0;
-	}
+	CheckDeathMoneyPickup(playerid, pickupid);
 
 	return 1;
 }

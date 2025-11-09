@@ -330,7 +330,7 @@ dcmd_fix(playerid, const params[])
 
 	if (!strlen(params))
 	{
-		if (gPlayers[playerid][TeamID] == TEAM_MECHANICS && IsPlayerInAnyVehicle(playerid))
+		if (IsPlayerInAnyVehicle(playerid))
 		{
 			SetVehicleHealth(GetPlayerVehicleID(playerid), 1000.0);
 			RepairVehicle(GetPlayerVehicleID(playerid));

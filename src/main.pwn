@@ -493,6 +493,11 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 
 	CreateDeathMoneyPickup(playerid);
 
+	if (killerid > 1000)
+	{
+		return 1;
+	}
+
 	// Adjust the wanted level
 	gPlayers[killerid][WantedLevel]++;
 	SetPlayerWantedLevel(killerid, gPlayers[killerid][WantedLevel]);
@@ -514,6 +519,8 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 		SpawnPlayer(killerid);
 		PlayerPlaySound(killerid, 1056, 0, 0, 0);
 	}
+
+	SpawnPlayer(playerid);
 
 	return 1;
 }

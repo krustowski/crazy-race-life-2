@@ -24,6 +24,7 @@
 #define PICKUP_SHIRT				1275
 #define PICKUP_TIKI				1276
 #define PICKUP_ARROW				1318
+#define PICKUP_MOMEY_BAG			1550
 #define PICKUP_DRUG_WHITE			1575
 #define PICKUP_DRUG_ORANGE			1576
 #define PICKUP_DRUG_YELLOW			1577
@@ -319,8 +320,9 @@ stock CreateDeathMoneyPickup(playerid)
 			gDeathMoneyPickupsPointer = 0;
 		}
 
-		gDeathMoneyPickups[gDeathMoneyPickupsPointer][PickupID] = EnsurePickupCreated(PICKUP_DOLLAR, 19, Float:X, Float:Y, Float:Z);
+		gDeathMoneyPickups[gDeathMoneyPickupsPointer][PickupID] = EnsurePickupCreated(PICKUP_MOMEY_BAG, 19, Float:X, Float:Y, Float:Z);
 		gDeathMoneyPickups[gDeathMoneyPickupsPointer][Amount] = GetPlayerMoney(playerid);
+		ResetPlayerMoney(playerid);
 
 		gDeathMoneyPickupsPointer++;
 

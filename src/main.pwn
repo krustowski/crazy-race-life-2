@@ -2414,6 +2414,81 @@ public OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 					}
 				}
 			}
+		case KEY_SUBMISSION:
+			{
+				if (IsPlayerInAnyVehicle(playerid) && GetVehicleModel(GetPlayerVehicleID(playerid)) == 420)
+				{
+					if (gTaxiMission[playerid][Active])
+					{
+						return AbortPlayerTaxiMission(playerid);
+					}
+
+					return ShowTaxiMissionOptionsDialog(playerid);
+				}
+
+				new nobodytofix = true;
+
+				for (new i = 0; i < MAX_PLAYERS; i++)
+				{
+					if (!IsPlayerConnected(i))
+					{
+						continue;
+					}
+
+					switch (gTeams[ gPlayers[i][TeamID] - 1][ID])
+					{
+						case TEAM_MECHANICS:
+							{
+								if (!IsPlayerInAnyVehicle(i))
+								{
+									continue;
+								}
+
+								new Float: X, Float: Y, Float: Z;
+								GetPlayerPos(playerid, X, Y, Z);
+
+								if (!IsPlayerInSphere(i, X, Y, Z, 7.5))
+								{
+									continue;
+								}
+
+								new Float: health;
+								GetVehicleHealth(GetPlayerVehicleID(i), health);
+
+								if (health >= 1000.0)
+								{
+									SendClientMessage(playerid, COLOR_YELLOW, "[ FIX ] No need to repair this vehicle");
+									continue;
+								}
+
+								SetVehicleHealth(GetPlayerVehicleID(i), 1000.0);
+								RepairVehicle(GetPlayerVehicleID(i));
+								SendClientMessage(i, COLOR_LIGHTGREEN, "[ FIX ] Vehicle fixed!");
+
+								if (i == playerid)
+								{
+									continue;
+								}
+
+								nobodytofix = false;
+
+								new commission = 1500 + random(1000), stringToPrint[128];
+								GivePlayerMoney(playerid, commission);
+
+								format(stringToPrint, sizeof(stringToPrint), "[ FIX ] Vehicle fixed, commission earned: $%d", commission);
+
+								SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
+
+							}
+					}
+
+				}
+
+				if (nobodytofix && gTeams[ gPlayers[playerid][TeamID] ][ID] == TEAM_MECHANICS)
+				{
+					SendClientMessage(playerid, COLOR_YELLOW, "[ FIX ] No vehicle to fix here");
+				}
+			}
 		case KEY_YES:
 			{
 				ApplyAnimation(playerid, "ped", "phone_in", 4.1, false, false, false, true, 0);

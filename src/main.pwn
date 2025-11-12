@@ -95,6 +95,7 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 #include "modules/real.pwn"
 #include "modules/taxi.pwn"
 #include "modules/combat.pwn"
+#include "modules/tutorial.pwn"
 
 
 //

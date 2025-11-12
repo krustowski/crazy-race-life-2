@@ -149,7 +149,7 @@ stock CheckCombatPickup(playerid, pickupid)
 					gCombatMission[playerid][BriefcaseCount]++;
 
 					new stringToPrint[128];
-					format(stringToPrint, sizeof(stringToPrint), "[ COMBAT ] You found a briefcase no. %d", gCombatMission[playerid][BriefcaseCount]);
+					format(stringToPrint, sizeof(stringToPrint), "[ COMBAT ] You found briefcase no. %d", gCombatMission[playerid][BriefcaseCount]);
 					SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 				}
 			case (CombatPickupType: TYPE_HEALTH):

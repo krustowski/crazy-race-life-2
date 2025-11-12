@@ -403,6 +403,18 @@ stock SetTaxiMissionCustomer(playerid)
 	return SetTaxiMissionCustomerPos(playerid);
 }
 
+stock IsPlayerInTaxiCab(playerid)
+{
+	new modelid = GetVehicleModel(GetPlayerVehicleID(playerid));
+
+	if (modelid != 420 && modelid != 438)
+	{
+		return 0;
+	}
+
+	return 1;
+}
+
 stock SetPlayerTaxiMission(playerid, areaid)
 {
 	if (gTaxiMission[playerid][Active])
@@ -410,9 +422,7 @@ stock SetPlayerTaxiMission(playerid, areaid)
 		return AbortPlayerTaxiMission(playerid);
 	}
 
-	new modelid = GetVehicleModel(GetPlayerVehicleID(playerid));
-
-	if (modelid != 420 && modelid != 438)
+	if (!IsPlayerInTaxiCab(playerid))
 	{
 		return SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Must be driving a taxi cab!");
 	}

@@ -593,3 +593,93 @@ stock AbortTruckingMission(playerid)
 
 	return 1;
 }
+
+stock IsPlayerInTruck(playerid)
+{
+	if (!IsPlayerInAnyVehicle(playerid))
+	{
+		return 0;
+	}
+
+        new vehicleId = GetPlayerVehicleID(playerid), truckModels[3] = {403, 514, 515}, bool:isTruck = false;
+
+        for (new i = 0; i < sizeof(truckModels); i++)
+        {
+                if (GetVehicleModel(vehicleId) == truckModels[i])
+                {
+                        isTruck = true;
+                        break;
+                }
+        }
+
+	if (isTruck)
+	{
+		return 1;
+	}
+
+	return 0;
+}
+
+stock CheckPlayerForTruckingMission(playerid)
+{
+        if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
+        {
+                return SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] You have to be in a truck as driver");
+        }
+
+        new vehicleId = GetPlayerVehicleID(playerid);
+
+	if (!IsPlayerInTruck(playerid))
+                return SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] You are not driving a truck");
+
+        if (!IsTrailerAttachedToVehicle(vehicleId))
+                return SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] No trailer attached!");
+
+        new trailerId = GetVehicleTrailer(vehicleId), MissionType: truckingMissionType;
+
+        switch (GetVehicleModel(trailerId))
+        {
+                case 584:
+                        {
+                                truckingMissionType = MT_PETROL;
+                        }
+                case 435, 450, 591:
+                        {
+                                truckingMissionType = MT_FREIGHT;
+                        }
+                default:
+                        {
+                                SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] Unknown trailer model");
+                                return 1;
+                        }
+        }
+
+        if (!gTrucking[playerid])
+        {
+                if (!SetPlayerTruckingMission(playerid, truckingMissionType))
+                {
+                        SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] Error setting new mission");
+                        return 1;
+                }
+
+                gTrucking[playerid] = true;
+
+                gPlayerMissions[playerid][VehicleID] = GetPlayerVehicleID(playerid);
+                gPlayerMissions[playerid][TrailerID] = trailerId;
+                gPlayerMissions[playerid][Type] = truckingMissionType;
+                gPlayerMissions[playerid][DoneCount] = 0;
+                gPlayerMissions[playerid][Earned] = 0;
+                gPlayerMissions[playerid][TimeElapsed] = 0;
+                gPlayerMissions[playerid][TimerElapsed] = SetTimerEx("UpdateMissionInfoText", 1000, true, "i", playerid);
+                gPlayerMissions[playerid][TimerAttachedCheck] = SetTimerEx("CheckPlayerTrailerAttached", 1500, true, "i", playerid);
+
+                GameTextForPlayer(playerid, "~w~Trucking Mission ~g~Started", 3000, 3); 
+
+                SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TRUCK ] Vehicle and trailer registered successfully");
+        }
+
+        return 1;
+}
+
+
+

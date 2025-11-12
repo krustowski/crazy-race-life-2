@@ -2405,11 +2405,13 @@ public OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 					new vehicleID = GetPlayerVehicleID(playerid);
 					if (IsVehicleRcTram(vehicleID) || GetVehicleModel(vehicleID) == RC_CAM)
 					{
-						if (GetVehicleModel(vehicleID) != D_TRAM)
+						if (GetVehicleModel(vehicleID) == D_TRAM)
 						{
 							new Float:x, Float:y, Float:z;
 							GetPlayerPos(playerid, x, y, z);
 							SetPlayerPos(playerid, x + 0.5, y, z + 1.0);
+
+							SetCameraBehindPlayer(playerid);
 						}
 					}
 				}

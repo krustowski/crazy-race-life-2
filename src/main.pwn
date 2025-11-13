@@ -560,6 +560,11 @@ public OnVehicleDeath(vehicleid, killerid)
 		}
 	}
 
+	if (gTaxiMission[killerid][Active] && vehicleid == gTaxiMission[killerid][VehicleID])
+	{
+		return AbortPlayerTaxiMission(killerid);
+	}
+
 	return 1;
 }
 

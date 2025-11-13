@@ -426,6 +426,9 @@ stock SpawnProperty(propertyId)
 					{
 						gProperties[propertyId][Vehicle][ID] = CreateVehicle(gProperties[propertyId][Vehicle][Model], pX, pY, pZ, pR, gProperties[propertyId][Vehicle][Colours][0], gProperties[propertyId][Vehicle][Colours][1], -1);
 
+						// Lock property vehicles for everyone
+						SetVehicleParamsEx(gProperties[propertyId][Vehicle][ID], false, false, false, true, false, false, false);
+
 						for (new j = 0; j < 16; j++)
 						{
 							if (gProperties[propertyId][Vehicle][Components][j])
@@ -482,7 +485,7 @@ stock SpawnProperty(propertyId)
 
 									format(text, sizeof(text), "property is rented by %s",
 											playerName
-										);
+									      );
 
 									if (gProperties[propertyId][LockedUntilTime] && gettime() < gProperties[propertyId][LockedUntilTime])
 									{
@@ -497,7 +500,7 @@ stock SpawnProperty(propertyId)
 												hour,
 												minute,
 												second
-											);
+										      );
 									}
 
 									if (strcmp(playerName, ""))
@@ -568,7 +571,15 @@ stock LoadPlayerProperties(playerid)
 
 	do
 	{
-		gPlayers[playerid][Properties][i] = DB_GetFieldIntByName(result, "id");
+		new propertyid = DB_GetFieldIntByName(result, "id");
+		gPlayers[playerid][Properties][i] = propertyid;
+
+		new vehicleid = gProperties[ GetPropertyArrayIDfromID(propertyid) ][Vehicle][ID];
+
+		if (vehicleid)
+		{
+			//SetVehicleParamsForPlayer(vehicleid, playerid, VEHICLE_PARAMS_OFF, VEHICLE_PARAMS_OFF);
+		}
 
 		i++;
 	}

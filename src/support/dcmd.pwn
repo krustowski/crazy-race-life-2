@@ -730,23 +730,49 @@ dcmd_truck(playerid, const params[])
 dcmd_unlock(playerid, const params[])
 {
 #pragma unused params
-	if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] You must be driving/riding a vehicle!");
-
-	for (new i = 0; i < MAX_PLAYERS; i++)
+	if (!IsPlayerInAnyVehicle(playerid))
 	{
-		if (i != playerid)
+		for (new i = 0; i < MAX_PROPERTIES; i++)
 		{
-			SetVehicleParamsForPlayer(GetPlayerVehicleID(playerid), i, 0, 0);
+			new vehicleid = gProperties[i][Vehicle][ID];
+
+			if (vehicleid && IsPlayerOwner(playerid, gProperties[i][ID]))
+			{
+				new Float: X, Float: Y, Float: Z;
+				GetVehiclePos(vehicleid, X, Y, Z);
+
+				if (IsPlayerInSphere(playerid, X, Y, Z, 7.5))
+				{
+					SetVehicleParamsEx(vehicleid, true, false, false, false, false, false, false);
+					PlayerPlaySound(playerid, 1056, X, Y, Z);
+
+					SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ LOCK ] Your car is now unlocked and started up");
+				}
+			}
 		}
 	}
+	else
+	{
+		if (GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
+		{
+			return SendClientMessage(playerid, COLOR_RED, "[ LOCK ] You must be driving/riding a vehicle!");
+		}
 
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ LOCK ] Vehicle unlocked");
+		for (new i = 0; i < MAX_PLAYERS; i++)
+		{
+			if (i != playerid)
+			{
+				SetVehicleParamsForPlayer(GetPlayerVehicleID(playerid), i, 0, 0);
+			}
+		}
 
-	new Float:pX, Float:pY, Float:pZ;
-	GetPlayerPos(playerid, pX, pY, pZ);
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ LOCK ] Vehicle unlocked");
 
-	PlayerPlaySound(playerid, 1056, pX, pY, pZ);
+		new Float:pX, Float:pY, Float:pZ;
+		GetPlayerPos(playerid, pX, pY, pZ);
+
+		PlayerPlaySound(playerid, 1056, pX, pY, pZ);
+	}
 
 	return 1;
 }

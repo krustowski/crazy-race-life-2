@@ -663,8 +663,9 @@ stock ShowPhoneOptionsDialog(playerid)
 {
 	new stringToPrint[256];
 
-	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s\n%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s\n%s\n%s",
 			"Check Bank account balance",
+			"Lock/Unlock personal vehicle",
 			"Send SMS to player",
 			"Call Taxi",
 			"Call Car mechanic",

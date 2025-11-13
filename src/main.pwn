@@ -1529,11 +1529,43 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							return ShowPhoneOptionsDialog(playerid);
 						}
 					case 1:
+						{
+							for (new i = 0; i < MAX_PROPERTIES; i++)
+							{
+								new vehicleid = gProperties[i][Vehicle][ID];
+
+								if (vehicleid && IsPlayerOwner(playerid, gProperties[i][ID]))
+								{
+									new Float: X, Float: Y, Float: Z;
+									GetVehiclePos(vehicleid, X, Y, Z);
+
+									if (IsPlayerInSphere(playerid, X, Y, Z, 7.5))
+									{
+										new engine, lights, alarm, doors, bonnet, boot, objective;
+										GetVehicleParamsEx(vehicleid, engine, lights, alarm, doors, bonnet, boot, objective);
+
+										if (doors)
+										{
+											SetVehicleParamsEx(vehicleid, true, false, false, false, false, false, false);
+											SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ LOCK ] Your car is now unlocked and started up");
+										}
+										else
+										{
+											SetVehicleParamsEx(vehicleid, true, false, false, true, false, false, false);
+											SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ LOCK ] Your car is now locked");
+										}
+
+										PlayerPlaySound(playerid, 1056, X, Y, Z);
+									}
+								}
+							}
+						}
+					case 2:
 						// PM to player
 						{
 							return ShowPhonePMPlayerListDialog(playerid);
 						}
-					case 2:
+					case 3:
 						// Taxi
 						{
 							if (!CheckTaxiDriversOnline())
@@ -1543,7 +1575,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 							return ShowPhoneOptionsDialog(playerid);
 						}
-					case 3:
+					case 4:
 						// Car mechanic
 						{
 							if (!CheckCarMechanicsOnline())
@@ -1553,7 +1585,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 							return ShowPhoneOptionsDialog(playerid);
 						}
-					case 4:
+					case 5:
 						// Pizza delivery
 						{
 							if (!CheckPizzaguysOnline())

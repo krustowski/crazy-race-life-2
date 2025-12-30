@@ -11,7 +11,7 @@ public ShowAdvert()
 	{
 		// General tips and info.
 		"[ TIP ] Use /cmd to print the basic command set",
-		"[ TIM ] Go browse the /help sections to explore more features available",
+		"[ TIP ] Go browse the /help sections to explore more features available",
 		"[ TIP ] To commit a suicide, use /kill",
 		"[ TIP ] You can use /port to warp throughout the map. No vehicles though",
 		"[ TIP ] Need some money??? Let's do some missions: /taxi /truck",

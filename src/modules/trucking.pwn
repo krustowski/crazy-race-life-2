@@ -82,7 +82,7 @@ enum MissionStats
 	TrailerID,
 	MissionType: Type,
 
-	Float: ProvisionBonusWeight,
+	Float: CommissionBonusWeight,
 	DoneCount,
 	TimeElapsed,
 	Earned,
@@ -145,11 +145,11 @@ stock CheckTruckingCheckpoint(playerid)
 
 	if (!gPlayerMissions[playerid][DoneCount])
 	{
-		provision = 10000 + (floatround(gPlayerMissions[playerid][ProvisionBonusWeight] * 1 * 5000));
+		provision = 10000 + (floatround(gPlayerMissions[playerid][CommissionBonusWeight] * 1 * 5000));
 	}
 	else
 	{
-		provision = 10000 + (floatround(gPlayerMissions[playerid][ProvisionBonusWeight] * (random(gPlayerMissions[playerid][DoneCount]) + 1) * 5000));
+		provision = 10000 + (floatround(gPlayerMissions[playerid][CommissionBonusWeight] * (random(gPlayerMissions[playerid][DoneCount]) + 1) * 5000));
 	}
 
 	GivePlayerMoney(playerid, provision);
@@ -157,7 +157,7 @@ stock CheckTruckingCheckpoint(playerid)
 	gPlayerMissions[playerid][TimeElapsed] = 0;
 	gPlayerMissions[playerid][DoneCount] += 1;
 
-	format(stringToPrint, sizeof(stringToPrint), "[ TRUCK ] Mission completed! Provision earned: $%d", provision);
+	format(stringToPrint, sizeof(stringToPrint), "[ TRUCK ] Mission completed! Commision earned: $%d", provision);
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 
 	if (!SetPlayerTruckingMission(playerid, gPlayerMissions[playerid][Type]))
@@ -258,7 +258,7 @@ stock SetPlayerTruckingMission(playerid, MissionType: missionType)
 	gPlayerMissions[playerid][Checkpoint][CoordY] = y0;
 	gPlayerMissions[playerid][Checkpoint][CoordZ] = z0;
 
-	gPlayerMissions[playerid][ProvisionBonusWeight] = (floatabs(X - x0) / 3000 + floatabs(Y - y0) / 3000) / 2;
+	gPlayerMissions[playerid][CommissionBonusWeight] = (floatabs(X - x0) / 3000 + floatabs(Y - y0) / 3000) / 2;
 
 	new gameString[128];
 	format(gameString, sizeof(gameString), "~w~Next destination: ~y~%s", name);

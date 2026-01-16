@@ -299,7 +299,11 @@ public OnPlayerConnect(playerid)
 
 	// Ask the user to login/register.
 	gPlayers[playerid][LoginAttempts] = 0;
-	ShowAuthDialog(playerid);
+
+	if (IsPlayerConnected(playerid)) 
+	{
+		ShowAuthDialog(playerid);
+	}
 
 	return 0;
 }

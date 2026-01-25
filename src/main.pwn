@@ -195,7 +195,9 @@ public OnGameModeInit()
 	//
 
 	SetTimer("AntiCheatWeapon", 30 * SECOND_MS, true);
-	SetTimer("AntiFlood", 1 * SECOND_MS, true);
+	
+	// Breaks connections often while player's in the game menu
+	//SetTimer("AntiFlood", 1 * SECOND_MS, true);
 
 	SetTimer("OnRadarCheckpoint", 300, true);
 

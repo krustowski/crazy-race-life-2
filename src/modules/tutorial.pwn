@@ -17,16 +17,16 @@
 enum Tutorial
 {
 	bool: Active,
-
-	bool: PropertyRented,
-      	bool: PropertyBought,
-      	bool: RaceFinished,
-      	bool: JoinedTeam,
-	bool: WentTrucking,
-	bool: DkdTaxiMission,
+	      
+	PropertyRentedCount,
+	PropertyBoughtCount,
+	RaceFinishedCount,
+	bool: JoinedTeam,
+	TruckingMissionsDone,
+	TaxiMissionsDone,
 	bool: SentPM,
-	bool: DepositedMoneyToBank,
-	bool: PlayedDeathmath
+	DepositedMoneyToBank,
+	bool: DeathmatchPlayed
 };
 
 #pragma unused gPlayerTutorial

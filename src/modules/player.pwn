@@ -12,6 +12,7 @@
 #include "support/i18n.pwn"
 #include "db/sql.pwn"
 #include "modules/team.pwn"
+#include "modules/tutorial.pwn"
 #include "modules/drugz.pwn"
 #include "support/helpers.pwn"
 
@@ -64,6 +65,8 @@ enum Player
 
 	Timer: OnDeathGunsTimer[11],
 
+	TutorialStats[Tutorial],
+
 	Temp,
 	SkinOperation: SkinOp
 }
@@ -111,7 +114,7 @@ public LoadPlayerData(playerid)
 		SendClientMessageLocalized(playerid, I18N_USER_DATA_LOAD);
 		SetPlayerColor(playerid, COLOR_INVISIBLE);
 
-		new query[256];
+		new query[512];
 		format(query, sizeof(query), "SELECT id, cash, bank, adminlvl, wanted, team, class, health, armour, spawn, properties FROM users WHERE nickname = '%s';", gPlayers[playerid][Name]);
 
 		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
@@ -162,6 +165,33 @@ public LoadPlayerData(playerid)
 		gPlayers[playerid][Drugs][JOINT] = DB_GetFieldIntByName(result_drugz, "joint");
 
 		DB_FreeResultSet(result_drugz);
+
+		//
+		// Tutorial
+		//
+
+		format(query, sizeof(query), "SELECT active, property_rented_count, property_bought_count, race_finished_count, joined_team, trucking_missions_done, taxi_missions_done, sent_pm, deposited_money_to_bank, deathmatch_played FROM tutorials WHERE user_id = %d", gPlayers[playerid][OrmID]);
+
+		new DBResult: result_tutorial = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result_tutorial) {
+			print("Database error: cannot fetch user data (tutorial)!");
+		}
+
+		if (DB_GetRowCount(result_tutorial))
+		{
+			gPlayers[playerid][TutorialStats][Active] = bool: DB_GetFieldIntByName(result_tutorial, "active");
+			gPlayers[playerid][TutorialStats][PropertyRentedCount] = DB_GetFieldIntByName(result_tutorial, "property_rented_count");
+			gPlayers[playerid][TutorialStats][PropertyBoughtCount] = DB_GetFieldIntByName(result_tutorial, "property_bought_count");
+			gPlayers[playerid][TutorialStats][RaceFinishedCount] = DB_GetFieldIntByName(result_tutorial, "race_finished_count");
+			gPlayers[playerid][TutorialStats][JoinedTeam] = bool: DB_GetFieldIntByName(result_tutorial, "joined_team");
+			gPlayers[playerid][TutorialStats][TruckingMissionsDone] = DB_GetFieldIntByName(result_tutorial, "trucking_missions_done");
+			gPlayers[playerid][TutorialStats][TaxiMissionsDone] = DB_GetFieldIntByName(result_tutorial, "taxi_missions_done");
+			gPlayers[playerid][TutorialStats][SentPM] = bool: DB_GetFieldIntByName(result_tutorial, "sent_pm");
+			gPlayers[playerid][TutorialStats][DepositedMoneyToBank] = DB_GetFieldIntByName(result_tutorial, "deposited_money_to_bank");
+			gPlayers[playerid][TutorialStats][DeathmatchPlayed] = bool: DB_GetFieldIntByName(result_tutorial, "deathmatch_played");
+		}
+
+		DB_FreeResultSet(result_tutorial);
 
 		GivePlayerMoney(playerid, gPlayers[playerid][Cash]);
 		SetPlayerHealth(playerid, gPlayers[playerid][Health]);
@@ -228,7 +258,7 @@ public SavePlayerData(playerid)
 
 		//writecfg(gPlayers[playerid][Name], "", "properties", propertiesString);
 
-		new query[512];
+		new query[1024];
 
 		format(query, sizeof(query), "UPDATE users SET cash = %d, bank = %d, adminlvl = %d, wanted = %d, team = %d, class = %d, health = %d, armour = %d, spawn = %d, properties = '%s' WHERE nickname = '%s';", 
 				GetPlayerMoney(playerid), 
@@ -272,9 +302,36 @@ public SavePlayerData(playerid)
 		new DBResult: result_drugz = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result_drugz) {
 			printf("Database error: cannot write user data (drugz, ID: %d)!", gPlayers[playerid][OrmID]);
+			print(query);
 		}
 
 		DB_FreeResultSet(result_drugz);
+
+		//
+		//  Tutorial
+		//
+		
+		format(query, sizeof(query), "INSERT INTO tutotials (user_id, active, property_rented, property_bought, race_finished, joined_team, trucking_missions_done, taxi_missions_done, sent_pm, deposited_money_to_bank, deathmatch_played) VALUES (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) ON CONFLICT(user_id) DO UPDATE SET active = excluded.active, property_rented_count = excluded.property_rented_count, property_bought_count = excluded.property_bought_count, race_finished_count = excluded.race_finished_count, joined_team = excluded.joined_team, trucking_missions_done = excluded.trucking_missions_done, taxi_missions_done = excluded.taxi_missions_done, sent_pm = excluded.sent_pm, deposited_money_to_bank = excluded.deposited_money_to_bank, deathmatch_played = excluded.deathmatch_played", 
+			gPlayers[playerid][OrmID],
+			gPlayers[playerid][TutorialStats][Active],
+			gPlayers[playerid][TutorialStats][PropertyRentedCount],
+			gPlayers[playerid][TutorialStats][PropertyBoughtCount],
+			gPlayers[playerid][TutorialStats][RaceFinishedCount],
+			gPlayers[playerid][TutorialStats][JoinedTeam],
+			gPlayers[playerid][TutorialStats][TruckingMissionsDone],
+			gPlayers[playerid][TutorialStats][TaxiMissionsDone],
+			gPlayers[playerid][TutorialStats][SentPM],
+			gPlayers[playerid][TutorialStats][DepositedMoneyToBank],
+			gPlayers[playerid][TutorialStats][DeathmatchPlayed]
+		);
+
+		new DBResult: result_tutorial = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result_tutorial) {
+			printf("Database error: cannot write user data (tutorial, ID: %d)!", gPlayers[playerid][OrmID]);
+			print(query);
+		}
+
+		DB_FreeResultSet(result_tutorial);
 
 		SendClientMessageLocalized(playerid, I18N_AUTOSAVE_SUCCESS);
 	}

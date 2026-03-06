@@ -406,6 +406,7 @@ public OnPlayerSpawn(playerid)
 		return 1;
 	}
 
+	SetPlayerHealth(playerid, 100.0);
 	SetPlayerSkin(playerid, gPlayers[playerid][Skin]);
 
 	// Set the player back to the deathmatch area if is set in game.
@@ -445,7 +446,9 @@ public OnPlayerSpawn(playerid)
 	if (gPlayers[playerid][SpawnPoint])
 	{
 		if (SpawnPlayerAtProperty(playerid))
+		{
 			return 1;
+		}
 	}
 
 	// Default location to spawrn a player (LV pyramid).
@@ -500,36 +503,31 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 
 	CreateDeathMoneyPickup(playerid);
 
-	if (killerid > 1000)
-	{
-		return 1;
+	if (IsPlayerConnected(killerid) && killerid != playerid) {
+		// Adjust the wanted level
+		gPlayers[killerid][WantedLevel]++;
+		SetPlayerWantedLevel(killerid, gPlayers[killerid][WantedLevel]);
+
+		new t_PLAYER_STATE:killerState = GetPlayerState(killerid);
+
+		if (IsPlayerInAnyVehicle(killerid) && !IsPlayerInAnyVehicle(playerid) && killerState == PLAYER_STATE_DRIVER && reason != WEAPON_VEHICLE)
+		{
+			new killerName[MAX_PLAYER_NAME]; 
+
+			GetPlayerName(killerid, killerName, MAX_PLAYER_NAME);
+
+			// Hide velocity meters.
+			TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
+	
+			format(stringToPrint, sizeof(stringToPrint), "[ CARKILL ] Player %s [ID: %d] has just broken the server rules", killerName, killerid);
+			SendClientMessageToAll(COLOR_RED, stringToPrint);
+
+			SpawnPlayer(killerid);
+			return PlayerPlaySound(killerid, 1056, 0, 0, 0);
+		}
 	}
 
-	// Adjust the wanted level
-	gPlayers[killerid][WantedLevel]++;
-	SetPlayerWantedLevel(killerid, gPlayers[killerid][WantedLevel]);
-
-	new t_PLAYER_STATE:killerState = GetPlayerState(killerid);
-
-	if (IsPlayerInAnyVehicle(killerid) && !IsPlayerInAnyVehicle(playerid) && killerState == PLAYER_STATE_DRIVER && reason != WEAPON_VEHICLE)
-	{
-		new killerName[MAX_PLAYER_NAME]; 
-
-		GetPlayerName(killerid, killerName, MAX_PLAYER_NAME);
-
-		// Hide velocity meters.
-		TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
-
-		format(stringToPrint, sizeof(stringToPrint), "[ CARKILL ] Player %s [ID: %d] has just broken the server rules", killerName, killerid);
-		SendClientMessageToAll(COLOR_RED, stringToPrint);
-
-		SpawnPlayer(killerid);
-		PlayerPlaySound(killerid, 1056, 0, 0, 0);
-	}
-
-	SpawnPlayer(playerid);
-
-	return 1;
+	return SpawnPlayer(playerid);
 }
 
 public OnVehicleSpawn(vehicleid)
@@ -558,6 +556,11 @@ public OnVehicleSpawn(vehicleid)
 
 public OnVehicleDeath(vehicleid, killerid)
 {
+	if (!IsPlayerConnected(killerid))
+	{
+		return 1;
+	}
+
 	if (gTrucking[killerid])
 	{
 		if (vehicleid == gPlayerMissions[killerid][VehicleID] || vehicleid == gPlayerMissions[killerid][TrailerID])

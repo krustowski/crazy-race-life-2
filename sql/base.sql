@@ -263,3 +263,19 @@ CREATE TABLE IF NOT EXISTS "high_scores" (
 	FOREIGN KEY("type") REFERENCES "high_scores_types"("id"),
 	FOREIGN KEY("user_id") REFERENCES "users"("id")
 );
+CREATE TABLE IF NOT EXISTS "tutorials" (
+	"id"	INTEGER,
+	"user_id"	INTEGER NOT NULL UNIQUE,
+	"active"	INTEGER DEFAULT 0,
+	"property_rented_count"	INTEGER DEFAULT 0,
+	"property_bought_count"	INTEGER DEFAULT 0,
+	"race_finished_count"	INTEGER DEFAULT 0,
+	"joined_team"	INTEGER DEFAULT 0,
+	"trucking_missions_done"	INTEGER DEFAULT 0,
+	"taxi_missions_done"	INTEGER DEFAULT 0,
+	"sent_pm"	INTEGER DEFAULT 0,
+	"deposited_money_to_bank"	INTEGER DEFAULT 0,
+	"deathmatch_played"	INTEGER DEFAULT 0,
+	PRIMARY KEY("id" AUTOINCREMENT),
+	FOREIGN KEY("user_id") REFERENCES "users"("id")
+);

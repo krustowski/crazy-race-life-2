@@ -81,7 +81,9 @@ enum
 	DIALOG_HIGH_SCORES_DEATHMATCH,
 	DIALOG_HIGH_SCORES_MISSIONS,
 	DIALOG_HIGH_SCORES_COMBAT,
-	DIALOG_COMBAT_LIST
+	DIALOG_COMBAT_LIST,
+	DIALOG_TUTORIAL_MAIN,
+	DIALOG_TUTORIAL_STATS
 };
 
 #include "modules/real.pwn"
@@ -1255,4 +1257,57 @@ stock ShowCombatListDialog(playerid)
 	DB_FreeResultSet(result);
 
 	return ShowPlayerDialog(playerid, DIALOG_COMBAT_LIST, DIALOG_STYLE_LIST, "Combat Missions", stringToPrint, "Select", "Close");
+}
+
+stock ShowTutorialMainDialog(playerid)
+{
+	new stringToPrint[256];
+
+	if (!gPlayers[playerid][TutorialStats][Active])
+	{
+		format(stringToPrint, sizeof(stringToPrint), "Activate Tutorial");
+	}
+	else
+	{
+		format(stringToPrint, sizeof(stringToPrint), "Tutorial stats\nNext task");
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_TUTORIAL_MAIN, DIALOG_STYLE_LIST, "Tutorial Main Menu", stringToPrint, "Select", "Close");
+}
+
+stock ShowTutorialStatsDialog(playerid)
+{
+	new stringToPrint[512], joinedTeam[5], sentPM[5];
+
+	if (gPlayers[playerid][TutorialStats][JoinedTeam])
+	{
+		format(joinedTeam, sizeof(joinedTeam), "true");
+	}
+	else
+	{
+		format(joinedTeam, sizeof(joinedTeam), "false");
+	}
+
+	if (gPlayers[playerid][TutorialStats][SentPM])
+	{
+		format(sentPM, sizeof(sentPM), "true");
+	}
+	else
+	{
+		format(sentPM, sizeof(sentPM), "false");
+	}
+
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Tutorial Stats{FFFFFF}\n\n- Property bought count: {FFD700}%d{FFFFFF}\n- Property rented count: {FFD700}%2d{FFFFFF}\n- Race finished count: {FFD700}%2d{FFFFFF}\n- Joined a team: {FFD700}%s{FFFFFF}\n- Trucking missions done: {FFD700}%2d{FFFFFF}\n- Taxi missions done: {FFD700}%2d{FFFFFF}\n- Sent a PM: {FFD700}%s{FFFFFF}\n- Deposited money to bank: {FFD700}%d{FFFFFF}\n- Played deathmatch: {FFD700}%d{FFFFFF}\n", 
+			gPlayers[playerid][TutorialStats][PropertyBoughtCount],
+			gPlayers[playerid][TutorialStats][PropertyBoughtCount],
+			gPlayers[playerid][TutorialStats][RaceFinishedCount],
+			joinedTeam,
+			gPlayers[playerid][TutorialStats][TruckingMissionsDone],
+			gPlayers[playerid][TutorialStats][TaxiMissionsDone],
+			sentPM,
+			gPlayers[playerid][TutorialStats][DepositedMoneyToBank],
+			gPlayers[playerid][TutorialStats][DeathmatchPlayed]
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_TUTORIAL_STATS, DIALOG_STYLE_MSGBOX, "Tutorial Stats", stringToPrint, "Close", "");
 }

@@ -47,6 +47,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(taxi, 4, cmdtext);           //all
 	dcmd(text, 4, cmdtext);           //all
 	dcmd(truck, 5, cmdtext); 	  //all
+	dcmd(tut, 3, cmdtext);            //all
 	dcmd(unlock, 6, cmdtext);         //all
 	dcmd(wanted, 6, cmdtext);	  //all
 
@@ -725,6 +726,12 @@ dcmd_truck(playerid, const params[])
 	}
 
 	return CheckPlayerForTruckingMission(playerid);
+}
+
+dcmd_tut(playerid, const params[])
+{
+#pragma unused params
+	return ShowTutorialMainDialog(playerid);
 }
 
 dcmd_unlock(playerid, const params[])

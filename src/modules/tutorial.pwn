@@ -8,12 +8,6 @@
 //  A special module to guide new players through the game,
 //
 
-/*
- *  Raw notes: buy a house, go racing, go trucking, go taxi, rent a property, join a team,...
- *
- *  
- */
-
 enum Tutorial
 {
 	bool: Active,
@@ -28,8 +22,4 @@ enum Tutorial
 	DepositedMoneyToBank,
 	bool: DeathmatchPlayed
 };
-
-#pragma unused gPlayerTutorial
-new gPlayerTutorial[MAX_PLAYERS][Tutorial];
-
 

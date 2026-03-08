@@ -280,6 +280,8 @@ public SavePlayerData(playerid)
 			return 0;
 		}
 
+		DB_FreeResultSet(result);
+
 		//
 		//  Drugz
 		//
@@ -310,7 +312,7 @@ public SavePlayerData(playerid)
 		//
 		//  Tutorial
 		//
-		
+
 		format(query, sizeof(query), "INSERT INTO tutorials (user_id, active, property_rented_count, property_bought_count, race_finished_count, joined_team, trucking_missions_done, taxi_missions_done, sent_pm, deposited_money_to_bank, deathmatch_played) VALUES (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) ON CONFLICT(user_id) DO UPDATE SET active = excluded.active, property_rented_count = excluded.property_rented_count, property_bought_count = excluded.property_bought_count, race_finished_count = excluded.race_finished_count, joined_team = excluded.joined_team, trucking_missions_done = excluded.trucking_missions_done, taxi_missions_done = excluded.taxi_missions_done, sent_pm = excluded.sent_pm, deposited_money_to_bank = excluded.deposited_money_to_bank, deathmatch_played = excluded.deathmatch_played", 
 			gPlayers[playerid][OrmID],
 			gPlayers[playerid][TutorialStats][Active],
@@ -332,7 +334,7 @@ public SavePlayerData(playerid)
 		}
 
 		DB_FreeResultSet(result_tutorial);
-
+		
 		SendClientMessageLocalized(playerid, I18N_AUTOSAVE_SUCCESS);
 	}
 

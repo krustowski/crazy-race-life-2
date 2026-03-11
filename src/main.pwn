@@ -31,7 +31,6 @@
 #include <float>
 #include <file>
 #include <string>
-//#include "npc/omp_npcs.inc"
 
 #pragma tabsize 8
 

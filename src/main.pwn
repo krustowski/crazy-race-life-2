@@ -26,12 +26,12 @@
 //
 
 #include <open.mp>
-#include <a_mysql>
+//#include <a_mysql>
 #include <core>
 #include <float>
 #include <file>
 #include <string>
-#include "npc/omp_npcs.inc"
+//#include "npc/omp_npcs.inc"
 
 #pragma tabsize 8
 
@@ -457,7 +457,7 @@ public OnPlayerSpawn(playerid)
 	return 1;
 }
 
-public OnNPCDeath(npcid, killerid, reason)
+public OnNPCDeath(npcid, killerid, WEAPON:reason)
 {
 	NPC_Destroy(npcid);
 

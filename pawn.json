@@ -1,14 +1,14 @@
 {
 	"user": "krustowski",
 	"repo": "crazy-race-life-2",
-	"tag": "v0.8.9",
+	"tag": "v0.9.2",
 	"entry": "src/main.pwn",
 	"output": "gamemodes/crl2.amx",
 	"dependencies": [
-		"openmultiplayer/omp-stdlib",
-		"pawn-lang/samp-stdlib@open.mp",
-		"pawn-lang/pawn-stdlib@open.mp",
-		"pBlueG/SA-MP-MySQL"
+		"openmultiplayer/omp-stdlib"
 	],
-	"local": true
+	"local": true,
+	"runtime": {
+		"version": "openmp"
+	}
 }

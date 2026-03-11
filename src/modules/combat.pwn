@@ -228,16 +228,16 @@ stock PrepareCombatInterior(playerid, missionid)
 					NPC_SetInterior(gCombatNPC[npcid], 3);
 					NPC_SetPos(gCombatNPC[npcid], X, Y, Z);
 
-					NPC_SetWeapon(gCombatNPC[npcid], 29);
+					NPC_SetWeapon(gCombatNPC[npcid], WEAPON:29);
 					NPC_SetAmmo(gCombatNPC[npcid], 1000);
 					NPC_EnableInfiniteAmmo(gCombatNPC[npcid], true);
-					NPC_SetWeaponAccuracy(gCombatNPC[npcid], 29, COMBAT_ACCURACY);
+					NPC_SetWeaponAccuracy(gCombatNPC[npcid], WEAPON:29, COMBAT_ACCURACY);
 
 					new Float: pX, Float: pY, Float: pZ;
 					GetPlayerPos(playerid, pX, pY, pZ);
 
 					NPC_AimAtPlayer(gCombatNPC[npcid], playerid, true, 0, true, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-					NPC_Shoot(gCombatNPC[npcid], 29, playerid, 0, pX, pY, pZ, 0.0, 0.0, 0.0, true);
+					NPC_Shoot(gCombatNPC[npcid], WEAPON:29, playerid, 0, pX, pY, pZ, 0.0, 0.0, 0.0, true);
 
 					npcid++;
 				}
@@ -291,10 +291,10 @@ stock PrepareCombatInterior(playerid, missionid)
 					NPC_SetInterior(gCombatNPC[npcid], 0);
 					NPC_SetPos(gCombatNPC[npcid], X, Y, Z);
 
-					NPC_SetWeapon(gCombatNPC[npcid], 29);
+					NPC_SetWeapon(gCombatNPC[npcid], WEAPON:29);
 					NPC_SetAmmo(gCombatNPC[npcid], 1000);
 					NPC_EnableInfiniteAmmo(gCombatNPC[npcid], true);
-					NPC_SetWeaponAccuracy(gCombatNPC[npcid], 29, COMBAT_ACCURACY);
+					NPC_SetWeaponAccuracy(gCombatNPC[npcid], WEAPON:29, COMBAT_ACCURACY);
 
 					SetPlayerMarkerForPlayer(playerid, gCombatNPC[npcid], COLOR_YELLOW);
 

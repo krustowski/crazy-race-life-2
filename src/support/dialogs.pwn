@@ -1277,7 +1277,7 @@ stock ShowTutorialMainDialog(playerid)
 
 stock ShowTutorialStatsDialog(playerid)
 {
-	new stringToPrint[512], joinedTeam[5], sentPM[5];
+	new stringToPrint[512], joinedTeam[6], sentPM[6];
 
 	if (gPlayers[playerid][TutorialStats][JoinedTeam])
 	{

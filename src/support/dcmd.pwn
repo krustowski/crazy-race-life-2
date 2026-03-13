@@ -27,6 +27,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(drugz, 5, cmdtext); 	  //all
 	dcmd(dwarp, 5, cmdtext); 	  //all
 	dcmd(fix, 3, cmdtext); 		  //all
+	dcmd(fork, 4, cmdtext); 	  //all
 	dcmd(givecash, 8, cmdtext);       //all
 	dcmd(help, 4, cmdtext);           //all
 	dcmd(hide, 4, cmdtext); 	  //all
@@ -381,6 +382,18 @@ dcmd_fix(playerid, const params[])
 	SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
 
 	return 1;
+}
+
+dcmd_fork(playerid, const params[])
+{
+#pragma unused params
+	if (!IsPlayerInAnyVehicle(playerid) || GetVehicleModel(GetPlayerVehicleID(playerid)) != 530)
+	{
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ FORK ] Only applies to forklifts!");
+	}
+
+	gPlayers[playerid][SwitchedControllers] = !gPlayers[playerid][SwitchedControllers];
+	return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ FORK ] Controllers switch toggled!");
 }
 
 dcmd_givecash(playerid, const params[])

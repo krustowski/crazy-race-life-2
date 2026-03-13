@@ -67,6 +67,8 @@ enum Player
 
 	TutorialStats[Tutorial],
 
+	bool: SwitchedControllers,
+
 	Temp,
 	SkinOperation: SkinOp
 }

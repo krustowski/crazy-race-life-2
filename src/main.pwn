@@ -239,6 +239,8 @@ public OnPlayerConnect(playerid)
 	gPlayers[playerid][IsLogged] = false;
 	gPlayers[playerid][TeamID] = 0;
 
+	gPlayers[playerid][SwitchedControllers] = false;
+
 	// Reset the deathmatch states.
 	gDeathmatch[playerid][IsRegistered] = false;
 	gDeathmatch[playerid][InGame] = false;
@@ -1547,7 +1549,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							{
 								new vehicleid = gProperties[i][Vehicle][ID];
 
-								if (vehicleid && IsPlayerOwner(playerid, gProperties[i][ID]))
+								if (vehicleid && (IsPlayerOwner(playerid, gProperties[i][ID])) || gTeams[ gPlayers[playerid][TeamID] -1 ][ID] == TEAM_HACKERS)
 								{
 									new Float: X, Float: Y, Float: Z;
 									GetVehiclePos(vehicleid, X, Y, Z);
@@ -2458,10 +2460,40 @@ public OnPlayerExitedMenu(playerid)
 	return 1;
 }
 
+public OnPlayerUpdate(playerid)
+{
+	return 1;
+}
+
 public OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 {
 	switch (newkeys)
 	{
+		//case KEY_SPRINT:
+		case KEY_JUMP:
+			{
+				if (!gPlayers[playerid][SwitchedControllers])
+				{
+					return 1;
+				}
+
+				if (!IsPlayerInAnyVehicle(playerid) || GetVehicleModel(GetPlayerVehicleID(playerid)) != 530)
+				{
+					return 1;
+				}
+
+				new vehicleid = GetPlayerVehicleID(playerid);
+
+				new Float:vx, Float:vy, Float:vz;
+				GetVehicleVelocity(vehicleid, vx, vy, vz);
+
+				vx *= 1.125;
+				vy *= 1.125;
+
+				SetVehicleVelocity(vehicleid, vx, vy, vz);
+
+			    	return 1;
+			}
 		case KEY_SECONDARY_ATTACK:
 			{
 				if (!IsPlayerInAnyVehicle(playerid))

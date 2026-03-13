@@ -1544,34 +1544,52 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							return ShowPhoneOptionsDialog(playerid);
 						}
 					case 1:
+						// Vehicle lock
 						{
 							for (new i = 0; i < MAX_PROPERTIES; i++)
 							{
 								new vehicleid = gProperties[i][Vehicle][ID];
+								new isowner = IsPlayerOwner(playerid, gProperties[i][ID]);
+								new ishacker = gTeams[ gPlayers[playerid][TeamID] - 1 ][ID] == TEAM_HACKERS;
 
-								if (vehicleid && (IsPlayerOwner(playerid, gProperties[i][ID])) || gTeams[ gPlayers[playerid][TeamID] -1 ][ID] == TEAM_HACKERS)
+								if (!vehicleid) 
 								{
-									new Float: X, Float: Y, Float: Z;
-									GetVehiclePos(vehicleid, X, Y, Z);
+									continue;
+								}
 
-									if (IsPlayerInSphere(playerid, X, Y, Z, 7.5))
+								if (!isowner && !ishacker)
+								{
+									continue;
+								}
+
+								new Float: X, Float: Y, Float: Z;
+								GetVehiclePos(vehicleid, X, Y, Z);
+
+								if (IsPlayerInSphere(playerid, X, Y, Z, 7.5))
+								{
+									new engine, lights, alarm, doors, bonnet, boot, objective;
+									GetVehicleParamsEx(vehicleid, engine, lights, alarm, doors, bonnet, boot, objective);
+
+									if (!isowner && ishacker && (alarm || random(6) == 5))
 									{
-										new engine, lights, alarm, doors, bonnet, boot, objective;
-										GetVehicleParamsEx(vehicleid, engine, lights, alarm, doors, bonnet, boot, objective);
+										SetVehicleParamsEx(vehicleid, true, false, true, true, false, false, false);
+										SendClientMessage(playerid, COLOR_YELLOW, "[ LOCK ] Car lock hack failed! Alarm has been activated! Run");
+										break;
+									}	
 
-										if (doors)
-										{
-											SetVehicleParamsEx(vehicleid, true, false, false, false, false, false, false);
-											SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ LOCK ] Your car is now unlocked and started up");
-										}
-										else
-										{
-											SetVehicleParamsEx(vehicleid, true, false, false, true, false, false, false);
-											SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ LOCK ] Your car is now locked");
-										}
-
-										PlayerPlaySound(playerid, 1056, X, Y, Z);
+									if ((doors && !alarm) || (doors && alarm && isowner))
+									{
+										SetVehicleParamsEx(vehicleid, true, false, false, false, false, false, false);
+										SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ LOCK ] Your car is now unlocked and started up");
 									}
+									else
+									{
+										SetVehicleParamsEx(vehicleid, true, false, false, true, false, false, false);
+										SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ LOCK ] Your car is now locked");
+									}
+
+									PlayerPlaySound(playerid, 1056, X, Y, Z);
+									break;
 								}
 							}
 						}

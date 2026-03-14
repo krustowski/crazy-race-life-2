@@ -48,6 +48,7 @@
 #include "support/i18n.pwn" 
 #include "support/net.pwn" 
 #include "support/http.pwn" 
+#include "modules/editor.pwn" 
 
 new const GAMEMODE_NAME[] = "CrazyRaceLife2";
 
@@ -173,6 +174,7 @@ public OnGameModeInit()
 	//
 
 	InitDB();
+	InitPoliceBribePickups();
 	InitBankLocations();
 	InitDrugValues();
 	InitDrugPickups();
@@ -1570,7 +1572,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 									new engine, lights, alarm, doors, bonnet, boot, objective;
 									GetVehicleParamsEx(vehicleid, engine, lights, alarm, doors, bonnet, boot, objective);
 
-									if (!isowner && ishacker && (alarm || random(6) == 5))
+									if (!isowner && ishacker && (alarm || random(4) == 3))
 									{
 										SetVehicleParamsEx(vehicleid, true, false, true, true, false, false, false);
 										SendClientMessage(playerid, COLOR_YELLOW, "[ LOCK ] Car lock hack failed! Alarm has been activated! Run");
@@ -1730,6 +1732,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 2:
 						{
 							return ShowRaceEditorMainDialog(playerid);
+						}
+					case 3:
+						{
+							return ShowBribeEditorMainDialog(playerid);
 						}
 				}
 			}
@@ -2231,6 +2237,45 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 				}
 			}
+		case DIALOG_BRIBE_MAIN:
+			{
+				if (!response)
+				{
+					gPlayers[playerid][EditingMode] = false;
+					gBribeEdit[playerid][Type] = BREDIT_NONE;
+					return 1;
+				}
+
+				switch (listitem)
+				{
+					case 0:
+						{
+							gPlayers[playerid][EditingMode] = true;
+							gBribeEdit[playerid][Type] = BREDIT_NEW;
+							return SendClientMessage(playerid, COLOR_ORANGE, "[ EDIT ] Record new police bribe pickup coords using the KEY_NO (N) key.");
+						}
+					case 1: 
+						{
+							gPlayers[playerid][EditingMode] = true;
+							gBribeEdit[playerid][Type] = BREDIT_DELETE;
+							//return SendClientMessage(playerid, COLOR_ORANGE, "[ EDIT ] Record new police bribe pickup coords using the KEY_NO (N) key.");
+							return 1;
+						}
+				}
+				
+			}
+		case DIALOG_BRIBE_NOTE:
+			{
+				if (!response)
+				{
+					gPlayers[playerid][EditingMode] = false;
+					gBribeEdit[playerid][Type] = BREDIT_NONE;
+					return 1;
+				}
+
+				format(gBribeEdit[playerid][Note], 64, "%s", inputtext);
+				return SaveNewPoliceBribePickup(playerid);
+			}
 
 		default: 
 			return 0; // dialog ID was not found, search in other scripts
@@ -2422,6 +2467,8 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	//
 
 	CheckDeathMoneyPickup(playerid, pickupid);
+
+	CheckPoliceBribePickup(playerid, pickupid);
 
 	return 1;
 }
@@ -2745,6 +2792,33 @@ public OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 								gPropertyEdit[playerid][EditingMode] = PREDIT_NONE;
 
 								return ShowPropertyEditDialogMain(playerid);
+							}
+						default:
+							{
+								return 1;
+							}
+					}
+				}
+
+				if (gBribeEdit[playerid][Type] != BREDIT_NONE)
+				{
+					new Float: X, Float: Y, Float: Z;
+					GetPlayerPos(playerid, X, Y, Z);
+
+					switch (gBribeEdit[playerid][Type])
+					{
+						case BREDIT_NEW:
+							{
+								gBribeEdit[playerid][CoordX] = X;
+								gBribeEdit[playerid][CoordY] = Y;
+								gBribeEdit[playerid][CoordZ] = Z;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Bribe pickup coords presaved!");
+								return ShowBribeEditorNoteDialog(playerid);
+							}
+						case BREDIT_DELETE:
+							{
+								return 1;
 							}
 						default:
 							{

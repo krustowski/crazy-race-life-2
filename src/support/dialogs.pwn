@@ -83,7 +83,9 @@ enum
 	DIALOG_HIGH_SCORES_COMBAT,
 	DIALOG_COMBAT_LIST,
 	DIALOG_TUTORIAL_MAIN,
-	DIALOG_TUTORIAL_STATS
+	DIALOG_TUTORIAL_STATS,
+	DIALOG_BRIBE_MAIN,
+	DIALOG_BRIBE_NOTE
 };
 
 #include "modules/real.pwn"
@@ -772,13 +774,30 @@ stock ShowServerRulesDialog(playerid)
 stock ShowGameEditorListDialog(playerid)
 {
 	new stringToPrint[256];
-	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s",
 			"Property Editor",
 			"Trucking Editor",
-			"Race Editor"
+			"Race Editor",
+			"Police Bribe Editor"
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_EDITOR_LIST, DIALOG_STYLE_LIST, "Game Editors", stringToPrint, "Select", "Cancel");
+}
+
+stock ShowBribeEditorMainDialog(playerid)
+{
+	new stringToPrint[256];
+	format(stringToPrint, sizeof(stringToPrint), "Add new bribe pickup\nDelete a pickup");
+
+	return ShowPlayerDialog(playerid, DIALOG_BRIBE_MAIN, DIALOG_STYLE_LIST, "Police Bribe Editor", stringToPrint, "Select", "Cancel");
+}
+
+stock ShowBribeEditorNoteDialog(playerid)
+{
+	new stringToPrint[256];
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Police Bribe Pickup Note{FFFFFF}\n\nAdd a note for a new police bribe pickup:\n");
+
+	return ShowPlayerDialog(playerid, DIALOG_BRIBE_NOTE, DIALOG_STYLE_INPUT, "Police Bribe Editor", stringToPrint, "Apply", "Cancel");
 }
 
 stock ShowPropertyEditorMainDialog(playerid)

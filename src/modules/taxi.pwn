@@ -207,7 +207,7 @@ stock CheckTaxiMissionCheckpoint(playerid)
 	DisablePlayerRaceCheckpoint(playerid);
 	SetVehicleVelocity(GetPlayerVehicleID(playerid), 0.0, 0.0, 0.0);
 
-	new commission = 8000 + (floatround(gTaxiMission[playerid][CommissionCoef] * (random(++gTaxiMission[playerid][DoneCount]) + 1) * 4000));
+	new commission = 5000 + (floatround(gTaxiMission[playerid][CommissionCoef] * (random(++gTaxiMission[playerid][DoneCount]) + 1) * 2500));
 	GivePlayerMoney(playerid, commission);
 	gTaxiMission[playerid][Earned] += commission;
 

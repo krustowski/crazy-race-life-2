@@ -395,6 +395,29 @@ func gameDataHandler(w http.ResponseWriter, r *http.Request) {
 
 	rows.Close()
 
+	// Police bribes
+	rows, err = db.Query("SELECT id, x, y, note FROM police_bribe_coords")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for rows.Next() {
+		var p Property
+		if err := rows.Scan(&p.ID, &p.X, &p.Y, &p.Name); err != nil {
+			log.Println(err)
+			continue
+		}
+
+		p.ID += 800
+		p.Name = fmt.Sprint("Police Bribe: ", p.Name)
+		p.Type = 10
+
+		props = append(props, p)
+	}
+
+	rows.Close()
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(props)
 }

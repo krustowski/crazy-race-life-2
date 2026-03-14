@@ -48,7 +48,6 @@
 #include "support/i18n.pwn" 
 #include "support/net.pwn" 
 #include "support/http.pwn" 
-#include "modules/editor.pwn" 
 
 new const GAMEMODE_NAME[] = "CrazyRaceLife2";
 
@@ -96,6 +95,7 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 #include "modules/taxi.pwn"
 #include "modules/combat.pwn"
 #include "modules/tutorial.pwn"
+#include "modules/bribe.pwn" 
 
 
 //

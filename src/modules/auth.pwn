@@ -45,6 +45,9 @@ stock SetPlayerAccountLogin(playerid, const text[])
 	LoadPlayerData(playerid);
 	LoadPlayerProperties(playerid);
 
+	// Draw mapicons for the user.
+	AddMapicons(playerid);
+
 	SpawnPlayer(playerid);
 
 	return 1;

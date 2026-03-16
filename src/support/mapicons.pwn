@@ -102,12 +102,10 @@ public AddMapicons(playerid)
 		SetPlayerMapIcon(playerid, mapiconid++, pX, pY, pZ, E_MAPICON_ID_RACE_TOURNAMENT, 0, MAPICON_LOCAL);
 	}
 
-	// Housing.
-
-	// Las Barrancas
+	// Las Barrancas Housing
 	SetPlayerMapIcon(playerid, mapiconid++, -846.13, 1567.15, 24.63, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
 
-	// Octane Springs
+	// Octane Springs Housing
 	SetPlayerMapIcon(playerid, mapiconid++, 776.62, 1986.97, 5.33, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
 
 	SetPlayerMapIcon(playerid, mapiconid++, -2686.03, 205.63, 3.96, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
@@ -117,6 +115,34 @@ public AddMapicons(playerid)
 	SetPlayerMapIcon(playerid, mapiconid++, -2803.74, -127.57, 6.84, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
 	SetPlayerMapIcon(playerid, mapiconid++, 248.99, -294.65, 1.34, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
 	SetPlayerMapIcon(playerid, mapiconid++, -210.51, 2751.34, 62.20, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+
+	// Real Estate
+
+	for (new i = 0; i < MAX_PROPERTIES; i++)
+	{
+		if (!IsPlayerOwner(playerid, gProperties[i][ID]))
+		{
+			continue;
+		}
+
+		new Float: pX, Float: pY, Float: pZ;
+
+		for (new j = 0; j < MAX_PROPERTY_PICKUPS; j++)
+		{
+			if (gPropertyCoords[i][j][PickupType] != SPAWN_POINT)
+			{
+				continue;
+			}
+
+			pX = gPropertyCoords[i][j][Primary][CoordX];
+			pY = gPropertyCoords[i][j][Primary][CoordY];
+			pZ = gPropertyCoords[i][j][Primary][CoordZ];
+
+			break;
+		}
+
+		SetPlayerMapIcon(playerid, mapiconid++, pX, pY, pZ, E_MAPICON_ID_SAVE_HOUSE, 0, MAPICON_LOCAL);
+	}
 
 	// Jobs.
 

@@ -271,9 +271,6 @@ public OnPlayerConnect(playerid)
 	// Taxi mission
 	gTaxiMission[playerid][Active] = false;
 
-	// Draw mapicons for the user.
-	AddMapicons(playerid);
-
 	// Text inits.
 	AddTexts(playerid);
 

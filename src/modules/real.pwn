@@ -968,24 +968,30 @@ stock DestroyPropertyInterior(playerid)
 
 stock SpawnPlayerAtProperty(playerid)
 {
-	if (!IsPlayerOwner(playerid, gPlayers[playerid][SpawnPoint]))
-		return 0;
-
 	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
+		if (!IsPlayerOwner(playerid, gProperties[i][ID]))
+		{
+			continue;
+		}
+
+		if (gProperties[i][ID] != gPlayers[playerid][SpawnPoint])
+		{
+			continue;
+		}
+
 		for (new j = 0; j < MAX_PROPERTY_PICKUPS; j++)
 		{
 			if (gPropertyCoords[i][j][PickupType] != SPAWN_POINT)
+			{
 				continue;
+			}
 
-			if (gProperties[i][ID] != gPlayers[playerid][SpawnPoint])
-				continue;
-
-			SetPlayerPos(playerid, gPropertyCoords[i][j][Primary][CoordX], gPropertyCoords[i][j][Primary][CoordY], gPropertyCoords[i][j][Primary][CoordZ]);
+			return SetPlayerPos(playerid, gPropertyCoords[i][j][Primary][CoordX], gPropertyCoords[i][j][Primary][CoordY], gPropertyCoords[i][j][Primary][CoordZ]);
 		}
 	}
 
-	return 1;
+	return 0;
 }
 
 stock GetPropertyArrayIDfromID(propertyID)

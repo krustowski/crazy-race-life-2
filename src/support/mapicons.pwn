@@ -141,6 +141,11 @@ public AddMapicons(playerid)
 			break;
 		}
 
+		if (pX == 0.0 && pY == 0.0)
+		{
+			continue;
+		}
+
 		SetPlayerMapIcon(playerid, mapiconid++, pX, pY, pZ, E_MAPICON_ID_SAVE_HOUSE, 0, MAPICON_LOCAL);
 	}
 

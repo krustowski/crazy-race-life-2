@@ -109,7 +109,9 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 	return 1; 
 }
 
-stock ShowAuthDialog(playerid)
+forward ShowAuthDialog(playerid);
+
+public ShowAuthDialog(playerid)
 {
 	new query[256];
 	new stringToPrint[128];

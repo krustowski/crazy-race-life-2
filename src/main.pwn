@@ -306,7 +306,8 @@ public OnPlayerConnect(playerid)
 
 	if (IsPlayerConnected(playerid)) 
 	{
-		ShowAuthDialog(playerid);
+		//ShowAuthDialog(playerid);
+		gPlayers[playerid][LoginTimer] = Timer: SetTimerEx("ShowAuthDialog", 2500, false, "i", playerid);
 	}
 
 	return 0;
@@ -501,6 +502,11 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 	if (gTrucking[playerid])
 	{
 		AbortTruckingMission(playerid);
+	}
+
+	if (gTaxiMission[playerid][Active])
+	{
+		AbortPlayerTaxiMission(playerid);
 	}
 
 	new raceid = CheckPlayerRaceState(playerid);
@@ -2618,7 +2624,7 @@ public OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 					return ShowTaxiMissionOptionsDialog(playerid);
 				}
 
-				if (gTeams[ gPlayers[playerid][TeamID] - 1 ][ID] == TEAM_MECHANICS)
+				if (gPlayers[playerid][TeamID] && gTeams[ gPlayers[playerid][TeamID] - 1 ][ID] == TEAM_MECHANICS)
 				{
 					for (new i = 0; i < MAX_PLAYERS; i++)
 					{

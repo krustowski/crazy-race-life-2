@@ -64,6 +64,7 @@ enum Player
 	Properties[MAX_PLAYER_PROPERTIES],
 
 	Timer: OnDeathGunsTimer[11],
+	Timer: LoginTimer,
 
 	TutorialStats[Tutorial],
 

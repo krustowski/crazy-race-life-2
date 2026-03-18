@@ -98,6 +98,7 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 #include "modules/combat.pwn"
 #include "modules/tutorial.pwn"
 #include "modules/bribe.pwn" 
+#include "modules/tow.pwn" 
 
 
 //
@@ -257,6 +258,10 @@ public OnPlayerConnect(playerid)
 	gPlayerMissions[playerid][DoneCount] = 0;
 	TextDrawHideForPlayer(playerid, gMissionInfoText[playerid]);
 
+	// Reset towing
+	gTowMission[playerid][TruckID] = INVALID_VEHICLE_ID;
+	gTowMission[playerid][Active] = false;
+
 	// Reset racing
 	gPlayerRaceTimer[playerid] = Timer: 0;
 	gPlayerRaceTime[playerid] = 0;
@@ -332,12 +337,15 @@ public OnPlayerDisconnect(playerid, reason)
 	KillTimer(_: gPlayerMissions[playerid][TimerElapsed]);
 	KillTimer(_: gPlayerMissions[playerid][TimerAttachedCheck]);
 
+	AbortTruckingMission(playerid);
 	AbortPlayerTaxiMission(playerid);
 	AbortCombatMission(playerid, false);
 
 	// Save player's data and set such player to unauthorized.
 	if (reason == 1)
+	{
 		SavePlayerData(playerid);
+	}
 
 	gPlayers[playerid][IsLogged] = false;
 
@@ -381,7 +389,9 @@ public OnPlayerRequestClass(playerid, classid)
 	SetPlayerCameraLookAt(playerid, 1966.1, 1936.1, 127.5);*/
 
 	if (!gPlayers[playerid][IsLogged])
+	{
 		return 0;
+	}
 
 	return 1;
 }
@@ -518,7 +528,7 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 
 	CreateDeathMoneyPickup(playerid);
 
-	if (IsPlayerConnected(killerid) && killerid != playerid && killerid != INVALID_PLAYER_ID) 
+	if (killerid != INVALID_PLAYER_ID && IsPlayerConnected(killerid) && killerid != playerid) 
 	{
 		// Adjust the wanted level
 		gPlayers[killerid][WantedLevel]++;
@@ -2622,6 +2632,11 @@ public OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 				if (IsPlayerInTaxiCab(playerid))
 				{
 					return ShowTaxiMissionOptionsDialog(playerid);
+				}
+
+				if (gTowMission[playerid][Active])
+				{
+					return OperateTowTruck(playerid);
 				}
 
 				if (gPlayers[playerid][TeamID] && gTeams[ gPlayers[playerid][TeamID] - 1 ][ID] == TEAM_MECHANICS)

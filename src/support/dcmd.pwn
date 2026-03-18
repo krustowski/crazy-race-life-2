@@ -47,6 +47,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(skydive, 7, cmdtext);        //all
 	dcmd(taxi, 4, cmdtext);           //all
 	dcmd(text, 4, cmdtext);           //all
+	dcmd(tow, 3, cmdtext);            //all
 	dcmd(truck, 5, cmdtext); 	  //all
 	dcmd(tut, 3, cmdtext);            //all
 	dcmd(unlock, 6, cmdtext);         //all
@@ -728,6 +729,12 @@ dcmd_text(playerid, const params[])
 	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
 
 	return 1;
+}
+
+dcmd_tow(playerid, const params[])
+{
+#pragma unused params
+	return ToggleTowMission(playerid);
 }
 
 dcmd_truck(playerid, const params[])

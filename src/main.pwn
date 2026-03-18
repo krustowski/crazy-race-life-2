@@ -14,10 +14,12 @@
 
  [ *** GameMode CRL2 *** ] 
 
+ *
+
  [ Created: 	Jan 2025 (Extends legacy GameMode CRL (2008-2010)) ]
  [ Credits: 	krusty, kompry, DRaGsTeR, amdulka ]
  [ Language: 	CZ, EN ]
- [ Version: 	0.8.z ]
+ [ Version: 	0.9.z ]
 
  *****************************************************************************************************************************************/
 
@@ -386,10 +388,13 @@ public OnPlayerRequestClass(playerid, classid)
 public OnPlayerRequestSpawn(playerid)
 {
 	if (!gPlayers[playerid][IsLogged])
+	{
 		return 0;
+	}
 
 	SpawnPlayer(playerid);
 
+	printf("Player %d requested spawn!", playerid);
 	return 1;
 }
 
@@ -406,7 +411,11 @@ public OnPlayerSpawn(playerid)
 		return 1;
 	}
 
-	SetPlayerHealth(playerid, 100.0);
+	if (!gPlayers[playerid][IsLogged])
+	{
+		return 1;
+	}
+
 	SetPlayerSkin(playerid, gPlayers[playerid][Skin]);
 
 	// Set the player back to the deathmatch area if is set in game.
@@ -475,7 +484,7 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 	// Hide velocity meters.
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
-	if (gDeathmatch[playerid][InGame] && playerid != killerid)
+	if (gDeathmatch[playerid][InGame] && playerid != killerid && killerid != INVALID_PLAYER_ID)
 	{
 		// Increment the killer's score.
 		gDeathmatch[killerid][Score]++;
@@ -503,7 +512,8 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 
 	CreateDeathMoneyPickup(playerid);
 
-	if (IsPlayerConnected(killerid) && killerid != playerid) {
+	if (IsPlayerConnected(killerid) && killerid != playerid && killerid != INVALID_PLAYER_ID) 
+	{
 		// Adjust the wanted level
 		gPlayers[killerid][WantedLevel]++;
 		SetPlayerWantedLevel(killerid, gPlayers[killerid][WantedLevel]);
@@ -523,11 +533,13 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 			SendClientMessageToAll(COLOR_RED, stringToPrint);
 
 			SpawnPlayer(killerid);
-			return PlayerPlaySound(killerid, 1056, 0, 0, 0);
+			PlayerPlaySound(killerid, 1056, 0, 0, 0);
 		}
 	}
 
-	return SpawnPlayer(playerid);
+	SetPlayerHealth(playerid, 100.0);
+	SpawnPlayer(playerid);
+	return 1;
 }
 
 public OnVehicleSpawn(vehicleid)
@@ -1578,7 +1590,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 									if ((doors && !alarm) || (doors && alarm && isowner))
 									{
-										SetVehicleParamsEx(vehicleid, true, false, false, false, false, false, false);
+										SetVehicleParamsEx(vehicleid, true, true, false, false, false, false, false);
 										SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ LOCK ] Your car is now unlocked and started up");
 									}
 									else

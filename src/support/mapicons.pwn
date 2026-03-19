@@ -116,6 +116,9 @@ public AddMapicons(playerid)
 	SetPlayerMapIcon(playerid, mapiconid++, 248.99, -294.65, 1.34, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
 	SetPlayerMapIcon(playerid, mapiconid++, -210.51, 2751.34, 62.20, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
 
+	// Tow mission point (modules/tow.pwn)
+	SetPlayerMapIcon(playerid, mapiconid++, DOCK_SF_X, DOCK_SF_Y, DOCK_SF_Z, E_MAPICON_ID_CAR_IMPOUND, 0, MAPICON_LOCAL);
+
 	// Real Estate
 
 	for (new i = 0; i < MAX_PROPERTIES; i++)

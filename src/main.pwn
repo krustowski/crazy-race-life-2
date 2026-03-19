@@ -262,6 +262,7 @@ public OnPlayerConnect(playerid)
 	// Reset towing
 	gTowMission[playerid][TruckID] = INVALID_VEHICLE_ID;
 	gTowMission[playerid][Active] = false;
+	TextDrawHideForPlayer(playerid, gTowMissionText[playerid]);
 
 	// Reset racing
 	gPlayerRaceTimer[playerid] = Timer: 0;
@@ -339,6 +340,7 @@ public OnPlayerDisconnect(playerid, reason)
 	KillTimer(_: gPlayerMissions[playerid][TimerAttachedCheck]);
 
 	AbortTruckingMission(playerid);
+	AbortTowMission(playerid);
 	AbortPlayerTaxiMission(playerid);
 	AbortCombatMission(playerid, false);
 

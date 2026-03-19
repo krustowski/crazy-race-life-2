@@ -102,32 +102,34 @@ public CheckPlayerTowTrailerAttached(playerid)
 	return 1;
 }
 
+stock AbortTowMission(playerid)
+{
+	gPlayers[playerid][InMinigame] = false;
+
+	gTowMission[playerid][TruckID] = INVALID_VEHICLE_ID;
+	gTowMission[playerid][Active] = false;
+	gTowMission[playerid][Earned] = 0;
+	gTowMission[playerid][TimeElapsed] = 0;
+	gTowMission[playerid][DoneCount] = 0;
+	gTowMission[playerid][CheckpointDisabled] = true;
+
+	KillTimer(gTowMission[playerid][TimerElapsed]);
+	KillTimer(gTowMission[playerid][TimerAttachedCheck]);
+
+	DisablePlayerRaceCheckpoint(playerid);
+	TextDrawHideForPlayer(playerid, gTowMissionText[playerid]);
+
+	SetVehicleParamsForPlayer(gTowMission[playerid][TruckID], playerid, false, false);
+	SetVehicleParamsForPlayer(gTowMission[playerid][TowedID], playerid, false, false);
+
+	return GameTextForPlayer(playerid, "~w~Tow Mission ~r~Aborted", 3000, 3); 
+}
 
 stock ToggleTowMission(playerid)
 {
 	if (gTowMission[playerid][Active])
 	{
-		gPlayers[playerid][InMinigame] = false;
-
-		gTowMission[playerid][TruckID] = INVALID_VEHICLE_ID;
-		gTowMission[playerid][Active] = false;
-		gTowMission[playerid][Earned] = 0;
-		gTowMission[playerid][TimeElapsed] = 0;
-		gTowMission[playerid][DoneCount] = 0;
-		gTowMission[playerid][CheckpointDisabled] = true;
-
-		KillTimer(gTowMission[playerid][TimerElapsed]);
-		KillTimer(gTowMission[playerid][TimerAttachedCheck]);
-
-		DisablePlayerRaceCheckpoint(playerid);
-		TextDrawHideForPlayer(playerid, gTowMissionText[playerid]);
-
-		SetVehicleParamsForPlayer(gTowMission[playerid][TruckID], playerid, false, false);
-		SetVehicleParamsForPlayer(gTowMission[playerid][TowedID], playerid, false, false);
-
-		GameTextForPlayer(playerid, "~w~Tow Mission ~r~Aborted", 3000, 3); 
-
-		return 1;
+		return AbortTowMission(playerid);
 	}
 
 	if (gPlayers[playerid][InMinigame])

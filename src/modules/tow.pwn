@@ -7,11 +7,15 @@
 //  tow.pwn
 //
 
+#define TYPE_MISSION_TOW	6
+
 #define VEHICLE_ID_TOW_TRUCK	525
 
-#define DOCK_SF_X	-1588.42
-#define DOCK_SF_Y	109.28
-#define DOCK_SF_Z	3.42
+#define MAX_VEHICLE_COUNT	211
+
+#define DOCK_SF_X		-1588.42
+#define DOCK_SF_Y		109.28
+#define DOCK_SF_Z		3.42
 
 enum TowMission
 {
@@ -19,6 +23,7 @@ enum TowMission
 	TruckID,
 	TowedID,
 
+	ModelCount,
 	DoneCount,
 	TimeElapsed,
 	Earned,
@@ -26,6 +31,8 @@ enum TowMission
 
 	TimerElapsed,
 	TimerAttachedCheck,
+
+	bool: Models[MAX_VEHICLE_COUNT],
 
 	bool: CheckpointDisabled
 }
@@ -49,7 +56,8 @@ public UpdateTowMissionText(playerid)
 			{}
 
 		default:
-			format(stringToPrint, sizeof(stringToPrint), "~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%2d", 
+			format(stringToPrint, sizeof(stringToPrint), "~w~Models:_~g~%d~n~~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%2d", 
+					gTowMission[playerid][ModelCount], 
 					gTowMission[playerid][DoneCount], 
 					gTowMission[playerid][Earned], 
 					floatround(floatround(gTowMission[playerid][TimeElapsed] / 1000) / 60), 
@@ -102,8 +110,27 @@ public CheckPlayerTowTrailerAttached(playerid)
 	return 1;
 }
 
+stock CheckVehicleModelTowed(playerid, modelid)
+{
+	if (modelid - 400 >= MAX_VEHICLE_COUNT)
+	{
+		return 0;
+	}
+
+	if (!gTowMission[playerid][Models][modelid - 400])
+	{
+		gTowMission[playerid][Models][modelid - 400] = true;
+		gTowMission[playerid][ModelCount]++;
+		return 1;
+	}
+
+	return 0;
+}
+
 stock AbortTowMission(playerid)
 {
+	SaveTowMissionScore(playerid);
+
 	gPlayers[playerid][InMinigame] = false;
 
 	gTowMission[playerid][TruckID] = INVALID_VEHICLE_ID;
@@ -111,7 +138,13 @@ stock AbortTowMission(playerid)
 	gTowMission[playerid][Earned] = 0;
 	gTowMission[playerid][TimeElapsed] = 0;
 	gTowMission[playerid][DoneCount] = 0;
+	gTowMission[playerid][ModelCount] = 0;
 	gTowMission[playerid][CheckpointDisabled] = true;
+
+	for (new i = 0; i < MAX_VEHICLE_COUNT; i++)
+	{
+		gTowMission[playerid][Models][i] = false;
+	}
 
 	KillTimer(gTowMission[playerid][TimerElapsed]);
 	KillTimer(gTowMission[playerid][TimerAttachedCheck]);
@@ -149,7 +182,13 @@ stock ToggleTowMission(playerid)
 	gTowMission[playerid][Earned] = 0;
 	gTowMission[playerid][TimeElapsed] = 0;
 	gTowMission[playerid][DoneCount] = 0;
+	gTowMission[playerid][ModelCount] = 0;
 	gTowMission[playerid][CheckpointDisabled] = true;
+
+	for (new i = 0; i < MAX_VEHICLE_COUNT; i++)
+	{
+		gTowMission[playerid][Models][i] = false;
+	}
 
 	gTowMission[playerid][TimerElapsed] = SetTimerEx("UpdateTowMissionText", 1000, true, "i", playerid);
 	gTowMission[playerid][TimerAttachedCheck] = SetTimerEx("CheckPlayerTowTrailerAttached", 1500, true, "i", playerid);
@@ -223,21 +262,30 @@ stock CheckTowMissionCheckpoint(playerid)
 
 	DisablePlayerRaceCheckpoint(playerid);
 
-	if (IsTrailerAttachedToVehicle(gTowMission[playerid][TruckID]))
+	if (!IsTrailerAttachedToVehicle(gTowMission[playerid][TruckID]))
 	{
-		DetachTrailerFromVehicle(gTowMission[playerid][TruckID]);
-		SetVehicleToRespawn(gTowMission[playerid][TowedID]);
+		return 0;
 	}
 
-	new commission, stringToPrint[128];
+	new commission = 0, stringToPrint[128];
+
+	if (CheckVehicleModelTowed(playerid, GetVehicleModel(gTowMission[playerid][TowedID])))
+	{
+		commission += 2500;
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TOW ] New vehicle model towed! A bonus to commission of $2500!");
+	}
+
+	DetachTrailerFromVehicle(gTowMission[playerid][TruckID]);
+	SetVehicleToRespawn(gTowMission[playerid][TowedID]);
+	gTowMission[playerid][TowedID] = INVALID_VEHICLE_ID;
 
 	if (!gTowMission[playerid][DoneCount])
 	{
-		commission = 5000 + (floatround(gTowMission[playerid][CommissionBonusWeight] * 1 * 5000));
+		commission += 5000 + (floatround(gTowMission[playerid][CommissionBonusWeight] * 1 * 5000));
 	}
 	else
 	{
-		commission = 5000 + (floatround(gTowMission[playerid][CommissionBonusWeight] * (random(gTowMission[playerid][DoneCount]) + 1) * 5000));
+		commission += 5000 + (floatround(gTowMission[playerid][CommissionBonusWeight] * (random(gTowMission[playerid][DoneCount]) + 1) * 5000));
 	}
 
 	GivePlayerMoney(playerid, commission);
@@ -245,9 +293,37 @@ stock CheckTowMissionCheckpoint(playerid)
 	gTowMission[playerid][TimeElapsed] = 0;
 	gTowMission[playerid][DoneCount] += 1;
 
-	format(stringToPrint, sizeof(stringToPrint), "[ TRUCK ] Mission completed! Commision earned: $%d", commission);
+	format(stringToPrint, sizeof(stringToPrint), "[ TOW ] Mission completed! Commision earned: $%d", commission);
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 
 	return 1;
 }
 
+stock SaveTowMissionScore(playerid)
+{
+	if (!gTowMission[playerid][DoneCount])
+	{
+		return 1;
+	}
+
+	new query[256];
+
+	format(query, sizeof(query), "INSERT INTO high_scores (type, spec_id, value, user_id) VALUES (%d, '%d', %d, %d)",
+			TYPE_MISSION_TOW,
+			gTowMission[playerid][ModelCount],
+			gTowMission[playerid][DoneCount],
+			gPlayers[playerid][OrmID]
+	      );
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot write tow high scores data!");
+		print(query);
+		return 0;
+	}
+
+	DB_FreeResultSet(result);
+
+	return 1;
+}

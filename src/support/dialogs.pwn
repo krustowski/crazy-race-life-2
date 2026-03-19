@@ -1190,6 +1190,39 @@ stock ShowHighScoresMissionsDialog(playerid)
 
 	DB_FreeResultSet(result);
 
+	// Towing
+
+	query = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 6 ORDER BY s.value DESC, s.rank";
+
+	result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for tow missions!");
+		print(query);
+		return 0;
+	}
+
+	i = 1;
+	format(stringToPrint, sizeof(stringToPrint), "%s\n\n\n{FFD700}Top 5 Tow Mission players{FFFFFF}\n", stringToPrint);
+
+	do
+	{
+		new nickname[MAX_PLAYER_NAME], done, models;
+
+		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+		models = DB_GetFieldIntByName(result, "spec_id");
+		done = DB_GetFieldIntByName(result, "value");
+
+		if (done)
+		{
+			format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}%3d{FFFFFF} ({00FF00}%d{FFFFFF} models)\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, done, models, nickname);
+			i++;
+		}
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
 	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_MISSIONS, DIALOG_STYLE_MSGBOX, "High Scores: Missions", stringToPrint, "Close", "");
 }
 

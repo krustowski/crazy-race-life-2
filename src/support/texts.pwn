@@ -40,8 +40,8 @@ public AddTexts(playerid)
 
 	gRaceInfoText[playerid] = TextDrawCreate(460.0, 400.0, "");
 	gMissionInfoText[playerid] = TextDrawCreate(460.0, 400.0, "");
-	gTowMissionText[playerid] = TextDrawCreate(460.0, 400.0, "");
-	gDeathmatchText[playerid] = TextDrawCreate(400.0, 400, "");
+	gTowMissionText[playerid] = TextDrawCreate(460.0, 380.0, "");
+	gDeathmatchText[playerid] = TextDrawCreate(400.0, 400.0, "");
 
 	TextDrawLetterSize(gRaceInfoText[playerid], 0.5, 1.5);
 	TextDrawFont(gRaceInfoText[playerid], t_TEXT_DRAW_FONT: 3);

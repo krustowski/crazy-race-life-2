@@ -157,7 +157,7 @@ stock CheckTruckingCheckpoint(playerid)
 	gPlayerMissions[playerid][TimeElapsed] = 0;
 	gPlayerMissions[playerid][DoneCount] += 1;
 
-	format(stringToPrint, sizeof(stringToPrint), "[ TRUCK ] Mission completed! Commision earned: $%d", provision);
+	format(stringToPrint, sizeof(stringToPrint), "[ TRUCK ] Mission completed! Commission earned: $%d", provision);
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 
 	if (!SetPlayerTruckingMission(playerid, gPlayerMissions[playerid][Type]))

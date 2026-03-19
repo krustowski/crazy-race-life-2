@@ -2324,6 +2324,7 @@ public OnPlayerLeaveCheckpoint(playerid)
 public OnPlayerEnterRaceCheckpoint(playerid)
 {
 	CheckRaceCheckpoint(playerid);
+	CheckTowMissionCheckpoint(playerid);
 	CheckTruckingCheckpoint(playerid);
 	CheckTaxiMissionCheckpoint(playerid);
 	CheckCombatCheckpoint(playerid);

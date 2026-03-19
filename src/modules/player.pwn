@@ -59,6 +59,7 @@ enum Player
 	bool: EditingMode,
 	bool: DialogShown,
 	bool: Listening,
+	bool: InMinigame,
 
 	Drugs[MAX_DRUG_TYPES],
 	Properties[MAX_PLAYER_PROPERTIES],

@@ -422,6 +422,11 @@ stock SetPlayerTaxiMission(playerid, areaid)
 		return AbortPlayerTaxiMission(playerid);
 	}
 
+	if (gPlayers[playerid][InMinigame])
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Another minigame started, close it to start the taxi mission!");
+	}
+
 	if (!IsPlayerInTaxiCab(playerid))
 	{
 		return SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Must be driving a taxi cab!");
@@ -432,6 +437,8 @@ stock SetPlayerTaxiMission(playerid, areaid)
 
 	gTaxiMission[playerid][NPCid] = -1;
 	SetTaxiMissionCustomer(playerid);
+
+	gPlayers[playerid][InMinigame] = true;
 
 	gTaxiMission[playerid][Active] = true;
 
@@ -468,6 +475,8 @@ stock AbortPlayerTaxiMission(playerid)
 	SetVehicleParamsForPlayer(gTaxiMission[playerid][VehicleID], playerid, false, false);
 
 	SaveTaxiMissionScore(playerid);
+
+	gPlayers[playerid][InMinigame] = false;
 
 	gTaxiMission[playerid][Active] = false;
 	gTaxiMission[playerid][NPCid] = -1;

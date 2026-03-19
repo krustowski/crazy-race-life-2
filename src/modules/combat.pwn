@@ -324,10 +324,17 @@ stock SetCombatMission(playerid, missionid)
 		return AbortCombatMission(playerid, false);
 	}
 
+	if (gPlayers[playerid][InMinigame])
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ COMBAT ] Another minigame started, close it to start the combat mission!");
+	}
+
 	if (!PrepareCombatInterior(playerid, missionid))
 	{
 		return SendClientMessage(playerid, COLOR_RED, "[ COMBAT ] Error setting new combat mission!");
 	}
+
+	gPlayers[playerid][InMinigame] = true;
 
 	gCombatMission[playerid][Active] = true;
 	gCombatMission[playerid][TimeElapsed] = 0;
@@ -420,6 +427,8 @@ stock AbortCombatMission(playerid, bool: success)
 	{
 		GameTextForPlayer(playerid, "~w~Combat Mission ~r~Aborted", 3000, 3); 
 	}
+
+	gPlayers[playerid][InMinigame] = false;
 
 	gCombatMission[playerid][Active] = false;
 	gCombatMission[playerid][TimeElapsed] = 0;

@@ -575,6 +575,8 @@ stock SaveTruckingMissionScore(playerid)
 
 stock AbortTruckingMission(playerid)
 {
+	gPlayers[playerid][InMinigame] = false;
+
 	gTrucking[playerid] = false;
 	DisablePlayerRaceCheckpoint(playerid);
 	TextDrawHideForPlayer(playerid, gMissionInfoText[playerid]);
@@ -622,6 +624,11 @@ stock IsPlayerInTruck(playerid)
 
 stock CheckPlayerForTruckingMission(playerid)
 {
+	if (gPlayers[playerid][InMinigame])
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] Another minigame started, close it to start the trucking mission!");
+	}
+
         if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
         {
                 return SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] You have to be in a truck as driver");
@@ -661,6 +668,8 @@ stock CheckPlayerForTruckingMission(playerid)
                         SendClientMessage(playerid, COLOR_RED, "[ TRUCK ] Error setting new mission");
                         return 1;
                 }
+
+		gPlayers[playerid][InMinigame] = true;
 
                 gTrucking[playerid] = true;
 

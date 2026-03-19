@@ -244,6 +244,7 @@ public OnPlayerConnect(playerid)
 	gPlayers[playerid][IsLogged] = false;
 	gPlayers[playerid][TeamID] = 0;
 
+	gPlayers[playerid][InMinigame] = false;
 	gPlayers[playerid][SwitchedControllers] = false;
 
 	// Reset the deathmatch states.

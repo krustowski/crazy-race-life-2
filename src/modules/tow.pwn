@@ -107,6 +107,8 @@ stock ToggleTowMission(playerid)
 {
 	if (gTowMission[playerid][Active])
 	{
+		gPlayers[playerid][InMinigame] = false;
+
 		gTowMission[playerid][TruckID] = INVALID_VEHICLE_ID;
 		gTowMission[playerid][Active] = false;
 		gTowMission[playerid][Earned] = 0;
@@ -127,12 +129,18 @@ stock ToggleTowMission(playerid)
 
 		return 1;
 	}
+
+	if (gPlayers[playerid][InMinigame])
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ TOW ] Another minigame started, close it to start the towing mission!");
+	}
 	
 	if (!IsPlayerInAnyVehicle(playerid) || GetVehicleModel(GetPlayerVehicleID(playerid)) != VEHICLE_ID_TOW_TRUCK)
 	{
-		SendClientMessage(playerid, COLOR_RED, "[ TOW ] You must be driving the Tow Truck!");
-		return 1;
+		return SendClientMessage(playerid, COLOR_RED, "[ TOW ] You must be driving the Tow Truck!");
 	}
+
+	gPlayers[playerid][InMinigame] = true;
 
 	gTowMission[playerid][TruckID] = GetPlayerVehicleID(playerid);
 	gTowMission[playerid][Active] = true;

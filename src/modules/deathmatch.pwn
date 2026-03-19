@@ -298,8 +298,15 @@ stock RegisterToDeathmatch(playerid)
 		return SendClientMessage(playerid, COLOR_GREY, "[ DEATHMATCH ] The game already started, try again later!");
 	}
 
+	if (gPlayers[playerid][InMinigame])
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ DEATHMATCH ] Another minigame started, close it to start the deathmatch minigame!");
+	}
+
 	gDeathmatch[playerid][Score] = 0;
 	gDeathmatch[playerid][IsRegistered] = true;
+
+	gPlayers[playerid][InMinigame] = true;
 
 	SetPlayerPos(playerid, -1365.1, -2307.0, 39.1);
 	TogglePlayerControllable(playerid, false);
@@ -335,6 +342,8 @@ stock LeaveDeathmatch(playerid)
 
 		gDeathmatch[playerid][IsRegistered] = false;
 		gDeathmatch[playerid][InGame] = false;
+
+		gPlayers[playerid][InMinigame] = false;
 
 		TogglePlayerControllable(playerid, true);
 		ResetPlayerWeapons(playerid);

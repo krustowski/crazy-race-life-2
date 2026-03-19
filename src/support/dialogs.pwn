@@ -1192,7 +1192,7 @@ stock ShowHighScoresMissionsDialog(playerid)
 
 	// Towing
 
-	query = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 6 ORDER BY s.value DESC, s.rank";
+	query = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 6 ORDER BY s.spec_id DESC, s.rank";
 
 	result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)

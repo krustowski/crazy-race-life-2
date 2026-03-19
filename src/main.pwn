@@ -261,6 +261,7 @@ public OnPlayerConnect(playerid)
 
 	// Reset towing
 	gTowMission[playerid][TruckID] = INVALID_VEHICLE_ID;
+	gTowMission[playerid][TowedID] = INVALID_VEHICLE_ID;
 	gTowMission[playerid][Active] = false;
 	TextDrawHideForPlayer(playerid, gTowMissionText[playerid]);
 

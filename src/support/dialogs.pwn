@@ -355,7 +355,7 @@ stock ShowPropertyOptionsDialog(playerid)
 	new propertyName[64];
         format(propertyName, sizeof(propertyName), "%s", gProperties[ GetPropertyArrayIDfromID( gPlayers[playerid][Temp] ) ][Label]);
 
-	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_OPTIONS, DIALOG_STYLE_LIST, propertyName, "Set spawn point\nAttach new vehicle\nSell property", "Select", "Cancel");
+	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_OPTIONS, DIALOG_STYLE_LIST, propertyName, "Set spawn point\nAttach new vehicle\nRespawn attached vehicle\nSell property", "Select", "Cancel");
 }
 
 stock ShowBankOptionsDialog(playerid)

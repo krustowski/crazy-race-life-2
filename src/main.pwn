@@ -1073,8 +1073,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							AttachVehicleToProperty(playerid, propertyid);
 						}
-						// Property selling
+						// Respawn attached car
 					case 2: 
+						{
+							RespawnPropertyVehicle(playerid, propertyid);
+						}
+						// Property selling
+					case 3: 
 						{
 							SellPlayerProperty(playerid, propertyid);
 						}

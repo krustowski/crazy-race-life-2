@@ -1729,6 +1729,25 @@ stock CheckRealEstatePickup(playerid, pickupid)
 	return 1;
 }
 
+stock RespawnPropertyVehicle(playerid, propertyid)
+{
+	if (!IsPlayerOwner(playerid, propertyid))
+	{
+		return 0;
+	}
+
+	new arrayid = GetPropertyArrayIDfromID(propertyid);
+	new vehicleid = gProperties[arrayid][Vehicle][ID];
+
+	if (vehicleid)
+	{
+		SetVehicleToRespawn(vehicleid);
+		SendClientMessage(playerid, COLOR_YELLOW, "[ REAL ] Attached vehicle set to respawn!");
+	}
+
+	return 1;
+}
+
 stock AttachVehicleToProperty(playerid, propertyid)
 {
 	if (!IsPlayerOwner(playerid, propertyid))

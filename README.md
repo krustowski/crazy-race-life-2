@@ -13,7 +13,7 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
     + At least one ATM per city/town/village
 + Combat Missions (experimental)
     + Business robbery with numerous NPC shooters
-    + Briefcase picking for money exchange ($0.5M per Briefcase) at the mission end
+    + Briefcase picking for money exchange ($50k per a Briefcase) at the mission end
 + Deathmatch Minigame
     + Custom arena in the woods
     + "Legal" player killing, no wanted level added per kill
@@ -41,6 +41,10 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
     + Randomized customer locations and targets
     + Increased commissions for the taxi rides with done count
     + Areas of operation: LV, SF, LS, or whole map
++ Tow Missions 
+    + Car impound service
+    + Bonus for a new vehicle model (per mission)
+    + Increased commission for the tow mission count and distance from SF Docks
 + Teams
     + Custom salary per team 
     + Special commands available
@@ -50,6 +54,9 @@ A GTA SA:MP/openMP gamemode scripted in the pawn lang.
     + 15+ trucking points (petrol stations etc)
     + Custom missions
     + Weighted commission/bonus per done mission/delivery
++ Tutorial (experimental)
+    + A vademecum subsystem for new players
+    + Work in progress
 
 
 ## Preview
@@ -193,44 +200,56 @@ The examples above are shown respectively to the config file names mentioned.
 	/search     --- special command for Policemen
 	/skydive    --- enables to skydive from random locations
 	/taxi       --- starts a Taxi mission
+	/tow        --- starts a Tow mission
 	/text       --- sends a public message to other player
 	/truck      --- enables/disables the Trucking missions
+	/tut        --- shows the tutorial statistics
 	/unlock     --- unlocks the player's vehicle
 	/wanted     --- shows the wanted list of online players
 ```
 
 ### Admin Command List
 
+#### Level 1
 ```
-	/acmd       --- (lvl 1) lists admin commands per level
-	/admincol   --- (lvl 1) changes the player color according 
-	/clear      --- (lvl 1) flushes the chat
-	/flip       --- (lvl 1) flips the player's car
-	/hp         --- (lvl 1) sets the 100 HP + armour to player
-	/nitro      --- (lvl 1) sets the nitrous level to player
+	/acmd       --- lists admin commands per level
+	/admincol   --- changes the player color according 
+	/clear      --- flushes the chat
+	/flip       --- flips and repairs a player's car
+	/hp         --- sets the 100 HP + armour to player
+	/nitro      --- sets the nitrous level to player
+```
 
-	/cam        --- (lvl 2) lists subcommands for camera view
-	/countdown  --- (lvl 2) sets the seconds to start the countdown
-	/get        --- (lvl 2) warps the player to admin   
-	/goto       --- (lvl 2) warps the admin to player
-	/skin       --- (lvl 2) sets the skin for player
+#### Level 2
+```
+	/cam        --- lists subcommands for camera view
+	/countdown  --- sets the seconds to start the countdown
+	/get        --- warps the player to admin   
+	/goto       --- warps the admin to player
+	/skin       --- sets the skin for player
+```
 
-	/crime      --- (lvl 3) plays the crime sound (Police T-Code), experimental
-	/drunk      --- (lvl 3) sets the drunk level to a player
-	/elevator   --- (lvl 3) operates the Admin elevator
-	/kick       --- (lvl 3) kicks the player from server
-	/packet     --- (lvl 3) prints the packet loss per player
-	/reset      --- (lvl 3) resets cash for a player
-	/spectate   --- (lvl 3) sets the spectate mode on a player
-	/vehicle    --- (lvl 3) spawns a vehicle by ID
-	/weapon     --- (lvl 3) sets a vehicle to a player
-	/weapons    --- (lvl 3) sets the weapons pack to player
+#### Level 3
+```
+	/crime      --- plays the crime sound (Police T-Code), experimental
+	/drunk      --- sets the drunk level to a player
+	/elevator   --- operates the Admin elevator
+	/kick       --- kicks the player from server
+	/packet     --- prints the packet loss per player
+	/reset      --- resets cash for a player
+	/spectate   --- sets the spectate mode on a player
+	/vehicle    --- spawns a vehicle by ID
+	/weapon     --- sets a vehicle to a player
+	/weapons    --- sets the weapons pack to player
+```
 
-	/ban        --- (lvl 4) bans the player (via IP)
-	/edit       --- (lvl 4) shows a dialog window with all common editors
-	/fakechat   --- (lvl 4) sends the fake chat as a player
-	/lvl        --- (lvl 4) sets the Admin level to player
-	/restart    --- (lvl 4) sets the countdown for 60 seconds to restart the server
+#### Level 4
+```
+	/ban        --- bans the player (via IP)
+	/edit       --- shows a dialog window with all common editors
+	/fakechat   --- sends the fake chat as a player
+	/lvl        --- sets the Admin level to player
+	/restart    --- sets the countdown for 60 seconds to restart the server
 ```
 
 ### Real Estate

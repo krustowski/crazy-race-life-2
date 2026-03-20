@@ -40,8 +40,9 @@ public InitVehicles()
 	// Tram SF 
 	AddStaticVehicle(449, -2006.57, 150.48, 27.10, 334.54, -1, -1);
 
-	// Tow truck SF docks
-	AddStaticVehicle(525, -1638.71, 63.78, 3.43, 347.18, -1, -1);
+	// Tow truck SF docks and Wang Cars
+	AddStaticVehicle(525, -1638.71, 63.78, 3.43, 131.83, -1, -1);
+	AddStaticVehicle(525, -1912.96, 304.25, 40.92, 179.81, -1, -1);
 
 	// Bayside boat race 
 	AddStaticVehicle(452, -2227.32, 2402.30, 0.00, 42.27, -1, -1);

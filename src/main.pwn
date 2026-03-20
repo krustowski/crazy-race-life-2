@@ -567,18 +567,27 @@ public OnVehicleSpawn(vehicleid)
 	for (new i = 0; i < sizeof(gProperties); i++)
 	{
 		if (gProperties[i][Vehicle][ID] != vehicleid)
+		{
 			continue;
+		}
 
 		if (gProperties[i][Vehicle][Colours][0])
+		{
 			ChangeVehicleColours(gProperties[i][Vehicle][ID], gProperties[i][Vehicle][Colours][0], gProperties[i][Vehicle][Colours][1]);
+		}
 
 		for (new j = 0; j < 16; j++)
 		{
 			if (gProperties[i][Vehicle][Components][j])
+			{
 				AddVehicleComponent(gProperties[i][Vehicle][ID], gProperties[i][Vehicle][Components][j]);
+			}
 		}
 
 		ChangeVehiclePaintjob(gProperties[i][Vehicle][ID], gProperties[i][Vehicle][Paintjob]);
+
+		// Lock the vehicle for everyone
+		SetVehicleParamsEx(vehicleid, false, false, false, true, false, false, false);
 	}
 
 	SetVehicleNumberPlate(vehicleid, VEHICLE_PLATE);

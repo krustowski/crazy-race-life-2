@@ -436,6 +436,9 @@ stock SpawnProperty(propertyId)
 						}
 
 						ChangeVehiclePaintjob(gProperties[propertyId][Vehicle][ID], gProperties[propertyId][Vehicle][Paintjob]);
+						
+						// Lock the vehicle for everyone
+						SetVehicleParamsEx(gProperties[propertyId][Vehicle][ID], false, false, false, true, false, false, false);
 					}
 				}
 			case OFFER_POINT:
@@ -1742,6 +1745,10 @@ stock RespawnPropertyVehicle(playerid, propertyid)
 	if (vehicleid)
 	{
 		SetVehicleToRespawn(vehicleid);
+
+		// Lock the vehicle for everyone
+		SetVehicleParamsEx(vehicleid, false, false, false, true, false, false, false);
+		
 		SendClientMessage(playerid, COLOR_YELLOW, "[ REAL ] Attached vehicle set to respawn!");
 	}
 

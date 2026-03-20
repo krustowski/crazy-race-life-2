@@ -42,13 +42,17 @@ enum PlayerLocale
 enum 
 {
 	I18N_WELCOME_MESSAGE,
+	I18N_NO_SUCH_COMMAND,
+	// User Ddata load
 	I18N_USER_DATA_LOAD,
 	I18N_USER_DATA_LOAD_SUCCESS,
+	// Autosave
 	I18N_AUTOSAVE_START,
 	I18N_AUTOSAVE_SUCCESS,
+	// Private messages
 	I18N_PRIV_MSG_MONEY,
 	I18N_PRIV_MSG_NO_PLAYER,
-	//
+	// Racing
 	I18N_RACE_WARP_NO_RACE,
 	I18N_RACE_WARP_AFTER_START,
 	I18N_RACE_WARP_NO_VEHIC_DRIVER,
@@ -58,13 +62,11 @@ enum
 	I18N_RACE_NO_SUCH_RACE,
 	I18N_RACE_ALREADY_JOINED,
 	I18N_RACE_NO_MONEY,
-	//
+	// Deathmatch
 	I18N_DEATHMATCH_STARTED,
-	//
-	I18N_NO_SUCH_COMMAND,
-	//
+	// Player
 	I18N_DEATH_MONEY_LOCALITY,
-	//
+	// Real estate
 	I18N_REAL_VEHMOD_SAVED,
 	I18N_REAL_INVALID_CODE,
 	I18N_REAL_SELL_PICKUP_MISLOC,
@@ -81,6 +83,7 @@ enum
 new gI18nMessageColor[] = 
 {
 	COLOR_GREEN,
+	COLOR_GREY,
 	// User data load
 	COLOR_YELLOW,
 	COLOR_GREEN,
@@ -100,11 +103,9 @@ new gI18nMessageColor[] =
 	COLOR_RED,
 	COLOR_YELLOW,
 	COLOR_RED,
-	//
+	// Deathmatch
 	COLOR_YELLOW,
-	//
-	COLOR_GREY,
-	//
+	// Player
 	COLOR_YELLOW,
 	// Real estate
 	COLOR_LIGHTGREEN,
@@ -120,72 +121,128 @@ new gI18nMessageColor[] =
 	COLOR_LIGHTGREEN
 };
 
-new gI18nMessageEn[][] = 
+new gI18nMessages[][PlayerLocale][] = 
 {
-	"Welcome to the gamemode CrazyRaceLife2! /help",
-	"[ DATA ] Loading user data...",
-	"[ DATA ] Data loaded successfully!",
-	"[ AUTOSAVE ] Saving user and system data... ",
-	"[ AUTOSAVE ] Data saved successfully! ",
-	"[ PM ] You need at least $10 to send a private message!",
-	"[ PM ] Such user (ID) not found in the game!",
-	"[ WARP ] You need to join a race to be able to use warp command!",
-	"[ WARP ] The race has already started, no warp allowed anymore!",
-	"[ WARP ] You need drive a vehicle before the warp to the race start!",
-	"[ RACE ] The race ended prematurely!",
-	"[ RACE ] You have just finished the race!",
-	"[ RACE ] You need to join a race to use such feature!",
-	"[ RACE ] No such race prepared to join!",
-	"[ RACE ] You have already joined the race!",
-	"[ RACE ] You haven't got enough moeny to join such race!",
-	"[ DEATHMATCH ] New match just started!",
-	"[ CMD ] No such command! /cmd /help /rules",
-	"[ CASH ] You dropped your money at the death position!",
-	"[ REAL ] Vehicle modifications saved",
-	"[ REAL ] Invalid property code entered!",
-	"[ REAL ] Use the red property pickup to sell such property!",
-	"[ REAL ] Such property is not for sell, or is not occupied at all!",
-	"[ REAL ] Such property is not owned by you!",
-	"[ REAL ] You have just bought such property!",
-	"[ REAL ] Interior generation failed!",
-	"[ REAL ] No free slot to buy such property! You need to sell one to be able to buy another",
-	"[ REAL ] Such property is already occupied! Invalid action",
-	"[ REAL ] You haven't got enough money to buy such property!",
-	"[ REAL ] The property has been sold successfully!"
-};
-
-new gI18nMessageCz[][] = 
-{
-	"Vitej ve hre! /help",
-	"[ DATA ] Nacitam ulozena uzivatelska data...",
-	"[ DATA ] Data uspesne nactena!",
-	"[ AUTOSAVE ] Ukladam uzivatelska a systemova data...",
-	"[ AUTOSAVE ] Data uspesne ulozena!",
-	"[ PM ] K odeslani soukrome zpravy potrebujes alespon $10!",
-	"[ PM ] Prijemce soukrome zpravy neni pritomen na serveru!",
-	"[ WARP ] Nejsi prihlasen v zadnem zavode, warp se nekona!",
-	"[ WARP ] Zavod jiz zacal, warp na start uz neni mozny!",
-	"[ WARP ] Pro warp je treba byt ve vozidle a byt ridicem!",
-	"[ ZAVOD ] Zavod, ve kterem jsi byl prihlasen, byl predcasne ukoncen!",
-	"[ ZAVOD ] Dokoncil jsi zavod!",
-	"[ ZAVOD ] Nejsi prihlasen v zadnem zavodu!",
-	"[ ZAVOD ] Dany zavod neni pripraven nebo neexistuje!",
-	"[ ZAVOD ] Do daneho zavodu jsi jiz prihlasen!",
-	"[ ZAVOD ] Nemas dostatek hotovosti pro zaplaceni prihlasky do zavodu!",
-	"[ DEATHMATCH ] Utkani zacalo! 4 minuty do konce",
-	"[ CMD ] Tento prikaz neexistuje! /cmd /help /rules",
-	"[ CASH ] Tve penize zustaly na miste umrti!",
-	"[ REAL ] Modifikace auta ulozeny k zaparkovanemu autu",
-	"[ REAL ] Neplatny kod nemovitosti!",
-	"[ REAL ] Je treba byt v okoli puvodniho pickupu (nyni rotujici cerveny domek)!",
-	"[ REAL ] Nelze prodat nemovitost, ktera neni prodana/obsazena.",
-	"[ REAL ] Dana nemovitost ti nepatri!",
-	"[ REAL ] Nemovitost uspesne zakoupena!",
-	"[ REAL ] Nebylo mozne vygenerovat vsechny pickupy v dome!",
-	"[ REAL ] Jiz vlastnis limitni pocet nemocitosti, je treba nejakou prodat, abys mohl nakoupit novou",
-	"[ REAL ] Tato nemovitost je jiz obsazena. Neplatna akce!",
-	"[ REAL ] Na danou transakci nemas dostatek hotovosti!",
-	"[ REAL ] Nemovitost byla uspesne prodana!"
+	{
+		"Welcome to the gamemode CrazyRaceLife2! /help",
+		"Vitej ve hre! /help"
+	},
+	{
+		"[ CMD ] No such command! /cmd /help /rules",
+		"[ CMD ] Tento prikaz neexistuje! /cmd /help /rules"
+	},
+	{
+		"[ DATA ] Loading user data...",
+		"[ DATA ] Nacitam ulozena uzivatelska data..."
+	},
+	{
+		"[ DATA ] Data loaded successfully!",
+		"[ DATA ] Data uspesne nactena!"
+	},
+	{
+		"[ AUTOSAVE ] Saving user and system data... ",
+		"[ AUTOSAVE ] Ukladam uzivatelska a systemova data..."
+	},
+	{
+		"[ AUTOSAVE ] Data saved successfully! ",
+		"[ AUTOSAVE ] Data uspesne ulozena!"
+	},
+	{
+		"[ PM ] You need at least $10 to send a private message!",
+		"[ PM ] K odeslani soukrome zpravy potrebujes alespon $10!"
+	},
+	{
+		"[ PM ] Such user (ID) not found in the game!",
+		"[ PM ] Prijemce soukrome zpravy neni pritomen na serveru!"
+	},
+	{
+		"[ WARP ] You need to join a race to be able to use warp command!",
+		"[ WARP ] Nejsi prihlasen v zadnem zavode, warp se nekona!"
+	},
+	{
+		"[ WARP ] The race has already started, no warp allowed anymore!",
+		"[ WARP ] Zavod jiz zacal, warp na start uz neni mozny!"
+	},
+	{
+		"[ WARP ] You need drive a vehicle before the warp to the race start!",
+		"[ WARP ] Pro warp je treba byt ve vozidle a byt ridicem!"
+	},
+	{
+		"[ RACE ] The race ended prematurely!",
+		"[ ZAVOD ] Zavod, ve kterem jsi byl prihlasen, byl predcasne ukoncen!"
+	},
+	{
+		"[ RACE ] You have just finished the race!",
+		"[ ZAVOD ] Dokoncil jsi zavod!"
+	},
+	{
+		"[ RACE ] You need to join a race to use such feature!",
+		"[ ZAVOD ] Nejsi prihlasen v zadnem zavodu!"
+	},
+	{
+		"[ RACE ] No such race prepared to join!",
+		"[ ZAVOD ] Dany zavod neni pripraven nebo neexistuje!"
+	},
+	{
+		"[ RACE ] You have already joined the race!",
+		"[ ZAVOD ] Do daneho zavodu jsi jiz prihlasen!"
+	},
+	{
+		"[ RACE ] You haven't got enough moeny to join such race!",
+		"[ ZAVOD ] Nemas dostatek hotovosti pro zaplaceni prihlasky do zavodu!"
+	},
+	{
+		"[ DEATHMATCH ] New match just started!",
+		"[ DEATHMATCH ] Utkani zacalo! 4 minuty do konce"
+	},
+	{
+		"[ CASH ] You dropped your money at the death position!",
+		"[ CASH ] Tve penize zustaly na miste umrti!"
+	},
+	{
+		"[ REAL ] Vehicle modifications saved",
+		"[ REAL ] Modifikace auta ulozeny k zaparkovanemu autu"
+	},
+	{
+		"[ REAL ] Invalid property code entered!",
+		"[ REAL ] Neplatny kod nemovitosti!"
+	},
+	{
+		"[ REAL ] Use the red property pickup to sell such property!",
+		"[ REAL ] Je treba byt v okoli puvodniho pickupu (nyni rotujici cerveny domek)!"
+	},
+	{
+		"[ REAL ] Such property is not for sell, or is not occupied at all!",
+		"[ REAL ] Nelze prodat nemovitost, ktera neni prodana/obsazena."
+	},
+	{
+		"[ REAL ] Such property is not owned by you!",
+		"[ REAL ] Dana nemovitost ti nepatri!"
+	},
+	{
+		"[ REAL ] You have just bought such property!",
+		"[ REAL ] Nemovitost uspesne zakoupena!"
+	},
+	{
+		"[ REAL ] Interior generation failed!",
+		"[ REAL ] Nebylo mozne vygenerovat vsechny pickupy v dome!"
+	},
+	{
+		"[ REAL ] No free slot to buy such property! You need to sell one to be able to buy another",
+		"[ REAL ] Jiz vlastnis limitni pocet nemocitosti, je treba nejakou prodat, abys mohl nakoupit novou"
+	},
+	{
+		"[ REAL ] Such property is already occupied! Invalid action",
+		"[ REAL ] Tato nemovitost je jiz obsazena. Neplatna akce!"
+	},
+	{
+		"[ REAL ] You haven't got enough money to buy such property!",
+		"[ REAL ] Na danou transakci nemas dostatek hotovosti!"
+	},
+	{
+		"[ REAL ] The property has been sold successfully!",
+		"[ REAL ] Nemovitost byla uspesne prodana!"
+	}
 };
 
 
@@ -199,13 +256,5 @@ forward SendClientMessageLocalized(playerid, msg_id);
 
 public SendClientMessageLocalized(playerid, msg_id)
 {
-	switch (gPlayers[playerid][Locale])
-	{
-		case LOCALE_CZ:
-			SendClientMessage(playerid, gI18nMessageColor[msg_id], gI18nMessageCz[msg_id]);
-		default:
-			SendClientMessage(playerid, gI18nMessageColor[msg_id], gI18nMessageEn[msg_id]);
-	}
-
-	return 1;
+	return SendClientMessage(playerid, gI18nMessageColor[msg_id], gI18nMessages[msg_id][ gPlayers[playerid][Locale] ]);
 }

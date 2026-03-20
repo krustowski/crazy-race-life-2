@@ -122,7 +122,7 @@ public ShowAuthDialog(playerid)
 
 	if (DB_GetRowCount(result)) {
 		DB_FreeResultSet(result);
-		format(stringToPrint, sizeof(stringToPrint), "Player (%s) has already registered their account. Log-in using your password:", gPlayers[playerid][Name]);
+		format(stringToPrint, sizeof(stringToPrint), "{FFD700}Login{FFFFFF}\n\nPlayer (%s) has already registered their account. Log-in using your password:", gPlayers[playerid][Name]);
 
 		ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", stringToPrint, "Log-in", "Cancel");
 
@@ -132,7 +132,7 @@ public ShowAuthDialog(playerid)
 	else 
 	{
 		DB_FreeResultSet(result);
-		format(stringToPrint, sizeof(stringToPrint), "Welcome %s! Register your account by entering a password:", gPlayers[playerid][Name]);
+		format(stringToPrint, sizeof(stringToPrint), "{FFD700}Register{FFFFFF}\n\nWelcome %s! Register your account by entering a password:", gPlayers[playerid][Name]);
 
 		ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registeration", stringToPrint, "Register", "Cancel");
 	}

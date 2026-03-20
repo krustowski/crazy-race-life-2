@@ -48,7 +48,7 @@ enum Player
 	WantedLevel,
 	SpawnPoint,
 
-	Locale[PlayerLocale],
+	PlayerLocale: Locale,
 
 	bool: IsLogged,
 	bool: AFK,
@@ -140,6 +140,7 @@ public LoadPlayerData(playerid)
 		gPlayers[playerid][Armour] = DB_GetFieldIntByName(result, "armour");
 		gPlayers[playerid][SpawnPoint] = DB_GetFieldIntByName(result, "spawn");
 		DB_GetFieldStringByName(result, "properties", propertiesString, sizeof(propertiesString));
+		gPlayers[playerid][Locale] = PlayerLocale: DB_GetFieldIntByName(result, "locale");
 
 		ExtractPropperties(propertiesString, properties);
 		gPlayers[playerid][Properties] = properties;
@@ -264,7 +265,7 @@ public SavePlayerData(playerid)
 
 		new query[1024];
 
-		format(query, sizeof(query), "UPDATE users SET cash = %d, bank = %d, adminlvl = %d, wanted = %d, team = %d, class = %d, health = %d, armour = %d, spawn = %d, properties = '%s' WHERE nickname = '%s';", 
+		format(query, sizeof(query), "UPDATE users SET cash = %d, bank = %d, adminlvl = %d, wanted = %d, team = %d, class = %d, health = %d, armour = %d, spawn = %d, properties = '%s', locale = %d WHERE nickname = '%s';", 
 				GetPlayerMoney(playerid), 
 				gPlayers[playerid][Bank], 
 				gPlayers[playerid][AdminLevel], 
@@ -275,6 +276,7 @@ public SavePlayerData(playerid)
 				floatround(armour), 
 				gPlayers[playerid][SpawnPoint], 
 				propertiesString, 
+				_: gPlayers[playerid][Locale],
 				gPlayers[playerid][Name]
 		);
 

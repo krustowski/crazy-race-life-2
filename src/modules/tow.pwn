@@ -103,7 +103,7 @@ public CheckPlayerTowTrailerAttached(playerid)
 		return 1;
 	}
 
-	//SetVehicleParamsForPlayer(trailerid, playerid, true, false);
+	SetVehicleParamsForPlayer(vehicleid, playerid, false, false);
 
 	//GameTextForPlayer(playerid, "~w~Trailer ~r~Detached! ~w~Reattach to continue!", 1000, 3); 
 

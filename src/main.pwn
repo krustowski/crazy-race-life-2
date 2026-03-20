@@ -1735,21 +1735,25 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 					case 5:
 						{
-							return ShowTruckingHelpDialog(playerid);
+							return ShowTowHelpDialog(playerid);
 						}
 					case 6:
 						{
-							return ShowCombatHelpDialog(playerid);
+							return ShowTruckingHelpDialog(playerid);
 						}
 					case 7:
 						{
-							return ShowPropertyHelpDialog(playerid);
+							return ShowCombatHelpDialog(playerid);
 						}
 					case 8:
 						{
-							return ShowRaceHelpDialog(playerid);
+							return ShowPropertyHelpDialog(playerid);
 						}
 					case 9:
+						{
+							return ShowRaceHelpDialog(playerid);
+						}
+					case 10:
 						{
 							return ShowPrizesInfoDialog(playerid);
 						}

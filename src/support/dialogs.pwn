@@ -72,6 +72,7 @@ enum
 	DIALOG_CREDITS,
 	DIALOG_WANTED_LIST,
 	DIALOG_TAXI_HELP,
+	DIALOG_TOW_HELP,
 	DIALOG_TRUCKING_HELP,
 	DIALOG_COMBAT_HELP,
 	DIALOG_PROPERTY_HELP,
@@ -207,7 +208,7 @@ stock ShowCommonCommandsDialog(playerid)
 {
 	new stringToPrint[2048];
 
-	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Common Commands{FFFFFF}\n\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Common Commands{FFFFFF}\n\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
     			"/acc\t\t\tgame account info dump\n",
 			"/admins\t\t\tlists admins online\n",
 			"/afk\t\t\t(un)sets the Away-From-Keyboard state\n",
@@ -240,7 +241,10 @@ stock ShowCommonCommandsDialog(playerid)
 			"/skydive\t\tenables to skydive from random locations\n",
 			"/text ID TEXT\t\tsends a public message to other player\n",
 			"/taxi\t\t\tstarts a Taxi mission\n",
+			"/tow\t\t\tstarts a Tow mission\n",
 			"/truck\t\t\tenables/disables the Trucking missions\n",
+
+			"/tut\t\t\tshows the tutorial statistics\n",
 			"/unlock\t\t\tunlocks the player's vehicle\n",
 			//
 			"\n{FFD700}Special Team-related Commands{FFFFFF}\n\n",
@@ -747,12 +751,13 @@ stock ShowPlayerAccountDialog(playerid)
 stock ShowServerHelpListDialog(playerid)
 {
 	new stringToPrint[512];
-	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
 			"Show Player Commands",
 			"Show Admin Commands",
 			"Show Server Rules",
 			"Show Gamemode Credits",
 			"Taxi Missions Info",
+			"Tow Mission Info",
 			"Trucking Missions Info",
 			"Combat Missions Info",
 			"Properties Info",
@@ -1017,6 +1022,13 @@ stock ShowTaxiHelpDialog(playerid)
 	new stringToPrint[1024] = "{FFD700}Taxi Missions{FFFFFF}\n\nA mission can be invoked using the {FFD700}/taxi{FFFFFF} command.\nFor the mission to start, player needs to be in any taxi cab.\nThese vehicles are located at train stations and at airports all across the map.\n\n{FFD700}Commissions{FFFFFF}\n\nA commission is calculated using the done missions count and using a special distance coefficient:\nthe more missions driven and the more distance between a start and destination point, the more the commission.";
 
 	return ShowPlayerDialog(playerid, DIALOG_TAXI_HELP, DIALOG_STYLE_MSGBOX, "Taxi Missions", stringToPrint, "Close", "");
+}
+
+stock ShowTowHelpDialog(playerid)
+{
+	new stringToPrint[1024] = "{FFD700}Tow Missions{FFFFFF}\n\nFor a mission to be started, a player needs to be driving any tow truck.\nThese vehicles are located at SF docks, where the car impound checkpoint is located too. A mission is started using the {FFD700}/tow{FFFFFF} command.\nPlayer should be using the controls for the hook rising and downing.\nThe hook must be full risen to tow any vehicle and using the {FFD700}SUBMISSION_KEY{FFFFFF} a vehicle is towed.\n\n{FFD700}Commissions{FFFFFF}\n\nA commission is calculated using the done missions count and using the special distance coefficient:\nthe more missions done and the more distance between the a mission start and the checkpoint, the more commission is earned.";
+
+	return ShowPlayerDialog(playerid, DIALOG_TOW_HELP, DIALOG_STYLE_MSGBOX, "Tow Missions", stringToPrint, "Close", "");
 }
 
 stock ShowTruckingHelpDialog(playerid)

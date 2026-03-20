@@ -2,10 +2,11 @@
 CREATE TABLE IF NOT EXISTS "locale_types" (
 	"id"	INTEGER,
 	"name"	TEXT UNIQUE,
+	"lang_name"	TEXT,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
-INSERT INTO "locale_types" VALUES (0,'LOCALE_EN');
-INSERT INTO "locale_types" VALUES (1,'LOCALE_CZ');
+INSERT INTO "locale_types" VALUES (0,'LOCALE_EN','English');
+INSERT INTO "locale_types" VALUES (1,'LOCALE_CZ','Czech');
 
 ALTER TABLE "users" ADD COLUMN "locale" INTEGER DEFAULT 0;
 CREATE TABLE "users_copy" AS SELECT * FROM "users";

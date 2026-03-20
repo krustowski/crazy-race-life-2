@@ -284,6 +284,9 @@ public OnPlayerConnect(playerid)
 	// Text inits.
 	AddTexts(playerid);
 
+	// Reset locale to English
+	gPlayers[playerid][Locale] = LOCALE_EN;
+
 	// Fetch player's name and print it out to outhers online.
 	GetPlayerName(playerid, playerName, sizeof(playerName));
 	gPlayers[playerid][Name] = playerName;

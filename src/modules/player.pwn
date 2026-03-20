@@ -119,7 +119,7 @@ public LoadPlayerData(playerid)
 		SetPlayerColor(playerid, COLOR_INVISIBLE);
 
 		new query[512];
-		format(query, sizeof(query), "SELECT id, cash, bank, adminlvl, wanted, team, class, health, armour, spawn, properties FROM users WHERE nickname = '%s';", gPlayers[playerid][Name]);
+		format(query, sizeof(query), "SELECT id, cash, bank, adminlvl, wanted, team, class, health, armour, spawn, properties, locale FROM users WHERE nickname = '%s';", gPlayers[playerid][Name]);
 
 		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result) {

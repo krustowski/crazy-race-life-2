@@ -86,7 +86,8 @@ enum
 	DIALOG_TUTORIAL_MAIN,
 	DIALOG_TUTORIAL_STATS,
 	DIALOG_BRIBE_MAIN,
-	DIALOG_BRIBE_NOTE
+	DIALOG_BRIBE_NOTE,
+	DIALOG_LOCALE_LIST
 };
 
 #include "modules/real.pwn"
@@ -208,7 +209,7 @@ stock ShowCommonCommandsDialog(playerid)
 {
 	new stringToPrint[2048];
 
-	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Common Commands{FFFFFF}\n\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Common Commands{FFFFFF}\n\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
     			"/acc\t\t\tgame account info dump\n",
 			"/admins\t\t\tlists admins online\n",
 			"/afk\t\t\t(un)sets the Away-From-Keyboard state\n",
@@ -226,6 +227,7 @@ stock ShowCommonCommandsDialog(playerid)
 			"/kill\t\t\tto commit suicide\n",
 			"/lay\t\t\tenables special animations (laying)\n",
 
+			"/locale\t\t\tshows the localization list of languages\n",
 			"/locate\t\t\tdumps the actual player's coordinates\n",
 			"/lock\t\t\tlocks the player's vehicle\n",
 			"/phone\t\t\tshows the phone call menu\n",
@@ -1374,4 +1376,31 @@ stock ShowTutorialStatsDialog(playerid)
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_TUTORIAL_STATS, DIALOG_STYLE_MSGBOX, "Tutorial Stats", stringToPrint, "Close", "");
+}
+
+stock ShowPlayerLocaleListDialog(playerid)
+{
+	new stringToPrint[128], query[64] = "SELECT lang_name FROM locale_types";
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot fetch locale lang names");
+		print(query);
+		return 1;
+	}
+
+	do
+	{
+		new name[64];
+
+		DB_GetFieldStringByName(result, "lang_name", name, sizeof(name));
+
+		format(stringToPrint, sizeof(stringToPrint), "%s%s\n", stringToPrint, name);
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	return ShowPlayerDialog(playerid, DIALOG_LOCALE_LIST, DIALOG_STYLE_LIST, "Localization List", stringToPrint, "Select", "Close");
 }

@@ -187,6 +187,7 @@ The examples above are shown respectively to the config file names mentioned.
 	/hide       --- (un)hides the player on map
 	/kill       --- to commit suicide
 	/lay        --- enables special animations (laying)
+	/locale     --- shows the language list for localization
 	/locate     --- dumps the actual player's coordinates 
 	/lock       --- locks the player's vehicle
     /phone      --- shows the phone call menu

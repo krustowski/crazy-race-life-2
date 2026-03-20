@@ -33,6 +33,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(hide, 4, cmdtext); 	  //all
 	dcmd(kill, 4, cmdtext); 	  //all
 	dcmd(lay, 3, cmdtext);		  //all
+	dcmd(locale, 6, cmdtext); 	  //all
 	dcmd(locate, 6, cmdtext); 	  //all
 	dcmd(lock, 4, cmdtext);           //all
 	dcmd(phone, 5, cmdtext);	  //all
@@ -490,6 +491,12 @@ dcmd_lay(playerid, const params[])
 	ApplyAnimation(playerid, "BEACH", "Lay_Bac_Loop", 4.1, false, true, true, true, true);
 
 	return 1;
+}
+
+dcmd_locale(playerid, const params[])
+{
+#pragma unused params
+	return ShowPlayerLocaleListDialog(playerid);
 }
 
 dcmd_locate(playerid, const params[])

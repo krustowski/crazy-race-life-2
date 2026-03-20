@@ -2323,6 +2323,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				format(gBribeEdit[playerid][Note], 64, "%s", inputtext);
 				return SaveNewPoliceBribePickup(playerid);
 			}
+		case DIALOG_LOCALE_LIST:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				gPlayers[playerid][Locale] = PlayerLocale: listitem;
+				return SendClientMessage(playerid, COLOR_YELLOW, "[ LOCALE ] Game language changed!");
+			}
 
 		default: 
 			return 0; // dialog ID was not found, search in other scripts

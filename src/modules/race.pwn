@@ -213,27 +213,43 @@ stock SetPlayerRaceState(playerid, raceId)
 {
 	new stringToPrint[256];
 
+	if (gPlayers[playerid][InMinigame])
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ RACE ] Another minigame is running, stop it to start racing!");
+	}
+
 	if (!IsPlayerInAnyVehicle(playerid))
+	{
 		return SendClientMessageLocalized(playerid, I18N_RACE_WARP_NO_VEHIC_DRIVER);
+	}
 
 	// Check if already joined such race.
 	if (gPlayerRace[playerid][raceId])
+	{
 		return SendClientMessageLocalized(playerid, I18N_RACE_ALREADY_JOINED);
+	}
 
 	if (CheckPlayerRaceState(playerid))
+	{
 		return SendClientMessageLocalized(playerid, I18N_RACE_ALREADY_JOINED);
-	//return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Jiz jsi prihlasen v jinem zavode! Pred prihlasenim je treba predchozi zavod dokoncit!");
+		//return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Jiz jsi prihlasen v jinem zavode! Pred prihlasenim je treba predchozi zavod dokoncit!");
+	}
 
 	if (raceId == 0)
+	{
 		return SendClientMessageLocalized(playerid, I18N_RACE_NO_SUCH_RACE);
+	}
 
 	if (GetPlayerMoney(playerid) < gRaces[raceId][CostDollars])
+	{
 		return SendClientMessageLocalized(playerid, I18N_RACE_NO_MONEY);
+	}
 
 	//
 	//  Ok, register the player with given raceId.
 	//
 
+	gPlayers[playerid][InMinigame] = true;
 	gPlayerRace[playerid][raceId] = 1;
 	GivePlayerMoney(playerid, -gRaces[raceId][CostDollars]);
 
@@ -255,12 +271,15 @@ stock SetPlayerRaceState(playerid, raceId)
 stock ResetPlayerRaceState(playerid, raceId, finishedSuccessfully)
 {
 	if (!CheckPlayerRaceState(playerid))
+	{
 		return SendClientMessageLocalized(playerid, I18N_RACE_NO_RACE);
+	}
 
 	DisablePlayerRaceCheckpoint(playerid);
 	TextDrawHideForPlayer(playerid, gRaceInfoText[playerid]);
 	KillTimer(_: gPlayerRaceTimer[playerid]);
 	gPlayerRaceTimer[playerid] = Timer: 0;
+	gPlayers[playerid][InMinigame] = false;
 
 	if (finishedSuccessfully)
 	{

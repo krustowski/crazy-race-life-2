@@ -54,3 +54,6 @@ INSERT INTO "police_bribe_coords" VALUES (47,1704.61,1801.97,10.39,'LV: Las Vent
 INSERT INTO "police_bribe_coords" VALUES (48,1996.37,1544.32,15.29,'LV: Pirates in Mens Pants');
 INSERT INTO "police_bribe_coords" VALUES (49,1884.17,908.61,10.37,'LV: The Four Dragons Casino');
 INSERT INTO "police_bribe_coords" VALUES (50,1536.08,1018.81,10.39,'LV: LVA Freight Depot');
+
+-- +goose Down
+DROP TABLE IF EXISTS "police_bribe_coords";

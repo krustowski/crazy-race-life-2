@@ -103,7 +103,13 @@ Live demo at [samp://95.216.7.113:39876](samp://95.216.7.113:39876)
 
 *^ A random destination shown when a new customer enters the taxi cab.*
 
-### Trucking
+### Tow Missions
+
+![](.github/img/crl2_tow_mission.png)
+
+*^ A random tow mission attempt stats while a vehicle being towed.*
+
+### Trucking Missions
 
 ![](.github/img/crl2_trucking_marked_truck.png)
 

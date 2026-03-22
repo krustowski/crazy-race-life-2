@@ -2,6 +2,8 @@
 
 A GTA SA:MP/openMP gamemode scripted in the pawn lang.
 
+Live demo at [samp://95.216.7.113:39876](samp://95.216.7.113:39876)
+
 
 ## Features
 

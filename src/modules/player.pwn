@@ -60,16 +60,18 @@ enum Player
 	bool: DialogShown,
 	bool: Listening,
 	bool: InMinigame,
+	bool: SwitchedControllers,
+
+	PlayTime,
 
 	Drugs[MAX_DRUG_TYPES],
 	Properties[MAX_PLAYER_PROPERTIES],
 
 	Timer: OnDeathGunsTimer[11],
 	Timer: LoginTimer,
+	Timer: PlayTimeTimer,
 
 	TutorialStats[Tutorial],
-
-	bool: SwitchedControllers,
 
 	Temp,
 	SkinOperation: SkinOp
@@ -119,7 +121,7 @@ public LoadPlayerData(playerid)
 		SetPlayerColor(playerid, COLOR_INVISIBLE);
 
 		new query[512];
-		format(query, sizeof(query), "SELECT id, cash, bank, adminlvl, wanted, team, class, health, armour, spawn, properties, locale FROM users WHERE nickname = '%s';", gPlayers[playerid][Name]);
+		format(query, sizeof(query), "SELECT id, cash, bank, adminlvl, wanted, team, class, health, armour, spawn, properties, locale, playtime FROM users WHERE nickname = '%s';", gPlayers[playerid][Name]);
 
 		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result) {
@@ -141,6 +143,7 @@ public LoadPlayerData(playerid)
 		gPlayers[playerid][SpawnPoint] = DB_GetFieldIntByName(result, "spawn");
 		DB_GetFieldStringByName(result, "properties", propertiesString, sizeof(propertiesString));
 		gPlayers[playerid][Locale] = PlayerLocale: DB_GetFieldIntByName(result, "locale");
+		gPlayers[playerid][PlayTime] = DB_GetFieldIntByName(result, "playtime");
 
 		ExtractPropperties(propertiesString, properties);
 		gPlayers[playerid][Properties] = properties;
@@ -265,7 +268,7 @@ public SavePlayerData(playerid)
 
 		new query[1024];
 
-		format(query, sizeof(query), "UPDATE users SET cash = %d, bank = %d, adminlvl = %d, wanted = %d, team = %d, class = %d, health = %d, armour = %d, spawn = %d, properties = '%s', locale = %d WHERE nickname = '%s';", 
+		format(query, sizeof(query), "UPDATE users SET cash = %d, bank = %d, adminlvl = %d, wanted = %d, team = %d, class = %d, health = %d, armour = %d, spawn = %d, properties = '%s', locale = %d, playtime = %d WHERE nickname = '%s';", 
 				GetPlayerMoney(playerid), 
 				gPlayers[playerid][Bank], 
 				gPlayers[playerid][AdminLevel], 
@@ -277,6 +280,7 @@ public SavePlayerData(playerid)
 				gPlayers[playerid][SpawnPoint], 
 				propertiesString, 
 				_: gPlayers[playerid][Locale],
+				gPlayers[playerid][PlayTime],
 				gPlayers[playerid][Name]
 		);
 
@@ -388,6 +392,19 @@ public SendPlayerSalary()
 	return 1;
 }
 
+forward UpdatePlayerPlayTime(playerid);
+
+public UpdatePlayerPlayTime(playerid)
+{
+	if (!IsPlayerConnected(playerid))
+	{
+		KillTimer(_: gPlayers[playerid][PlayTimeTimer]);
+	}
+
+	gPlayers[playerid][PlayTime] += 5000;
+
+	return 1;
+}
 
 public UpdatePlayerScore()
 {

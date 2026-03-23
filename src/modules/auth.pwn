@@ -103,6 +103,8 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 	gPlayers[playerid][IsLogged] = true;
 	LoadPlayerData(playerid);
 
+	gPlayers[playerid][PlayTimeTimer] = Timer: SetTimerEx("UpdatePlayerPlayTime", 5000, true, "i", playerid);
+
 	SetPlayerHealth(playerid, 100.0);
 	SpawnPlayer(playerid);
 

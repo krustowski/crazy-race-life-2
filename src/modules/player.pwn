@@ -626,3 +626,32 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 
 	return 1;
 }
+
+stock ProcessNewBlackMarketOffer(playerid)
+{
+	new query[256];
+	format(query, sizeof(query), "INSERT INTO black_market_items (settler_id, drug_type, amount, value) VALUES (%d, %d, %f, %d)",
+			gPlayers[playerid][OrmID],
+			_: gBlackMarketItemOffer[playerid][Type],
+			gBlackMarketItemOffer[playerid][Amount],
+			gBlackMarketItemOffer[playerid][Value]
+		);
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) {
+		printf("Database error: cannot write new market item!");
+		return 1;
+	}
+
+	DB_FreeResultSet(result);
+
+	gPlayers[playerid][Drugs][ _: gBlackMarketItemOffer[playerid][Type] - 1 ] -= gBlackMarketItemOffer[playerid][Amount];
+
+	gBlackMarketItemOffer[playerid][Type] = DrugType: TYPE_NONE;
+	gBlackMarketItemOffer[playerid][Amount] = 0;
+	gBlackMarketItemOffer[playerid][Value] = 0;
+
+	SendClientMessage(playerid, COLOR_ORANGE, "[ MARKET ] New offer placed!");
+
+	return 1;
+}

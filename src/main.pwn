@@ -2364,6 +2364,59 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				return ProcessBlackMarketOffer(playerid, listitem);
 			}
+		case DIALOG_BLACK_MARKET_NEW:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				gBlackMarketItemOffer[playerid][Type] = DrugType: (listitem + 1);
+				SendClientMessage(playerid, COLOR_YELLOW, "[ MARKET ] Item selected!");
+
+				return ShowBlackMarketAmountDialog(playerid);
+			}
+		case DIALOG_BLACK_MARKET_AMOUNT:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				if (!IsNumeric(inputtext) || strval(inputtext) < 0)
+				{
+					SendClientMessage(playerid, COLOR_RED, "[ MARKET ] Wrong amount set!");
+					return ShowBlackMarketAmountDialog(playerid);
+				}
+
+				if (gPlayers[playerid][Drugs][_: gBlackMarketItemOffer[playerid][Type] - 1 ] < strval(inputtext))
+				{
+					return SendClientMessage(playerid, COLOR_RED, "[ MARKET ] Not such amount of such item in pockets!");
+				}
+
+				gBlackMarketItemOffer[playerid][Amount] = strval(inputtext);
+				SendClientMessage(playerid, COLOR_YELLOW, "[ MARKET ] Amount set!");
+
+				return ShowBlackMarketValueDialog(playerid);
+			}
+		case DIALOG_BLACK_MARKET_VALUE:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				if (!IsNumeric(inputtext) || strval(inputtext) < 0)
+				{
+					SendClientMessage(playerid, COLOR_RED, "[ MARKET ] Wrong value set!");
+					return ShowBlackMarketValueDialog(playerid);
+				}
+
+				gBlackMarketItemOffer[playerid][Value] = strval(inputtext);
+				SendClientMessage(playerid, COLOR_YELLOW, "[ MARKET ] Value set!");
+
+				return ProcessNewBlackMarketOffer(playerid);
+			}
 
 		default: 
 			return 0; // dialog ID was not found, search in other scripts

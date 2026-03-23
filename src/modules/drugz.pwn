@@ -24,6 +24,8 @@ enum BlackMarketItem
 
 new gBlackMarketItems[MAX_MARKET_ITEMS][BlackMarketItem];
 
+new gBlackMarketItemOffer[MAX_PLAYERS][BlackMarketItem];
+
 enum
 {
 	ZAZA,

@@ -90,7 +90,9 @@ enum
 	DIALOG_LOCALE_LIST,
 	DIALOG_BLACK_MARKET_MAIN,
 	DIALOG_BLACK_MARKET_LIST,
-	DIALOG_BLACK_MARKET_NEW
+	DIALOG_BLACK_MARKET_NEW,
+	DIALOG_BLACK_MARKET_AMOUNT,
+	DIALOG_BLACK_MARKET_VALUE
 };
 
 #include "modules/real.pwn"
@@ -1442,7 +1444,7 @@ stock ShowBlackMarketItemListDialog(playerid)
 			value = DB_GetFieldIntByName(result, "value"),
 			nickname[MAX_PLAYER_NAME], drug_name[64];
 
-		if (!amount || !value)
+		if (!amount)
 		{
 			break;
 		}
@@ -1465,7 +1467,7 @@ stock ShowBlackMarketItemListDialog(playerid)
 				price
 			);
 	}
-	while(DB_SelectNextRow(result));
+	while (DB_SelectNextRow(result));
 
 	DB_FreeResultSet(result);
 
@@ -1481,8 +1483,42 @@ stock ShowBlackMarketMainDialog(playerid)
 
 stock ShowBlackMarketNewDialog(playerid)
 {
-	new stringToPrint[128] = "List actual market items\nPlace new offer";
+	new stringToPrint[128] = "";
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, "SELECT id, name FROM drug_types");
+	if (!result) {
+		print("Database error: cannot fetch drug type names!");
+		return 1;
+	}
+
+	do
+	{
+		if (!DB_GetFieldIntByName(result, "id"))
+		{
+			continue;
+		}
+
+		new name[64];
+		DB_GetFieldStringByName(result, "name", name, sizeof(name));
+
+		format(stringToPrint, sizeof(stringToPrint), "%s%s\n", stringToPrint, name);
+	}
+	while (DB_SelectNextRow(result));
 
 	return ShowPlayerDialog(playerid, DIALOG_BLACK_MARKET_NEW, DIALOG_STYLE_LIST, "Black Market New Offer", stringToPrint, "Select", "Close");
+}
+
+stock ShowBlackMarketAmountDialog(playerid)
+{
+	new stringToPrint[256] = "{FFD700}New Market Offer{FFFFFF}\n\nSet the amount you want to place in offer:";
+
+	return ShowPlayerDialog(playerid, DIALOG_BLACK_MARKET_AMOUNT, DIALOG_STYLE_INPUT, "Black Market New Offer", stringToPrint, "Set", "Close");
+}
+
+stock ShowBlackMarketValueDialog(playerid)
+{
+	new stringToPrint[256] = "{FFD700}New Market Offer{FFFFFF}\n\nSet the value per unit you want to place in offer:";
+
+	return ShowPlayerDialog(playerid, DIALOG_BLACK_MARKET_VALUE, DIALOG_STYLE_INPUT, "Black Market New Offer", stringToPrint, "Set", "Close");
 }
 

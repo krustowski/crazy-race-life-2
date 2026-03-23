@@ -7,7 +7,7 @@
 //  player.pwn
 //
 
-#define MAX_PLAYER_PROPERTIES	5
+#define MAX_PLAYER_PROPERTIES 7
 
 #include "support/i18n.pwn"
 #include "db/sql.pwn"
@@ -580,3 +580,48 @@ stock CheckDrugzPickup(playerid, pickupid)
 
 	return 1;
 }
+
+stock ProcessBlackMarketOffer(playerid, listitem)
+{
+	if (!gBlackMarketItems[listitem][OrmID])
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ MAKRET ] Such offer has been already processed!");
+	}
+
+	new 
+		offerid = gBlackMarketItems[listitem][OrmID],
+		Float: amount = gBlackMarketItems[listitem][Amount],
+		value = gBlackMarketItems[listitem][Value],
+		DrugType: type = gBlackMarketItems[listitem][Type],
+		price = floatround(amount * Float: value);
+
+	if (GetPlayerMoney(playerid) < price)
+	{
+		return SendClientMessage(playerid, COLOR_RED, "[ MARKET ] Not enough money to buy an offer!");
+	}
+
+	GivePlayerMoney(playerid, -price);
+	gPlayers[playerid][Drugs][_: type] += floatround(amount);
+
+	// Clean the market item
+	gBlackMarketItems[listitem][OrmID] = -1;
+	gBlackMarketItems[listitem][Amount] = 0;
+	gBlackMarketItems[listitem][Value] = 0;
+	gBlackMarketItems[listitem][Type] = DrugType: TYPE_NONE;
+
+	SendClientMessage(playerid, COLOR_ORANGE, "[ MARKET ] Market offer proceeded!");
+
+	new query[64];	
+	format(query, sizeof(query), "DELETE FROM black_market_items WHERE id = %d", offerid);
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) {
+		printf("Database error: cannot delete market item (ID %d)!", offerid);
+		return 1;
+	}
+
+	DB_FreeResultSet(result);
+
+	return 1;
+}
+

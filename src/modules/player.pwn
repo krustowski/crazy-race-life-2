@@ -392,16 +392,19 @@ public SendPlayerSalary()
 	return 1;
 }
 
-forward UpdatePlayerPlayTime(playerid);
+forward UpdatePlayerPlayTime();
 
-public UpdatePlayerPlayTime(playerid)
+public UpdatePlayerPlayTime()
 {
-	if (!IsPlayerConnected(playerid))
+	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
-		KillTimer(_: gPlayers[playerid][PlayTimeTimer]);
-	}
+		if (!IsPlayerConnected(i))
+		{
+			return 1;	
+		}
 
-	gPlayers[playerid][PlayTime] += 5000;
+		gPlayers[i][PlayTime] += 5000;
+	}
 
 	return 1;
 }

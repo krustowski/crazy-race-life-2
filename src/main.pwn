@@ -206,6 +206,7 @@ public OnGameModeInit()
 	SetTimer("OnRadarCheckpoint", 300, true);
 
 	SetTimer("AutosaveData", 200 * SECOND_MS, true);
+	SetTimer("UpdatePlayerPlayTime", 10 * SECOND_MS, true);
 	SetTimer("UpdatePlayerScore", 1 * SECOND_MS, true);
 
 	SetTimer("SendPlayerSalary", 5 * 60 * SECOND_MS, true);

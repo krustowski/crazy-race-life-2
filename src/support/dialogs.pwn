@@ -742,13 +742,16 @@ stock ShowPlayerAccountDialog(playerid)
 	new version[16];
 	GetPlayerVersion(playerid, version, sizeof(version));
 
-	format(stringToPrint, sizeof(stringToPrint), "Account details:\n\n{FFFFFF}Cash: \t\t{00FF00}${FFD700}%d{FFFFFF}\nTeam: \t\t{FFD700}%s{FFFFFF} (ID: {FFD700}%d{FFFFFF})\nSkin ID:\t\t{FFD700}%d{FFFFFF}\nAdmin level: \t{FFD700}%d{FFFFFF}\nWanted level: \t{FFD700}%d{FFFFFF}\n\nClient version: \t{FFD700}%s{FFFFFF}",
+	format(stringToPrint, sizeof(stringToPrint), "Account details:\n\n{FFFFFF}Cash: \t\t{00FF00}${FFD700}%d{FFFFFF}\nTeam: \t\t{FFD700}%s{FFFFFF} (ID: {FFD700}%d{FFFFFF})\nSkin ID:\t\t{FFD700}%d{FFFFFF}\nAdmin level: \t{FFD700}%d{FFFFFF}\nWanted level: \t{FFD700}%d{FFFFFF}\nPlayTime: \t{FFD700}%3d h %3d min %2d sec\n\nClient version: \t{FFD700}%s{FFFFFF}",
 			GetPlayerMoney(playerid),
 			team_name,
 			gPlayers[playerid][TeamID],
 			GetPlayerSkin(playerid),
 			gPlayers[playerid][AdminLevel],
 			GetPlayerWantedLevel(playerid),
+			floatround(gPlayers[playerid][PlayTime] / 1000 / 3600),
+			floatround(gPlayers[playerid][PlayTime] / 1000 / 60 % 60),
+			floatround(gPlayers[playerid][PlayTime] / 1000 % 60),
 			version
 	      );
 

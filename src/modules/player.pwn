@@ -593,7 +593,7 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 		Float: amount = gBlackMarketItems[listitem][Amount],
 		value = gBlackMarketItems[listitem][Value],
 		DrugType: type = gBlackMarketItems[listitem][Type],
-		price = floatround(amount * Float: value);
+		price = floatround(amount * value);
 
 	if (GetPlayerMoney(playerid) < price)
 	{
@@ -609,7 +609,9 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 	gBlackMarketItems[listitem][Value] = 0;
 	gBlackMarketItems[listitem][Type] = DrugType: TYPE_NONE;
 
-	SendClientMessage(playerid, COLOR_ORANGE, "[ MARKET ] Market offer proceeded!");
+	new msg[64];
+	format(msg, sizeof(msg), "[ MARKET ] Offer %d proceeded! (price: %d)", offerid, price);
+	SendClientMessage(playerid, COLOR_ORANGE, msg);
 
 	new query[64];	
 	format(query, sizeof(query), "DELETE FROM black_market_items WHERE id = %d", offerid);
@@ -624,4 +626,3 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 
 	return 1;
 }
-

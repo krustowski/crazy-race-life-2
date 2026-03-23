@@ -49,21 +49,14 @@ public UpdateTowMissionText(playerid)
 
 	gTowMission[playerid][TimeElapsed] += 1000;
 
-	switch (gPlayers[playerid][Locale]) 
-	{
-		case LOCALE_CZ:
-			//
-			{}
-
-		default:
-			format(stringToPrint, sizeof(stringToPrint), "~w~Models:_~g~%d~n~~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%2d", 
-					gTowMission[playerid][ModelCount], 
-					gTowMission[playerid][DoneCount], 
-					gTowMission[playerid][Earned], 
-					floatround(floatround(gTowMission[playerid][TimeElapsed] / 1000) / 60), 
-					floatround(gTowMission[playerid][TimeElapsed] / 1000) % 60
-				);
-	}
+	//format(stringToPrint, sizeof(stringToPrint), "~w~Models:_~g~%d~n~~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%2d", 
+	format(stringToPrint, sizeof(stringToPrint), gI18nMessages[I18N_TOW_MISS_INFO][ gPlayers[playerid][Locale] ], 
+			gTowMission[playerid][ModelCount], 
+			gTowMission[playerid][DoneCount], 
+			gTowMission[playerid][Earned], 
+			floatround(floatround(gTowMission[playerid][TimeElapsed] / 1000) / 60), 
+			floatround(gTowMission[playerid][TimeElapsed] / 1000) % 60
+		);
 
 	TextDrawSetString(gTowMissionText[playerid], stringToPrint);
 	TextDrawShowForPlayer(playerid, gTowMissionText[playerid]);
@@ -279,19 +272,12 @@ stock CheckTowMissionCheckpoint(playerid)
 	SetVehicleToRespawn(gTowMission[playerid][TowedID]);
 	gTowMission[playerid][TowedID] = INVALID_VEHICLE_ID;
 
-	if (!gTowMission[playerid][DoneCount])
-	{
-		commission += 5000 + (floatround(gTowMission[playerid][CommissionBonusWeight] * 1 * 5000));
-	}
-	else
-	{
-		commission += 5000 + (floatround(gTowMission[playerid][CommissionBonusWeight] * (random(gTowMission[playerid][DoneCount]) + 1) * 5000));
-	}
+	commission += 5000 + (floatround(gTowMission[playerid][CommissionBonusWeight] * (random(++gTowMission[playerid][DoneCount])) * 5000));
 
 	GivePlayerMoney(playerid, commission);
 	gTowMission[playerid][Earned] += commission;
 	gTowMission[playerid][TimeElapsed] = 0;
-	gTowMission[playerid][DoneCount] += 1;
+	//gTowMission[playerid][DoneCount] += 1;
 
 	format(stringToPrint, sizeof(stringToPrint), "[ TOW ] Mission completed! Commision earned: $%d", commission);
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);

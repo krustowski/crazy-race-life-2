@@ -77,7 +77,9 @@ enum
 	I18N_REAL_NO_FREE_SLOT,
 	I18N_REAL_ALREADY_OCCUPIED,
 	I18N_REAL_NO_MONEY,
-	I18N_REAL_SELL_SUCCESS
+	I18N_REAL_SELL_SUCCESS,
+	//
+	I18N_TOW_MISS_INFO
 }
 
 new gI18nMessageColor[] = 
@@ -118,7 +120,9 @@ new gI18nMessageColor[] =
 	COLOR_RED,
 	COLOR_RED,
 	COLOR_RED,
-	COLOR_LIGHTGREEN
+	COLOR_LIGHTGREEN,
+	// 
+	COLOR_INVISIBLE
 };
 
 new gI18nMessages[][PlayerLocale][] = 
@@ -242,9 +246,12 @@ new gI18nMessages[][PlayerLocale][] =
 	{
 		"[ REAL ] The property has been sold successfully!",
 		"[ REAL ] Nemovitost byla uspesne prodana!"
+	},
+	{
+		"~w~Models:_~g~%d~n~~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%2d",
+		"~w~Modely:_~g~%d~n~~w~Zavezeno:_~g~%d~n~~w~Zarobeno:_~g~$~y~%d~n~~w~Cas:_____~b~%d~y~:~b~%2d"
 	}
 };
-
 
 //
 //

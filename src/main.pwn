@@ -2336,6 +2336,34 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				gPlayers[playerid][Locale] = PlayerLocale: listitem;
 				return SendClientMessage(playerid, COLOR_YELLOW, "[ LOCALE ] Game language changed!");
 			}
+		case DIALOG_BLACK_MARKET_MAIN:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				switch (listitem)
+				{
+					case 0:
+						{
+							return ShowBlackMarketItemListDialog(playerid);
+						}
+					case 1:
+						{
+							return ShowBlackMarketNewDialog(playerid);
+						}
+				}
+			}
+		case DIALOG_BLACK_MARKET_LIST:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				return ProcessBlackMarketOffer(playerid, listitem);
+			}
 
 		default: 
 			return 0; // dialog ID was not found, search in other scripts
@@ -2454,6 +2482,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	//
 
 	CheckDrugzPickup(playerid, pickupid);
+	CheckBlackMarketPickup(playerid, pickupid);
 
 	//
 	//  Other pickups --- entries,  baggies etc.

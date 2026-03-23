@@ -87,7 +87,10 @@ enum
 	DIALOG_TUTORIAL_STATS,
 	DIALOG_BRIBE_MAIN,
 	DIALOG_BRIBE_NOTE,
-	DIALOG_LOCALE_LIST
+	DIALOG_LOCALE_LIST,
+	DIALOG_BLACK_MARKET_MAIN,
+	DIALOG_BLACK_MARKET_LIST,
+	DIALOG_BLACK_MARKET_NEW
 };
 
 #include "modules/real.pwn"
@@ -1404,3 +1407,82 @@ stock ShowPlayerLocaleListDialog(playerid)
 
 	return ShowPlayerDialog(playerid, DIALOG_LOCALE_LIST, DIALOG_STYLE_LIST, "Localization List", stringToPrint, "Select", "Close");
 }
+
+stock ShowBlackMarketItemListDialog(playerid)
+{
+	new stringToPrint[1024],
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, 
+			"SELECT i.id, u.id AS uid, u.nickname, t.id AS tid, t.name, i.amount, i.value, p.price FROM (SELECT id, drug_type, settler_id, amount, value FROM black_market_items) i JOIN users u ON u.id = i.settler_id JOIN drug_types t ON t.id = i.drug_type JOIN drug_prices p ON p.id = i.drug_type");
+	if (!result) {
+		print("Database error: cannot fetch black market items!");
+		return 1;
+	}
+
+	if (!DB_GetRowCount(result))
+	{
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ MARKET ] No offers set on market!");
+	}
+
+	new i = 0;
+
+	do
+	{
+		if (++i == MAX_MARKET_ITEMS)
+		{
+			break;
+		}
+		i--;
+
+		new 
+			//settler_id = DB_GetFieldIntByName(result, "uid"),
+		    	offer_id = DB_GetFieldIntByName(result, "id"),
+		    	type = DB_GetFieldIntByName(result, "tid") - 1,
+		    	Float: amount = DB_GetFieldFloatByName(result, "amount"),
+		   	price = DB_GetFieldIntByName(result, "price"),
+			value = DB_GetFieldIntByName(result, "value"),
+			nickname[MAX_PLAYER_NAME], drug_name[64];
+
+		if (!amount || !value)
+		{
+			break;
+		}
+
+		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+		DB_GetFieldStringByName(result, "name", drug_name, sizeof(drug_name));
+
+		gBlackMarketItems[i][OrmID] = offer_id;
+		gBlackMarketItems[i][Amount] = amount;
+		gBlackMarketItems[i][Value] = value;
+		gBlackMarketItems[i][Type] = DrugType: type;
+
+		format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}[%3d] {FFD700}%.2f{FFFFFF} %s (%s): {00FF00}$%d{FFFFFF} (mkt: %d)",
+				stringToPrint,
+				offer_id,
+				amount,
+				drug_name,
+				nickname,
+				value,
+				price
+			);
+	}
+	while(DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	return ShowPlayerDialog(playerid, DIALOG_BLACK_MARKET_LIST, DIALOG_STYLE_LIST, "Black Market Items", stringToPrint, "Buy", "Close");
+}
+
+stock ShowBlackMarketMainDialog(playerid)
+{
+	new stringToPrint[128] = "List actual market items\nPlace new offer";
+
+	return ShowPlayerDialog(playerid, DIALOG_BLACK_MARKET_MAIN, DIALOG_STYLE_LIST, "Black Market Mainmenu", stringToPrint, "Select", "Close");
+}
+
+stock ShowBlackMarketNewDialog(playerid)
+{
+	new stringToPrint[128] = "List actual market items\nPlace new offer";
+
+	return ShowPlayerDialog(playerid, DIALOG_BLACK_MARKET_NEW, DIALOG_STYLE_LIST, "Black Market New Offer", stringToPrint, "Select", "Close");
+}
+

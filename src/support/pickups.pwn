@@ -18,6 +18,7 @@
 #define PICKUP_PILL				1241
 #define PICKUP_ARMOUR				1242
 #define PICKUP_STAR				1247
+#define PICKUP_SKULL				1254
 #define PICKUP_HOUSE_BLUE			1272
 #define PICKUP_HOUSE_GREEN			1273
 #define PICKUP_DOLLAR				1274
@@ -54,6 +55,7 @@ new gAdminDoorDown;
 new gAdminDoorUp;
 
 new gDruggery;
+new gDruggeryMarket;
 new gDruggeryEntrance;
 
 #pragma unused gDruggeryExit
@@ -124,14 +126,16 @@ public InitPickups()
 				// Dillimore
 				gDruggeryEntrance = EnsurePickupCreated(1318, 1, 645.68, -510.51, 16.33);
 				gDruggery = CreateObject(18056, 645.68, -510.51, 1500.00, 0.0, 0.0, 0.0, 0.0);
-				gDruggeryExit = EnsurePickupCreated(1318, 1, 658.45, -507.50, 1500.00);
+				gDruggeryMarket = EnsurePickupCreated(PICKUP_SKULL, 1, 658.45, -507.50, 1500.00);
+				//gDruggeryExit = EnsurePickupCreated(1318, 1, 658.45, -507.50, 1500.00);
 			}
 		case 1:
 			{
 				// Montgomery
 				gDruggeryEntrance = EnsurePickupCreated(1318, 1, 1280.85, 304.07, 19.55);
 				gDruggery = CreateObject(18056, 1280.85, 304.07, 1500.00, 0.0, 0.0, 0.0, 0.0);
-				gDruggeryExit = EnsurePickupCreated(1318, 1, 1293.66, 301.10, 1500.00);
+				gDruggeryMarket = EnsurePickupCreated(PICKUP_SKULL, 1, 1293.66, 301.10, 1500.00);
+				//gDruggeryExit = EnsurePickupCreated(1318, 1, 1293.66, 301.10, 1500.00);
 			}
 	}
 
@@ -347,4 +351,14 @@ stock CheckDeathMoneyPickup(playerid, pickupid)
 		GivePlayerMoney(playerid, gDeathMoneyPickups[i][Amount]);
 		gDeathMoneyPickups[i][Amount] = 0;
 	}
+}
+
+stock CheckBlackMarketPickup(playerid, pickupid)
+{
+	if (pickupid != gDruggeryMarket || GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
+	{
+		return 0;
+	}
+
+	return ShowBlackMarketMainDialog(playerid);
 }

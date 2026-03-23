@@ -9,9 +9,20 @@
 
 #define MAX_DRUG_TYPES		10
 #define MAX_DRUG_PICKUPS	64
+#define MAX_MARKET_ITEMS	128
 
 #include "support/helpers.pwn"
 #include "support/pickups.pwn"
+
+enum BlackMarketItem
+{
+	OrmID,
+	Float: Amount,
+	Value,
+	DrugType: Type
+};
+
+new gBlackMarketItems[MAX_MARKET_ITEMS][BlackMarketItem];
 
 enum
 {
@@ -159,6 +170,8 @@ stock InitDrugPickups()
 		i++;
 	}
 	while(DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
 
 	print("Drug pickups initialized!");
 }

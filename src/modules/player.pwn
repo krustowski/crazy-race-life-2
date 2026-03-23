@@ -88,6 +88,7 @@ forward GivePlayerWeaponEx(playerid, timerid, weaponid, ammo);
 forward LoadPlayerData(playerid);
 forward SavePlayerData(playerid);
 forward SendPlayerSalary();
+forward UpdatePlayerPlayTime();
 forward UpdatePlayerScore();
 
 public BatchSavePlayerData()
@@ -392,8 +393,6 @@ public SendPlayerSalary()
 	return 1;
 }
 
-forward UpdatePlayerPlayTime();
-
 public UpdatePlayerPlayTime()
 {
 	for (new i = 0; i < MAX_PLAYERS; i++)
@@ -411,10 +410,17 @@ public UpdatePlayerPlayTime()
 
 public UpdatePlayerScore()
 {
-	for (new i; i <= GetMaxPlayers(); i++)
+	for (new i; i < GetMaxPlayers(); i++)
 	{
+		if (!IsPlayerConnected(i))
+		{
+			return 1;	
+		}
+
 		SetPlayerScore(i, GetPlayerMoney(i));
 	}
+
+	return 1;
 }
 
 stock OnPlayerPrivMsg(playerid, receiverid, text[])
@@ -610,6 +616,7 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 
 	new 
 		offerid = gBlackMarketItems[listitem][OrmID],
+		settler_id = gBlackMarketItems[listitem][SettlerID],
 		Float: amount = gBlackMarketItems[listitem][Amount],
 		value = gBlackMarketItems[listitem][Value],
 		DrugType: type = gBlackMarketItems[listitem][Type],
@@ -620,11 +627,32 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 		return SendClientMessage(playerid, COLOR_RED, "[ MARKET ] Not enough money to buy an offer!");
 	}
 
+	new query[64];
+	format(query, sizeof(query), "UPDATE users SET bank = bank + %d WHERE id = %d", 
+			price,
+			settler_id
+		);
+
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (settler_id == gPlayers[i][OrmID] && IsPlayerConnected(i))
+		{
+			gPlayers[i][Bank] += price;
+			//GivePlayerMoney(i, price);
+
+			new msg[64];
+			format(msg, sizeof(msg), "[ MARKET ] Somebody accepted your offer! (+$%d)", price);
+			SendClientMessage(i, COLOR_ORANGE, msg);
+			break;
+		}
+	}
+
 	GivePlayerMoney(playerid, -price);
 	gPlayers[playerid][Drugs][_: type] += floatround(amount);
 
 	// Clean the market item
 	gBlackMarketItems[listitem][OrmID] = -1;
+	gBlackMarketItems[listitem][SettlerID] = -1;
 	gBlackMarketItems[listitem][Amount] = 0;
 	gBlackMarketItems[listitem][Value] = 0;
 	gBlackMarketItems[listitem][Type] = DrugType: TYPE_NONE;
@@ -633,7 +661,6 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 	format(msg, sizeof(msg), "[ MARKET ] Offer %d proceeded! (price: %d)", offerid, price);
 	SendClientMessage(playerid, COLOR_ORANGE, msg);
 
-	new query[64];	
 	format(query, sizeof(query), "DELETE FROM black_market_items WHERE id = %d", offerid);
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);

@@ -742,7 +742,7 @@ stock ShowPlayerAccountDialog(playerid)
 	new version[16];
 	GetPlayerVersion(playerid, version, sizeof(version));
 
-	format(stringToPrint, sizeof(stringToPrint), "Account details:\n\n{FFFFFF}Cash: \t\t{00FF00}${FFD700}%d{FFFFFF}\nTeam: \t\t{FFD700}%s{FFFFFF} (ID: {FFD700}%d{FFFFFF})\nSkin ID:\t\t{FFD700}%d{FFFFFF}\nAdmin level: \t{FFD700}%d{FFFFFF}\nWanted level: \t{FFD700}%d{FFFFFF}\nPlayTime: \t{FFD700}%3d h %3d min %2d sec\n\nClient version: \t{FFD700}%s{FFFFFF}",
+	format(stringToPrint, sizeof(stringToPrint), "Account details:\n\n{FFFFFF}Cash: \t\t{00FF00}${FFD700}%d{FFFFFF}\nTeam: \t\t{FFD700}%s{FFFFFF} (ID: {FFD700}%d{FFFFFF})\nSkin ID:\t\t{FFD700}%d{FFFFFF}\nAdmin level: \t{FFD700}%d{FFFFFF}\nWanted level: \t{FFD700}%d{FFFFFF}\nPlayTime: \t{FFD700}%3d h %3d min %2d sec{FFFFFF}\n\nClient version: \t{FFD700}%s{FFFFFF}",
 			GetPlayerMoney(playerid),
 			team_name,
 			gPlayers[playerid][TeamID],
@@ -1432,14 +1432,13 @@ stock ShowBlackMarketItemListDialog(playerid)
 
 	do
 	{
-		if (++i == MAX_MARKET_ITEMS)
+		if (i + 1 == MAX_MARKET_ITEMS)
 		{
 			break;
 		}
-		i--;
 
 		new 
-			//settler_id = DB_GetFieldIntByName(result, "uid"),
+			settler_id = DB_GetFieldIntByName(result, "uid"),
 		    	offer_id = DB_GetFieldIntByName(result, "id"),
 		    	type = DB_GetFieldIntByName(result, "tid") - 1,
 		    	Float: amount = DB_GetFieldFloatByName(result, "amount"),
@@ -1456,11 +1455,12 @@ stock ShowBlackMarketItemListDialog(playerid)
 		DB_GetFieldStringByName(result, "name", drug_name, sizeof(drug_name));
 
 		gBlackMarketItems[i][OrmID] = offer_id;
+		gBlackMarketItems[i][SettlerID] = settler_id;
 		gBlackMarketItems[i][Amount] = amount;
 		gBlackMarketItems[i][Value] = value;
 		gBlackMarketItems[i][Type] = DrugType: type;
 
-		format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}[%3d] {FFD700}%.2f{FFFFFF} %s (%s): {00FF00}$%d{FFFFFF} (mkt: %d)",
+		format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}[%3d] {FFD700}%.2f{FFFFFF} %s (%s): {00FF00}$%d{FFFFFF} (mkt: %d)\n",
 				stringToPrint,
 				offer_id,
 				amount,
@@ -1469,6 +1469,8 @@ stock ShowBlackMarketItemListDialog(playerid)
 				value,
 				price
 			);
+
+		i++;
 	}
 	while (DB_SelectNextRow(result));
 

@@ -17,6 +17,7 @@
 enum BlackMarketItem
 {
 	OrmID,
+	SettlerID,
 	Float: Amount,
 	Value,
 	DrugType: Type

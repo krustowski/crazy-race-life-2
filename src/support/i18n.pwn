@@ -81,8 +81,15 @@ enum
 	// Taxi
 	I18N_TAXI_MISS_WRONG_VEHICLE,
 	I18N_TAXI_MISS_NPC_ENTERING,
+	I18N_TAXI_MISS_COMMISSION,
+	I18N_TAXI_MISS_DB_READ_ERROR,
+	I18N_TAXI_MISS_TOO_MANY_CUSTOMERS,
+	I18N_TAXI_MISS_MINIGAME_COLLISION,
 	I18N_TAXI_MISS_INFO,
 	I18N_TAXI_MISS_EXIT_VEHICLE,
+	I18N_TAXI_MISS_NEXT_DESTINATION,
+	I18N_TAXI_MISS_START,
+	I18N_TAXI_MISS_ABORT,
 	// Tow
 	I18N_TOW_MISS_INFO
 }
@@ -129,6 +136,13 @@ new gI18nMessageColor[] =
 	// Taxi
 	COLOR_RED,
 	COLOR_YELLOW,
+	COLOR_INVISIBLE,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_INVISIBLE,
+	COLOR_INVISIBLE,
+	COLOR_INVISIBLE,
 	COLOR_INVISIBLE,
 	COLOR_INVISIBLE,
 	// Tow
@@ -266,12 +280,40 @@ new gI18nMessages[][PlayerLocale][] =
 		"[ TAXI ] NPC nastupuje do auta..."
 	},
 	{
+		"[ TAXI ] Good job! Commission earned: $%d",
+		"[ TAXI ] Dobra prace! Provize: $%d"
+	},
+	{
+		"[ TAXI ] Database read error!",
+		"[ TAXI ] Chyba cteni databaze!"
+	},
+	{
+		"[ TAXI ] Too many customers in game, try again later!",
+		"[ TAXI ] Ve hre je prilis mnoho zakazniku, zkus to pozdeji!"
+	},
+	{
+		"[ TAXI ] Another minigame started, close it to start the taxi mission!",
+		"[ TAXI ] Jina minihra jiz bezi, ukonci ji pro zahajeni taxi mise!"
+	},
+	{
 		"~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%2d", 
 		"~w~Jizd:_____~g~%d~n~~w~Zarobeno:_~g~$~y~%d~n~~w~Cas:_____~b~%d~y~:~b~%2d"
 	},
 	{
 		"~w~Return to the ~y~taxi cab ~w~to continue the ~y~mission!",
 		"~w~Vrat se do ~y~taxiku ~w~k pokracovani zapocate ~y~mise!"
+	},
+	{
+		"~w~Next destination: ~y~%s",
+		"~w~Pristi destinace: ~y~%s"
+	},
+	{
+		"~w~Taxi Mission ~g~Started!",
+		"~w~Taxi Mise ~g~Zahajena!"
+	},
+	{
+		"~w~Taxi Mission ~r~Aborted!",
+		"~w~Taxi Mise ~r~Ukoncena!"
 	},
 	{
 		"~w~Models:_~g~%d~n~~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%2d",

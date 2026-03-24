@@ -210,7 +210,7 @@ stock CheckTaxiMissionCheckpoint(playerid)
 	gTaxiMission[playerid][Earned] += commission;
 
 	new stringToPrint[128];
-	format(stringToPrint, sizeof(stringToPrint), "[ TAXI ] Commission earned: $%d", commission);
+	format(stringToPrint, sizeof(stringToPrint), gI18nMessages[I18N_TAXI_MISS_COMMISSION][ gPlayers[playerid][Locale] ], commission);
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 
 	TogglePlayerControllable(playerid, false);
@@ -258,7 +258,8 @@ stock SetTaxiMissionCheckpoint(playerid)
 		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result) 
 		{
-			SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Database read error!");
+			SendClientMessageLocalized(playerid, I18N_TAXI_MISS_DB_READ_ERROR);
+
 			print("Database error: cannot get random row from property_coords!");
 			print(query);
 			return 0;
@@ -289,7 +290,7 @@ stock SetTaxiMissionCheckpoint(playerid)
 	gTaxiMission[playerid][Checkpoint][CoordZ] = Z;
 
 	new gameString[128];
-	format(gameString, sizeof(gameString), "~w~Next destination: ~y~%s", name);
+	format(gameString, sizeof(gameString), gI18nMessages[I18N_TAXI_MISS_NEXT_DESTINATION][ gPlayers[playerid][Locale] ], name);
 
 	GameTextForPlayer(playerid, gameString, 4000, 3); 
 	SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, X, Y, Z, X, Y, Z, 15.0);
@@ -329,7 +330,8 @@ stock SetTaxiMissionCustomerPos(playerid)
 		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result) 
 		{
-			SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Database read error!");
+			SendClientMessageLocalized(playerid, I18N_TAXI_MISS_DB_READ_ERROR);
+
 			print("Database error: cannot get random row from property_coords!");
 			print(query);
 			return 0;
@@ -380,7 +382,7 @@ stock SetTaxiMissionCustomer(playerid)
 
 	if (preid == -1)
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Too many customers in game, try again later!");
+		return SendClientMessageLocalized(playerid, I18N_TAXI_MISS_TOO_MANY_CUSTOMERS);
 	}
 
 	new npc_name[MAX_PLAYER_NAME];
@@ -391,7 +393,7 @@ stock SetTaxiMissionCustomer(playerid)
 	if (npcid == INVALID_NPC_ID)
 	{
 		print(npc_name);
-		return SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Too many customers in game, try again later!");
+		return SendClientMessageLocalized(playerid, I18N_TAXI_MISS_TOO_MANY_CUSTOMERS);
 	}
 
 	NPC_Spawn(npcid);
@@ -422,12 +424,12 @@ stock SetPlayerTaxiMission(playerid, areaid)
 
 	if (gPlayers[playerid][InMinigame])
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Another minigame started, close it to start the taxi mission!");
+		return SendClientMessageLocalized(playerid, I18N_TAXI_MISS_MINIGAME_COLLISION);
 	}
 
 	if (!IsPlayerInTaxiCab(playerid))
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Must be driving a taxi cab!");
+		return SendClientMessageLocalized(playerid, I18N_TAXI_MISS_WRONG_VEHICLE);
 	}
 
 	gTaxiMission[playerid][AreaID] = areaid;
@@ -448,7 +450,7 @@ stock SetPlayerTaxiMission(playerid, areaid)
 	TextDrawFont(gTaxiMission[playerid][InfoText], t_TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gTaxiMission[playerid][InfoText], 1);
 
-	GameTextForPlayer(playerid, "~w~Taxi Mission ~g~Started!", 3000, 3); 
+	GameTextForPlayer(playerid, gI18nMessages[I18N_TAXI_MISS_START][ gPlayers[playerid][Locale] ], 3000, 3); 
 
 	return 1;
 }
@@ -486,7 +488,7 @@ stock AbortPlayerTaxiMission(playerid)
 	DisablePlayerRaceCheckpoint(playerid);
 	TextDrawHideForPlayer(playerid, gTaxiMission[playerid][InfoText]);
 
-	GameTextForPlayer(playerid, "~w~Taxi Mission ~r~Aborted", 3000, 3); 
+	GameTextForPlayer(playerid, gI18nMessages[I18N_TAXI_MISS_ABORT][ gPlayers[playerid][Locale] ], 3000, 3); 
 
 	return 1;
 }

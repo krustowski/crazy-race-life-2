@@ -260,6 +260,8 @@ stock InitPrizes()
 				{
 					gPrizes[i][Pickup] = PICKUP: EnsurePickupCreated(PICKUP_PUMPKIN, PICKUP_TYPE_NO_RESPAWN, X, Y, Z);
 				}
+			default:
+				{}
 		}
 
 		i++;
@@ -298,6 +300,8 @@ stock UpdatePrize(playerid, prizeid)
 				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ PRIZE ] You have found the pumpkin prize ($1.5M)! Cg");
 				GivePlayerMoney(playerid, 1500000);
 			}
+		default:
+			{}
 	}
 
 	return 1;

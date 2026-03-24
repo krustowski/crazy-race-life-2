@@ -147,6 +147,8 @@ stock CheckDeathmatchPickups(playerid, pickupid)
 							    SetPlayerArmour(playerid, 100.0);
 							    break;
 						    }
+			default:
+						    {}
 		}
 	}
 }

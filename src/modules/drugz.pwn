@@ -128,7 +128,7 @@ stock InitDrugPickups()
 
 	do
 	{
-		new type = DB_GetFieldIntByName(result, "type"),
+		new DrugType: type = DrugType: DB_GetFieldIntByName(result, "type"),
 		    Float: X,
 		    Float: Y,
 		    Float: Z;

@@ -316,7 +316,7 @@ stock SpawnProperty(propertyId)
 
 	do 
 	{
-		new type = DB_GetFieldIntByName(result, "type");
+		new PropertyPoint: type = PropertyPoint: DB_GetFieldIntByName(result, "type");
 
 		new 
 			Float: pX = DB_GetFieldFloatByName(result, "primary_x"),
@@ -515,8 +515,12 @@ stock SpawnProperty(propertyId)
 									}
 								}
 							}
+						default:
+							{}
 					}
 				}
+			default:
+				{}
 		}
 
 		i++;
@@ -1657,6 +1661,8 @@ stock CheckRealEstatePickup(playerid, pickupid)
 									format(stringToPrint, sizeof(stringToPrint), "Property '%s' is currently rented by %s, but you can still pay the cost to rent it yourself.\n\n\tCost: $%d (%.2f mio)\n\n\nProperty code: %d\n\nTo rent this property, enter its code below:", gProperties[i][Label], playerName, gProperties[i][Cost], float(gProperties[i][Cost]) / 1000000, gProperties[i][ID]);
 									return ShowPlayerDialog(playerid, DIALOG_PROPERTY_RENT, DIALOG_STYLE_INPUT, "Real Estate (Commercial)", stringToPrint, "Rent", "Cancel");
 								}
+							default:
+								{}
 						}
 
 					}

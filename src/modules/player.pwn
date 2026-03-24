@@ -633,6 +633,14 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 			settler_id
 		);
 
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) {
+		printf("Database error: cannot update players bank account (offer ID %d, settler_id: %d)!", offerid, settler_id);
+		return 1;
+	}
+
+	DB_FreeResultSet(result);
+
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if (settler_id == gPlayers[i][OrmID] && IsPlayerConnected(i))
@@ -663,7 +671,7 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 
 	format(query, sizeof(query), "DELETE FROM black_market_items WHERE id = %d", offerid);
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
 		printf("Database error: cannot delete market item (ID %d)!", offerid);
 		return 1;

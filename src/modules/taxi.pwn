@@ -102,7 +102,7 @@ public CheckTaxiVehicle(playerid)
 		DisablePlayerRaceCheckpoint(playerid);
 		gTaxiMission[playerid][CheckpointDisabled] = true;
 
-		return GameTextForPlayer(playerid, "~w~Return to the ~y~taxi cab ~w~to continue the ~y~mission!", 1000, 3); 
+		return GameTextForPlayer(playerid, gI18nMessages[I18N_TAXI_MISS_EXIT_VEHICLE][ gPlayers[playerid][Locale] ], 1000, 3); 
 	}
 
 	if (gTaxiMission[playerid][CheckpointDisabled] && gTaxiMission[playerid][Checkpoint][CoordX] != 0.0 && gTaxiMission[playerid][Checkpoint][CoordY] != 0.0)
@@ -127,7 +127,7 @@ public CheckTaxiNearNPC(playerid)
 
 	if (GetVehicleModel(vehicleid) != 420)
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ TAXI ] Not a taxi car");
+		return SendClientMessageLocalized(playerid, I18N_TAXI_MISS_WRONG_VEHICLE);
 	}
 
 	new Float: pX, Float: pY, Float: pZ, Float: veolcity[3];
@@ -139,7 +139,8 @@ public CheckTaxiNearNPC(playerid)
 	{
 		KillTimer(gTaxiMission[playerid][TimerCheckNearNPC]);
 
-		SendClientMessage(playerid, COLOR_YELLOW, "[ TAXI ] Telling NPC to enter the vehicle...");
+		SendClientMessageLocalized(playerid, I18N_TAXI_MISS_NPC_ENTERING);
+
 		SetPVarInt(gTaxiMission[playerid][NPCid], "VehicleToEnter", vehicleid);
 		PlayerPlaySound(playerid, 1147, 0, 0, 0);
 
@@ -180,15 +181,12 @@ public UpdateTaxiMissionInfoText(playerid)
 
 	gTaxiMission[playerid][TimeElapsed] += 1000;
 
-	switch (gPlayers[playerid][Locale]) 
-	{
-		case LOCALE_CZ:
-			//
-			{}
-
-		default:
-			format(stringToPrint, sizeof(stringToPrint), "~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%2d", gTaxiMission[playerid][DoneCount], gTaxiMission[playerid][Earned], floatround(floatround(gTaxiMission[playerid][TimeElapsed] / 1000) / 60), floatround(gTaxiMission[playerid][TimeElapsed] / 1000) % 60);
-	}
+	format(stringToPrint, sizeof(stringToPrint), gI18nMessages[I18N_TAXI_MISS_INFO][ gPlayers[playerid][Locale] ], 
+		gTaxiMission[playerid][DoneCount], 
+		gTaxiMission[playerid][Earned], 
+		floatround(floatround(gTaxiMission[playerid][TimeElapsed] / 1000) / 60), 
+		floatround(gTaxiMission[playerid][TimeElapsed] / 1000) % 60
+	);
 
 	TextDrawSetString(gTaxiMission[playerid][InfoText], stringToPrint);
 	TextDrawShowForPlayer(playerid, gTaxiMission[playerid][InfoText]);

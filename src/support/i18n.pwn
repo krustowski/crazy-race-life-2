@@ -78,7 +78,12 @@ enum
 	I18N_REAL_ALREADY_OCCUPIED,
 	I18N_REAL_NO_MONEY,
 	I18N_REAL_SELL_SUCCESS,
-	//
+	// Taxi
+	I18N_TAXI_MISS_WRONG_VEHICLE,
+	I18N_TAXI_MISS_NPC_ENTERING,
+	I18N_TAXI_MISS_INFO,
+	I18N_TAXI_MISS_EXIT_VEHICLE,
+	// Tow
 	I18N_TOW_MISS_INFO
 }
 
@@ -121,7 +126,12 @@ new gI18nMessageColor[] =
 	COLOR_RED,
 	COLOR_RED,
 	COLOR_LIGHTGREEN,
-	// 
+	// Taxi
+	COLOR_RED,
+	COLOR_YELLOW,
+	COLOR_INVISIBLE,
+	COLOR_INVISIBLE,
+	// Tow
 	COLOR_INVISIBLE
 };
 
@@ -248,6 +258,22 @@ new gI18nMessages[][PlayerLocale][] =
 		"[ REAL ] Nemovitost byla uspesne prodana!"
 	},
 	{
+		"[ TAXI ] Not a taxi cab!",
+		"[ TAXI ] Musis ridit taxi auto!"
+	},
+	{
+		"[ TAXI ] Telling NPC to enter the vehicle...",
+		"[ TAXI ] NPC nastupuje do auta..."
+	},
+	{
+		"~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%2d", 
+		"~w~Jizd:_____~g~%d~n~~w~Zarobeno:_~g~$~y~%d~n~~w~Cas:_____~b~%d~y~:~b~%2d"
+	},
+	{
+		"~w~Return to the ~y~taxi cab ~w~to continue the ~y~mission!",
+		"~w~Vrat se do ~y~taxiku ~w~k pokracovani zapocate ~y~mise!"
+	},
+	{
 		"~w~Models:_~g~%d~n~~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%2d",
 		"~w~Modely:_~g~%d~n~~w~Zavezeno:_~g~%d~n~~w~Zarobeno:_~g~$~y~%d~n~~w~Cas:_____~b~%d~y~:~b~%2d"
 	}
@@ -264,4 +290,10 @@ forward SendClientMessageLocalized(playerid, msg_id);
 public SendClientMessageLocalized(playerid, msg_id)
 {
 	return SendClientMessage(playerid, gI18nMessageColor[msg_id], gI18nMessages[msg_id][ gPlayers[playerid][Locale] ]);
+}
+
+stock GetLocalizedString(playerid, msg_id, string, size)
+{
+	format(string, size, "%s", gI18nMessages[msg_id][ gPlayers[playerid][Locale] ]);
+	return 1;
 }

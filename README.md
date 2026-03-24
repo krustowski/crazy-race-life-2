@@ -1,6 +1,6 @@
 # CrazyRaceLife2 (CRL2)
 
-A GTA SA:MP/openMP gamemode scripted in the pawn lang.
+A GTA SA:MP/openMP gamemode scripted in the Pawn lang with sqlite-designed SQL connector built-in.
 
 Live demo at [samp://95.216.7.113:39876](samp://95.216.7.113:39876)
 
@@ -119,6 +119,7 @@ Live demo at [samp://95.216.7.113:39876](samp://95.216.7.113:39876)
 
 *^ Detail of a detached trailer (decomposing in the sea waters). Custom information text is shown until the trailer is reattached back to the truck registered for the mission.*
 
+
 ### MapUI
 
 MapUI is an util to parse and visualize the database data (coords) on the high-res GTA SA map (source: [reddit](https://www.reddit.com/r/sanandreas/comments/9856u1/high_resolution_map_for_grand_theft_auto_san/)). To run it, go to `utils/mapui` and just run it in console like this:
@@ -132,6 +133,7 @@ The MapUI tool is the available at [http://localhost:3000](http://localhost:3000
 ![](.github/img/crl2_mapui_detail.jpg)
 
 *^ Detailed tooltip for a commercial property in the MapUI util.*
+
 
 ## How to build
 
@@ -171,6 +173,7 @@ gamemode crl2
 ```
 
 The examples above are shown respectively to the config file names mentioned.
+
 
 ## Vademecum
 
@@ -261,6 +264,7 @@ The examples above are shown respectively to the config file names mentioned.
 	/restart    --- sets the countdown for 60 seconds to restart the server
 ```
 
+
 ### Real Estate
 
 Each property ID has to be unique server-wide. It is recommended to use 5-digit format like `40605`, where:
@@ -278,6 +282,7 @@ Greater zone IDs:
 4 - Countryside, Farms
 5 - Los Santos
 ```
+
 
 ## Development
 

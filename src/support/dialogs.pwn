@@ -79,6 +79,7 @@ enum
 	DIALOG_RACE_HELP,
 	DIALOG_TAXI_OPTIONS,
 	DIALOG_HIGH_SCORES_OPTIONS,
+	DIALOG_HIGH_SCORES_PLAYTIME,
 	DIALOG_HIGH_SCORES_DEATHMATCH,
 	DIALOG_HIGH_SCORES_MISSIONS,
 	DIALOG_HIGH_SCORES_COMBAT,
@@ -1085,14 +1086,53 @@ stock ShowTaxiMissionOptionsDialog(playerid)
 stock ShowHighScoresOptionsDialog(playerid)
 {
 	new stringToPrint[256];
-	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%s",
 			"Races\n",
 			"Deathmatch\n",
 			"Missions\n",
-			"Combat"
+			"Combat\n",
+			"PlayTime"
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_OPTIONS, DIALOG_STYLE_LIST, "High Scores", stringToPrint, "Select", "Close");
+}
+
+stock ShowHighScoresPlayTimeDialog(playerid)
+{
+	new query[512] = "SELECT id, nickname, playtime FROM users WHERE playtime IS NOT 0 ORDER by playtime DESC LIMIT 10";
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for playtime!");
+		print(query);
+		return 0;
+	}
+
+	new i = 1, stringToPrint[512] = "{FFD700}Top 10 players by Playtime:{FFFFFF}\n";
+
+	do
+	{
+		new nickname[MAX_PLAYER_NAME], value;
+
+		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+		value = DB_GetFieldIntByName(result, "playtime");
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%d: {FFD700}%24s{FFFFFF} \t %3d h %2d min %2d sec", 
+				stringToPrint, 
+				i, 
+				nickname,
+				value / 1000 / 3600,
+				value / 1000 / 60 % 60,
+				value / 1000 % 60
+			);
+		i++;
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_PLAYTIME, DIALOG_STYLE_MSGBOX, "High Scores: PlayTime", stringToPrint, "Close", "");
 }
 
 stock ShowHighScoresDeathmatchDialog(playerid)

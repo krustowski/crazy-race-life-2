@@ -1099,7 +1099,7 @@ stock ShowHighScoresOptionsDialog(playerid)
 
 stock ShowHighScoresPlayTimeDialog(playerid)
 {
-	new query[512] = "SELECT id, nickname, playtime FROM users WHERE playtime IS NOT 0 ORDER by playtime DESC LIMIT 10";
+	new query[512] = "SELECT id, nickname, playtime FROM users WHERE playtime IS NOT 0 ORDER BY playtime DESC LIMIT 10";
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)

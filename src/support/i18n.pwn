@@ -42,7 +42,11 @@ enum PlayerLocale
 enum 
 {
 	I18N_WELCOME_MESSAGE,
+	I18N_PLAYER_NOT_CONNECTED,
 	I18N_NO_SUCH_COMMAND,
+	I18N_CMD_USAGE_FMT,
+	I18N_LOW_ADMIN_LEVEL,
+	I18N_VEHICLE_ID_MISMATCH,
 	// Black Market
 	I18N_BLACK_MARKET_RATIO_UPDATE,
 	// User data load
@@ -66,6 +70,7 @@ enum
 	I18N_RACE_NO_MONEY,
 	// Deathmatch
 	I18N_DEATHMATCH_STARTED,
+	I18N_DEATHMATCH_INGAME_BLOCK,
 	// Player
 	I18N_DEATH_MONEY_LOCALITY,
 	// Real estate
@@ -99,7 +104,11 @@ enum
 new gI18nMessageColor[] = 
 {
 	COLOR_GREEN,
+	COLOR_RED,
 	COLOR_GREY,
+	COLOR_YELLOW,
+	COLOR_RED,
+	COLOR_RED,
 	// Black Market
 	COLOR_ORANGE,
 	// User data load
@@ -123,6 +132,7 @@ new gI18nMessageColor[] =
 	COLOR_RED,
 	// Deathmatch
 	COLOR_YELLOW,
+	COLOR_RED,
 	// Player
 	COLOR_YELLOW,
 	// Real estate
@@ -160,8 +170,24 @@ new gI18nMessages[][PlayerLocale][] =
 		"Vitej ve hre! /help"
 	},
 	{
+		"[ ! ] The player is not connected!",
+		"[ ! ] Hrac neni pripojen ke hre!"
+	},
+	{
 		"[ CMD ] No such command! /cmd /help /rules",
 		"[ CMD ] Tento prikaz neexistuje! /cmd /help /rules"
+	},
+	{
+		"[ CMD ] Usage: %s",
+		"[ CMD ] Pouziti prikazu: %s"
+	},
+	{
+		"[ CMD ] Admin level too low!",
+		"[ CMD ] Pro dany prikaz nemas opravneni!"
+	},
+	{
+		"[ CMD ] Invalid ID! (IDs 400-611)",
+		"[ CMD ] Neplatne ID! (pouzij ID z rozmezi 400-611)"
 	},
 	{
 		"[ MARKET ] Market token-to-dollar ratio changed to: %.3f",
@@ -229,7 +255,11 @@ new gI18nMessages[][PlayerLocale][] =
 	},
 	{
 		"[ DEATHMATCH ] New match just started!",
-		"[ DEATHMATCH ] Utkani zacalo! 4 minuty do konce"
+		"[ DEATHMATCH ] Nove utkani zacalo!"
+	},
+	{
+		"[ DEATHMATCH ] The player is currently in a deathmatch minigame, try again later!",
+		"[ DEATHMATCH ] Hrac zrovna hraje utkani deathmatch, zkus to pozdeji!"
 	},
 	{
 		"[ CASH ] You dropped your money at the death position!",

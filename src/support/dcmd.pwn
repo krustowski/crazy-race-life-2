@@ -1450,20 +1450,31 @@ dcmd_spectate(playerid, const params[])
 dcmd_vehicle(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
 
 	if (!strlen(params) || !IsNumeric(params))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /vehicle [vehicleID]");
+	{
+		new msg[64];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg);
+		format(msg, sizeof(msg), msg, "/vehicle [vehicleID]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+	}
 
-	new vehicleId = strval(params);
+	new modelid = strval(params);
 
-	if (vehicleId < 400 || vehicleId > 611)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Invalid ID! (IDs 400-611)");
+	if (modelid < 400 || modelid > 611)
+	{
+		return SendClientMessageLocalized(playerid, I18N_VEHICLE_ID_MISMATCH);
+	}
 
 	new Float:X, Float:Y, Float:Z;
 
 	GetPlayerPos(playerid, X, Y, Z);
-	CreateVehicle(vehicleId, Float:X, Float:Y, Float:Z, 0.0, -1, -1, -1);
+
+	new vehicleid = CreateVehicle(modelid, Float:X, Float:Y, Float:Z + 2.0, 0.0, -1, -1, -1);
+	PutPlayerInVehicle(playerid, vehicleid, 0);
 
 	return 1;
 }
@@ -1471,22 +1482,31 @@ dcmd_vehicle(playerid, const params[])
 dcmd_weapon(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
 
 	new token1[32], token2[32];
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /weapon [playerID] [weaponID]");
+	{
+		new msg[64];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg);
+		format(msg, sizeof(msg), msg, "/weapon [playerID] [weaponID]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+	}
 
 	new targetId = strval(token1), targetWeapon = strval(token2);
 
 	if (!IsPlayerConnected(targetId))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] No such player online!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
 
 	if (gDeathmatch[targetId][IsRegistered] || gDeathmatch[targetId][InGame])
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Target ID is playing a minigame!");
+		return SendClientMessageLocalized(playerid, I18N_DEATHMATCH_INGAME_BLOCK);
 	}
 
 	GivePlayerWeapon(targetId, t_WEAPON: targetWeapon, 1000);
@@ -1497,20 +1517,28 @@ dcmd_weapon(playerid, const params[])
 dcmd_weapons(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
 
 	if (!strlen(params) || !IsNumeric(params)) 
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /weapons [playerID]!");
+	{
+		new msg[64];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg);
+		format(msg, sizeof(msg), msg, "/weapons [playerID]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+	}
 
 	new targetId = strval(params);
 
 	if (!IsPlayerConnected(targetId))
-		//return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+	{
 		targetId = playerid;
+	}
 
 	if (gDeathmatch[targetId][IsRegistered] || gDeathmatch[targetId][InGame])
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Target ID is playing a minigame!");
+		return SendClientMessageLocalized(playerid, I18N_DEATHMATCH_INGAME_BLOCK);
 	}
 
 	GivePlayerWeapon(targetId, t_WEAPON: 26, 400);

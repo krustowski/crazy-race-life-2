@@ -575,6 +575,11 @@ stock SaveTruckingMissionScore(playerid)
 
 stock AbortTruckingMission(playerid)
 {
+	if (!gTrucking[playerid])
+	{
+		return 1;
+	}
+
 	gPlayers[playerid][InMinigame] = false;
 
 	gTrucking[playerid] = false;

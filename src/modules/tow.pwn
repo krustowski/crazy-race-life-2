@@ -121,6 +121,11 @@ stock CheckVehicleModelTowed(playerid, modelid)
 
 stock AbortTowMission(playerid)
 {
+	if (!gTowMission[playerid][Active])
+	{
+		return 1;
+	}
+
 	SaveTowMissionScore(playerid);
 
 	gPlayers[playerid][InMinigame] = false;

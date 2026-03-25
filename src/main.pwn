@@ -205,16 +205,18 @@ public OnGameModeInit()
 
 	SetTimer("OnRadarCheckpoint", 300, true);
 
-	SetTimer("AutosaveData", 200 * SECOND_MS, true);
+	SetTimer("AutosaveData", 3 * 60 * SECOND_MS, true);
 	SetTimer("UpdatePlayerPlayTime", 10 * SECOND_MS, true);
-	SetTimer("UpdatePlayerScore", 1 * SECOND_MS, true);
+	SetTimer("UpdatePlayerScore", 2 * SECOND_MS, true);
+
+	SetTimer("UpdateBlackMarketRatio", 3 * 60 * SECOND_MS, true);
 
 	SetTimer("SendPlayerSalary", 5 * 60 * SECOND_MS, true);
 	SetTimer("SendRealEstateCommission", 5 * 60 * SECOND_MS, true);
 
 	SetTimer("DrawClockText", 10 * SECOND_MS, true);
 
-	SetTimer("ShowAdvert", 120 * SECOND_MS, true);
+	SetTimer("ShowAdvert", 2 * 60 * SECOND_MS, true);
 
 	return 1;
 }

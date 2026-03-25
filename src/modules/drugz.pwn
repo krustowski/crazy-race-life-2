@@ -27,6 +27,8 @@ new gBlackMarketItems[MAX_MARKET_ITEMS][BlackMarketItem];
 
 new gBlackMarketItemOffer[MAX_PLAYERS][BlackMarketItem];
 
+new Float: gBlackMarketRatio = 1.0;
+
 enum
 {
 	ZAZA,
@@ -74,6 +76,34 @@ enum DrugPickup
 new gDrugPickups[MAX_DRUG_PICKUPS][DrugPickup];
 
 new gDrugz[MAX_DRUG_TYPES][Drug];
+
+forward UpdateBlackMarketRatio();
+
+public UpdateBlackMarketRatio()
+{
+	new 
+		Float: ratio = floatdiv(random(20) + 1, 10.0);
+	
+	ratio = floatmul(ratio, gBlackMarketRatio);
+	gBlackMarketRatio = ratio;
+	
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i))
+		{
+			continue;
+		}
+
+		new msg[64];
+		GetLocalizedString(i, I18N_BLACK_MARKET_RATIO_UPDATE, msg);
+
+		format(msg, sizeof(msg), msg,
+				ratio
+			);
+
+		SendClientMessage(i, COLOR_ORANGE, msg);
+	}
+}
 
 stock InitDrugValues()
 {

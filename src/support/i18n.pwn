@@ -43,7 +43,9 @@ enum
 {
 	I18N_WELCOME_MESSAGE,
 	I18N_NO_SUCH_COMMAND,
-	// User Ddata load
+	// Black Market
+	I18N_BLACK_MARKET_RATIO_UPDATE,
+	// User data load
 	I18N_USER_DATA_LOAD,
 	I18N_USER_DATA_LOAD_SUCCESS,
 	// Autosave
@@ -98,6 +100,8 @@ new gI18nMessageColor[] =
 {
 	COLOR_GREEN,
 	COLOR_GREY,
+	// Black Market
+	COLOR_ORANGE,
 	// User data load
 	COLOR_YELLOW,
 	COLOR_GREEN,
@@ -158,6 +162,10 @@ new gI18nMessages[][PlayerLocale][] =
 	{
 		"[ CMD ] No such command! /cmd /help /rules",
 		"[ CMD ] Tento prikaz neexistuje! /cmd /help /rules"
+	},
+	{
+		"[ MARKET ] Market token-to-dollar ratio changed to: %.2f",
+		"[ TRH ] Kurz token:dolaru na trhu se zmenil: %.2f"
 	},
 	{
 		"[ DATA ] Loading user data...",
@@ -334,8 +342,8 @@ public SendClientMessageLocalized(playerid, msg_id)
 	return SendClientMessage(playerid, gI18nMessageColor[msg_id], gI18nMessages[msg_id][ gPlayers[playerid][Locale] ]);
 }
 
-stock GetLocalizedString(playerid, msg_id, string, size)
+stock GetLocalizedString(playerid, msg_id, str[64])
 {
-	format(string, size, "%s", gI18nMessages[msg_id][ gPlayers[playerid][Locale] ]);
+	format(str, sizeof(str), "%s", gI18nMessages[msg_id][ gPlayers[playerid][Locale] ]);
 	return 1;
 }

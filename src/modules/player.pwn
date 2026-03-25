@@ -634,7 +634,8 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 		);
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) {
+	if (!result) 
+	{
 		printf("Database error: cannot update players bank account (offer ID %d, settler_id: %d)!", offerid, settler_id);
 		return 1;
 	}

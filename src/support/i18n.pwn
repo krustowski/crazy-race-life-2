@@ -59,7 +59,18 @@ enum
 	I18N_ADMIN_LVL_SET_SAME,
 	I18N_ADMIN_LVL_SET_FMT,
 	I18N_PLAYER_KICK_FMT,
+	I18N_PLAYER_BAN_FMT,
 	I18N_PLAYER_HP_SET,
+	I18N_DRUNK_LEVEL_INVALID,
+	I18N_DRUNK_LEVEL_SET,
+	I18N_CRIME_LEVEL_INVALID,
+	I18N_CLEAR_CHAT_INFO,
+	I18N_CAM_ATTACHED_ID_FMT,
+	I18N_CAM_DETACHED,
+	// Admin elevator
+	I18N_AE_MOVE_UP,
+	I18N_AE_MOVE_DOWN,
+	I18N_AE_MOVE_STOP,
 	// Black Market
 	I18N_BLACK_MARKET_RATIO_UPDATE,
 	// User data load
@@ -134,7 +145,18 @@ new gI18nMessageColor[] =
 	COLOR_YELLOW,
 	COLOR_YELLOW,
 	COLOR_YELLOW,
+	COLOR_YELLOW,
 	COLOR_LIGHTGREEN,
+	COLOR_RED,
+	COLOR_ORANGE,
+	COLOR_RED,
+	COLOR_YELLOW,
+	COLOR_BLUE,
+	COLOR_YELLOW,
+	// Admin elevator
+	COLOR_YELLOW,
+	COLOR_YELLOW,
+	COLOR_YELLOW,
 	// Black Market
 	COLOR_ORANGE,
 	// User data load
@@ -264,8 +286,51 @@ new gI18nMessages[][PlayerLocale][] =
 		"[ KICK ] Admin %s [ID: %d] vykopl hrace %s [ID: %d] ze hry!"
 	},
 	{
+		"[ BAN ] Admin %s [ID: %d] banned player %s [ID: %d] from server!",
+		"[ BAN ] Admin %s [ID: %d] zakazal hraci %s [ID: %d] pristup do hry!"
+	},
+	{
 		"[ HP ] Health: 100.0, armour: 100.0",
 		"[ HP ] Zdravi: 100.0, vesta: 100.0"
+	},
+	{
+		"[ DRUGZ ] Invalid level, use a number from range 0-50000",
+		"[ DRUGZ ] Neplatny level, pouzij cislo z rozmezi 0-50000"
+	},
+	{
+		"[ DRUGZ ] Your drunk level changed!",
+		"[ DRUGZ ] Zmenil se level opilstvi!"
+	},
+	{
+		"[ CMD ] Invalid input (crime IDs: 3-22)",
+		"[ CMD ] Neplatne ID zlocinu (rozmezi ID je 3-22)"
+	},
+	{
+		"[ CLEAR ] Chat history flushed!",
+		"[ CLEAR ] Historie chatu byla smazana!"
+	},
+	{
+		"[ CAM ] Camera No. %d attached [/ccmd /camoff]",
+		"[ CAM ] Kamera cislo %d pripojena [/ccmd /camoff]"
+	},
+	{
+		"[ CAM ] Camera dettached [/ccmd]",
+		"[ CAM ] Kamera odpojena [/ccmd]"
+	},
+	//
+	//  Admin elevator
+	//
+	{
+		"[ AE ] Admin elevator goes up!",
+		"[ AE ] Vytah adminu se rozjel nahoru!"
+	},
+	{
+		"[ AE ] Admin elevator goes down!",
+		"[ AE ] Vytah adminu se rozjel dolu!"
+	},
+	{
+		"[ AE ] Admin elevator stopped due to a technical malfunction!",
+		"[ AE ] Vytah admin se zasekl kvuli poruse zarizeni!"
 	},
 	//
 	//  Black Market

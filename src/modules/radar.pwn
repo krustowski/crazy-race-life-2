@@ -60,11 +60,13 @@ public OnRadarCheckpoint()
 
 		if (floatround(radarValue / 1400) > 65)
 		{
-			format(stringToPrint, sizeof(stringToPrint), "~w~Health:____%3d_%%~n~~w~Velocity:__~r~~h~%3d", floatround(vehicleHelth / 10), floatround(radarValue / 1400));
+			GetLocalizedString(i, I18N_HID_STATS_RED_FMT, stringToPrint, sizeof(stringToPrint));
+			format(stringToPrint, sizeof(stringToPrint), stringToPrint, floatround(vehicleHelth / 10), floatround(radarValue / 1400));
 		}
 		else
 		{
-			format(stringToPrint, sizeof(stringToPrint), "~w~Health:____%3d_%%~n~~w~Velocity:__~g~~h~%3d", floatround(vehicleHelth / 10), floatround(radarValue / 1400));
+			GetLocalizedString(i, I18N_HID_STATS_GREEN_FMT, stringToPrint, sizeof(stringToPrint));
+			format(stringToPrint, sizeof(stringToPrint), stringToPrint, floatround(vehicleHelth / 10), floatround(radarValue / 1400));
 		}
 
 		// Redraw the player's current velocity.
@@ -86,14 +88,11 @@ public OnRadarCheckpoint()
 					GivePlayerMoney(i, -RADAR_FEE);
 					PlayerPlaySound(i, 1147, 0, 0, 0);
 
-					switch (gPlayers[i][Locale])
-					{
-						case LOCALE_CZ:
-							format(stringToPrint, 128, "[ RADAR ] Jel jsi prilis vysokou rychlosti ( %3d km/h )! Pokuta: $%d", floatround(radarValue / 1400), RADAR_FEE);
-
-						default:
-							format(stringToPrint, 128, "[ SPEED ] Vehicle speed too high ( %3d km/h )! Fee amount: $%d", floatround(radarValue / 1400), RADAR_FEE);
-					}
+					GetLocalizedString(i, I18N_RADAR_FEE_FMT, stringToPrint, sizeof(stringToPrint));
+					format(stringToPrint, sizeof(stringToPrint), stringToPrint,
+							floatround(radarValue / 1400), 
+							RADAR_FEE
+						);
 
 					SendClientMessage(i, COLOR_RED, stringToPrint);
 

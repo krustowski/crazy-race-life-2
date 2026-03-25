@@ -69,6 +69,10 @@ enum
 	I18N_CAM_DETACHED,
 	I18N_ADMINCOL_FMT,
 	I18N_TEAM_RELATED_CMD_POLICE,
+	// Radar (vehicle stats)
+	I18N_HID_STATS_GREEN_FMT,
+	I18N_HID_STATS_RED_FMT,
+	I18N_RADAR_FEE_FMT,
 	// Admin elevator
 	I18N_AE_MOVE_UP,
 	I18N_AE_MOVE_DOWN,
@@ -157,6 +161,10 @@ new gI18nMessageColor[] =
 	COLOR_YELLOW,
 	COLOR_YELLOW,
 	COLOR_YELLOW,
+	// Radar (vehicle stats)
+	COLOR_LIGHTGREEN,
+	COLOR_RED,
+	COLOR_RED,
 	// Admin elevator
 	COLOR_YELLOW,
 	COLOR_YELLOW,
@@ -328,6 +336,21 @@ new gI18nMessages[][PlayerLocale][] =
 	{
 		"[ CMD ] Police team-related command!",
 		"[ CMD ] Tento prikaz je urcen pouze pro team policistu!"
+	},
+	//
+	//  Radar (vehicle stats)
+	//
+	{
+		"~w~Health:____%3d_%%~n~~w~Velocity:__~g~~h~%3d",
+		"~w~Stav:______%3d_%%~n~~w~Rychlost:__~g~~h~%3d"
+	},
+	{
+		"~w~Health:____%3d_%%~n~~w~Velocity:__~r~~h~%3d",
+		"~w~Stav:______%3d_%%~n~~w~Rychlost:__~r~~h~%3d"
+	},
+	{
+		"[ SPEED ] Vehicle speed too high (%3d km/h)! Fee amount: $%d",
+		"[ SPEED ] Jedes prilis rychle (%3d km/h)! Pokuta: $%d"
 	},
 	//
 	//  Admin elevator

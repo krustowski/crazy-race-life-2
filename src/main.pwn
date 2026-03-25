@@ -1623,7 +1623,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 									if (!isowner && ishacker && (alarm || random(4) == 3))
 									{
-										SetVehicleParamsEx(vehicleid, true, false, true, true, false, false, false);
+										SetVehicleParamsEx(vehicleid, true, false, true, true, false, true, false);
 										SendClientMessage(playerid, COLOR_YELLOW, "[ LOCK ] Car lock hack failed! Alarm has been activated! Run");
 										break;
 									}	

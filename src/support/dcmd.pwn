@@ -815,10 +815,13 @@ dcmd_wanted(playerid, const params[])
 {
 #pragma unused params
 	if (gPlayers[playerid][TeamID] != TEAM_POLICE && !IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1)
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Police team-related command!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_TEAM_RELATED_CMD_POLICE);
+	}
 
 	return ShowWantedListDialog(playerid);
 }
+
 
 //
 //  DCMDs --- ADMIN COMMANDS
@@ -834,33 +837,6 @@ dcmd_acmd(playerid, const params[])
 
 	return ShowAdminCommandsDialog(playerid);
 }
-
-new gAdminColNames[6][2][] = {
-	{
-		"none",
-		"zadna"
-	},
-	{
-		"green",
-		"zelenou"
-	},
-	{
-		"blue",
-		"modrou"
-	},
-	{
-		"red",
-		"cervenou"
-	},
-	{
-		"orange",
-		"oranzovou"
-	},
-	{
-		"white",
-		"bilou"
-	}
-};
 
 dcmd_admincol(playerid, const params[])
 {
@@ -881,7 +857,7 @@ dcmd_admincol(playerid, const params[])
 
 	new msg[64];
 	GetLocalizedString(playerid, I18N_ADMINCOL_FMT, msg, sizeof(msg));
-	format(msg, sizeof(msg), msg, gAdminColNames[adminColToSet][ _: gPlayers[playerid][Locale] ]);
+	format(msg, sizeof(msg), msg, gAdminColNames[adminColToSet][ gPlayers[playerid][Locale] ]);
 
 	switch (adminColToSet)
 	{
@@ -1771,7 +1747,11 @@ dcmd_vehicle(playerid, const params[])
 	GetPlayerPos(playerid, X, Y, Z);
 
 	new vehicleid = CreateVehicle(modelid, Float:X, Float:Y, Float:Z + 2.0, 0.0, -1, -1, -1);
-	PutPlayerInVehicle(playerid, vehicleid, 0);
+
+	if (vehicleid)
+	{
+		PutPlayerInVehicle(playerid, vehicleid, 0);
+	}
 
 	return 1;
 }

@@ -68,6 +68,7 @@ enum
 	I18N_CAM_ATTACHED_ID_FMT,
 	I18N_CAM_DETACHED,
 	I18N_ADMINCOL_FMT,
+	I18N_TEAM_RELATED_CMD_POLICE,
 	// Admin elevator
 	I18N_AE_MOVE_UP,
 	I18N_AE_MOVE_DOWN,
@@ -153,6 +154,7 @@ new gI18nMessageColor[] =
 	COLOR_RED,
 	COLOR_YELLOW,
 	COLOR_BLUE,
+	COLOR_YELLOW,
 	COLOR_YELLOW,
 	COLOR_YELLOW,
 	// Admin elevator
@@ -322,6 +324,10 @@ new gI18nMessages[][PlayerLocale][] =
 	{
 		"[ COL ] Player label color set to %s!",
 		"[ COL ] Barva stitku hrace zmenena na %s!"
+	},
+	{
+		"[ CMD ] Police team-related command!",
+		"[ CMD ] Tento prikaz je urcen pouze pro team policistu!"
 	},
 	//
 	//  Admin elevator
@@ -508,6 +514,33 @@ new gI18nMessages[][PlayerLocale][] =
 	{
 		"~w~Models:_~g~%d~n~~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%2d",
 		"~w~Modely:_~g~%d~n~~w~Zavezeno:_~g~%d~n~~w~Vydelek:__~g~$~y~%d~n~~w~Cas:_____~b~%d~y~:~b~%2d"
+	}
+};
+
+new gAdminColNames[6][PlayerLocale][] = {
+	{
+		"none",
+		"zadna"
+	},
+	{
+		"green",
+		"zelenou"
+	},
+	{
+		"blue",
+		"modrou"
+	},
+	{
+		"red",
+		"cervenou"
+	},
+	{
+		"orange",
+		"oranzovou"
+	},
+	{
+		"white",
+		"bilou"
 	}
 };
 

@@ -1118,13 +1118,13 @@ stock ShowHighScoresPlayTimeDialog(playerid)
 		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
 		value = DB_GetFieldIntByName(result, "playtime");
 
-		format(stringToPrint, sizeof(stringToPrint), "%s\n%d: {FFD700}%24s{FFFFFF} \t %3d h %2d min %2d sec", 
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%d: %3d h %2d min %2d sec \t\t {FFD700}%s{FFFFFF}", 
 				stringToPrint, 
 				i, 
-				nickname,
 				value / 1000 / 3600,
 				value / 1000 / 60 % 60,
-				value / 1000 % 60
+				value / 1000 % 60,
+				nickname
 			);
 		i++;
 	}

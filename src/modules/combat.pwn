@@ -401,6 +401,11 @@ stock SaveCombatMissionScore(playerid)
 
 stock AbortCombatMission(playerid, bool: success)
 {
+	if (!gCombatMission[playerid][Active])
+	{
+		return 1;
+	}
+
 	for (new i = 0; i < MAX_COMBAT_PICKUPS; i++)
 	{
 		DestroyPickup(gCombatPickups[i][Pickup]);

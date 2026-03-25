@@ -11,7 +11,7 @@
 
 #define VEHICLE_ID_TOW_TRUCK	525
 
-#define MAX_VEHICLE_COUNT	211
+#define MAX_VEHICLE_MODELS	211
 
 #define DOCK_SF_X		-1588.42
 #define DOCK_SF_Y		109.28
@@ -32,7 +32,7 @@ enum TowMission
 	TimerElapsed,
 	TimerAttachedCheck,
 
-	bool: Models[MAX_VEHICLE_COUNT],
+	bool: Models[MAX_VEHICLE_MODELS],
 
 	bool: CheckpointDisabled
 }
@@ -104,7 +104,7 @@ public CheckPlayerTowTrailerAttached(playerid)
 
 stock CheckVehicleModelTowed(playerid, modelid)
 {
-	if (modelid - 400 >= MAX_VEHICLE_COUNT)
+	if (modelid - 400 >= MAX_VEHICLE_MODELS)
 	{
 		return 0;
 	}
@@ -138,7 +138,7 @@ stock AbortTowMission(playerid)
 	gTowMission[playerid][ModelCount] = 0;
 	gTowMission[playerid][CheckpointDisabled] = true;
 
-	for (new i = 0; i < MAX_VEHICLE_COUNT; i++)
+	for (new i = 0; i < MAX_VEHICLE_MODELS; i++)
 	{
 		gTowMission[playerid][Models][i] = false;
 	}
@@ -182,7 +182,7 @@ stock ToggleTowMission(playerid)
 	gTowMission[playerid][ModelCount] = 0;
 	gTowMission[playerid][CheckpointDisabled] = true;
 
-	for (new i = 0; i < MAX_VEHICLE_COUNT; i++)
+	for (new i = 0; i < MAX_VEHICLE_MODELS; i++)
 	{
 		gTowMission[playerid][Models][i] = false;
 	}
@@ -221,7 +221,7 @@ stock OperateTowTruck(playerid)
 
 	for (new i = 0; i < MAX_VEHICLES; i++)
 	{
-		if (i == gTowMission[playerid][TruckID])
+		if (i == gTowMission[playerid][TruckID] || GetVehicleModel(i) == 525)
 		{
 			continue;
 		}

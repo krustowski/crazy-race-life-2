@@ -164,8 +164,8 @@ new gI18nMessages[][PlayerLocale][] =
 		"[ CMD ] Tento prikaz neexistuje! /cmd /help /rules"
 	},
 	{
-		"[ MARKET ] Market token-to-dollar ratio changed to: %.2f",
-		"[ TRH ] Kurz token:dolaru na trhu se zmenil: %.2f"
+		"[ MARKET ] Market token-to-dollar ratio changed to: %.3f",
+		"[ TRH ] Kurz token:dolaru na trhu se zmenil: %.3f"
 	},
 	{
 		"[ DATA ] Loading user data...",
@@ -305,7 +305,7 @@ new gI18nMessages[][PlayerLocale][] =
 	},
 	{
 		"~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%2d", 
-		"~w~Jizd:_____~g~%d~n~~w~Zarobeno:_~g~$~y~%d~n~~w~Cas:_____~b~%d~y~:~b~%2d"
+		"~w~Jizd:_____~g~%d~n~~w~Vydelek:_~g~$~y~%d~n~~w~Cas:_____~b~%d~y~:~b~%2d"
 	},
 	{
 		"~w~Return to the ~y~taxi cab ~w~to continue the ~y~mission!",
@@ -325,7 +325,7 @@ new gI18nMessages[][PlayerLocale][] =
 	},
 	{
 		"~w~Models:_~g~%d~n~~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%2d",
-		"~w~Modely:_~g~%d~n~~w~Zavezeno:_~g~%d~n~~w~Zarobeno:_~g~$~y~%d~n~~w~Cas:_____~b~%d~y~:~b~%2d"
+		"~w~Modely:_~g~%d~n~~w~Zavezeno:_~g~%d~n~~w~Vydelek:__~g~$~y~%d~n~~w~Cas:_____~b~%d~y~:~b~%2d"
 	}
 };
 

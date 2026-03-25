@@ -1118,22 +1118,31 @@ dcmd_elevator(playerid, const params[])
 dcmd_fakechat(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4) 
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
 
 	new token1[32], token2[32];
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || count != 2 || !IsNumeric(token1))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /fakechat [playerID] [text]");
+	{
+		new msg[64];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
+		format(msg, sizeof(msg), msg, "/fakechat [playerID] [text]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+	}
 
 	new targetId = strval(token1);
 
 	if (!IsPlayerConnected(targetId)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
 
 	SendPlayerMessageToAll(targetId, token2);
 
-	SendClientMessage(playerid, COLOR_WHITE, "[ FAKE ] Fake client message sent!");
+	//SendClientMessage(playerid, COLOR_WHITE, "[ FAKE ] Fake client message sent!");
 
 	return 1;
 }
@@ -1141,7 +1150,9 @@ dcmd_fakechat(playerid, const params[])
 dcmd_flip(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
 
 	new Float: z;
 
@@ -1160,13 +1171,19 @@ dcmd_flip(playerid, const params[])
 	new targetId = strval(params);
 
 	if (!IsPlayerConnected(targetId)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
 
 	if (!IsPlayerInAnyVehicle(targetId)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Such player not in a vehicle!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_IN_VEHICLE);
+	}
 
 	if (GetPlayerState(targetId) != PLAYER_STATE_DRIVER) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Such player not driving/riding a vehicle!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_DRIVER);
+	}
 
 	// Flip and fix player's vehicle.
 	GetVehicleZAngle(GetPlayerVehicleID(targetId), z);
@@ -1181,11 +1198,14 @@ dcmd_flip(playerid, const params[])
 dcmd_get(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 2) 
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
 
 	if (!strlen(params) || !IsNumeric(params)) 
-		//return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /get [ID]!");
+	{
 		return ShowGetPlayerListDialog(playerid);
+	}
 
 	new targetid = strval(params);
 
@@ -1196,11 +1216,14 @@ dcmd_get(playerid, const params[])
 dcmd_goto(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 2) 
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
 
 	if (!strlen(params) || !IsNumeric(params)) 
-		//return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /goto [ID]!");
+	{
 		return ShowGotoPlayerListDialog(playerid);
+	}
 
 	new targetid = strval(params);
 
@@ -1210,25 +1233,34 @@ dcmd_goto(playerid, const params[])
 dcmd_hp(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
 
 	if (!strlen(params) || !IsNumeric(params))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /hp [playerID]");
+	{
+		new msg[64];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
+		format(msg, sizeof(msg), msg, "/hp [playerID]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+	}
 
 	new targetId = strval(params);
 
 	if (!IsPlayerConnected(targetId))
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
 
 	if (gDeathmatch[targetId][IsRegistered] || gDeathmatch[targetId][InGame])
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Target ID is playing a minigame!");
+		return SendClientMessageLocalized(playerid, I18N_DEATHMATCH_INGAME_BLOCK);
 	}
 
 	SetPlayerHealth(targetId, 100.0);
 	SetPlayerArmour(targetId, 100.0);
 
-	SendClientMessage(targetId, COLOR_LIGHTGREEN, "[ HP ] Health: 100.0, Armour: 100.0");
+	SendClientMessageLocalized(targetId, I18N_PLAYER_HP_SET);
 
 	return 1;
 }
@@ -1236,22 +1268,42 @@ dcmd_hp(playerid, const params[])
 dcmd_kick(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3) 
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
 
 	if (!strlen(params) || !IsNumeric(params)) 
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /kick [ID]");
+	{
+		new msg[64];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
+		format(msg, sizeof(msg), msg, "/kick [playerID]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+	}
 
-	new adminName[MAX_PLAYER_NAME], playerIdToKick = strval(params), playerName[MAX_PLAYER_NAME], stringToPrint[128];
+	new adminName[MAX_PLAYER_NAME], playerIdToKick = strval(params), playerName[MAX_PLAYER_NAME];
 
 	if (!IsPlayerConnected(playerIdToKick)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
 
 	GetPlayerName(playerid, adminName, sizeof(adminName));
 	GetPlayerName(playerIdToKick, playerName, sizeof(playerName));
 
-	format(stringToPrint, sizeof(stringToPrint), "[ KICK ] Admin %s [ID: %d] kicked player %s [ID: %d] from server! ", adminName, playerid, playerName, playerIdToKick);
+	new msg[128];
+	GetLocalizedString(playerid, I18N_PLAYER_KICK_FMT, msg, sizeof(msg));
+	format(msg, sizeof(msg), msg, adminName, playerid, playerName, playerIdToKick);
 
-	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i))
+		{
+			continue;
+		}
+
+		SendClientMessage(i, COLOR_YELLOW, msg);
+	}
+
 	Kick(playerIdToKick);
 
 	return 1;
@@ -1260,42 +1312,63 @@ dcmd_kick(playerid, const params[])
 dcmd_lvl(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4) 
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
 
 	new token1[32], token2[32];
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /lvl [playerID] [0-5]");
+	{
+		new msg[64];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
+		format(msg, sizeof(msg), msg, "/lvl [playerID] [0-5]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+	}
 
 	new targetId = strval(token1), targetLvl = strval(token2);
 
 	if (!IsPlayerConnected(targetId)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
 
 	if (gPlayers[playerid][AdminLevel] <= gPlayers[targetId][AdminLevel])
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] You can only set the same or lower level that you have got yourself!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_ADMIN_LVL_SET_MISMATCH);
+	}
 
 	if (targetId == playerid) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Invalid player!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_ID_INVALID);
+	}
 
 	if (targetLvl < 0 || targetLvl > 5)
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Usage: /lvl [playerID] [0-5]");
+	{
+		new msg[64];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
+		format(msg, sizeof(msg), msg, "/lvl [playerID] [0-5]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+	}
 
 	if (targetLvl == gPlayers[targetId][AdminLevel])
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No need to change such admin level!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_ADMIN_LVL_SET_SAME);
+	}
 
-	new adminName[MAX_PLAYER_NAME], playerName[MAX_PLAYER_NAME], stringToPrint[128];
+	new adminName[MAX_PLAYER_NAME], playerName[MAX_PLAYER_NAME];
 
 	GetPlayerName(playerid, adminName, sizeof(adminName));
 	GetPlayerName(targetId, playerName, sizeof(playerName));
 
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s set player %s [ ID: %d ] an Admin (level %d)!", adminName, playerName, targetId, targetLvl);
-
 	gPlayers[targetId][AdminLevel] = targetLvl;
 	SavePlayerData(targetId);
 
-	SendClientMessageToAll(COLOR_GREY, stringToPrint);
+	new msg[64];
+	GetLocalizedString(playerid, I18N_ADMIN_LVL_SET_FMT, msg, sizeof(msg));
+	format(msg, sizeof(msg), msg, adminName, playerName, targetId, targetLvl);
+	SendClientMessage(playerid, COLOR_GREY, msg);
 
 	return 1;
 }
@@ -1303,10 +1376,17 @@ dcmd_lvl(playerid, const params[])
 dcmd_nitro(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
 
 	if (!strlen(params) || !IsNumeric(params))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /nitro [ID]");
+	{
+		new msg[128];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
+		format(msg, sizeof(msg), msg, "/nitro [playerID]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+	}
 
 	new targetid = strval(params);
 
@@ -1316,22 +1396,33 @@ dcmd_nitro(playerid, const params[])
 dcmd_packet(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
 
 	if (!strlen(params) || !IsNumeric(params))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /packet [ID]");
+	{
+		new msg[64];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
+		format(msg, sizeof(msg), msg, "/packet [playerID]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+	}
 
 	new targetId = strval(params);
 
 	if (!IsPlayerConnected(targetId))
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
 
-	new Float: loss = 0.0, stringToPrint[128];
+	new Float: loss = 0.0;
 
 	GetPlayerPacketLoss(targetId, loss);
 
-	format(stringToPrint, sizeof(stringToPrint), "[ NET ] Player ID: %d, packet loss: %.2f %%", targetId, loss);
-	SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
+	new msg[64];
+	GetLocalizedString(playerid, I18N_PACKET_LOSS_FMT, msg, sizeof(msg));
+	format(msg, sizeof(msg), msg, targetId, loss);
+	SendClientMessage(playerid, COLOR_YELLOW, msg);
 
 	return 1;
 }
@@ -1340,7 +1431,9 @@ dcmd_radio(playerid, const params[])
 {
 #pragma unused params
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
 
 	if (!gPlayers[playerid][Listening])
 	{
@@ -1357,15 +1450,24 @@ dcmd_radio(playerid, const params[])
 dcmd_reset(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
 
 	if (!strlen(params) || !IsNumeric(params)) 
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /reset [playerID]!");
+	{
+		new msg[64];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
+		format(msg, sizeof(msg), msg, "/reset [playerID]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+	}
 
 	new targetId = strval(params);
 
 	if (!IsPlayerConnected(targetId))
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
 
 	ResetPlayerMoney(targetId);
 
@@ -1391,7 +1493,7 @@ dcmd_restart(playerid, const params[])
 	}
 
 	new msg[64];
-	GetLocalizedString(playerid, I18N_SERVER_RESTART_COUNTDOWN, msg);
+	GetLocalizedString(playerid, I18N_SERVER_RESTART_COUNTDOWN, msg, sizeof(msg));
 	format(msg, sizeof(msg), msg, seconds);
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
@@ -1423,7 +1525,7 @@ dcmd_skin(playerid, const params[])
 	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
 	{
 		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg);
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
 		format(msg, sizeof(msg), msg, "/skin [playerID] [skinID]");
 		return SendClientMessage(playerid, COLOR_YELLOW, msg);
 	}
@@ -1456,7 +1558,7 @@ dcmd_spectate(playerid, const params[])
 	if ((!strlen(params) || !IsNumeric(params)) && !gPlayers[playerid][Spectating])
 	{
 		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg);
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
 		format(msg, sizeof(msg), msg, "/spectate [playerID]");
 		return SendClientMessage(playerid, COLOR_YELLOW, msg);
 	}
@@ -1500,7 +1602,7 @@ dcmd_vehicle(playerid, const params[])
 	if (!strlen(params) || !IsNumeric(params))
 	{
 		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg);
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
 		format(msg, sizeof(msg), msg, "/vehicle [vehicleID]");
 		return SendClientMessage(playerid, COLOR_YELLOW, msg);
 	}
@@ -1535,7 +1637,7 @@ dcmd_weapon(playerid, const params[])
 	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
 	{
 		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg);
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
 		format(msg, sizeof(msg), msg, "/weapon [playerID] [weaponID]");
 		return SendClientMessage(playerid, COLOR_YELLOW, msg);
 	}
@@ -1567,7 +1669,7 @@ dcmd_weapons(playerid, const params[])
 	if (!strlen(params) || !IsNumeric(params)) 
 	{
 		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg);
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
 		format(msg, sizeof(msg), msg, "/weapons [playerID]");
 		return SendClientMessage(playerid, COLOR_YELLOW, msg);
 	}

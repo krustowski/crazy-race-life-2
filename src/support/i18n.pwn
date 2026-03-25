@@ -43,6 +43,8 @@ enum
 {
 	I18N_WELCOME_MESSAGE,
 	I18N_SERVER_RESTART_COUNTDOWN,
+	I18N_PLAYER_NOT_IN_VEHICLE,
+	I18N_PLAYER_NOT_DRIVER,
 	I18N_PLAYER_NOT_CONNECTED,
 	I18N_PLAYER_ID_INVALID,
 	I18N_NO_SUCH_COMMAND,
@@ -52,6 +54,12 @@ enum
 	I18N_SPECTATE_DISABLED,
 	I18N_SPECTATE_ENABLED,
 	I18N_SKIN_ID_MISMATCH,
+	I18N_PACKET_LOSS_FMT,
+	I18N_ADMIN_LVL_SET_MISMATCH,
+	I18N_ADMIN_LVL_SET_SAME,
+	I18N_ADMIN_LVL_SET_FMT,
+	I18N_PLAYER_KICK_FMT,
+	I18N_PLAYER_HP_SET,
 	// Black Market
 	I18N_BLACK_MARKET_RATIO_UPDATE,
 	// User data load
@@ -112,6 +120,8 @@ new gI18nMessageColor[] =
 	COLOR_YELLOW,
 	COLOR_RED,
 	COLOR_RED,
+	COLOR_RED,
+	COLOR_RED,
 	COLOR_GREY,
 	COLOR_YELLOW,
 	COLOR_RED,
@@ -119,6 +129,12 @@ new gI18nMessageColor[] =
 	COLOR_YELLOW,
 	COLOR_YELLOW,
 	COLOR_RED,
+	COLOR_YELLOW,
+	COLOR_RED,
+	COLOR_YELLOW,
+	COLOR_YELLOW,
+	COLOR_YELLOW,
+	COLOR_LIGHTGREEN,
 	// Black Market
 	COLOR_ORANGE,
 	// User data load
@@ -184,6 +200,14 @@ new gI18nMessages[][PlayerLocale][] =
 		"[ RESTART ] Za %d sekund dojde k restartu serveru!"
 	},
 	{
+		"[ ! ] Such player not in a vehicle!",
+		"[ ! ] Hrac se nenachazi ve vozidle!"
+	},
+	{
+		"[ ! ] Such player not driving/riding a vehicle!",
+		"[ ! ] Hrac neni ridicem ve vozidle!"
+	},
+	{
 		"[ ! ] The player is not connected!",
 		"[ ! ] Hrac neni pripojen ke hre!"
 	},
@@ -219,6 +243,33 @@ new gI18nMessages[][PlayerLocale][] =
 		"[ CMD ] Invalid skin ID!",
 		"[ CMD ] Neplatne ID skinu!"
 	},
+	{
+		"[ NET ] Player ID: %d, packet loss: %.2f %%",
+		"[ NET ] ID hrace: %d, ztrata paketu: %.2f %%"
+	},
+	{
+		"[ ADMIN ] You can only set the same or lower level that you have got yourself!",
+		"[ ADMIN ] Muzes nastavit pouze stejny nebo nizsi level nez jaky sam mas!"
+	},
+	{
+		"[ ADMIN ] No need to change such admin level!",
+		"[ ADMIN ] Neni potreba menit jiz nastaveny stejny level!"
+	},
+	{
+		"[ ADMIN ] Admin %s set player %s [ ID: %d ] an Admin (level %d)!",
+		"[ ADMIN ] Admin %s nastavil hrace %s [ ID: %d ] adminem (level %d)!"
+	},
+	{
+		"[ KICK ] Admin %s [ID: %d] kicked player %s [ID: %d] from server!",
+		"[ KICK ] Admin %s [ID: %d] vykopl hrace %s [ID: %d] ze hry!"
+	},
+	{
+		"[ HP ] Health: 100.0, armour: 100.0",
+		"[ HP ] Zdravi: 100.0, vesta: 100.0"
+	},
+	//
+	//  Black Market
+	//
 	{
 		"[ MARKET ] Market token-to-dollar ratio changed to: %.3f",
 		"[ TRH ] Kurz token:dolaru na trhu se zmenil: %.3f"
@@ -402,8 +453,8 @@ public SendClientMessageLocalized(playerid, msg_id)
 	return SendClientMessage(playerid, gI18nMessageColor[msg_id], gI18nMessages[msg_id][ gPlayers[playerid][Locale] ]);
 }
 
-stock GetLocalizedString(playerid, msg_id, str[64])
+stock GetLocalizedString(playerid, msg_id, str[], size)
 {
-	format(str, sizeof(str), "%s", gI18nMessages[msg_id][ gPlayers[playerid][Locale] ]);
+	format(str, size, "%s", gI18nMessages[msg_id][ gPlayers[playerid][Locale] ]);
 	return 1;
 }

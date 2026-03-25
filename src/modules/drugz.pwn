@@ -95,7 +95,7 @@ public UpdateBlackMarketRatio()
 		}
 
 		new msg[64];
-		GetLocalizedString(i, I18N_BLACK_MARKET_RATIO_UPDATE, msg);
+		GetLocalizedString(i, I18N_BLACK_MARKET_RATIO_UPDATE, msg, sizeof(msg));
 
 		format(msg, sizeof(msg), msg,
 				ratio

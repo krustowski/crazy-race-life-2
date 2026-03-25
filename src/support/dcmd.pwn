@@ -835,13 +835,31 @@ dcmd_acmd(playerid, const params[])
 	return ShowAdminCommandsDialog(playerid);
 }
 
-new gAdminColNames[6][] = {
-	"none",
-	"green",
-	"blue",
-	"red",
-	"orange",
-	"white",
+new gAdminColNames[6][2][] = {
+	{
+		"none",
+		"zadna"
+	},
+	{
+		"green",
+		"zelenou"
+	},
+	{
+		"blue",
+		"modrou"
+	},
+	{
+		"red",
+		"cervenou"
+	},
+	{
+		"orange",
+		"oranzovou"
+	},
+	{
+		"white",
+		"bilou"
+	}
 };
 
 dcmd_admincol(playerid, const params[])
@@ -861,36 +879,39 @@ dcmd_admincol(playerid, const params[])
 
 	new adminColToSet = strval(params);
 
+	new msg[64];
+	GetLocalizedString(playerid, I18N_ADMINCOL_FMT, msg, sizeof(msg));
+	format(msg, sizeof(msg), msg, gAdminColNames[adminColToSet][ _: gPlayers[playerid][Locale] ]);
+
 	switch (adminColToSet)
 	{
 		case 1:
 			{
 				SetPlayerColor(playerid, COLOR_LIGHTGREEN);
-				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ COL ] Player color set to light green!");
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, msg);
 			}
 		case 2:
 			{
 				SetPlayerColor(playerid, COLOR_BLUE);
-				SendClientMessage(playerid, COLOR_BLUE, "[ COL ] Player color set to blue!");
+				SendClientMessage(playerid, COLOR_BLUE, msg);
 			}
 		case 3:
 			{
 				SetPlayerColor(playerid, COLOR_RED);
-				SendClientMessage(playerid, COLOR_RED, "[ COL ] Player color set to red!");
+				SendClientMessage(playerid, COLOR_RED, msg);
 			}
 		case 4:
 			{
 				SetPlayerColor(playerid, COLOR_ORANGE);
-				SendClientMessage(playerid, COLOR_ORANGE, "[ COL ] Player color set to orange!");
+				SendClientMessage(playerid, COLOR_ORANGE, msg);
 			}
 		case 5:
 			{
 				SetPlayerColor(playerid, COLOR_WHITE);
-				SendClientMessage(playerid, COLOR_WHITE, "[ COL ] Player color set to white!");
+				SendClientMessage(playerid, COLOR_WHITE, msg);
 			}
 		default:
 			{
-				new msg[64];
 				GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
 				format(msg, sizeof(msg), msg, "/admincol [1-5]");
 				return SendClientMessage(playerid, COLOR_YELLOW, msg);

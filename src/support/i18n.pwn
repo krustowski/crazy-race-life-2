@@ -67,6 +67,7 @@ enum
 	I18N_CLEAR_CHAT_INFO,
 	I18N_CAM_ATTACHED_ID_FMT,
 	I18N_CAM_DETACHED,
+	I18N_ADMINCOL_FMT,
 	// Admin elevator
 	I18N_AE_MOVE_UP,
 	I18N_AE_MOVE_DOWN,
@@ -152,6 +153,7 @@ new gI18nMessageColor[] =
 	COLOR_RED,
 	COLOR_YELLOW,
 	COLOR_BLUE,
+	COLOR_YELLOW,
 	COLOR_YELLOW,
 	// Admin elevator
 	COLOR_YELLOW,
@@ -316,6 +318,10 @@ new gI18nMessages[][PlayerLocale][] =
 	{
 		"[ CAM ] Camera dettached [/ccmd]",
 		"[ CAM ] Kamera odpojena [/ccmd]"
+	},
+	{
+		"[ COL ] Player label color set to %s!",
+		"[ COL ] Barva stitku hrace zmenena na %s!"
 	},
 	//
 	//  Admin elevator

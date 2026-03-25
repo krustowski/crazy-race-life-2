@@ -1374,17 +1374,38 @@ dcmd_reset(playerid, const params[])
 
 dcmd_restart(playerid, const params[])
 {
-#pragma unused params
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4)
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
 
-	new stringToPrint[128];
+	new seconds = 0;
 
-	format(stringToPrint, sizeof(stringToPrint), "[ RESTART ] Server restarts in 60 seconds!");
-	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+	if (!strlen(params) || !IsNumeric(params)) 
+	{
+		seconds = 60;
+	}
+	else 
+	{
+		seconds = strval(params);
+	}
 
-	CountDownHelper(60);
-	SetTimer("StartServerReset", 60 * SECOND_MS, true);
+	new msg[64];
+	GetLocalizedString(playerid, I18N_SERVER_RESTART_COUNTDOWN, msg);
+	format(msg, sizeof(msg), msg, seconds);
+
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i))
+		{
+			continue;
+		}
+
+		SendClientMessage(i, COLOR_YELLOW, msg);
+	}
+
+	CountDownHelper(seconds);
+	SetTimer("StartServerReset", seconds * SECOND_MS, true);
 
 	return 1;
 }
@@ -1392,21 +1413,32 @@ dcmd_restart(playerid, const params[])
 dcmd_skin(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 2)
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
 
 	new token1[32], token2[32];
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /skin [playerID] [skinID]");
+	{
+		new msg[64];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg);
+		format(msg, sizeof(msg), msg, "/skin [playerID] [skinID]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+	}
 
 	new targetId = strval(token1), targetSkin = strval(token2);
 
 	if (targetSkin < 0 || targetSkin > 311)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Invalid skin ID!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_SKIN_ID_MISMATCH);
+	}
 
 	if (!IsPlayerConnected(targetId))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] No such player online!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
 
 	gPlayers[targetId][Skin] = targetSkin;
 	SetPlayerSkin(targetId, targetSkin);
@@ -1417,32 +1449,43 @@ dcmd_skin(playerid, const params[])
 dcmd_spectate(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3) 
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Admin level too low!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
 
 	if ((!strlen(params) || !IsNumeric(params)) && !gPlayers[playerid][Spectating])
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /spectate [playerID]");
+	{
+		new msg[64];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg);
+		format(msg, sizeof(msg), msg, "/spectate [playerID]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+	}
 
 	if (gPlayers[playerid][Spectating])
 	{
 		TogglePlayerSpectating(playerid, false);
-
 		gPlayers[playerid][Spectating] = false;
-		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ SPECTATE ] Mode disabled!");
+
+		SendClientMessageLocalized(playerid, I18N_SPECTATE_DISABLED);
 	}
 
 	new targetId = strval(params);
 
 	if (!IsPlayerConnected(targetId))
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
 
 	if (playerid == targetId)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Invalid player!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_ID_INVALID);
+	}
 
 	TogglePlayerSpectating(playerid, true);
 	PlayerSpectatePlayer(playerid, targetId);
 
 	gPlayers[playerid][Spectating] = true;
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ SPECTATE ] Mode enabled (type /spectate again to disable)");
+	SendClientMessageLocalized(playerid, I18N_SPECTATE_ENABLED);
 
 	return 1;
 }

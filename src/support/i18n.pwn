@@ -42,11 +42,16 @@ enum PlayerLocale
 enum 
 {
 	I18N_WELCOME_MESSAGE,
+	I18N_SERVER_RESTART_COUNTDOWN,
 	I18N_PLAYER_NOT_CONNECTED,
+	I18N_PLAYER_ID_INVALID,
 	I18N_NO_SUCH_COMMAND,
 	I18N_CMD_USAGE_FMT,
 	I18N_LOW_ADMIN_LEVEL,
 	I18N_VEHICLE_ID_MISMATCH,
+	I18N_SPECTATE_DISABLED,
+	I18N_SPECTATE_ENABLED,
+	I18N_SKIN_ID_MISMATCH,
 	// Black Market
 	I18N_BLACK_MARKET_RATIO_UPDATE,
 	// User data load
@@ -104,10 +109,15 @@ enum
 new gI18nMessageColor[] = 
 {
 	COLOR_GREEN,
+	COLOR_YELLOW,
+	COLOR_RED,
 	COLOR_RED,
 	COLOR_GREY,
 	COLOR_YELLOW,
 	COLOR_RED,
+	COLOR_RED,
+	COLOR_YELLOW,
+	COLOR_YELLOW,
 	COLOR_RED,
 	// Black Market
 	COLOR_ORANGE,
@@ -170,8 +180,16 @@ new gI18nMessages[][PlayerLocale][] =
 		"Vitej ve hre! /help"
 	},
 	{
+		"[ RESTART ] Server restarts in %d seconds!",
+		"[ RESTART ] Za %d sekund dojde k restartu serveru!"
+	},
+	{
 		"[ ! ] The player is not connected!",
 		"[ ! ] Hrac neni pripojen ke hre!"
+	},
+	{
+		"[ ! ] Invalid player ID!",
+		"[ ! ] Neplatne ID hrace!"
 	},
 	{
 		"[ CMD ] No such command! /cmd /help /rules",
@@ -186,8 +204,20 @@ new gI18nMessages[][PlayerLocale][] =
 		"[ CMD ] Pro dany prikaz nemas opravneni!"
 	},
 	{
-		"[ CMD ] Invalid ID! (IDs 400-611)",
-		"[ CMD ] Neplatne ID! (pouzij ID z rozmezi 400-611)"
+		"[ CMD ] Invalid vehicle model ID! (Model IDs: 400-611)",
+		"[ CMD ] Neplatne ID modelu vozidla! (Pouzij ID z rozmezi 400-611)"
+	},
+	{
+		"[ SPECTATE ] Mode disabled!",
+		"[ SPECTATE ] Spehovani vypnuto!"
+	},
+	{
+		"[ SPECTATE ] Mode enabled!",
+		"[ SPECTATE ] Spehovani zapnuto!"
+	},
+	{
+		"[ CMD ] Invalid skin ID!",
+		"[ CMD ] Neplatne ID skinu!"
 	},
 	{
 		"[ MARKET ] Market token-to-dollar ratio changed to: %.3f",

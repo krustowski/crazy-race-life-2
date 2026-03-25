@@ -20,6 +20,8 @@ Live demo at [samp://95.216.7.113:39876](samp://95.216.7.113:39876)
     + Custom arena in the woods
     + "Legal" player killing, no wanted level added per kill
     + 4-minute long matches, 45-second interval before a match for players to join
++ Localization
+    + English + Czech (partly, WIP)
 + Personal cellphone
     + Accessed easily via the `KEY_YES` key (Y usually)
     + Send private messages directly to a player

@@ -1528,29 +1528,34 @@ stock ShowBlackMarketMainDialog(playerid)
 
 stock ShowBlackMarketNewDialog(playerid)
 {
-	new stringToPrint[128] = "";
+	new stringToPrint[512] = "Substance/stuff\tIn pockets\tMarket price";
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, "SELECT id, name FROM drug_types");
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, "SELECT id, name, price FROM drug_prices");
 	if (!result) {
-		print("Database error: cannot fetch drug type names!");
+		print("Database error: cannot fetch drug type names and prices!");
 		return 1;
 	}
 
 	do
 	{
-		if (!DB_GetFieldIntByName(result, "id"))
+		new id = DB_GetFieldIntByName(result, "id");
+		if (!id)
 		{
 			continue;
 		}
 
-		new name[64];
+		new 
+			name[64],
+			price = DB_GetFieldIntByName(result, "price");
 		DB_GetFieldStringByName(result, "name", name, sizeof(name));
 
-		format(stringToPrint, sizeof(stringToPrint), "%s%s\n", stringToPrint, name);
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d\t%d", stringToPrint, name, gPlayers[playerid][Drugs][id - 1], price);
 	}
 	while (DB_SelectNextRow(result));
 
-	return ShowPlayerDialog(playerid, DIALOG_BLACK_MARKET_NEW, DIALOG_STYLE_LIST, "Black Market New Offer", stringToPrint, "Select", "Close");
+	DB_FreeResultSet(result);
+
+	return ShowPlayerDialog(playerid, DIALOG_BLACK_MARKET_NEW, DIALOG_STYLE_TABLIST_HEADERS, "Black Market New Offer", stringToPrint, "Select", "Close");
 }
 
 stock ShowBlackMarketAmountDialog(playerid)

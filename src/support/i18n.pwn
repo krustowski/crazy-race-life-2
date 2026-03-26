@@ -372,7 +372,7 @@ new gI18nMessages[][PlayerLocale][] =
 	//
 	{
 		"[ MARKET ] Market token-to-dollar ratio changed to: %.3f",
-		"[ TRH ] Kurz token:dolaru na trhu se zmenil: %.3f"
+		"[ TRH ] Kurz token ku dolaru na trhu se zmenil: %.3f"
 	},
 	{
 		"[ DATA ] Loading user data...",

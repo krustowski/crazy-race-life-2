@@ -82,7 +82,7 @@ forward UpdateBlackMarketRatio();
 public UpdateBlackMarketRatio()
 {
 	new 
-		Float: ratio = floatdiv(random(20) + 1, 10.0);
+		Float: ratio = floatdiv(random(16) + 5, 10.0);
 	
 	ratio = floatmul(ratio, gBlackMarketRatio);
 	gBlackMarketRatio = ratio;

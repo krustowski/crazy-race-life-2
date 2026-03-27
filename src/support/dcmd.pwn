@@ -142,9 +142,6 @@ dcmd_afk(playerid, const params[])
 		gPlayers[playerid][AFK] = false;
 	}
 
-	new playerName[MAX_PLAYER_NAME];
-	GetPlayerName(playerid, playerName, sizeof(playerName));
-
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if (!IsPlayerConnected(i))
@@ -153,7 +150,7 @@ dcmd_afk(playerid, const params[])
 		}
 
 		GetLocalizedString(i, stringID, stringToPrint, sizeof(stringToPrint));
-		format(stringToPrint, sizeof(stringToPrint), stringToPrint, playerName, playerid);
+		format(stringToPrint, sizeof(stringToPrint), stringToPrint, gPlayers[playerid][Name], playerid);
 		SendClientMessage(i, COLOR_YELLOW, stringToPrint);
 	}
 

@@ -82,10 +82,17 @@ forward UpdateBlackMarketRatio();
 public UpdateBlackMarketRatio()
 {
 	new 
-		Float: ratio = floatdiv(random(16) + 5, 10.0);
-	
-	ratio = floatmul(ratio, gBlackMarketRatio);
-	gBlackMarketRatio = ratio;
+		sign = random(2),
+		Float: multiplier = floatdiv(random(20) + 1, 10.0);
+
+	if (sign)
+	{
+		gBlackMarketRatio = floatmul(multiplier, gBlackMarketRatio);
+	}
+	else
+	{
+		gBlackMarketRatio = floatdiv(gBlackMarketRatio, multiplier);
+	}
 	
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -98,7 +105,7 @@ public UpdateBlackMarketRatio()
 		GetLocalizedString(i, I18N_BLACK_MARKET_RATIO_UPDATE, msg, sizeof(msg));
 
 		format(msg, sizeof(msg), msg,
-				ratio
+				gBlackMarketRatio
 			);
 
 		SendClientMessage(i, COLOR_ORANGE, msg);

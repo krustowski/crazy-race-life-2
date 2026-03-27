@@ -78,6 +78,13 @@ enum
 	I18N_SEARCH_DRUNK_NEGATIVE,
 	I18N_SEARCH_DRUNK_NEGATIVE_PLAYER,
 	I18N_IN_PROPERTY_BLOCK,
+	I18N_IN_MINIGAME_BLOCK,
+	I18N_LOCATE_COORDS_FMT,
+	I18N_ANIMATION_VEHICLE_BLOCK,
+	I18N_KILL_CMD_FMT,
+	I18N_TEAM_RELATED_CMD_ADMINZ,
+	I18N_HIDE_CMD_APPLIED,
+	I18N_HIDE_CMD_REVERTED,
 	// Radar (vehicle stats)
 	I18N_HID_STATS_GREEN_FMT,
 	I18N_HID_STATS_RED_FMT,
@@ -179,6 +186,13 @@ new gI18nMessageColor[] =
 	COLOR_ORANGE,
 	COLOR_ORANGE,
 	COLOR_RED,
+	COLOR_RED,
+	COLOR_LIGHTGREEN,
+	COLOR_RED,
+	COLOR_RED2,
+	COLOR_RED,
+	COLOR_LIGHTGREEN,
+	COLOR_LIGHTGREEN,
 	// Radar (vehicle stats)
 	COLOR_LIGHTGREEN,
 	COLOR_RED,
@@ -390,6 +404,34 @@ new gI18nMessages[][PlayerLocale][] =
 	{
 		"[ ! ] Leave the property to be able to use such command!",
 		"[ ! ] Pred pouzitim daneho prikazu musis opustit nemovitost!"
+	},
+	{
+		"[ ! ] You cannot use such command while in minigame!",
+		"[ ! ] Pred pouzitim daneho prikazu musis ukoncit aktualne spustenou minihru"
+	},
+	{
+		"[ COORDS ] Current location coordinates: Interior No. %d, X[%.2f], Y[%.2f], Z[%.2f], Rotation/Angle[%.2f]",
+		"[ COORDS ] Souradnice aktualni polohy: Interier cislo %d, X[%.2f], Y[%.2f], Z[%.2f], Rotace/Uhel[%.2f]"
+	},
+	{
+		"[ ! ] Animation allowed outside the vehicle only!",
+		"[ ! ] Musis byt venku z vozidla pro pouziti teto animace!"
+	},
+	{
+		"[ i ] Player %s has just committed a suicide! [ /kill ]",
+		"[ i ] Hrac %s prave spachal sebevrazdu!  [ /kill ]!"
+	},
+	{
+		"[ CMD ] Adminz-only team-related command!",
+		"[ CMD ] Prikaz je urcen pouze pro cleny teamu Adminz!"
+	},
+	{
+		"[ HIDE ] Player color set to invisible!",
+		"[ HIDE ] Hracsky stitek zneviditelnen pro ostatni hrace!"
+	},
+	{
+		"[ HIDE ] Player color set to visible!",
+		"[ HIDE ] Hracsky stitek zviditelnen pro ostatni hrace!"
 	},
 	//
 	//  Radar (vehicle stats)

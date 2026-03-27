@@ -448,15 +448,19 @@ dcmd_hide(playerid, const params[])
 {
 #pragma unused params
 	if (gPlayers[playerid][TeamID] != TEAM_ADMINZ)
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Adminz-only team-related command!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_TEAM_RELATED_CMD_ADMINZ);
+	}
+
+	new color = GetPlayerColor(playerid);
 
 	if (!gPlayers[playerid][Hidden])
 	{
-		SetPlayerColor(playerid, COLOR_INVISIBLE);
-		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ HIDE ] Player color set to invisible!");
+		SetPlayerColor(playerid, color | 0x00);
+		SendClientMessageLocalized(playerid, I18N_HIDE_CMD_APPLIED);
 	} else {
-		SetPlayerColor(playerid, COLOR_LIGHTGREEN);
-		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ HIDE ] Player color set to light green!");
+		SetPlayerColor(playerid, color | 0xAA);
+		SendClientMessageLocalized(playerid, I18N_HIDE_CMD_REVERTED);
 	}
 
 	gPlayers[playerid][Hidden] = !gPlayers[playerid][Hidden];
@@ -471,8 +475,17 @@ dcmd_kill(playerid, const params[])
 
 	GetPlayerName(playerid, playerName, sizeof(playerName));
 
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s has just committed a suicide [ /kill ]!", playerName);
-	SendClientMessageToAll(COLOR_BROWN, stringToPrint);
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i))
+		{
+			continue;
+		}
+
+		GetLocalizedString(i, I18N_KILL_CMD_FMT, stringToPrint, sizeof(stringToPrint));
+		format(stringToPrint, sizeof(stringToPrint), stringToPrint, playerName);
+		SendClientMessage(i, COLOR_BROWN, stringToPrint);
+	}
 
 	SetPlayerHealth(playerid, 0);
 
@@ -484,8 +497,7 @@ dcmd_lay(playerid, const params[])
 #pragma unused params
 	if (IsPlayerInAnyVehicle(playerid))
 	{
-		SendClientMessage(playerid, COLOR_RED, "[ ! ] Animation allowed outside the vehicle only!");
-		return 1;
+		return SendClientMessageLocalized(playerid, I18N_ANIMATION_VEHICLE_BLOCK);
 	}
 
 	ApplyAnimation(playerid, "BEACH", "Lay_Bac_Loop", 4.1, false, true, true, true, true);
@@ -507,7 +519,8 @@ dcmd_locate(playerid, const params[])
 	GetPlayerPos(playerid, X, Y, Z);
 	GetPlayerFacingAngle(playerid, Angle);
 
-	format(stringToPrint, sizeof(stringToPrint), "[ COORDS ] Current location coordinates: Interior No. %d, X[%.2f], Y[%.2f], Z[%.2f], Rotation/Angle[%.2f].", interiorNo, X, Y, Z, Angle);
+	GetLocalizedString(playerid, I18N_LOCATE_COORDS_FMT, stringToPrint, sizeof(stringToPrint));
+	format(stringToPrint, sizeof(stringToPrint), stringToPrint, interiorNo, X, Y, Z, Angle);
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 
 	return 1;
@@ -589,6 +602,11 @@ dcmd_port(playerid, const params[])
 	if (gPlayers[playerid][InsideProperty])
 	{
 		return SendClientMessageLocalized(playerid, I18N_IN_PROPERTY_BLOCK);
+	}
+
+	if (gPlayers[playerid][InMinigame])
+	{
+		return SendClientMessageLocalized(playerid, I18N_IN_MINIGAME_BLOCK);
 	}
 
 	return ShowPortListDialog(playerid);

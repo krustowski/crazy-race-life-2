@@ -12,14 +12,14 @@
  *                                        Y8b d88P                                                                             
  *                                         "Y88P"                                                                              
 
- [ *** GameMode CRL2 *** ] 
+ *  GameMode CRL2
 
  *
 
- [ Created: 	Jan 2025 (Extends legacy GameMode CRL (2008-2010)) ]
- [ Credits: 	krusty, kompry, DRaGsTeR, amdulka ]
- [ Language: 	CZ, EN ]
- [ Version: 	0.10.z ]
+ *  Created: 	Jan 2025 (Extends legacy GameMode CRL (2008-2010))
+ *  Credits: 	krusty, kompry, DRaGsTeR, amdulka
+ *  Language: 	EN, CZ
+ *  Version: 	0.10.z
 
  *****************************************************************************************************************************************/
 

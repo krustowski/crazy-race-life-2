@@ -504,7 +504,7 @@ dcmd_hide(playerid, const params[])
 
 	if (!gPlayers[playerid][Hidden])
 	{
-		SetPlayerColor(playerid, color | 0x00);
+		SetPlayerColor(playerid, color & 0xFFFFFF00);
 		SendClientMessageLocalized(playerid, I18N_HIDE_CMD_APPLIED);
 	} else {
 		SetPlayerColor(playerid, color | 0xAA);
@@ -708,7 +708,7 @@ dcmd_search(playerid, const params[])
 {
 	if (gPlayers[playerid][TeamID] != TEAM_POLICE)
 	{
-		SendClientMessageLocalized(playerid, I18N_TEAM_RELATED_CMD_POLICE);
+		return SendClientMessageLocalized(playerid, I18N_TEAM_RELATED_CMD_POLICE);
 	}
 
 	new token1[32], token2[32];
@@ -1803,7 +1803,7 @@ dcmd_spectate(playerid, const params[])
 		TogglePlayerSpectating(playerid, false);
 		gPlayers[playerid][Spectating] = false;
 
-		SendClientMessageLocalized(playerid, I18N_SPECTATE_DISABLED);
+		return SendClientMessageLocalized(playerid, I18N_SPECTATE_DISABLED);
 	}
 
 	new targetId = strval(params);

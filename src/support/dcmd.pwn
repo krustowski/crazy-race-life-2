@@ -112,20 +112,17 @@ dcmd_afk(playerid, const params[])
 #pragma unused params
 	if (gDeathmatch[playerid][InGame] || gDeathmatch[playerid][IsRegistered])
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ AFK ] Cannot go to AFK mode while in Deathmatch!");
+		return SendClientMessageLocalized(playerid, I18N_AFK_CMD_DEATHMATCH_BLOCK);
 	}
 
-	new playerName[MAX_PLAYER_NAME], stringToPrint[256];
-
-	GetPlayerName(playerid, playerName, sizeof(playerName));
+	new stringToPrint[256], stringID;
 
 	if (!gPlayers[playerid][AFK])
 	{
-		format(stringToPrint, sizeof(stringToPrint), "[ AFK ] Player %s (ID: %d) has just gone away from the keyboard (/afk)!", playerName, playerid);
-		SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+		stringID = I18N_AFK_CMD_APPLIED;
 
 		new playerAFKName[MAX_PLAYER_NAME];
-		format(playerAFKName, sizeof(playerAFKName), "(AFK) %s", gPlayers[playerid][Name]);
+		format(playerAFKName, sizeof(playerAFKName), "%s_AFK", gPlayers[playerid][Name]);
 		SetPlayerName(playerid, playerAFKName);
 
 		// Lock the player's animations.
@@ -135,8 +132,7 @@ dcmd_afk(playerid, const params[])
 	}
 	else
 	{
-		format(stringToPrint, sizeof(stringToPrint), "[ AFK ] Player %s (ID: %d) is back in game (/afk)!", playerName, playerid);
-		SendClientMessageToAll(COLOR_LIGHTGREEN, stringToPrint);
+		stringID = I18N_AFK_CMD_REVERTED;
 
 		SetPlayerName(playerid, gPlayers[playerid][Name]);
 
@@ -144,6 +140,21 @@ dcmd_afk(playerid, const params[])
 		TogglePlayerControllable(playerid, true);
 
 		gPlayers[playerid][AFK] = false;
+	}
+
+	new playerName[MAX_PLAYER_NAME];
+	GetPlayerName(playerid, playerName, sizeof(playerName));
+
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i))
+		{
+			continue;
+		}
+
+		GetLocalizedString(i, stringID, stringToPrint, sizeof(stringToPrint));
+		format(stringToPrint, sizeof(stringToPrint), stringToPrint, playerName, playerid);
+		SendClientMessage(i, COLOR_YELLOW, stringToPrint);
 	}
 
 	return 1;
@@ -214,8 +225,7 @@ dcmd_dance(playerid, const params[])
 {
 	if (IsPlayerInAnyVehicle(playerid))
 	{
-		SendClientMessage(playerid, COLOR_RED, "[ ! ] Animation allowed outside the vehicle only!");
-		return 1;
+		return SendClientMessageLocalized(playerid, I18N_ANIMATION_VEHICLE_BLOCK);
 	}
 
 	switch (strval(params)) 
@@ -238,7 +248,10 @@ dcmd_dance(playerid, const params[])
 			}
 		default:
 			{
-				SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /dance [1-4]");
+				new msg[64];
+				GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
+				format(msg, sizeof(msg), msg, "/dance [1-4]");
+				return SendClientMessage(playerid, COLOR_YELLOW, msg);
 			}
 	}
 
@@ -251,7 +264,9 @@ dcmd_deal(playerid, const params[])
 	SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (gPlayers[playerid][TeamID] != TEAM_DEALERS)
+	{
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Dealerz-only reserved command!");
+	}
 
 	if (!strlen(params) || (!IsNumeric(token1) && !IsNumeric(token2) && !strcmp(token1, "list")) || (strcmp(token1, "list") && IsNumeric(token2)))
 	{
@@ -265,10 +280,14 @@ dcmd_deal(playerid, const params[])
 		new targetId = strval(token1);// targetAmount = strval(token2);
 
 		if (targetId == playerid)
+		{
 			return SendClientMessage(playerid, COLOR_RED, "[ ! ] Cannot deal to such player!");
+		}
 
 		if (!IsPlayerConnected(targetId))
+		{
 			return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] No such player online!");
+		}
 
 		//
 		//
@@ -307,20 +326,35 @@ dcmd_dwarp(playerid, const params[])
 {
 #pragma unused params
 	if (gPlayers[playerid][InsideProperty])
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ WARP ] Leave the property to be able to use this warp command!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_IN_PROPERTY_BLOCK);
+	}
 
 	new t_PLAYER_STATE: playerState = GetPlayerState(playerid), senderName[MAX_PLAYER_NAME], stringToPrint[256], vehicleId = GetPlayerVehicleID(playerid);
 
 	SetPlayerInterior(playerid, 0);
 	GetPlayerName(playerid, senderName, sizeof(senderName));
 
-	format(stringToPrint, sizeof(stringToPrint), "[ WARP ] Player %s used warp to the drag race spot [ /dwarp ]", senderName);
-	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i))
+		{
+			continue;
+		}
+
+		GetLocalizedString(i, I18N_DWARP_CMD_APPLIED_FMT, stringToPrint, sizeof(stringToPrint));
+		format(stringToPrint, sizeof(stringToPrint), stringToPrint, senderName);
+		SendClientMessage(i, COLOR_YELLOW, stringToPrint);
+	}
 
 	if (IsPlayerInVehicle(playerid, vehicleId) && playerState == PLAYER_STATE_DRIVER) 
+	{
 		SetVehiclePos(vehicleId, 2635.67, 1171.51, 10.37);
+	}
 	else
+	{
 		SetPlayerPos(playerid, 2635.67, 1171.51, 10.37);
+	}
 
 	return 1;
 }
@@ -329,7 +363,7 @@ dcmd_fix(playerid, const params[])
 {
 	if (gPlayers[playerid][TeamID] != TEAM_MECHANICS)
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Mechanics team-related command!");
+		return SendClientMessageLocalized(playerid, I18N_TEAM_RELATED_CMD_MECHANICS);
 	}
 
 	if (!strlen(params))
@@ -339,21 +373,25 @@ dcmd_fix(playerid, const params[])
 			SetVehicleHealth(GetPlayerVehicleID(playerid), 1000.0);
 			RepairVehicle(GetPlayerVehicleID(playerid));
 
-			return SendClientMessage(playerid, COLOR_YELLOW, "[ FIX ] Vehicle fixed");
+			return SendClientMessageLocalized(playerid, I18N_FIX_CMD_APPLIED);
 		}
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /fix [playerID]");
+
+		new msg[64];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
+		format(msg, sizeof(msg), msg, "/fix [playerID]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
 	}
 
 	new targetid = strval(params);
 
 	if (!IsPlayerConnected(targetid))
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Player with that ID is not connected!");
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
 	}
 
 	if (!IsPlayerInAnyVehicle(targetid) || GetPlayerState(targetid) != PLAYER_STATE_DRIVER)
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ FIX ] Player with that ID is not riding/driving a vehicle");
+		return SendClientMessageLocalized(playerid, I18N_FIX_CMD_TARGET_NOT_IN_VEHICLE);
 	}
 
 	new Float: vehicleHealth;
@@ -361,7 +399,7 @@ dcmd_fix(playerid, const params[])
 
 	if (vehicleHealth >= 1000.0)
 	{
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ FIX ] No need to repair this car");
+		return SendClientMessageLocalized(playerid, I18N_FIX_CMD_NO_REPAIRING);
 	}
 
 	new Float: pX, Float: pY, Float: pZ;
@@ -369,7 +407,7 @@ dcmd_fix(playerid, const params[])
 
 	if (!IsPlayerInSphere(targetid, pX, pY, pZ, 10.0))
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ FIX ] Target vehicle is too far");
+		return SendClientMessageLocalized(playerid, I18N_FIX_CMD_TARGET_TOO_FAR);
 	}
 	
 	SetVehicleHealth(GetPlayerVehicleID(targetid), 1000.0);
@@ -378,12 +416,11 @@ dcmd_fix(playerid, const params[])
 	new commission = 1500 + random(1000), stringToPrint[128];
 	GivePlayerMoney(playerid, commission);
 
-	format(stringToPrint, sizeof(stringToPrint), "[ FIX ] Vehicle fixed, commission earned: $%d", commission);
-
-	SendClientMessage(targetid, COLOR_YELLOW, "[ FIX ] Vehicle fixed!");
+	GetLocalizedString(playerid, I18N_FIX_CMD_COMMISSION_FMT, stringToPrint, sizeof(stringToPrint));
+	format(stringToPrint, sizeof(stringToPrint), stringToPrint, commission);
 	SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
 
-	return 1;
+	return SendClientMessageLocalized(targetid, I18N_FIX_CMD_APPLIED);
 }
 
 dcmd_fork(playerid, const params[])
@@ -391,11 +428,12 @@ dcmd_fork(playerid, const params[])
 #pragma unused params
 	if (!IsPlayerInAnyVehicle(playerid) || GetVehicleModel(GetPlayerVehicleID(playerid)) != 530)
 	{
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ FORK ] Only applies to forklifts!");
+		return SendClientMessageLocalized(playerid, I18N_FORK_CMD_FORKLIFTS_BLOCK);
 	}
 
 	gPlayers[playerid][SwitchedControllers] = !gPlayers[playerid][SwitchedControllers];
-	return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ FORK ] Controllers switch toggled!");
+
+	return SendClientMessageLocalized(playerid, I18N_FORK_CMD_APPLIED);
 }
 
 dcmd_givecash(playerid, const params[])
@@ -404,18 +442,29 @@ dcmd_givecash(playerid, const params[])
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /givecash [playerID] [amount]");
+	{
+		new msg[64];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
+		format(msg, sizeof(msg), msg, "/givecash [playerID] [$$$]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+	}
 
 	new targetId = strval(token1), targetAmount = strval(token2);
 
 	if (targetId == playerid)
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Invalid transaction amount!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_ID_INVALID);
+	}
 
-	if (targetAmount > GetPlayerMoney(playerid) || targetAmount < 0)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Invalid amount!");
+	if (targetAmount > GetPlayerMoney(playerid) || targetAmount <= 0)
+	{
+		return SendClientMessageLocalized(playerid, I18N_GIVECASH_INVALID_AMOUNT);
+	}
 
 	if (!IsPlayerConnected(targetId))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] No such player online!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
 
 	new playerName[MAX_PLAYER_NAME], stringToPrint[128], targetName[MAX_PLAYER_NAME];
 
@@ -424,7 +473,8 @@ dcmd_givecash(playerid, const params[])
 	GetPlayerName(targetId, targetName, sizeof(targetName));
 
 	// Send an informative statement to the receiving player.
-	format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Received money ($%d) from player %s [ID: %d]!", targetAmount, playerName, playerid);
+	GetLocalizedString(targetId, I18N_GIVECASH_RECEIVED, stringToPrint, sizeof(stringToPrint));
+	format(stringToPrint, sizeof(stringToPrint), stringToPrint, targetAmount, playerName, playerid);
 	SendClientMessage(targetId, COLOR_LIGHTGREEN, stringToPrint);
 
 	// Transfer money.
@@ -432,7 +482,8 @@ dcmd_givecash(playerid, const params[])
 	GivePlayerMoney(playerid, -targetAmount);
 
 	// Send an informative statement to the sending player.
-	format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Sent money ($%d) to player %s [ID: %d]!", targetAmount, targetName, targetId);
+	GetLocalizedString(playerid, I18N_GIVECASH_SENT, stringToPrint, sizeof(stringToPrint));
+	format(stringToPrint, sizeof(stringToPrint), stringToPrint, targetAmount, targetName, targetId);
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 
 	return 1;
@@ -588,6 +639,11 @@ dcmd_pm(playerid, const params[])
 	if (!IsPlayerConnected(targetId))
 	{
 		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
+
+	if (targetId == playerid)
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_ID_INVALID);
 	}
 
 	OnPlayerPrivMsg(playerid, targetId, token2);

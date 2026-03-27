@@ -85,6 +85,21 @@ enum
 	I18N_TEAM_RELATED_CMD_ADMINZ,
 	I18N_HIDE_CMD_APPLIED,
 	I18N_HIDE_CMD_REVERTED,
+	I18N_GIVECASH_INVALID_AMOUNT,
+	I18N_GIVECASH_RECEIVED,
+	I18N_GIVECASH_SENT,
+	I18N_FORK_CMD_FORKLIFTS_BLOCK,
+	I18N_FORK_CMD_APPLIED,
+	I18N_TEAM_RELATED_CMD_MECHANICS,
+	I18N_FIX_CMD_APPLIED,
+	I18N_FIX_CMD_TARGET_NOT_IN_VEHICLE,
+	I18N_FIX_CMD_NO_REPAIRING,
+	I18N_FIX_CMD_TARGET_TOO_FAR,
+	I18N_FIX_CMD_COMMISSION_FMT,
+	I18N_DWARP_CMD_APPLIED_FMT,
+	I18N_AFK_CMD_APPLIED,
+	I18N_AFK_CMD_REVERTED,
+	I18N_AFK_CMD_DEATHMATCH_BLOCK,
 	// Radar (vehicle stats)
 	I18N_HID_STATS_GREEN_FMT,
 	I18N_HID_STATS_RED_FMT,
@@ -193,6 +208,21 @@ new gI18nMessageColor[] =
 	COLOR_RED,
 	COLOR_LIGHTGREEN,
 	COLOR_LIGHTGREEN,
+	COLOR_RED,
+	COLOR_LIGHTGREEN,
+	COLOR_LIGHTGREEN,
+	COLOR_RED,
+	COLOR_LIGHTGREEN,
+	COLOR_RED,
+	COLOR_LIGHTGREEN,
+	COLOR_RED,
+	COLOR_YELLOW,
+	COLOR_RED,
+	COLOR_LIGHTGREEN,
+	COLOR_YELLOW,
+	COLOR_YELLOW,
+	COLOR_YELLOW,
+	COLOR_RED,
 	// Radar (vehicle stats)
 	COLOR_LIGHTGREEN,
 	COLOR_RED,
@@ -432,6 +462,66 @@ new gI18nMessages[][PlayerLocale][] =
 	{
 		"[ HIDE ] Player color set to visible!",
 		"[ HIDE ] Hracsky stitek zviditelnen pro ostatni hrace!"
+	},
+	{
+		"[ ! ] Invalid amount!",
+		"[ ! ] Neplatna castka!"
+	},
+	{
+		"[ CASH ] Received money ($%d) from player %s [ID: %d]!",
+		"[ CASH ] Prijem hotovosti ($%d) od hrace %s [ID: %d]!"
+	},
+	{
+		"[ CASH ] Sent money ($%d) to player %s [ID: %d]!",
+		"[ CASH ] Hotovost ($%d) odeslana hraci %s [ID: %d]!"
+	},
+	{
+		"[ FORK ] Only applies to forklifts!",
+		"[ FORK ] Prikaz je pouzitelny pouze pro vysokozdvizne voziky!"
+	},
+	{
+		"[ FORK ] Controllers switch toggled!",
+		"[ FORK ] Ovladani prepnuto!"
+	},
+	{
+		"[ CMD ] Mechanics team-related command!",
+		"[ CMD ] Prikaz je urcen pouze pro cleny teamu mechaniku!"
+	},
+	{
+		"[ FIX ] Vehicle fixed!",
+		"[ FIX ] Vozidlo opraveno!"
+	},
+	{
+		"[ FIX ] Player with that ID is not riding/driving a vehicle!",
+		"[ FIX ] Hrac s danym ID neni ve vozidle!"
+	},
+	{
+		"[ FIX ] No need to repair this car",
+		"[ FIX ] Vozidlo neni treba opravovat"
+	},
+	{
+		"[ FIX ] Target vehicle is too far away!",
+		"[ FIX ] Cilove vozidlo je moc daleko!"
+	},
+	{
+		"[ FIX ] Vehicle fixed, commission earned: $%d",
+		"[ FIX ] Vozidlo opraveno, odmena: $%d"
+	},
+	{
+		"[ WARP ] Player %s used warp to the drag race spot! [ /dwarp ]",
+		"[ WARP ] Hrac %s hodil warp na drag spot! [ /dwarp ]"
+	},
+	{
+		"[ AFK ] Player %s (ID: %d) has just gone away from the keyboard! [ /afk ]",
+		"[ AFK ] Hrac %s (ID: %d) odesel na chvili od klavesnice! [ /afk ]"
+	},
+	{
+		"[ AFK ] Player %s (ID: %d) is back in game! [ /afk ]",
+		"[ AFK ] Hrac %s (ID: %d) je zpet ve hre! [ /afk ]"
+	},
+	{
+		"[ AFK ] Cannot go to AFK mode while in Deathmatch!",
+		"[ AFK ] Nesmis pouzit /afk kdyz jsi v Deathmatch minihre!"
 	},
 	//
 	//  Radar (vehicle stats)

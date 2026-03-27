@@ -563,12 +563,19 @@ dcmd_pm(playerid, const params[])
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || count != 2 || !IsNumeric(token1))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /pm [playerID] [text]");
+	{
+		new msg[64];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
+		format(msg, sizeof(msg), msg, "/pm [playerID] [text]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+	}
 
 	new targetId = strval(token1);
 
 	if (!IsPlayerConnected(targetId))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] No such player online!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
 
 	OnPlayerPrivMsg(playerid, targetId, token2);
 
@@ -580,7 +587,9 @@ dcmd_port(playerid, const params[])
 #pragma unused params
 
 	if (gPlayers[playerid][InsideProperty])
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Leave the property to be able to use such command!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_IN_PROPERTY_BLOCK);
+	}
 
 	return ShowPortListDialog(playerid);
 }
@@ -605,7 +614,9 @@ dcmd_race(playerid, const params[])
 	new raceid = CheckPlayerRaceState(playerid);
 
 	if (!raceid)
+	{
 		return ShowRaceListDialog(playerid);
+	}
 
 	return ShowRaceOptionsDialog(playerid, raceid);
 }
@@ -625,37 +636,45 @@ dcmd_scores(playerid, const params[])
 dcmd_search(playerid, const params[]) 
 {
 	if (gPlayers[playerid][TeamID] != TEAM_POLICE)
-		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Police team-related command!");
+	{
+		SendClientMessageLocalized(playerid, I18N_TEAM_RELATED_CMD_POLICE);
+	}
 
 	new token1[32], token2[32];
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || count != 2)
 	{
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /search [playerID] drugz");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /search [playerID] drunk");
-
-		return 1;
+		new msg[64];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
+		format(msg, sizeof(msg), msg, "/search [playerID] [drugz/drunk]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
 	}
 
 	new targetId = strval(token1);
 
 	if (!IsPlayerConnected(targetId)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
 
 	if (targetId == playerid)
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Cannot use the test against yourself");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_ID_INVALID);
+	}
 
 	new Float:X, Float:Y, Float:Z;
 	GetPlayerPos(targetId, X, Y, Z);
 
 	if (!IsPlayerInSphere(playerid, X, Y, Z, _: 15.0)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] You need to be closer to the player to search them");
+	{
+		return SendClientMessageLocalized(playerid, I18N_SEARCH_CMD_PROXIMITY);
+	}
 
 	// Check drunk driving
 	if (GetPlayerDrunkLevel(targetId) > 1999 && IsPlayerInAnyVehicle(targetId) && GetPlayerState(targetId) == PLAYER_STATE_DRIVER)
 	{
-		SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Player is drunk driving! The player is fined $25000");
+		SendClientMessageLocalized(playerid, I18N_SEARCH_DRUNK_POSITIVE);
 
 		// Lock the car for the player and remove them from such vehicle
 		SetVehicleParamsForPlayer(GetPlayerVehicleID(targetId), targetId, 0, 1);
@@ -670,20 +689,21 @@ dcmd_search(playerid, const params[])
 		// Fine them
 		GivePlayerMoney(targetId, -25000);
 
-		SendClientMessage(targetId, COLOR_ORANGE, "[ DRUGZ ] You have been fined $25000 for drunk driving, your vehicle has been confiscated");
+		SendClientMessageLocalized(targetId, I18N_SEARCH_DRUNK_POSITIVE_PLAYER);
 
 		// Generate a bonus for the policeman
-		new bonus = random(10000), stringToPrint[128];
+		new bonus = 4000 + random(6000), stringToPrint[128];
 		GivePlayerMoney(playerid, bonus);
 
-		format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Received a &%d bonus", bonus);
+		GetLocalizedString(playerid, I18N_SEARCH_DRUNK_BONUS_FMT, stringToPrint, sizeof(stringToPrint));
+		format(stringToPrint, sizeof(stringToPrint), stringToPrint, bonus);
 		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 
 		return 1;
 	}
 
-	SendClientMessage(playerid, COLOR_YELLOW, "[ DRUGZ ] You have used a breathalyzer, the player is sober.");
-	SendClientMessage(targetId, COLOR_YELLOW, "[ DRUGZ ] You have just been tested for intoxication and you passed");
+	SendClientMessageLocalized(playerid, I18N_SEARCH_DRUNK_NEGATIVE);
+	SendClientMessageLocalized(targetId, I18N_SEARCH_DRUNK_NEGATIVE_PLAYER);
 
 	return 1;
 }
@@ -697,7 +717,7 @@ dcmd_skydive(playerid, const params[])
 	// Set their position high above the LV pyramide.
 	SetPlayerPos(playerid, 2247.61, 1260.14, 1313.40);
 
-	SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ SKYDIVE ] Enjoy the skydive");
+	SendClientMessageLocalized(playerid, I18N_SKYDIVE);
 
 	return 1;
 }
@@ -719,21 +739,37 @@ dcmd_text(playerid, const params[])
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || count != 2)
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /text [ID] [text]");
+	{
+		new msg[64];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
+		format(msg, sizeof(msg), msg, "/text [playerID] [text]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+	}
 
 	new targetId = strval(token1);
 
 	if (!IsPlayerConnected(targetId)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
 
 	new playerName[MAX_PLAYER_NAME], stringToPrint[256], targetName[MAX_PLAYER_NAME];
 
 	GetPlayerName(playerid, playerName, sizeof(playerName));
 	GetPlayerName(targetId, targetName, sizeof(targetName));
 
-	format(stringToPrint, sizeof(stringToPrint), "Player %s says to player %s: %s", playerName, targetName, token2);
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i))
+		{
+			continue;
+		}
 
-	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+		GetLocalizedString(i, I18N_TEXT_PLAYER_FMT, stringToPrint, sizeof(stringToPrint));
+		format(stringToPrint, sizeof(stringToPrint), stringToPrint, playerName, targetName, token2);
+
+		SendClientMessage(i, COLOR_YELLOW, stringToPrint);
+	}
 
 	return 1;
 }

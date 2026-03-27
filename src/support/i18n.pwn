@@ -69,6 +69,15 @@ enum
 	I18N_CAM_DETACHED,
 	I18N_ADMINCOL_FMT,
 	I18N_TEAM_RELATED_CMD_POLICE,
+	I18N_TEXT_PLAYER_FMT,
+	I18N_SKYDIVE,
+	I18N_SEARCH_CMD_PROXIMITY,
+	I18N_SEARCH_DRUNK_POSITIVE,
+	I18N_SEARCH_DRUNK_POSITIVE_PLAYER,
+	I18N_SEARCH_DRUNK_BONUS_FMT,
+	I18N_SEARCH_DRUNK_NEGATIVE,
+	I18N_SEARCH_DRUNK_NEGATIVE_PLAYER,
+	I18N_IN_PROPERTY_BLOCK,
 	// Radar (vehicle stats)
 	I18N_HID_STATS_GREEN_FMT,
 	I18N_HID_STATS_RED_FMT,
@@ -161,6 +170,15 @@ new gI18nMessageColor[] =
 	COLOR_YELLOW,
 	COLOR_YELLOW,
 	COLOR_YELLOW,
+	COLOR_YELLOW,
+	COLOR_LIGHTGREEN,
+	COLOR_RED,
+	COLOR_ORANGE,
+	COLOR_ORANGE,
+	COLOR_ORANGE,
+	COLOR_ORANGE,
+	COLOR_ORANGE,
+	COLOR_RED,
 	// Radar (vehicle stats)
 	COLOR_LIGHTGREEN,
 	COLOR_RED,
@@ -336,6 +354,42 @@ new gI18nMessages[][PlayerLocale][] =
 	{
 		"[ CMD ] Police team-related command!",
 		"[ CMD ] Tento prikaz je urcen pouze pro team policistu!"
+	},
+	{
+		"Player %s says to player %s: %s",
+		"Hrac %s vzkazuje hraci %s: %s"
+	},
+	{
+		"[ SKYDIVE ] Enjoy the skydive!",
+		"[ SKYDIVE ] Uzij si seskok!"
+	},
+	{
+		"[ ! ] You need to be closer to the player to search them",
+		"[ ! ] Potrebujes byt hraci blize, abys mohl provest prohlidku"
+	},
+	{
+		"[ DRUGZ ] Player is drunk driving! The player is fined $25000",
+		"[ DRUGZ ] Hrac ridi opily! Hrac zaplati pokutu $25000"
+	},
+	{
+		"[ DRUGZ ] You have been fined $25000 for drunk driving, your vehicle has been confiscated",
+		"[ DRUGZ ] Za rizeni pod vlivem zaplatis pokutu $25000, vozidlo bylo odstaveno"
+	},
+	{
+		 "[ CASH ] Received a bonus of $%d!",
+		 "[ CASH ] Ziskana odmena $%d!"
+	},
+	{
+		"[ DRUGZ ] You have used a breathalyzer, the player is sober",
+		"[ DRUGZ ] Hraci byl podan alkoholtester, hrac je strizlivy"
+	},
+	{
+		"[ DRUGZ ] You have just been tested for intoxication and you passed",
+		"[ DRUGZ ] Byl ti podan alkoholtester, jsi strizlivy"
+	},
+	{
+		"[ ! ] Leave the property to be able to use such command!",
+		"[ ! ] Pred pouzitim daneho prikazu musis opustit nemovitost!"
 	},
 	//
 	//  Radar (vehicle stats)

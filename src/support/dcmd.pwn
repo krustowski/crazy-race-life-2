@@ -102,8 +102,8 @@ dcmd_acc(playerid, const params[])
 }
 
 dcmd_admins(playerid, const params[])
-#pragma unused params
 {
+#pragma unused params
 	return ShowAdminsOnlineDialog(playerid);
 }
 

@@ -1178,11 +1178,19 @@ dcmd_combat(playerid, const params[])
 	return ShowCombatListDialog(playerid);
 }
 
+new gCountDownStarted = false;
+
 dcmd_countdown(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 2) 
 	{
 		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
+
+	if (gCountDownStarted)
+	{
+		gCountDownStarted = false;
+		return 1;
 	}
 
 	if (!strlen(params) || !IsNumeric(params) || !strval(params))
@@ -1195,6 +1203,7 @@ dcmd_countdown(playerid, const params[])
 
 	new remaining = strval(params);
 
+	gCountDownStarted = true;
 	CountDownHelper(remaining);
 
 	return 1;
@@ -1204,11 +1213,13 @@ forward CountDownHelper(remaining);
 
 public CountDownHelper(remaining)
 {
-	if (remaining >= 0)
+	if (!remaining || !gCountDownStarted)
 	{
-		GameTextForAll("~n~~n~~n~~n~~n~~n~%d", 1000, 4, remaining);
-		SetTimerEx("CountDownHelper", 1000, false, "i", --remaining);
+		return 0;
 	}
+
+	GameTextForAll("~n~~n~~n~~n~~n~~n~%d", 1000, 4, remaining);
+	return SetTimerEx("CountDownHelper", 1000, false, "i", --remaining);
 }
 
 dcmd_crime(playerid, const params[])
@@ -1216,6 +1227,14 @@ dcmd_crime(playerid, const params[])
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3) 
 	{
 		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
+
+	if (!strlen(params) || !IsNumeric(params))
+	{
+		new msg[64];
+		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
+		format(msg, sizeof(msg), msg, "/crime [3-22]");
+		return SendClientMessage(playerid, COLOR_YELLOW, msg);
 	}
 
 	new crimeId = strval(params);

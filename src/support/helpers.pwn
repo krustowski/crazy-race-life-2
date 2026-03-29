@@ -311,3 +311,19 @@ stock UnixToDateTime(timestamp, &year, &month, &day, &hour, &minute, &second)
 	day = days + 1;
 }
 
+stock BroadcastMessage(color, const str[])
+{
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i))
+		{
+			continue;
+		}
+
+		//GetLocalizedString(i, msg_id, str, size);
+		//format(str, size, str, playerName, targetName, token2);
+
+		SendClientMessage(i, color, str);
+	}
+
+}

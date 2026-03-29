@@ -301,18 +301,38 @@ public OnPlayerConnect(playerid)
 	}
 
 	format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s joined the game!", playerName);
-	SendClientMessageToAll(COLOR_GREY, stringToPrint);
+	BroadcastMessage(COLOR_GREY, stringToPrint);
+	//SendClientMessageToAll(COLOR_GREY, stringToPrint);
 
 	SendMessageToWebhook(playerid, "connected", -1);
 
 	// Send a welcome text to the connecting new player.
 	SendClientMessage(playerid, COLOR_INVISIBLE, "");
 	SendClientMessageLocalized(playerid, I18N_WELCOME_MESSAGE);
+	//GetLocalizedString(playerid, I18N_WELCOME_MESSAGE_VERSION_FMT, stringToPrint, sizeof(stringToPrint));
+
+	format(stringToPrint, sizeof(stringToPrint), "%s",
+			"{FFD700}CrazyRaceLife2{FFFFFF} (CRL2)"
+	      );
+	SendClientMessage(playerid, COLOR_GREY, stringToPrint);
+	format(stringToPrint, sizeof(stringToPrint), "%s%s",
+			"Credits: {00FF00}",
+			GAMEMODE_CREDITS,
+			"{FFFFFF} (2008-2010, 2025-){FFFFFF}"
+	      );
+	SendClientMessage(playerid, COLOR_GREY, stringToPrint);
+	format(stringToPrint, sizeof(stringToPrint), "%s%d.%d.%d",
+			"Version: {FFD700}",
+		       	CRAZY_RACE_LIFE_2_VERSION_MAJOR,
+			CRAZY_RACE_LIFE_2_VERSION_MINOR,
+			CRAZY_RACE_LIFE_2_VERSION_PATCH
+	      );
+	SendClientMessage(playerid, COLOR_GREY, stringToPrint);
 	SendClientMessage(playerid, COLOR_INVISIBLE, "");
 
 	if (!IsPlayerUsingOmp(playerid))
 	{
-		SendClientMessage(playerid, COLOR_RED, "[ CLIENT ] You don't seem to use the openMP launcher, some game features may not be available for you. Please visit https://open.mp to get it.");
+		SendClientMessage(playerid, COLOR_RED, "[ CLIENT ] You don't seem to be using the openMP launcher, some game features may not be available for you. Please visit https://open.mp to get it.");
 	}
 
 	// Ask the user to login/register.

@@ -21,3 +21,19 @@ schema:
 
 migrate:
 	@./utils/goose -dir ./sql/migrations sqlite3 crl2_data.db up
+
+.PHONY: tests
+
+tests:
+	@LD_LIBRARY_PATH=${HOME}/.config/sampctl/pawn/openmultiplayer/compiler/v3.10.11 DYLD_LIBRARY_PATH=${HOME}/.config/sampctl/pawn/openmultiplayer/compiler/v3.10.11 \
+		${HOME}/.config/sampctl/pawn/openmultiplayer/compiler/v3.10.11/pawncc \
+		${PWD}/tests/run_tests.pwn \
+		-D${PWD}/src \
+		-D${PWD}/tests \
+		-o${PWD}/gamemodes/crl2_tests.amx \
+		-d3 \
+		-Z+ \
+		-i${PWD} \
+		-i${PWD}/dependencies/omp-stdlib
+	@./samp03svr -c configs/test_server.cfg
+

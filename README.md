@@ -65,6 +65,13 @@ Live demo at [samp://95.216.7.113:39876](samp://95.216.7.113:39876)
 
 ## Preview
 
+### On Connect (authorized spawn)
+
+![](.github/img/crl2_on_connect_logged.png)
+
+*^ A player spawned at their set spawn-point after a registeration/logging-in.*
+
+
 ### Racing
 
 ![](.github/img/crl2_racing_start.jpg)

@@ -93,6 +93,10 @@ Live demo at [samp://95.216.7.113:39876](samp://95.216.7.113:39876)
 
 *^ The custom interior is an ad-hoc built interior (very limited occurance). Pickups are places to custom points, allowing the secondary exit(s) as well.*
 
+![](.github/img/crl2_real_custom_interior_black_market.png)
+
+*^ Custom black market entrypoint in a custom interior.*
+
 ![](.github/img/crl2_real_estate_exterior_commercial.png)
 
 *^ The commercial property exterior example. Occupied state is indicated via the `3DText` text with the tenant's name. This property can still be outbought by another player though.*

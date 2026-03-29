@@ -67,7 +67,8 @@ enum PropertyPoint
 	VEHICLE_POINT,
 	OFFER_POINT,
 	MONEY_POINT,
-	SHIRT_POINT
+	SHIRT_POINT,
+	BLACK_MARKET_POINT
 }
 
 // Helper enum for the real estate data field parsing.
@@ -138,6 +139,7 @@ enum Property
 	Float: CoordsMoney[Coords],
 	Float: CoordsShirt[Coords],
 	Float: CoordsVehicle[Coords],
+	Float: CoordsMarket[Coords],
 
 	bool: Occupied,
 	bool: CustomInterior,
@@ -180,6 +182,7 @@ new gNullProperty[Property] =
 	PROPERTY_TYPE_NONE,
 	0,
 	PREDIT_NONE,
+	{0.0, 0.0, 0.0, 0.0},
 	{0.0, 0.0, 0.0, 0.0},
 	{0.0, 0.0, 0.0, 0.0},
 	{0.0, 0.0, 0.0, 0.0},
@@ -367,6 +370,15 @@ stock SpawnProperty(propertyId)
 					}
 
 					gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_INFO, 1, pX, pY, pZ);
+				}
+			case BLACK_MARKET_POINT:
+				{
+					if (gPropertyCoords[propertyId][i][Pickup])
+					{
+						DestroyPickup(gPropertyCoords[propertyId][i][Pickup]);
+					}
+
+					gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_SKULL, 1, pX, pY, pZ);
 				}
 			case SHIRT_POINT:
 				{
@@ -761,7 +773,7 @@ stock LoadRealEstateData()
 
 	do
 	{
-		printf("stock LoadRealEstateData(): i = %d", i);
+		//printf("stock LoadRealEstateData(): i = %d", i);
 
 		new name[64];
 
@@ -1572,16 +1584,29 @@ stock CheckRealEstatePickup(playerid, pickupid)
 				case DRUGZ_POINT:
 					{
 						if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
+						{
 							break;
+						}
 
 						return ShowPlayerDrugzDialog(playerid);
 					}
 				case SHIRT_POINT:
 					{
 						if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
+						{
 							break;
+						}
 
 						return ShowPropertySkinMainDialog(playerid, gProperties[i][ID]);
+					}
+				case BLACK_MARKET_POINT:
+					{
+						if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
+						{
+							break;
+						}
+
+						return ShowBlackMarketMainDialog(playerid);
 					}
 				case EXIT_POINT:
 					{

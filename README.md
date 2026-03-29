@@ -69,7 +69,7 @@ Live demo at [samp://95.216.7.113:39876](samp://95.216.7.113:39876)
 
 ![](.github/img/crl2_on_connect_logged.png)
 
-*^ A player spawned at their set spawn-point after a registeration/logging-in.*
+*^ A player spawned at their set spawn-point after a registration/logging-in.*
 
 
 ### Racing

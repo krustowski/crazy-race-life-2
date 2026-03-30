@@ -103,6 +103,11 @@ enum
 	I18N_AFK_CMD_DEATHMATCH_BLOCK,
 	I18N_PLAYER_SALARY_FMT,
 	I18N_PLAYER_SALARY_GAMETEXT_FMT,
+	I18N_MOVE_TO_PLAYER_INVALID_ID,
+	I18N_MOVE_TO_PLAYER_IN_MINIGAME_BLOCK,
+	I18N_VEHICLE_MOD_BLOCKED,
+	I18N_VEHICLE_MOD_NITRO_INSTALLED_FMT,
+	I18N_VEHICLE_MOD_NITRO_INSTALLED_ADMIN,
 	// Private messages
 	I18N_PRIV_MSG_RECEIVED_FMT,
 	I18N_PRIV_MSG_SENT_FMT,
@@ -234,6 +239,11 @@ new gI18nMessageColor[] =
 	COLOR_RED,
 	COLOR_YELLOW,
 	COLOR_YELLOW,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_LIGHTGREEN,
+	COLOR_LIGHTGREEN,
 	// Private messages
 	COLOR_YELLOW,
 	COLOR_YELLOW,
@@ -550,6 +560,26 @@ new gI18nMessages[][PlayerLocale][] =
 	{
 		"~y~S~g~alary~n~~y~$~g~%d",
 		"~y~V~g~yplata~n~~y~$~g~%d"
+	},
+	{
+		"[ ! ] Cannot use get/goto for the player!",
+		"[ ! ] Nelze pouzit get/goto u daneho hrace!"
+	},
+	{
+		"[ ! ] Target ID is playing a minigame, try again later!",
+		"[ ! ] Cilove ID hraje minihru, zkus to pozdeji!"
+	},
+	{
+		"[ ! ] Cannot mod such vehicle!",
+		"[ ! ] Nelze modifikovat dane vozidlo!"
+	},
+	{
+		"[ i ] Admin %s installed the Nitrous component to your vehicle!",
+		"[ i ] Admin %s nainstaloval do tveho vozu nitro!"
+	},
+	{
+		"[ i ] The Nitrous component installed for the player!",
+		"[ i ] Hraci bylo nainstalovano nitro!"
 	},
 	//
 	//  Private messages

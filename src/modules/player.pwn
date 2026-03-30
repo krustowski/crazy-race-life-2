@@ -489,10 +489,14 @@ stock OnPlayerPrivMsg(playerid, receiverid, text[])
 stock MovePlayerToPlayer(playerid, targetid, bool: reversed)
 {
 	if (!IsPlayerConnected(playerid) || !IsPlayerConnected(targetid)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
 
 	if (targetid == playerid)
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] Cannot use get/goto for the player!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_MOVE_TO_PLAYER_INVALID_ID);
+	}
 
 	new 
 		interior,
@@ -516,7 +520,7 @@ stock MovePlayerToPlayer(playerid, targetid, bool: reversed)
 
 	if (gDeathmatch[portedid][IsRegistered] || gDeathmatch[portedid][InGame] || gCombatMission[playerid][Active])
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Target ID is playing a minigame!");
+		return SendClientMessageLocalized(playerid, I18N_MOVE_TO_PLAYER_IN_MINIGAME_BLOCK);
 	}
 
 	new portedPlayerState = GetPlayerState(portedid), portedVehicleId = GetPlayerVehicleID(portedid);
@@ -541,30 +545,44 @@ stock MovePlayerToPlayer(playerid, targetid, bool: reversed)
 stock SetPlayerVehicleNitro(playerid, targetid)
 {
 	if (!IsPlayerConnected(targetid))
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] No such player online!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
 
 	if (!IsPlayerInAnyVehicle(targetid))
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] The player must be driving a vehicle!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_DRIVER);
+	}
 
-	new t_PLAYER_STATE: targetPlayerState = GetPlayerState(targetid), targetVehicleId = GetPlayerVehicleID(targetid);
+	new 
+		t_PLAYER_STATE: targetPlayerState = GetPlayerState(targetid), 
+		targetVehicleId = GetPlayerVehicleID(targetid);
 
 	if (targetPlayerState != PLAYER_STATE_DRIVER)
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] The player must be driving a vehicle!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_DRIVER);
+	}
 
 	if (!IsPlayerInValidNosVehicle(targetid, targetVehicleId)) 
-		return SendClientMessage(playerid, COLOR_RED, "[ ! ] Cannot mod such vehicle!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_VEHICLE_MOD_BLOCKED);
+	}
 
-	new adminName[MAX_PLAYER_NAME], stringToPrint[128];
+	new 
+		adminName[MAX_PLAYER_NAME], 
+		stringToPrint[128];
 
 	GetPlayerName(playerid, adminName, sizeof(adminName));
 
 	// Add the NoS component to such vehicleId.
 	AddVehicleComponent(targetVehicleId, 1010);
 
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s installed the Nitrous component to your vehicle!", adminName);
-
-	SendClientMessage(playerid, COLOR_GREY, "[ i ] The Nitrous component installed for the player!");
+	GetLocalizedString(targetid, I18N_VEHICLE_MOD_NITRO_INSTALLED_FMT, stringToPrint, sizeof(stringToPrint));
+	format(stringToPrint, sizeof(stringToPrint), stringToPrint, adminName);
 	SendClientMessage(targetid, COLOR_LIGHTGREEN, stringToPrint);
+
+	GetLocalizedString(playerid, I18N_VEHICLE_MOD_NITRO_INSTALLED_ADMIN, stringToPrint, sizeof(stringToPrint));
+	SendClientMessage(playerid, COLOR_GREY, stringToPrint);
 
 	return 1;
 }
@@ -572,7 +590,9 @@ stock SetPlayerVehicleNitro(playerid, targetid)
 stock DepositMoneyToBankAccount(playerid, amount)
 {
 	if (amount > GetPlayerMoney(playerid))
+	{
 		return SendClientMessage(playerid, COLOR_RED, "[ ATM ] Invalid amount!");
+	}
 
 	gPlayers[playerid][Bank] += amount;
 	GivePlayerMoney(playerid, -amount);

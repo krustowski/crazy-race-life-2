@@ -2271,6 +2271,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							return ShowHighScoresPlayTimeDialog(playerid);
 						}
+					case 5:
+						{
+							return ShowHighScoresPropertiesDialog(playerid);
+						}
 				}
 
 			}

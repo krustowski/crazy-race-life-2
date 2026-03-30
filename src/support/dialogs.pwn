@@ -80,6 +80,7 @@ enum
 	DIALOG_TAXI_OPTIONS,
 	DIALOG_HIGH_SCORES_OPTIONS,
 	DIALOG_HIGH_SCORES_PLAYTIME,
+	DIALOG_HIGH_SCORES_PROPERTIES,
 	DIALOG_HIGH_SCORES_DEATHMATCH,
 	DIALOG_HIGH_SCORES_MISSIONS,
 	DIALOG_HIGH_SCORES_COMBAT,
@@ -1086,12 +1087,13 @@ stock ShowTaxiMissionOptionsDialog(playerid)
 stock ShowHighScoresOptionsDialog(playerid)
 {
 	new stringToPrint[256];
-	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%s%s",
 			"Races\n",
 			"Deathmatch\n",
 			"Missions\n",
 			"Combat\n",
-			"PlayTime"
+			"PlayTime\n",
+			"Properties"
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_OPTIONS, DIALOG_STYLE_LIST, "High Scores", stringToPrint, "Select", "Close");
@@ -1133,6 +1135,38 @@ stock ShowHighScoresPlayTimeDialog(playerid)
 	DB_FreeResultSet(result);
 
 	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_PLAYTIME, DIALOG_STYLE_MSGBOX, "High Scores: PlayTime", stringToPrint, "Close", "");
+}
+
+stock ShowHighScoresPropertiesDialog(playerid)
+{
+	new 
+		query[] = "SELECT rank, u.nickname, property_count FROM ( SELECT user_id, COUNT(*) AS property_count, RANK() OVER (ORDER BY COUNT(*) DESC) AS rank FROM properties WHERE occupied = 1 AND type = 2 AND user_id > 0 GROUP BY user_id ) JOIN users AS u ON u.id == user_id WHERE rank <= 3",
+	    	stringToPrint[512] = "{FFD700}Top 3 players by rented property count (whole map):{FFFFFF}\n";
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for properties!");
+		print(query);
+		return 0;
+	}
+
+	do
+	{
+		new 
+			count = DB_GetFieldIntByName(result, "property_count"), 
+			rank = DB_GetFieldIntByName(result, "rank"), 
+			nickname[MAX_PLAYER_NAME];
+
+		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%d. {00FF00}%3d{FFFFFF}\t\t{FFD700}%s{FFFFFF}", stringToPrint, rank, count, nickname);
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_PROPERTIES, DIALOG_STYLE_MSGBOX, "High Scores: Properties", stringToPrint, "Close", "");
 }
 
 stock ShowHighScoresDeathmatchDialog(playerid)

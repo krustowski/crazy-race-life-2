@@ -1678,9 +1678,29 @@ dcmd_restart(playerid, const params[])
 	}
 
 	new msg[64];
-	GetLocalizedString(playerid, I18N_SERVER_RESTART_COUNTDOWN, msg, sizeof(msg));
-	format(msg, sizeof(msg), msg, seconds);
 
+	// Kill the countdown if already running
+	if (gServerRestartCountdown)
+	{
+		gCountDownStarted = false;
+		KillTimer(_: gServerRestartTimer);
+		gServerRestartCountdown = false;
+
+		for (new i = 0; i < MAX_PLAYERS; i++)
+		{
+			if (!IsPlayerConnected(i))
+			{
+				continue;
+			}
+
+			GetLocalizedString(i, I18N_SERVER_RESTART_ABORTED, msg, sizeof(msg));
+			SendClientMessage(i, COLOR_YELLOW, msg);
+		}
+
+		return 1;
+	}
+
+	// Announce the server restart to all online players
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if (!IsPlayerConnected(i))
@@ -1688,19 +1708,15 @@ dcmd_restart(playerid, const params[])
 			continue;
 		}
 
+		GetLocalizedString(i, I18N_SERVER_RESTART_COUNTDOWN, msg, sizeof(msg));
+		format(msg, sizeof(msg), msg, seconds);
+
 		SendClientMessage(i, COLOR_YELLOW, msg);
 	}
 
-	if (gServerRestartCountdown)
-	{
-		KillTimer(_: gServerRestartTimer);
-		gServerRestartCountdown = false;
-		gCountDownStarted = false;
-
-		return 1;
-	}
-
+	gServerRestartCountdown = true;
 	gCountDownStarted = true;
+
 	CountDownHelper(seconds);
 	gServerRestartTimer = Timer: SetTimer("StartServerReset", seconds * SECOND_MS, false);
 

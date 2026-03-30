@@ -311,6 +311,8 @@ stock UnixToDateTime(timestamp, &year, &month, &day, &hour, &minute, &second)
 	day = days + 1;
 }
 
+//stock BroadcastMessageLocalized(msg_id, color)
+
 stock BroadcastMessage(color, const str[])
 {
 	for (new i = 0; i < MAX_PLAYERS; i++)

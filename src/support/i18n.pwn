@@ -43,6 +43,7 @@ enum
 {
 	I18N_WELCOME_MESSAGE,
 	I18N_SERVER_RESTART_COUNTDOWN,
+	I18N_SERVER_RESTART_ABORTED,
 	I18N_PLAYER_NOT_IN_VEHICLE,
 	I18N_PLAYER_NOT_DRIVER,
 	I18N_PLAYER_NOT_CONNECTED,
@@ -165,6 +166,7 @@ enum
 new gI18nMessageColor[] = 
 {
 	COLOR_GREEN,
+	COLOR_YELLOW,
 	COLOR_YELLOW,
 	COLOR_RED,
 	COLOR_RED,
@@ -294,6 +296,10 @@ new gI18nMessages[][PlayerLocale][] =
 	{
 		"[ RESTART ] Server restarts in %d seconds!",
 		"[ RESTART ] Za %d sekund dojde k restartu serveru!"
+	},
+	{
+		"[ RESTART ] Server restart aborted!",
+		"[ RESTART ] Restart serveru zrusen!"
 	},
 	{
 		"[ ! ] Such player not in a vehicle!",

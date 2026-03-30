@@ -108,6 +108,9 @@ enum
 	I18N_VEHICLE_MOD_BLOCKED,
 	I18N_VEHICLE_MOD_NITRO_INSTALLED_FMT,
 	I18N_VEHICLE_MOD_NITRO_INSTALLED_ADMIN,
+	I18N_ATM_INVALID_AMOUNT,
+	I18N_ATM_DEPOSITED_FMT,
+	I18N_ATM_WITHDRAWAL_FMT,
 	// Private messages
 	I18N_PRIV_MSG_RECEIVED_FMT,
 	I18N_PRIV_MSG_SENT_FMT,
@@ -123,6 +126,12 @@ enum
 	I18N_AE_MOVE_STOP,
 	// Black Market
 	I18N_BLACK_MARKET_RATIO_UPDATE,
+	I18N_BLACK_MARKET_ALREADY_PROCESSED,
+	I18N_BLACK_MARKET_NO_MONEY,
+	I18N_BLACK_MARKET_OFFER_ACCEPTED_FMT,
+	I18N_BLACK_MARKET_OFFER_PROCESSED_FMT,
+	I18N_BLACK_MARKET_OFFER_PLACED,
+	I18N_DRUGZ_PICKUP_FMT,
 	// User data load
 	I18N_USER_DATA_LOAD,
 	I18N_USER_DATA_LOAD_SUCCESS,
@@ -244,6 +253,9 @@ new gI18nMessageColor[] =
 	COLOR_RED,
 	COLOR_LIGHTGREEN,
 	COLOR_LIGHTGREEN,
+	COLOR_RED,
+	COLOR_YELLOW,
+	COLOR_YELLOW,
 	// Private messages
 	COLOR_YELLOW,
 	COLOR_YELLOW,
@@ -258,6 +270,12 @@ new gI18nMessageColor[] =
 	COLOR_YELLOW,
 	COLOR_YELLOW,
 	// Black Market
+	COLOR_ORANGE,
+	COLOR_YELLOW,
+	COLOR_RED,
+	COLOR_ORANGE,
+	COLOR_ORANGE,
+	COLOR_ORANGE,
 	COLOR_ORANGE,
 	// User data load
 	COLOR_YELLOW,
@@ -581,6 +599,18 @@ new gI18nMessages[][PlayerLocale][] =
 		"[ i ] The Nitrous component installed for the player!",
 		"[ i ] Hraci bylo nainstalovano nitro!"
 	},
+	{
+		"[ ATM ] Invalid amount!",
+		"[ ATM ] Neplatna castka!"
+	},
+	{
+		"[ ATM ] Cash deposit: $%d! Account balance: $%d!",
+		"[ ATM ] Vlozeno na ucet: $%d! Aktualni zustatek: $%d!"
+	},
+	{
+		"[ ATM ] Cash withdrawal: $%d! Account balance: $%d!",
+		"[ ATM ] Vybrano z uctu: $%d! Aktualni zustatek: $%d!"
+	},
 	//
 	//  Private messages
 	//
@@ -636,6 +666,30 @@ new gI18nMessages[][PlayerLocale][] =
 	{
 		"[ MARKET ] Market token-to-dollar ratio changed to: %.3f",
 		"[ TRH ] Kurz token ku dolaru na trhu se zmenil: %.3f"
+	},
+	{
+		"[ MAKRET ] Such offer has been already processed, try another one!",
+		"[ TRH ] Dana nabidka jiz byla zpracovana, zkus jinou!"
+	},
+	{
+		"[ MARKET ] Not enough money to buy an offer!",
+		"[ TRH ] Danou nabidku nemas jak zaplatit!"
+	},
+	{
+		"[ MARKET ] Somebody accepted your offer! (+$%d)",
+		"[ TRH ] Nekdo prijal tvou nabidku na cernem trhu! (+$%d)"
+	},
+	{
+		"[ MARKET ] Offer %d proceeded (price: %d)!",
+		"[ TRH ] Nabidka %d zprocesovana (cena: %d)!"
+	},
+	{
+		"[ MARKET ] New offer placed!",
+		"[ TRH ] Nova nabidka byla vlozena na cerny trh!"
+	},
+	{
+		"[ DRUGZ ] Just found %d g of %s.",
+		"[ DRUGZ ] Prave jsi nasel %d g %s."
 	},
 	//
 	//  Server data autosave

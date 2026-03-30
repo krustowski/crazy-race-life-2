@@ -591,7 +591,7 @@ stock DepositMoneyToBankAccount(playerid, amount)
 {
 	if (amount > GetPlayerMoney(playerid))
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ ATM ] Invalid amount!");
+		return SendClientMessageLocalized(playerid, I18N_ATM_INVALID_AMOUNT);
 	}
 
 	gPlayers[playerid][Bank] += amount;
@@ -599,7 +599,8 @@ stock DepositMoneyToBankAccount(playerid, amount)
 
 	new stringToPrint[256];
 
-	format(stringToPrint, sizeof(stringToPrint), "[ ATM ] Cash deposit: $%d! Account balance: $%d!", amount, gPlayers[playerid][Bank]);
+	GetLocalizedString(playerid, I18N_ATM_DEPOSITED_FMT, stringToPrint, sizeof(stringToPrint));
+	format(stringToPrint, sizeof(stringToPrint), stringToPrint, amount, gPlayers[playerid][Bank]);
 	SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
 
 	return 1;
@@ -608,14 +609,17 @@ stock DepositMoneyToBankAccount(playerid, amount)
 stock WithdrawMoneyFromBankAccount(playerid, amount)
 {
 	if (amount > gPlayers[playerid][Bank])
-		return SendClientMessage(playerid, COLOR_RED, "[ ATM ] Invalid amount!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_ATM_INVALID_AMOUNT);
+	}
 
 	gPlayers[playerid][Bank] -= amount;
 	GivePlayerMoney(playerid, amount);
 
 	new stringToPrint[256];
 
-	format(stringToPrint, sizeof(stringToPrint), "[ ATM ] Cash withdrawal: $%d! Account balance: $%d!", amount, gPlayers[playerid][Bank]);
+	GetLocalizedString(playerid, I18N_ATM_WITHDRAWAL_FMT, stringToPrint, sizeof(stringToPrint));
+	format(stringToPrint, sizeof(stringToPrint), stringToPrint, amount, gPlayers[playerid][Bank]);
 	SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
 
 	return 1;
@@ -634,8 +638,10 @@ stock CheckDrugzPickup(playerid, pickupid)
 
 		gPlayers[playerid][Drugs][type - 1] += amount;
 
-		format(stringToPrint, sizeof(stringToPrint), "[ DRUGZ ] Just found %d g of %s.", amount, gDrugz[type - 1][DrugName]);
+		GetLocalizedString(playerid, I18N_DRUGZ_PICKUP_FMT, stringToPrint, sizeof(stringToPrint));
+		format(stringToPrint, sizeof(stringToPrint), stringToPrint, amount, gDrugz[type - 1][DrugName]);
 		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
+		break;
 	}
 
 	return 1;
@@ -645,7 +651,7 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 {
 	if (!gBlackMarketItems[listitem][OrmID])
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ MAKRET ] Such offer has been already processed!");
+		return SendClientMessageLocalized(playerid, I18N_BLACK_MARKET_ALREADY_PROCESSED);
 	}
 
 	new 
@@ -658,7 +664,7 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 
 	if (GetPlayerMoney(playerid) < price)
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ MARKET ] Not enough money to buy an offer!");
+		return SendClientMessageLocalized(playerid, I18N_BLACK_MARKET_NO_MONEY);
 	}
 
 	new query[64];
@@ -684,7 +690,8 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 			//GivePlayerMoney(i, price);
 
 			new msg[64];
-			format(msg, sizeof(msg), "[ MARKET ] Somebody accepted your offer! (+$%d)", price);
+			GetLocalizedString(i, I18N_BLACK_MARKET_OFFER_ACCEPTED_FMT, msg, sizeof(msg));
+			format(msg, sizeof(msg), msg, price);
 			SendClientMessage(i, COLOR_ORANGE, msg);
 			break;
 		}
@@ -701,7 +708,8 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 	gBlackMarketItems[listitem][Type] = DrugType: TYPE_NONE;
 
 	new msg[64];
-	format(msg, sizeof(msg), "[ MARKET ] Offer %d proceeded! (price: %d)", offerid, price);
+	GetLocalizedString(playerid, I18N_BLACK_MARKET_OFFER_PROCESSED_FMT, msg, sizeof(msg));
+	format(msg, sizeof(msg), msg, offerid, price);
 	SendClientMessage(playerid, COLOR_ORANGE, msg);
 
 	format(query, sizeof(query), "DELETE FROM black_market_items WHERE id = %d", offerid);
@@ -741,7 +749,5 @@ stock ProcessNewBlackMarketOffer(playerid)
 	gBlackMarketItemOffer[playerid][Amount] = 0;
 	gBlackMarketItemOffer[playerid][Value] = 0;
 
-	SendClientMessage(playerid, COLOR_ORANGE, "[ MARKET ] New offer placed!");
-
-	return 1;
+	return SendClientMessageLocalized(playerid, I18N_BLACK_MARKET_OFFER_PLACED);
 }

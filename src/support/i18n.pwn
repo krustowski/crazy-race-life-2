@@ -191,7 +191,23 @@ enum
 	I18N_REAL_PRIVATE_PROPERTY_ENTRANCE_BLOCK,
 	I18N_REAL_PROPERTY_FOR_SELL_FMT,
 	I18N_REAL_PROPERTY_FOR_SELL_OWNED_FMT,
+	I18N_REAL_PROPERTY_FOR_RENT_FMT,
+	I18N_REAL_PROPERTY_FOR_RENT_OWNED_FMT,
 	I18N_REAL_PROPERTY_ALREADY_SOLD,
+	I18N_REAL_ATTACHED_VEHICLE_RESPAWN_SET,
+	I18N_REAL_NOT_OWNED_BY_PLAYER,
+	I18N_REAL_NOT_DRIVING_VEHICLE,
+	I18N_REAL_VEHICLE_MODEL_ALREADY_ATTACHED,
+	I18N_REAL_NO_VEHICLE_SLOT,
+	I18N_REAL_VEHICLE_ATTACHED_SUCCESSFULLY,
+	I18N_REAL_SPAWN_POINT_CHANGED,
+	I18N_REAL_PLAYER_NOT_INSIDE,
+	I18N_REAL_SKIN_ALREADY_SAVED,
+	I18N_REAL_SKIN_NO_FREE_SLOT,
+	I18N_REAL_SKIN_SAVED,
+	I18N_REAL_SKIN_FREE_SLOT,
+	I18N_REAL_SKIN_SET,
+	I18N_REAL_SKIN_DELETED,
 	// Taxi
 	I18N_TAXI_MISS_WRONG_VEHICLE,
 	I18N_TAXI_MISS_NPC_ENTERING,
@@ -360,7 +376,23 @@ new gI18nMessageColor[] =
 	COLOR_RED,
 	COLOR_YELLOW,
 	COLOR_YELLOW,
+	COLOR_YELLOW,
+	COLOR_YELLOW,
 	COLOR_RED,
+	COLOR_YELLOW,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_YELLOW,
+	COLOR_RED,
+	COLOR_LIGHTGREEN,
+	COLOR_LIGHTGREEN,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_LIGHTGREEN,
+	COLOR_YELLOW,
+	COLOR_LIGHTGREEN,
+	COLOR_LIGHTGREEN,
 	// Taxi
 	COLOR_RED,
 	COLOR_YELLOW,
@@ -882,7 +914,7 @@ new gI18nMessages[][PlayerLocale][] =
 	},
 	{
 		"[ REAL ] No free slot to buy such property! You need to sell one to be able to buy another",
-		"[ REAL ] Jiz vlastnis limitni pocet nemocitosti, je treba nejakou prodat, abys mohl nakoupit novou"
+		"[ REAL ] Jiz vlastnis limitni pocet nemovitosti, je treba nejakou prodat, abys mohl nakoupit novou"
 	},
 	{
 		"[ REAL ] Such property is already occupied! Invalid action",
@@ -949,16 +981,80 @@ new gI18nMessages[][PlayerLocale][] =
 		"[ REAL ] Soukromy pozemek!"
 	},
 	{
-		"{FFFFFF}Property '%s' for sell.\n\n\tCost: ${00FF00}%d{FFFFFF} (%.2f mio)\n\n\nProperty code: {FFD700}%d{FFFFFF}\n\nTo buy this property, enter its code below:",
-		"{FFFFFF}Nemovitost '%s' je na prodej.\n\n\tCena: ${00FF00}%d{FFFFFF} (%.2f mil)\n\n\nKod nemovitosti: {FFD700}%d{FFFFFF}\n\nZadej kod nemovitosti pro nakup:"
+		"{FFFFFF}Property '{FFD700}%s{FFFFFF}' for sell.\n\n\tCost: ${00FF00}%d{FFFFFF} (%.2f mio)\n\n\nProperty code: {FFD700}%d{FFFFFF}\n\nTo buy this property, enter its code below:",
+		"{FFFFFF}Nemovitost '{FFD700}%s{FFFFFF}' je na prodej.\n\n\tCena: ${00FF00}%d{FFFFFF} (%.2f mil)\n\n\nKod nemovitosti: {FFD700}%d{FFFFFF}\n\nZadej kod nemovitosti pro nakup:"
 	},
 	{
-		"{FFFFFF}Property '%s' is owned by you.\n\nCurrent value: ${00FF00}%d{FFFFFF} (%.2f mio)\n\n\nProperty code: {FFD700}%d{FFFFFF}\n\nThe selling fee is set to 10%% of the property value.\nEnter its code to sell this property:",
-		"{FFFFFF}Nemovitost '%s' je v tvem drzeni.\n\nAktualni hodnota: ${00FF00}%d{FFFFFF} (%.2f mil)\n\n\nKod nemovitosti: {FFD700}%d{FFFFFF}\n\nProvize realitni kancelari je 10%% z ceny nemovitosti.\nZadej kod nemovitosti pro prodej:"
+		"{FFFFFF}Property '{FFD700}%s{FFFFFF}' is owned by you.\n\nCurrent value: ${00FF00}%d{FFFFFF} (%.2f mio)\n\n\nProperty code: {FFD700}%d{FFFFFF}\n\nThe selling fee is set to 10%% of the property value.\nEnter its code to sell this property:",
+		"{FFFFFF}Nemovitost '{FFD700}%s{FFFFFF}' je v tvem drzeni.\n\nAktualni hodnota: ${00FF00}%d{FFFFFF} (%.2f mil)\n\n\nKod nemovitosti: {FFD700}%d{FFFFFF}\n\nProvize realitni kancelari je 10%% z ceny nemovitosti.\nZadej kod nemovitosti pro prodej:"
+	},
+	{
+		"{FFFFFF}Property '{FFD700}%s{FFFFFF}' for rent.\n\n\tCost: ${00FF00}%d{FFFFFF} (%.2f mio)\n\n\nProperty code: %d\n\nTo rent this property, enter its code below:",
+		"{FFFFFF}Nemovitost '{FFD700}%s{FFFFFF}' je k pronajmu.\n\n\tCena: ${00FF00}%d{FFFFFF} (%.2f mil)\n\n\nKod nemovitosti: %d\n\nK pronajmuti zadej kod nemovitosti:"
+	},
+	{
+		"{FFFFFF}Property '{FFD700}%s{FFFFFF}' is currently rented by {FFD700}%s{FFFFFF}, but you can still pay the cost to rent it yourself.\n\n\tCost: ${00FF00}%d{FFFFFF} (%.2f mio)\n\n\nProperty code: {FFD700}%d{FFFFFF}\n\nTo rent this property, enter its code below:",
+		"{FFFFFF}Nemovitost '{FFD700}%s{FFFFFF}' je v soucasne dobe pronajata hracem {FFD700}%s{FFFFFF}, ale stale ji muzes preplatit a pronajat si ji.\n\n\tCena: ${00FF00}%d{FFFFFF} (%.2f mil)\n\n\nKod nemovitosti: {FFD700}%d{FFFFFF}\n\nK pronajmuti zadej kod nemovitosti:"
 	},
 	{
 		"[ REAL ] This property has been already sold.",
 		"[ REAL ] Tahle nemovitost jiz byla prodana."
+	},
+	{
+		"[ REAL ] Attached vehicle set to respawn!",
+		"[ REAL ] Zaparkovane auto bude respawnuto!"
+	},
+	{
+		"[ REAL ] You do not own such property!",
+		"[ REAL ] Danou nemovitost nevlastnis!"
+	},
+	{
+		"[ REAL ] You must be driving/riding a vehicle!",
+		"[ REAL ] Musis ridit auto, aby mohlo byt zaregistrovano k tve nemovitosti!"
+	},
+	{
+		"[ REAL ] Such vehicle model has been already attached to such property!",
+		"[ REAL ] Tento model vozidla jiz byl zaregistrovan k tve nemovitosti!"
+	},
+	{
+		"[ REAL ] Such property does not have a vehicle spot!",
+		"[ REAL ] Dana nemovitost nema parkovaci misto pro vozidlo!"
+	},
+	{
+		"[ REAL ] This vehicle has been attached to your property successfully",
+		"[ REAL ] Vozidlo bylo uspesne zaparkovano u tve nemovitosti"
+	},
+	{
+		"[ REAL ] Spawn point changed successfully",
+		"[ REAL ] Spawn bod byl uspesne zmenen"
+	},
+	{
+		"[ REAL ] You need to be inside your owned property!",
+		"[ REAL ] Je treba byt uvnitr nemovitosti!"
+	},
+	{
+		"[ REAL ] This skin model has been already saved!",
+		"[ REAL ] Tento skin byl jiz ulozen!"
+	},
+	{
+		"[ REAL ] No more free skin slots for such property!",
+		"[ REAL ] Nejsou zadna dalsi volna mista pro ulozeni skinu!"
+	},
+	{
+		"[ REAL ] New skin model saved successfully!",
+		"[ REAL ] Novy skin byl uspesne ulozen!"
+	},
+	{
+		"[ REAL ] This skin slot is free!",
+		"[ REAL ] Volny slot pro skin!"
+	},
+	{
+		"[ REAL ] Property skin set successfully!",
+		"[ REAL ] Skin ulozeny v nemovitosti byl nastaven!"
+	},
+	{
+		"[ REAL ] Selected skin model deleted successfully!",
+		"[ REAL ] Zvoleny skin byl smazan!"
 	},
 	//
 	//  Taxi

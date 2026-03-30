@@ -1571,7 +1571,7 @@ stock EditProperty(playerid)
 
 stock CheckRealEstatePickup(playerid, pickupid)
 {
-	new stringToPrint[256];
+	new stringToPrint[512];
 
 	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
@@ -1703,24 +1703,37 @@ stock CheckRealEstatePickup(playerid, pickupid)
 								{
 									if (!gProperties[i][Occupied])
 									{
-										format(stringToPrint, sizeof(stringToPrint), "Property '%s' for rent.\n\n\tCost: $%d (%.2f mio)\n\n\nProperty code: %d\n\nTo rent this property, enter its code below:", gProperties[i][Label], gProperties[i][Cost], float(gProperties[i][Cost]) / 1000000, gProperties[i][ID]);
+										GetLocalizedString(playerid, I18N_REAL_PROPERTY_FOR_RENT_FMT, stringToPrint, sizeof(stringToPrint));
+										format(stringToPrint, sizeof(stringToPrint), stringToPrint,
+												gProperties[i][Label], 
+												gProperties[i][Cost], 
+												float(gProperties[i][Cost]) / 1000000, 
+												gProperties[i][ID]
+											);
 										return ShowPlayerDialog(playerid, DIALOG_PROPERTY_RENT, DIALOG_STYLE_INPUT, "Real Estate (Commercial)", stringToPrint, "Rent", "Cancel");
 									}
 
 									if (IsPlayerOwner(playerid, gProperties[i][ID]))
 									{
-										return SendClientMessage(playerid, COLOR_YELLOW, "[ REAL ] You have already rented this property!");
+										return SendClientMessageLocalized(playerid, I18N_REAL_ALREADY_RENTED_BY_PLAYER);
 									}
 
 									if (gProperties[i][LockedUntilTime] > gettime())
 									{
-										return SendClientMessage(playerid, COLOR_RED, "[ REAL ] This property is locked until the date shown in the pickup text.");
+										return SendClientMessageLocalized(playerid, I18N_REAL_STILL_LOCKED);
 									}
 
 									new playerName[MAX_PLAYER_NAME];
 									GetOwnerName(gProperties[i][UserID], playerName);
 
-									format(stringToPrint, sizeof(stringToPrint), "Property '%s' is currently rented by %s, but you can still pay the cost to rent it yourself.\n\n\tCost: $%d (%.2f mio)\n\n\nProperty code: %d\n\nTo rent this property, enter its code below:", gProperties[i][Label], playerName, gProperties[i][Cost], float(gProperties[i][Cost]) / 1000000, gProperties[i][ID]);
+									GetLocalizedString(playerid, I18N_REAL_PROPERTY_FOR_RENT_OWNED_FMT, stringToPrint, sizeof(stringToPrint));
+									format(stringToPrint, sizeof(stringToPrint), stringToPrint,
+											gProperties[i][Label], 
+											playerName, 
+											gProperties[i][Cost], 
+											float(gProperties[i][Cost]) / 1000000, 
+											gProperties[i][ID]
+										);
 									return ShowPlayerDialog(playerid, DIALOG_PROPERTY_RENT, DIALOG_STYLE_INPUT, "Real Estate (Commercial)", stringToPrint, "Rent", "Cancel");
 								}
 							default:
@@ -1750,8 +1763,8 @@ stock CheckRealEstatePickup(playerid, pickupid)
 				{
 					SetPlayerHealth(playerid, 100.0);
 					SetPlayerArmour(playerid, 100.0);
-					SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ HP ] Health: 100.0, Armour: 100.0");
-					return 1;
+
+					return SendClientMessageLocalized(playerid, I18N_PLAYER_HP_SET);
 				}
 			case PICKUP_TYPE_PILLS:
 				{
@@ -1817,7 +1830,7 @@ stock RespawnPropertyVehicle(playerid, propertyid)
 		// Lock the vehicle for everyone
 		SetVehicleParamsEx(vehicleid, false, false, false, true, false, false, false);
 		
-		SendClientMessage(playerid, COLOR_YELLOW, "[ REAL ] Attached vehicle set to respawn!");
+		SendClientMessageLocalized(playerid, I18N_REAL_ATTACHED_VEHICLE_RESPAWN_SET);
 	}
 
 	return 1;
@@ -1826,35 +1839,47 @@ stock RespawnPropertyVehicle(playerid, propertyid)
 stock AttachVehicleToProperty(playerid, propertyid)
 {
 	if (!IsPlayerOwner(playerid, propertyid))
-		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] You do not own such property!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_REAL_NOT_OWNED_BY_PLAYER);
+	}
 
 	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
 		if (gProperties[i][ID] != propertyid || !gProperties[i][Occupied])
+		{
 			continue;
+		}
 
 		if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
-			return SendClientMessage(playerid, COLOR_RED, "[ REAL ] You must be driving/riding a vehicle!");
+		{
+			return SendClientMessageLocalized(playerid, I18N_REAL_NOT_DRIVING_VEHICLE);
+		}
 
 		new vehicleId = GetPlayerVehicleID(playerid);
 		new modelId = GetVehicleModel(vehicleId);
 
 		if (gProperties[i][Vehicle][Model] == modelId)
-			return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Such vehicle model has been already attached to such property!");
+		{
+			return SendClientMessageLocalized(playerid, I18N_REAL_VEHICLE_MODEL_ALREADY_ATTACHED);
+		}
 
 		new vehiclePickupID = 0, pickupFound = false;
 
 		for (new j = 0; j < MAX_PROPERTY_PICKUPS; j++)
 		{
 			if (gPropertyCoords[i][j][PickupType] != VEHICLE_POINT)
+			{
 				continue;
+			}
 
 			vehiclePickupID = j;
 			pickupFound = true;
 		}
 
 		if (!pickupFound)
-			return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Such property does not have a vehicle spot!");
+		{
+			return SendClientMessageLocalized(playerid, I18N_REAL_NO_VEHICLE_SLOT);
+		}
 
 		gProperties[i][Vehicle][Model] = modelId;
 
@@ -1895,7 +1920,7 @@ stock AttachVehicleToProperty(playerid, propertyid)
 			}
 		}
 
-		return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] This vehicle has been attached to your property successfully");
+		return SendClientMessageLocalized(playerid, I18N_REAL_VEHICLE_ATTACHED_SUCCESSFULLY);
 	}
 
 	return 1;
@@ -1904,17 +1929,20 @@ stock AttachVehicleToProperty(playerid, propertyid)
 stock SetSpawnPointAtProperty(playerid, propertyid)
 {
 	if (!IsPlayerOwner(playerid, propertyid))
-		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Such property must be owned first!");
+	{
+		return SendClientMessageLocalized(playerid, I18N_REAL_NOT_OWNED_BY_PLAYER);
+	}
 
 	for (new i = 0; i < sizeof(gProperties); i++)
 	{
 		if (gProperties[i][ID] != propertyid || !gProperties[i][Occupied])
+		{
 			continue;
+		}
 
 		gPlayers[playerid][SpawnPoint] = propertyid;
 
-		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] Spawn point changed successfully");
-
+		SendClientMessageLocalized(playerid, I18N_REAL_SPAWN_POINT_CHANGED);
 		break;
 	}
 
@@ -1925,12 +1953,12 @@ stock SavePropertySkin(playerid)
 {
 	if (!gPlayers[playerid][InsideProperty])
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] You need to be inside your owned property!");
+		return SendClientMessageLocalized(playerid, I18N_REAL_PLAYER_NOT_INSIDE);
 	}
 
 	if (!IsPlayerOwner(playerid, gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ][ID]))
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Such property must be owned first!");
+		return SendClientMessageLocalized(playerid, I18N_REAL_NOT_OWNED_BY_PLAYER);
 	}
 
 	new arrayid = gPlayerInteriors[playerid][PropertyArrayID], freeSlot = -1, skin_model = GetPlayerSkin(playerid);
@@ -1939,7 +1967,7 @@ stock SavePropertySkin(playerid)
 	{
 		if (gProperties[arrayid][Skins][i] == skin_model)
 		{
-			return SendClientMessage(playerid, COLOR_RED, "[ REAL ] This skin model has been already saved!");
+			return SendClientMessageLocalized(playerid, I18N_REAL_SKIN_ALREADY_SAVED);
 		}
 
 		if (gProperties[arrayid][Skins][i])
@@ -1953,7 +1981,7 @@ stock SavePropertySkin(playerid)
 
 	if (freeSlot == -1)
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] No more free skin slots for such property!");
+		return SendClientMessageLocalized(playerid, I18N_REAL_SKIN_NO_FREE_SLOT);
 	}
 
 	new query[256];
@@ -1971,49 +1999,49 @@ stock SavePropertySkin(playerid)
 	DB_FreeResultSet(result);
 
 	gProperties[arrayid][Skins][freeSlot] = skin_model;
-	return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] New skin model saved successfully!");
+	return SendClientMessageLocalized(playerid, I18N_REAL_SKIN_SAVED);
 }
 
 stock SelectPropertySkin(playerid, skinid)
 {
 	if (!gPlayers[playerid][InsideProperty])
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] You need to be inside your owned property!");
+		return SendClientMessageLocalized(playerid, I18N_REAL_PLAYER_NOT_INSIDE);
 	}
 
 	new arrayid = gPlayerInteriors[playerid][PropertyArrayID];
 
 	if (!IsPlayerOwner(playerid, gProperties[arrayid][ID]))
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Such property must be owned first!");
+		return SendClientMessageLocalized(playerid, I18N_REAL_NOT_OWNED_BY_PLAYER);
 	}
 
 	if (!gProperties[arrayid][Skins][skinid])
 	{
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ REAL ] This skin slot is free!");
+		return SendClientMessageLocalized(playerid, I18N_REAL_SKIN_FREE_SLOT);
 	}
 
 	SetPlayerSkin(playerid, gProperties[arrayid][Skins][skinid]);
-	return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] Property skin set successfully!");
+	return SendClientMessageLocalized(playerid, I18N_REAL_SKIN_SET);
 }
 
 stock DeletePropertySkin(playerid, skinid)
 {
 	if (!gPlayers[playerid][InsideProperty])
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] You need to be inside your owned property!");
+		return SendClientMessageLocalized(playerid, I18N_REAL_PLAYER_NOT_INSIDE);
 	}
 
 	new arrayid = gPlayerInteriors[playerid][PropertyArrayID];
 
 	if (!IsPlayerOwner(playerid, gProperties[arrayid][ID]))
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ REAL ] Such property must be owned first!");
+		return SendClientMessageLocalized(playerid, I18N_REAL_NOT_OWNED_BY_PLAYER);
 	}
 
 	if (!gProperties[arrayid][Skins][skinid])
 	{
-		return SendClientMessage(playerid, COLOR_YELLOW, "[ REAL ] This skin slot is free!");
+		return SendClientMessageLocalized(playerid, I18N_REAL_SKIN_FREE_SLOT);
 	}
 
 	new query[256];
@@ -2024,7 +2052,7 @@ stock DeletePropertySkin(playerid, skinid)
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
-		SendClientMessage(playerid, COLOR_RED, "[ REAL ] Database error!");
+		SendClientMessageLocalized(playerid, I18N_REAL_DATABASE_ERROR);
 		printf("Database error: cannot write property data)!");
 		print(query);
 
@@ -2034,7 +2062,7 @@ stock DeletePropertySkin(playerid, skinid)
 	DB_FreeResultSet(result);
 
 	gProperties[arrayid][Skins][skinid] = 0;
-	return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] Selected skin model deleted successfully!");
+	return SendClientMessageLocalized(playerid, I18N_REAL_SKIN_DELETED);
 }
 
 //

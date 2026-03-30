@@ -433,9 +433,9 @@ public OnPlayerRequestSpawn(playerid)
 		return 0;
 	}
 
+	printf("Player %d requested spawn!", playerid);
 	SpawnPlayer(playerid);
 
-	printf("Player %d requested spawn!", playerid);
 	return 1;
 }
 
@@ -479,9 +479,6 @@ public OnPlayerSpawn(playerid)
 			if (gTeams[teamid][Weapons][i] && gTeams[teamid][Ammo][i])
 			{
        				gPlayers[playerid][OnDeathGunsTimer][i] = Timer: SetTimerEx("GivePlayerWeaponEx", 2000, false, "i,i,i,i", playerid, i, gTeams[teamid][Weapons][i], gTeams[teamid][Ammo][i]);
-
-				//printf("Giving weapon ID: %d, Ammo: %d", gTeams[teamid][Weapons][i], gTeams[teamid][Ammo][i]);
-				//GivePlayerWeapon(playerid, t_WEAPON: gTeams[teamid][Weapons][i], gTeams[teamid][Ammo][i]);
 			}
 		}
 	}

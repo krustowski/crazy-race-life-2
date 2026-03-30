@@ -327,3 +327,11 @@ stock BroadcastMessage(color, const str[])
 	}
 
 }
+
+stock SendUsageMessage(playerid, const usage[])
+{
+	new msg[64];
+	GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
+	format(msg, sizeof(msg), msg, usage);
+	return SendClientMessage(playerid, COLOR_YELLOW, msg);
+}

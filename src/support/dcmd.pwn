@@ -245,10 +245,7 @@ dcmd_dance(playerid, const params[])
 			}
 		default:
 			{
-				new msg[64];
-				GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-				format(msg, sizeof(msg), msg, "/dance [1-4]");
-				return SendClientMessage(playerid, COLOR_YELLOW, msg);
+				return SendUsageMessage(playerid, "/dance [1-4]");
 			}
 	}
 
@@ -373,10 +370,7 @@ dcmd_fix(playerid, const params[])
 			return SendClientMessageLocalized(playerid, I18N_FIX_CMD_APPLIED);
 		}
 
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/fix [playerID]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/fix [playerID]");
 	}
 
 	new targetid = strval(params);
@@ -440,10 +434,7 @@ dcmd_givecash(playerid, const params[])
 
 	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/givecash [playerID] [$$$]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/givecash [playerID] [$$$]");
 	}
 
 	new targetId = strval(token1), targetAmount = strval(token2);
@@ -625,10 +616,7 @@ dcmd_pm(playerid, const params[])
 
 	if (!strlen(params) || count != 2 || !IsNumeric(token1))
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/pm [playerID] [text]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/pm [playerID] [text]");
 	}
 
 	new targetId = strval(token1);
@@ -716,10 +704,7 @@ dcmd_search(playerid, const params[])
 
 	if (!strlen(params) || count != 2)
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/search [playerID] [drugz/drunk]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/search [playerID] [drugz/drunk]");
 	}
 
 	new targetId = strval(token1);
@@ -811,10 +796,7 @@ dcmd_text(playerid, const params[])
 
 	if (!strlen(params) || count != 2)
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/text [playerID] [text]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/text [playerID] [text]");
 	}
 
 	new targetId = strval(token1);
@@ -954,10 +936,7 @@ dcmd_admincol(playerid, const params[])
 
 	if (!strlen(params) || !IsNumeric(params)) 
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/admincol [1-5]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/admincol [1-5]");
 	}
 
 	new adminColToSet = strval(params);
@@ -995,9 +974,7 @@ dcmd_admincol(playerid, const params[])
 			}
 		default:
 			{
-				GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-				format(msg, sizeof(msg), msg, "/admincol [1-5]");
-				return SendClientMessage(playerid, COLOR_YELLOW, msg);
+				return SendUsageMessage(playerid, "/admincol [1-5]");
 			}
 	}
 
@@ -1013,10 +990,7 @@ dcmd_ban(playerid, const params[])
 
 	if (!strlen(params) || !IsNumeric(params)) 
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/ban [playerID]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/ban [playerID]");
 	}
 
 	new adminName[MAX_PLAYER_NAME], playerIdToBan = strval(params), playerName[MAX_PLAYER_NAME];
@@ -1058,10 +1032,7 @@ dcmd_cam(playerid, const params[])
 
 	if (!strlen(params) || !IsNumeric(params))
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/cam [camID]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/cam [0-3]");
 	}
 
 	new camid = strval(params);
@@ -1124,13 +1095,7 @@ dcmd_ccmd(playerid, const params[])
 		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
 	}
 
-	SendClientMessage(playerid, COLOR_YELLOWGREEN, "[ CAM ] Cameras:");
-	SendClientMessage(playerid, COLOR_YELLOW, "-> /cam 1 (LV Pyramid Entrance)");
-	SendClientMessage(playerid, COLOR_YELLOW, "-> /cam 2 (Bank)");
-	SendClientMessage(playerid, COLOR_YELLOW, "-> /cam 3");
-	SendClientMessage(playerid, COLOR_YELLOW, "-> /camoff");
-
-	return 1;
+	return SendUsageMessage(playerid, "/cam [0-3]");
 }
 
 dcmd_clear(playerid, const params[])
@@ -1195,10 +1160,7 @@ dcmd_countdown(playerid, const params[])
 
 	if (!strlen(params) || !IsNumeric(params) || !strval(params))
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/countdown [sec]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/countdown [sec]");
 	}
 
 	new remaining = strval(params);
@@ -1231,10 +1193,7 @@ dcmd_crime(playerid, const params[])
 
 	if (!strlen(params) || !IsNumeric(params))
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/crime [3-22]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/crime [3-22]");
 	}
 
 	new crimeId = strval(params);
@@ -1261,10 +1220,7 @@ dcmd_drunk(playerid, const params[])
 
 	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/drunk [playerID] [0-50000]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/drunk [playerID] [0-50000]");
 	}
 
 	new targetId = strval(token1), level = strval(token2);
@@ -1360,10 +1316,7 @@ dcmd_elevator(playerid, const params[])
 	}
 	else
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/elevator [up/down/stop]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/elevator [up/down/stop]");
 	}
 
 	return 1;
@@ -1381,10 +1334,7 @@ dcmd_fakechat(playerid, const params[])
 
 	if (!strlen(params) || count != 2 || !IsNumeric(token1))
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/fakechat [playerID] [text]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/fakechat [playerID] [text]");
 	}
 
 	new targetId = strval(token1);
@@ -1395,8 +1345,6 @@ dcmd_fakechat(playerid, const params[])
 	}
 
 	SendPlayerMessageToAll(targetId, token2);
-
-	//SendClientMessage(playerid, COLOR_WHITE, "[ FAKE ] Fake client message sent!");
 
 	return 1;
 }
@@ -1493,10 +1441,7 @@ dcmd_hp(playerid, const params[])
 
 	if (!strlen(params) || !IsNumeric(params))
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/hp [playerID]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/hp [playerID]");
 	}
 
 	new targetId = strval(params);
@@ -1528,10 +1473,7 @@ dcmd_kick(playerid, const params[])
 
 	if (!strlen(params) || !IsNumeric(params)) 
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/kick [playerID]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/kick [playerID]");
 	}
 
 	new adminName[MAX_PLAYER_NAME], playerIdToKick = strval(params), playerName[MAX_PLAYER_NAME];
@@ -1575,10 +1517,7 @@ dcmd_lvl(playerid, const params[])
 
 	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/lvl [playerID] [0-5]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		SendUsageMessage(playerid, "/lvl [playerID] [0-5]");
 	}
 
 	new targetId = strval(token1), targetLvl = strval(token2);
@@ -1600,10 +1539,7 @@ dcmd_lvl(playerid, const params[])
 
 	if (targetLvl < 0 || targetLvl > 5)
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/lvl [playerID] [0-5]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		SendUsageMessage(playerid, "/lvl [playerID] [0-5]");
 	}
 
 	if (targetLvl == gPlayers[targetId][AdminLevel])
@@ -1636,10 +1572,7 @@ dcmd_nitro(playerid, const params[])
 
 	if (!strlen(params) || !IsNumeric(params))
 	{
-		new msg[128];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/nitro [playerID]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/nitro [playerID]");
 	}
 
 	new targetid = strval(params);
@@ -1656,10 +1589,7 @@ dcmd_packet(playerid, const params[])
 
 	if (!strlen(params) || !IsNumeric(params))
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/packet [playerID]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		SendUsageMessage(playerid, "/packet [playerID]");
 	}
 
 	new targetId = strval(params);
@@ -1710,10 +1640,7 @@ dcmd_reset(playerid, const params[])
 
 	if (!strlen(params) || !IsNumeric(params)) 
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/reset [playerID]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/reset [playerID]");
 	}
 
 	new targetId = strval(params);
@@ -1727,6 +1654,10 @@ dcmd_reset(playerid, const params[])
 
 	return 1;
 }
+
+new 
+	bool: gServerRestartCountdown = false,
+	Timer: gServerRestartTimer = Timer: 0;
 
 dcmd_restart(playerid, const params[])
 {
@@ -1760,8 +1691,18 @@ dcmd_restart(playerid, const params[])
 		SendClientMessage(i, COLOR_YELLOW, msg);
 	}
 
+	if (gServerRestartCountdown)
+	{
+		KillTimer(_: gServerRestartTimer);
+		gServerRestartCountdown = false;
+		gCountDownStarted = false;
+
+		return 1;
+	}
+
+	gCountDownStarted = true;
 	CountDownHelper(seconds);
-	SetTimer("StartServerReset", seconds * SECOND_MS, true);
+	gServerRestartTimer = Timer: SetTimer("StartServerReset", seconds * SECOND_MS, false);
 
 	return 1;
 }
@@ -1778,10 +1719,7 @@ dcmd_skin(playerid, const params[])
 
 	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/skin [playerID] [skinID]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/skin [playerID] [skinID]");
 	}
 
 	new targetId = strval(token1), targetSkin = strval(token2);
@@ -1811,10 +1749,7 @@ dcmd_spectate(playerid, const params[])
 
 	if ((!strlen(params) || !IsNumeric(params)) && !gPlayers[playerid][Spectating])
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/spectate [playerID]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/spectate [playerID]");
 	}
 
 	if (gPlayers[playerid][Spectating])
@@ -1855,10 +1790,7 @@ dcmd_vehicle(playerid, const params[])
 
 	if (!strlen(params) || !IsNumeric(params))
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/vehicle [vehicleID]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/vehicle [vehicleID]");
 	}
 
 	new modelid = strval(params);
@@ -1894,10 +1826,7 @@ dcmd_weapon(playerid, const params[])
 
 	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/weapon [playerID] [weaponID]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/weapon [playerID] [weaponID]");
 	}
 
 	new targetId = strval(token1), targetWeapon = strval(token2);
@@ -1926,10 +1855,7 @@ dcmd_weapons(playerid, const params[])
 
 	if (!strlen(params) || !IsNumeric(params)) 
 	{
-		new msg[64];
-		GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
-		format(msg, sizeof(msg), msg, "/weapons [playerID]");
-		return SendClientMessage(playerid, COLOR_YELLOW, msg);
+		return SendUsageMessage(playerid, "/weapons [playerID]");
 	}
 
 	new targetId = strval(params);

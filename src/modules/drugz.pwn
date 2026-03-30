@@ -115,7 +115,8 @@ public UpdateBlackMarketRatio()
 stock InitDrugValues()
 {
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, "SELECT name, name_alt, price FROM drug_prices ORDER BY id ASC");
-	if (!result) {
+	if (!result) 
+	{
 		print("Database error: cannot fetch drug prices!");
 		return;
 	}
@@ -156,7 +157,8 @@ stock InitDrugValues()
 stock InitDrugPickups()
 {
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, "SELECT type, x, y, z FROM drug_coords");
-	if (!result) {
+	if (!result) 
+	{
 		print("Database error: cannot fetch drug coords!");
 		return;
 	}

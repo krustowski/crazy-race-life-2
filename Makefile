@@ -34,6 +34,7 @@ tests:
 		-d3 \
 		-Z+ \
 		-i${PWD} \
+		-i${PWD}/src \
 		-i${PWD}/dependencies/omp-stdlib
 	@./samp03svr -c configs/test_server.cfg
 

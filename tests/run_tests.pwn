@@ -12,26 +12,12 @@
 //#include "test_vehicle.pwn"
 //#include "test_business.pwn"
 
-// Test statistics
-new gTestsPassed = 0;
-new gTestsFailed = 0;
-new gTotalTests = 0;
-
-#define RUN_TEST(%1) \
-	gTotalTests++; \
-	printf("\n[TEST %03d] Running: %s", gTotalTests, #%1); \
-	%1(); \
-	printf("[TEST %03d] Result: %s", gTotalTests, (gCurrentTestFailed) ? ("FAILED") : ("PASSED")); \
-	if (gCurrentTestFailed) gTestsFailed++; else gTestsPassed++; \
-	gCurrentTestFailed = false
-
-new bool:gCurrentTestFailed = false;
-
 public OnGameModeInit()
 {
 	print("\n=== Starting SA-MP Pawn Tests ===\n");
     
 	// Run all tests
+	RUN_TEST(PlayerConnect);
 	RUN_TEST(PlayerRegistration);
 	//RUN_TEST(PlayerInventory);
 	//RUN_TEST(VehicleCreation);

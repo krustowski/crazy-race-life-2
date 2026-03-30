@@ -50,6 +50,7 @@
 #include "support/i18n.pwn" 
 #include "support/net.pwn" 
 #include "support/http.pwn" 
+#include "sampctl_build_file.inc"
 
 new const GAMEMODE_NAME[] = "CrazyRaceLife2";
 
@@ -321,11 +322,12 @@ public OnPlayerConnect(playerid)
 			"{FFFFFF} (2008-2010, 2025-){FFFFFF}"
 	      );
 	SendClientMessage(playerid, COLOR_GREY, stringToPrint);
-	format(stringToPrint, sizeof(stringToPrint), "%s%d.%d.%d",
+	format(stringToPrint, sizeof(stringToPrint), "%s%d.%d.%d (%s)",
 			"Version: {FFD700}",
 		       	CRAZY_RACE_LIFE_2_VERSION_MAJOR,
 			CRAZY_RACE_LIFE_2_VERSION_MINOR,
-			CRAZY_RACE_LIFE_2_VERSION_PATCH
+			CRAZY_RACE_LIFE_2_VERSION_PATCH,
+			SAMPCTL_BUILD_COMMIT_SHORT
 	      );
 	SendClientMessage(playerid, COLOR_GREY, stringToPrint);
 	SendClientMessage(playerid, COLOR_INVISIBLE, "");

@@ -1139,11 +1139,25 @@ stock ShowHighScoresPlayTimeDialog(playerid)
 
 stock ShowHighScoresPropertiesDialog(playerid)
 {
-	new 
-		query[] = "SELECT rank, u.nickname, property_count FROM ( SELECT user_id, COUNT(*) AS property_count, RANK() OVER (ORDER BY COUNT(*) DESC) AS rank FROM properties WHERE occupied = 1 AND type = 2 AND user_id > 0 GROUP BY user_id ) JOIN users AS u ON u.id == user_id WHERE rank <= 3",
-	    	stringToPrint[512] = "{FFD700}Top 3 players by rented property count (whole map):{FFFFFF}\n";
+	new query[] = "SELECT COUNT(*) AS total FROM properties WHERE type = 2";
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for properties (total count)!");
+		print(query);
+		return 0;
+	}
+
+	new total = DB_GetFieldIntByName(result, "total");
+
+	DB_FreeResultSet(result);
+
+	new 
+		query_rank[] = "SELECT rank, u.nickname, property_count FROM ( SELECT user_id, COUNT(*) AS property_count, RANK() OVER (ORDER BY COUNT(*) DESC) AS rank FROM properties WHERE occupied = 1 AND type = 2 AND user_id > 0 GROUP BY user_id ) JOIN users AS u ON u.id == user_id WHERE rank <= 3",
+		stringToPrint[512] = "{FFD700}Top 3 players by rented property count (whole map):{FFFFFF}\n";
+
+	result = DB_ExecuteQuery(gDbConnectionHandle, query_rank);
 	if (!result)
 	{
 		print("Database error: cannot read high_scores data for properties!");
@@ -1160,7 +1174,13 @@ stock ShowHighScoresPropertiesDialog(playerid)
 
 		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
 
-		format(stringToPrint, sizeof(stringToPrint), "%s\n%d. {00FF00}%3d{FFFFFF}\t\t{FFD700}%s{FFFFFF}", stringToPrint, rank, count, nickname);
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%d. {00FF00}%3d{FFFFFF} (%2.2f %%)\t\t{FFD700}%s{FFFFFF}", 
+				stringToPrint, 
+				rank, 
+				count, 
+				floatmul(floatdiv(count, total), 100.0),
+				nickname
+			);
 	}
 	while (DB_SelectNextRow(result));
 

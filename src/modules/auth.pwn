@@ -18,7 +18,8 @@ stock SetPlayerAccountLogin(playerid, const text[])
 	format(query, sizeof(query), "SELECT id, pwdhash, salt FROM users WHERE nickname = '%s'", gPlayers[playerid][Name]);
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) {
+	if (!result) 
+	{
 		print("Database error: cannot fetch user data!");
 		return 0;
 	}
@@ -59,7 +60,9 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 
 	// 16 random characters from 33 to 126 (in ASCII) for the salt
 	for (new i = 0; i < 16; i++) 
+	{
 		salt[i] = random(94) + 33;
+	}
 
 	SHA256_Hash(text, salt, hashedPwd, sizeof(hashedPwd));
 
@@ -81,7 +84,8 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 	);
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) {
+	if (!result) 
+	{
 		print("Database error: cannot write (register) user data!");
 		return 0;
 	}
@@ -91,7 +95,8 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 	format(query, sizeof(query), "SELECT id FROM users WHERE nickname = '%s'", gPlayers[playerid][Name]);
 
 	result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) {
+	if (!result) 
+	{
 		print("Database error: cannot read (register) user data!");
 		return 0;
 	}
@@ -122,8 +127,8 @@ public ShowAuthDialog(playerid)
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 
-	if (DB_GetRowCount(result)) {
-		DB_FreeResultSet(result);
+	if (DB_GetRowCount(result)) 
+	{
 		format(stringToPrint, sizeof(stringToPrint), "{FFD700}Login{FFFFFF}\n\nPlayer (%s) has already registered their account. Log-in using your password:", gPlayers[playerid][Name]);
 
 		ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", stringToPrint, "Log-in", "Cancel");
@@ -133,11 +138,12 @@ public ShowAuthDialog(playerid)
 	}
 	else 
 	{
-		DB_FreeResultSet(result);
 		format(stringToPrint, sizeof(stringToPrint), "{FFD700}Register{FFFFFF}\n\nWelcome %s! Register your account by entering a password:", gPlayers[playerid][Name]);
 
 		ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registeration", stringToPrint, "Register", "Cancel");
 	}
+
+	DB_FreeResultSet(result);
 
 	return 1;
 }

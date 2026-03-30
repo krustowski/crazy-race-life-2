@@ -1683,8 +1683,8 @@ dcmd_restart(playerid, const params[])
 	if (gServerRestartCountdown)
 	{
 		gCountDownStarted = false;
-		KillTimer(_: gServerRestartTimer);
 		gServerRestartCountdown = false;
+		KillTimer(_: gServerRestartTimer);
 
 		for (new i = 0; i < MAX_PLAYERS; i++)
 		{

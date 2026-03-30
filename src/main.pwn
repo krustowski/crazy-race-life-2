@@ -387,28 +387,23 @@ public OnPlayerDisconnect(playerid, reason)
 
 	new stringToPrint[128];
 
-	// Prepare the statement for others.
-	switch (reason)
+	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
-		case 0: 
-			{
-				format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s disconnected [crash].", gPlayers[playerid][Name]);
-			}
-		case 1: 
-			{
-				format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s disconnected [left].", gPlayers[playerid][Name]); 
-			}
-		case 2: 
-			{
-				format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s disconnected [kick/ban].", gPlayers[playerid][Name]);
-			}
-		default: 
-			{
-				format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s disconnected [unknown].", gPlayers[playerid][Name]);
-			}
-	}
+		if (!IsPlayerConnected(i))
+		{
+			continue;
+		}
 
-	SendClientMessageToAll(COLOR_GREY, stringToPrint);
+		// Hotfix for the i18n message enum
+		if (reason < 0 || reason > 2)
+		{
+			reason = 3;
+		}
+
+		GetLocalizedString(i, I18N_PLAYER_DISCONNECT_CRASH + reason, stringToPrint, sizeof(stringToPrint));
+		format(stringToPrint, sizeof(stringToPrint), stringToPrint, gPlayers[playerid][Name]);
+		SendClientMessage(i, COLOR_GREY, stringToPrint);
+	}
 
 	return 0;
 }

@@ -42,6 +42,10 @@ enum PlayerLocale
 enum 
 {
 	I18N_WELCOME_MESSAGE,
+	I18N_PLAYER_DISCONNECT_CRASH,
+	I18N_PLAYER_DISCONNECT_LEFT,
+	I18N_PLAYER_DISCONNECT_KICK_BAN,
+	I18N_PLAYER_DISCONNECT_UNKNOWN,
 	I18N_SERVER_RESTART_COUNTDOWN,
 	I18N_SERVER_RESTART_ABORTED,
 	I18N_PLAYER_NOT_IN_VEHICLE,
@@ -227,6 +231,10 @@ enum
 new gI18nMessageColor[] = 
 {
 	COLOR_GREEN,
+	COLOR_GREY,
+	COLOR_GREY,
+	COLOR_GREY,
+	COLOR_GREY,
 	COLOR_YELLOW,
 	COLOR_YELLOW,
 	COLOR_RED,
@@ -414,6 +422,22 @@ new gI18nMessages[][PlayerLocale][] =
 	{
 		"Welcome to the gamemode CrazyRaceLife2! /help",
 		"Vitej ve hre! /help"
+	},
+	{
+		"[ i ] Player %s disconnected [crash].",
+		"[ i ] Hrac %s se odpojil [spadlo to]."
+	},
+	{
+		"[ i ] Player %s disconnected [left].",
+		"[ i ] Hrac %s se odpojil [odchod]."
+	},
+	{
+		"[ i ] Player %s disconnected [kick/ban].",
+		"[ i ] Hrac %s se odpojil [kick/ban]."
+	},
+	{
+		"[ i ] Player %s disconnected [unknown].",
+		"[ i ] Hrac %s se odpojil [neznamy duvod]."
 	},
 	{
 		"[ RESTART ] Server restarts in %d seconds!",

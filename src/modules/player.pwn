@@ -125,7 +125,8 @@ public LoadPlayerData(playerid)
 		format(query, sizeof(query), "SELECT id, cash, bank, adminlvl, wanted, team, class, health, armour, spawn, properties, locale, playtime FROM users WHERE nickname = '%s';", gPlayers[playerid][Name]);
 
 		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result) {
+		if (!result) 
+		{
 			print("Database error: cannot fetch user data!");
 			return 0;
 		}
@@ -158,7 +159,8 @@ public LoadPlayerData(playerid)
 		format(query, sizeof(query), "SELECT cocaine, heroin, meth, fent, zaza, tobacco, pcp, paper, lighter, joint FROM drugz WHERE owner_id = %d AND owner_type = 1", gPlayers[playerid][OrmID]);
 
 		new DBResult: result_drugz = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result_drugz) {
+		if (!result_drugz) 
+		{
 			print("Database error: cannot fetch user data (drugz)!");
 		}
 
@@ -182,7 +184,8 @@ public LoadPlayerData(playerid)
 		format(query, sizeof(query), "SELECT active, property_rented_count, property_bought_count, race_finished_count, joined_team, trucking_missions_done, taxi_missions_done, sent_pm, deposited_money_to_bank, deathmatch_played FROM tutorials WHERE user_id = %d", gPlayers[playerid][OrmID]);
 
 		new DBResult: result_tutorial = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result_tutorial) {
+		if (!result_tutorial) 
+		{
 			print("Database error: cannot fetch user data (tutorial)!");
 		}
 
@@ -210,9 +213,13 @@ public LoadPlayerData(playerid)
 		SetPlayerWantedLevel(playerid, gPlayers[playerid][WantedLevel]);
 
 		if (gPlayers[playerid][TeamID])
+		{
 			SetPlayerColor(playerid, gTeams[ gPlayers[playerid][TeamID] ][Color]);
+		}
 		else
+		{
 			SetPlayerColor(playerid, COLOR_WHITE);
+		}
 
 		SendClientMessageLocalized(playerid, I18N_USER_DATA_LOAD_SUCCESS);
 
@@ -228,13 +235,15 @@ stock ExtractPropperties(const input[], properties[MAX_PLAYER_PROPERTIES])
 
 	strcopy(toSplit, input);
 
-	do {
+	do 
+	{
 		SplitIntoTwo(toSplit, token1, token2, sizeof(token1), ",");
 		properties[i] = strval(token1);
 
 		strcopy(toSplit, token2);
 		i++;
-	} while (strcmp(token2, ""));
+	} 
+	while (strcmp(token2, ""));
 
 	return properties;
 }
@@ -286,7 +295,8 @@ public SavePlayerData(playerid)
 		);
 
 		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result) {
+		if (!result) 
+		{
 			printf("Database error: cannot write user data (%s)!", gPlayers[playerid][Name]);
 			return 0;
 		}
@@ -313,7 +323,8 @@ public SavePlayerData(playerid)
 			);
 
 		new DBResult: result_drugz = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result_drugz) {
+		if (!result_drugz) 
+		{
 			printf("Database error: cannot write user data (drugz, ID: %d)!", gPlayers[playerid][OrmID]);
 			print(query);
 		}
@@ -339,7 +350,8 @@ public SavePlayerData(playerid)
 		);
 
 		new DBResult: result_tutorial = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result_tutorial) {
+		if (!result_tutorial) 
+		{
 			printf("Database error: cannot write user data (tutorial, ID: %d)!", gPlayers[playerid][OrmID]);
 			print(query);
 		}
@@ -359,34 +371,32 @@ public SendPlayerSalary()
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if (!IsPlayerConnected(i)) 
+		{
 			continue;
+		}
 
 		if (gPlayers[i][TeamID] == 0)
+		{
 			continue;
+		}
 
 		if (gPlayers[i][AFK])
+		{
 			continue;
+		}
 
 		teamSalary = gTeams[ gPlayers[i][TeamID] - 1 ][SalaryBase] + random(gTeams[ gPlayers[i][TeamID] - 1 ][SalaryVolatile]);
 
-		switch (gPlayers[i][Locale]) 
-		{
-			case LOCALE_CZ:
-				{
-				format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Tymova vyplata pristala do kapsy: $%d", teamSalary);
-
-				format(gameText, sizeof(gameText), "~y~V~g~yplata~n~~y~$~g~%d", teamSalary);
-				}
-			default:
-				{
-				format(stringToPrint, sizeof(stringToPrint), "[ CASH ] Team salary just arrived: $%d", teamSalary);
-
-				format(gameText, sizeof(gameText), "~y~S~g~alary~n~~y~$~g~%d", teamSalary);
-				}
-		}
-
-		GameTextForPlayer(i, gameText, 4000, 1);
+		// Send localized client message to a player
+		GetLocalizedString(i, I18N_PLAYER_SALARY_FMT, stringToPrint, sizeof(stringToPrint));
+		format(stringToPrint, sizeof(stringToPrint), stringToPrint, teamSalary);
 		SendClientMessage(i, COLOR_YELLOW, stringToPrint);
+
+		// Show localized game text to a player
+		GetLocalizedString(i, I18N_PLAYER_SALARY_GAMETEXT_FMT, gameText, sizeof(gameText));
+		format(gameText, sizeof(gameText), gameText, teamSalary);
+		GameTextForPlayer(i, gameText, 4000, 1);
+
 		GivePlayerMoney(i, teamSalary);
 	}
 
@@ -439,20 +449,19 @@ stock OnPlayerPrivMsg(playerid, receiverid, text[])
 
 	new stringForReceiver[256], stringForSender[256]; 
 
-	switch (gPlayers[playerid][Locale])
-	{
-		case LOCALE_CZ:
-			{
-				format(stringForReceiver, sizeof(stringForReceiver), "[ PM ] od %s (ID: %d): %s", gPlayers[playerid][Name], playerid, text);
-				format(stringForSender, sizeof(stringForSender), "[ PM ] pro %s (ID: %d): %s", gPlayers[receiverid][Name], receiverid, text);
-			}
+	GetLocalizedString(receiverid, I18N_PRIV_MSG_RECEIVED_FMT, stringForReceiver, sizeof(stringForReceiver));
+	format(stringForReceiver, sizeof(stringForReceiver), stringForReceiver, 
+			gPlayers[playerid][Name], 
+			playerid, 
+			text
+		);
 
-		default:
-			{
-				format(stringForReceiver, sizeof(stringForReceiver), "[ PM ] Received from %s (ID: %d): %s", gPlayers[playerid][Name], playerid, text);
-				format(stringForSender, sizeof(stringForSender), "[ PM ] Sent for %s (ID: %d): %s", gPlayers[receiverid][Name], receiverid, text);
-			}
-	}
+	GetLocalizedString(playerid, I18N_PRIV_MSG_SENT_FMT, stringForSender, sizeof(stringForSender));
+	format(stringForSender, sizeof(stringForSender), stringForSender,
+			gPlayers[receiverid][Name], 
+			receiverid, 
+			text
+		);
 
 	SendClientMessage(receiverid, COLOR_GREEN, stringForReceiver);
 	SendClientMessage(playerid, COLOR_GREEN, stringForSender);
@@ -461,8 +470,13 @@ stock OnPlayerPrivMsg(playerid, receiverid, text[])
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0); 
 	PlayerPlaySound(receiverid, 1057, 0.0, 0.0, 0.0);
 
-	GameTextForPlayer(playerid, "~w~PM ~g~Sent~w~.", 3000, 3); 
-	GameTextForPlayer(receiverid, "~w~PM ~g~Received~w~.", 3000, 3);
+	new gameTextSent[32], gameTextReceived[32];
+
+	GetLocalizedString(playerid, I18N_PRIV_MSG_SENT_GAMETEXT, gameTextSent, sizeof(gameTextSent));
+	GetLocalizedString(receiverid, I18N_PRIV_MSG_RECEIVED_GAMETEXT, gameTextReceived, sizeof(gameTextReceived));
+
+	GameTextForPlayer(playerid, gameTextSent, 3000, 3); 
+	GameTextForPlayer(receiverid, gameTextReceived, 3000, 3);
 
 	GivePlayerMoney(playerid, -10); 
 

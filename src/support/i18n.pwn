@@ -101,6 +101,13 @@ enum
 	I18N_AFK_CMD_APPLIED,
 	I18N_AFK_CMD_REVERTED,
 	I18N_AFK_CMD_DEATHMATCH_BLOCK,
+	I18N_PLAYER_SALARY_FMT,
+	I18N_PLAYER_SALARY_GAMETEXT_FMT,
+	// Private messages
+	I18N_PRIV_MSG_RECEIVED_FMT,
+	I18N_PRIV_MSG_SENT_FMT,
+	I18N_PRIV_MSG_RECEIVED_GAMETEXT,
+	I18N_PRIV_MSG_SENT_GAMETEXT,
 	// Radar (vehicle stats)
 	I18N_HID_STATS_GREEN_FMT,
 	I18N_HID_STATS_RED_FMT,
@@ -225,6 +232,13 @@ new gI18nMessageColor[] =
 	COLOR_YELLOW,
 	COLOR_YELLOW,
 	COLOR_RED,
+	COLOR_YELLOW,
+	COLOR_YELLOW,
+	// Private messages
+	COLOR_YELLOW,
+	COLOR_YELLOW,
+	COLOR_YELLOW,
+	COLOR_YELLOW,
 	// Radar (vehicle stats)
 	COLOR_LIGHTGREEN,
 	COLOR_RED,
@@ -529,6 +543,33 @@ new gI18nMessages[][PlayerLocale][] =
 		"[ AFK ] Cannot go to AFK mode while in Deathmatch!",
 		"[ AFK ] Nesmis pouzit /afk kdyz jsi v Deathmatch minihre!"
 	},
+	{
+		"[ CASH ] Team salary just arrived: $%d",
+		"[ CASH ] Tymova vyplata pristala do kapsy: $%d"
+	},
+	{
+		"~y~S~g~alary~n~~y~$~g~%d",
+		"~y~V~g~yplata~n~~y~$~g~%d"
+	},
+	//
+	//  Private messages
+	//
+	{
+		"[ PM ] Received from %s (ID: %d): %s",
+		"[ PM ] Prijato od %s (ID: %d): %s"
+	},
+	{
+		"[ PM ] Sent for %s (ID: %d): %s",
+		"[ PM ] Odeslano pro %s (ID: %d): %s"
+	},
+	{
+		"~w~PM ~g~Received~w~.",
+		"~w~PM ~g~Prijata~w~."
+	},
+	{
+		"~w~PM ~g~Sent~w~.",
+		"~w~PM ~g~Odeslana~w~."
+	},
 	//
 	//  Radar (vehicle stats)
 	//
@@ -566,6 +607,9 @@ new gI18nMessages[][PlayerLocale][] =
 		"[ MARKET ] Market token-to-dollar ratio changed to: %.3f",
 		"[ TRH ] Kurz token ku dolaru na trhu se zmenil: %.3f"
 	},
+	//
+	//  Server data autosave
+	//
 	{
 		"[ DATA ] Loading user data...",
 		"[ DATA ] Nacitam ulozena uzivatelska data..."

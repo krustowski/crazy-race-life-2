@@ -176,6 +176,19 @@ enum
 	I18N_REAL_ALREADY_OCCUPIED,
 	I18N_REAL_NO_MONEY,
 	I18N_REAL_SELL_SUCCESS,
+	I18N_REAL_PERIODIC_COMMISSION_FMT,
+	I18N_REAL_PROPERTY_OWNED_FMT,
+	I18N_REAL_PROPERTY_RENTED_FMT,
+	I18N_REAL_PROPERTY_LOCKED_FMT,
+	I18N_REAL_ALREADY_RENTED_BY_PLAYER,
+	I18N_REAL_STILL_LOCKED,
+	I18N_REAL_DATABASE_ERROR,
+	I18N_REAL_RENTED_SUCCESSFULLY,
+	I18N_REAL_RENT_OUTBOUGHT,
+	I18N_REAL_PAINTJOB_ASSIGNED,
+	I18N_REAL_PROPERTY_LIMIT_REACHED,
+	I18N_REAL_PROPERTY_SAVED,
+	I18N_REAL_PRIVATE_PROPERTY_ENTRANCE_BLOCK,
 	// Taxi
 	I18N_TAXI_MISS_WRONG_VEHICLE,
 	I18N_TAXI_MISS_NPC_ENTERING,
@@ -329,6 +342,19 @@ new gI18nMessageColor[] =
 	COLOR_RED,
 	COLOR_RED,
 	COLOR_LIGHTGREEN,
+	COLOR_ORANGE,
+	COLOR_ORANGE,
+	COLOR_ORANGE,
+	COLOR_ORANGE,
+	COLOR_YELLOW,
+	COLOR_YELLOW,
+	COLOR_RED,
+	COLOR_LIGHTGREEN,
+	COLOR_ORANGE,
+	COLOR_LIGHTGREEN,
+	COLOR_RED,
+	COLOR_LIGHTGREEN,
+	COLOR_RED,
 	// Taxi
 	COLOR_RED,
 	COLOR_YELLOW,
@@ -817,6 +843,9 @@ new gI18nMessages[][PlayerLocale][] =
 		"[ CASH ] You dropped your money at the death position!",
 		"[ CASH ] Tve penize zustaly na miste umrti!"
 	},
+	//
+	//  Real Estate
+	//
 	{
 		"[ REAL ] Vehicle modifications saved",
 		"[ REAL ] Modifikace auta ulozeny k zaparkovanemu autu"
@@ -861,6 +890,61 @@ new gI18nMessages[][PlayerLocale][] =
 		"[ REAL ] The property has been sold successfully!",
 		"[ REAL ] Nemovitost byla uspesne prodana!"
 	},
+	{
+		"[ CASH ] Periodic commission from rented properties: $%d",
+		"[ CASH ] Periodicka provize z pronajatych nemovitosti: $%d"
+	},
+	{
+		"%s owns this property",
+		"%s vlastni tuto nemovitost"
+	},
+	{
+		"property is rented by %s",
+		"nemovitost pronajata hracem %s"
+	},
+	{
+		"%s\n\nlocked until %02d/%02d/%4d %02d:%02d:%02d UTC",
+		"%s\n\nzamknuto do %02d/%02d/%4d %02d:%02d:%02d UTC"
+	},
+	{
+		"[ REAL ] This property is already rented by you!",
+		"[ REAL ] Tuto nemovitost jiz mas v pronajmu!"
+	},
+	{
+		"[ REAL ] This property is still locked for rent!",
+		"[ REAL ] Tuto nemovitost stale nelze pronajat (je zamknuta)!"
+	},
+	{
+		"[ REAL ] Database error!",
+		"[ REAL ] Chyba databaze!"
+	},
+	{
+		"[ REAL ] Property rented successfully!",
+		"[ REAL ] Nemovitost uspesne pronajata!"
+	},
+	{
+		"[ REAL ] Somebody has outbought one of your rented properties!",
+		"[ REAL ] Nekdo prave odkoupil pronajem nektere tve nemovitosti!"
+	},
+	{
+		"[ REAL ] New paintjob assigned to property vehicle!",
+		"[ REAL ] Novy paintjob byl ulozen k zaparkovanemu autu!"
+	},
+	{
+		"[ EDIT ] Max properties limit reached, cancelling the transaction",
+		"[ EDIT ] Limit poctu nemovitosti byl dosazen, rusim transakci"
+	},
+	{
+		"[ EDIT ] Property saved successfully!",
+		"[ EDIT ] Nemovitost uspesne ulozena!"
+	},
+	{
+		"[ REAL ] Cannot enter the private property!",
+		"[ REAL ] Soukromy pozemek!"
+	},
+	//
+	//  Taxi
+	//
 	{
 		"[ TAXI ] Not a taxi cab!",
 		"[ TAXI ] Musis ridit taxi auto!"

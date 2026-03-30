@@ -151,6 +151,14 @@ enum
 	I18N_RACE_NO_SUCH_RACE,
 	I18N_RACE_ALREADY_JOINED,
 	I18N_RACE_NO_MONEY,
+	I18N_RACE_IN_MINIGAME_BLOCK,
+	I18N_RACE_REGISTERED_FMT,
+	I18N_RACE_FINISHED_FMT,
+	I18N_RACE_STARTED_GAMETEXT,
+	I18N_RACE_FINISHED_GAMETEXT,
+	I18N_RACE_ABORTED_GAMETEXT,
+	I18N_RACE_INFO_TEXT_FMT,
+	I18N_RACE_DATABASE_ERROR,
 	// Deathmatch
 	I18N_DEATHMATCH_STARTED,
 	I18N_DEATHMATCH_INGAME_BLOCK,
@@ -295,6 +303,14 @@ new gI18nMessageColor[] =
 	COLOR_RED,
 	COLOR_RED,
 	COLOR_YELLOW,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_LIGHTGREEN,
+	COLOR_LIGHTGREEN,
+	COLOR_LIGHTGREEN,
+	COLOR_LIGHTGREEN,
+	COLOR_RED,
+	COLOR_LIGHTGREEN,
 	COLOR_RED,
 	// Deathmatch
 	COLOR_YELLOW,
@@ -754,6 +770,41 @@ new gI18nMessages[][PlayerLocale][] =
 		"[ RACE ] You haven't got enough moeny to join such race!",
 		"[ ZAVOD ] Nemas dostatek hotovosti pro zaplaceni prihlasky do zavodu!"
 	},
+	{
+		"[ RACE ] Another minigame is running, stop it to start racing!",
+		"[ ZAVOD ] Jiz mas spustenou jinou minihru, ukonci ji pro zahajeni zavodu!"
+	},
+	{
+		"[ RACE ] Joined the '%s' race (cost $%d). Use the first checkpoint to start the race!",
+		"[ ZAVOD ] Uspesne prihlasen do zavodu '%s' (prihlaska $%d). Projed prvnim checkpointem pro spusteni casomiry."
+	},
+	{
+		"[ RACE ] Player %s just finished the '%s' race, and received a prize of $%d!",
+		"[ ZAVOD ] Hrac %s prave dokoncil zavod '%s' a ziskal odmenu $%d!"
+	},
+	{
+		"~w~Race ~g~Started",
+		"~w~Zavod ~g~Zahajen"
+	},
+	{
+		"~w~Race ~g~Finished",
+		"~w~Zavod ~g~Dokoncen"
+	},
+	{
+		"~w~Race ~r~Aborted",
+		"~w~Zavod ~r~Zrusen"
+	},
+	{
+		"~w~Race:__________~g~%3d~n~~w~Checkpoint:_~r~%2d~y~/~r~%2d~n~~w~Time:______~b~%4d~y~:~b~%2d",
+		"~w~Zavod:_________~g~%3d~n~~w~Checkpoint:_~r~%2d~y~/~r~%2d~n~~w~Cas:_______~b~%4d~y~:~b~%2d"
+	},
+	{
+		"[ RACE ] Database error!",
+		"[ ZAVOD ] Chyba databaze!"
+	},
+	//
+	//  Deathmatch
+	//
 	{
 		"[ DEATHMATCH ] New match just started!",
 		"[ DEATHMATCH ] Nove utkani zacalo!"

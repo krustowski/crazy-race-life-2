@@ -67,7 +67,8 @@ public InitRaces()
 	format(query, sizeof(query), "SELECT id, name, type, cost_dollars, prize_dollars, start_x, start_y, start_z FROM races");
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) {
+	if (!result) 
+	{
 		print("Database error: cannot fetch race data!");
 		return 0;
 	}
@@ -140,7 +141,9 @@ stock SetPlayerRaceSingle(playerid, raceId, const Float:coords[][E_RACE_COORD], 
 		x1 = coords[raceCpPosition+1][E_RACE_COORD_X];
 		y1 = coords[raceCpPosition+1][E_RACE_COORD_Y];
 		z1 = coords[raceCpPosition+1][E_RACE_COORD_Z];
-	} else {
+	} 
+	else
+	{
 		switch (raceType)
 		{
 			case 1:
@@ -178,7 +181,8 @@ stock SetPlayerRace(playerid, raceId)
 	format(query, sizeof(query), "SELECT seq_no, x, y, z, rot FROM race_coords WHERE race_id = %d", raceId);
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) {
+	if (!result) 
+	{
 		print("Database error: cannot fetch race coords data!");
 		return 0;
 	}
@@ -215,7 +219,7 @@ stock SetPlayerRaceState(playerid, raceId)
 
 	if (gPlayers[playerid][InMinigame])
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ RACE ] Another minigame is running, stop it to start racing!");
+		return SendClientMessageLocalized(playerid, I18N_RACE_IN_MINIGAME_BLOCK);
 	}
 
 	if (!IsPlayerInAnyVehicle(playerid))
@@ -232,7 +236,6 @@ stock SetPlayerRaceState(playerid, raceId)
 	if (CheckPlayerRaceState(playerid))
 	{
 		return SendClientMessageLocalized(playerid, I18N_RACE_ALREADY_JOINED);
-		//return SendClientMessage(playerid, COLOR_ZLUTA, "[ ! ] Jiz jsi prihlasen v jinem zavode! Pred prihlasenim je treba predchozi zavod dokoncit!");
 	}
 
 	if (raceId == 0)
@@ -253,14 +256,11 @@ stock SetPlayerRaceState(playerid, raceId)
 	gPlayerRace[playerid][raceId] = 1;
 	GivePlayerMoney(playerid, -gRaces[raceId][CostDollars]);
 
-	switch (gPlayers[playerid][Locale])
-	{
-		case LOCALE_CZ:
-			format(stringToPrint, sizeof(stringToPrint), "[ ZAVOD ] Uspesne prihlasen do zavodu '%s' (prihlaska $%d). Projed prvnim checkpointem pro spusteni casomiry.", gRaces[raceId][Name], gRaces[raceId][CostDollars]);
-
-		default:
-			format(stringToPrint, sizeof(stringToPrint), "[ RACE ] Joined the '%s' race (cost $%d). Use the first checkpoint to start the race!", gRaces[raceId][Name], gRaces[raceId][CostDollars]);
-	}
+	GetLocalizedString(playerid, I18N_RACE_REGISTERED_FMT, stringToPrint, sizeof(stringToPrint));
+	format(stringToPrint, sizeof(stringToPrint), stringToPrint,
+			gRaces[raceId][Name], 
+			gRaces[raceId][CostDollars]
+		);
 
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 	SetPlayerRace(playerid, raceId);
@@ -281,6 +281,8 @@ stock ResetPlayerRaceState(playerid, raceId, finishedSuccessfully)
 	gPlayerRaceTimer[playerid] = Timer: 0;
 	gPlayers[playerid][InMinigame] = false;
 
+	new gameText[32];
+
 	if (finishedSuccessfully)
 	{
 		SendClientMessageLocalized(playerid, I18N_RACE_ENDED_SUCCESSFULLY);
@@ -290,10 +292,25 @@ stock ResetPlayerRaceState(playerid, raceId, finishedSuccessfully)
 		GetPlayerName(playerid, playerName, sizeof(playerName));
 		GivePlayerMoney(playerid, gRaces[raceId][PrizeDollars]);
 
-		format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s just finished the '%s' race, and received a price of $%d!", playerName, gRaces[raceId][Name], gRaces[raceId][PrizeDollars]);
-		SendClientMessageToAll(COLOR_LIGHTGREEN, stringToPrint);
+		for (new i = 0; i < MAX_PLAYERS; i++)
+		{
+			if (!IsPlayerConnected(i))
+			{
+				continue;
+			}
 
-		GameTextForPlayer(playerid, "~w~Race ~g~Finished", 3000, 3); 
+			GetLocalizedString(i, I18N_RACE_FINISHED_FMT, stringToPrint, sizeof(stringToPrint));
+			format(stringToPrint, sizeof(stringToPrint), stringToPrint,
+					playerName, 
+					gRaces[raceId][Name], 
+					gRaces[raceId][PrizeDollars]
+				);
+
+			SendClientMessage(i, COLOR_LIGHTGREEN, stringToPrint);
+		}
+
+		GetLocalizedString(playerid, I18N_RACE_FINISHED_GAMETEXT, gameText, sizeof(gameText));
+		GameTextForPlayer(playerid, gameText, 3000, 3); 
 
 		SaveNewScore(raceId, playerid, gPlayerRaceTime[playerid], GetVehicleModel(GetPlayerVehicleID(playerid)));
 	}
@@ -304,7 +321,8 @@ stock ResetPlayerRaceState(playerid, raceId, finishedSuccessfully)
 	{
 		SendClientMessageLocalized(playerid, I18N_RACE_ENDED_PREMATURELY);
 
-		GameTextForPlayer(playerid, "~w~Race ~r~Aborted", 3000, 3); 
+		GetLocalizedString(playerid, I18N_RACE_ABORTED_GAMETEXT, gameText, sizeof(gameText));
+		GameTextForPlayer(playerid, gameText, 3000, 3); 
 	}
 
 	// Reset all race states to be sure not to interfere with others.
@@ -370,14 +388,14 @@ public UpdateRaceInfoText(playerid)
 
 	gPlayerRaceTime[playerid] += 1000;
 
-	switch (gPlayers[playerid][Locale]) 
-	{
-		case LOCALE_CZ:
-			format(stringToPrint, sizeof(stringToPrint), "~w~Zavod:_________~g~%3d~n~~w~Checkpoint:_~r~%2d~y~/~r~%2d~n~~w~Cas:_______~b~%4d~y~:~b~%2d", float:raceId, gPlayerRace[playerid][raceId]-1, cpCount, floatround(floatround(gPlayerRaceTime[playerid] / 1000) / 60), floatround(gPlayerRaceTime[playerid] / 1000) % 60);
-
-		default:
-			format(stringToPrint, sizeof(stringToPrint), "~w~Race:__________~g~%3d~n~~w~Checkpoint:_~r~%2d~y~/~r~%2d~n~~w~Time:______~b~%4d~y~:~b~%2d", float:raceId, gPlayerRace[playerid][raceId]-1, cpCount, floatround(floatround(gPlayerRaceTime[playerid] / 1000) / 60), floatround(gPlayerRaceTime[playerid] / 1000) % 60);
-	}
+	GetLocalizedString(playerid, I18N_RACE_INFO_TEXT_FMT, stringToPrint, sizeof(stringToPrint));
+	format(stringToPrint, sizeof(stringToPrint), stringToPrint,
+			raceId, 
+			gPlayerRace[playerid][raceId]-1, 
+			cpCount, 
+			floatround(floatround(gPlayerRaceTime[playerid] / 1000) / 60), 
+			floatround(gPlayerRaceTime[playerid] / 1000) % 60
+		);
 
 	// Redraw the player's current velocity.
 	TextDrawSetString(gRaceInfoText[playerid], stringToPrint);
@@ -396,7 +414,9 @@ stock CheckRaceCheckpoint(playerid)
 		gPlayerRaceTimer[playerid] = Timer: SetTimerEx("UpdateRaceInfoText", 1 * SECOND_MS, true, "i", playerid);
 		TextDrawShowForPlayer(playerid, gRaceInfoText[playerid]);
 
-		GameTextForPlayer(playerid, "~w~Race ~g~Started", 3000, 3); 
+		new gameText[32];
+		GetLocalizedString(playerid, I18N_RACE_STARTED_GAMETEXT, gameText, sizeof(gameText));
+		GameTextForPlayer(playerid, gameText, 3000, 3); 
 	}
 
 	DisablePlayerRaceCheckpoint(playerid);
@@ -432,7 +452,8 @@ stock InitHighScores()
 	format(query, sizeof(query), "select spec_id, nickname, value, vehicle_model from ( select spec_id, u.nickname, value, vehicle_model, row_number() over ( PARTITION by spec_id ORDER by value ASC ) as rank from high_scores join users as u on u.id = user_id where type = 1 ) ranked where rank <= 3 order by spec_id, rank;");
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) {
+	if (!result) 
+	{
 		print("Database error: cannot fetch high scores data!");
 		return 0;
 	}
@@ -488,8 +509,9 @@ stock SaveNewScore(raceId, playerid, time, vehicleModel)
 		);
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) {
-		SendClientMessage(playerid, COLOR_RED, "[ RACE ] Database error!");
+	if (!result) 
+	{
+		SendClientMessageLocalized(playerid, I18N_RACE_DATABASE_ERROR);
 		printf("Database error: cannot write high score data (race_id: %d, nickname: %s)!", raceId, nickname);
 
 		return 0;
@@ -524,8 +546,9 @@ stock SaveRaceData(playerid)
 		);
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) {
-		SendClientMessage(playerid, COLOR_RED, "[ RACE ] Database error!");
+	if (!result) 
+	{
+		SendClientMessageLocalized(playerid, I18N_RACE_DATABASE_ERROR);
 		printf("Database error: cannot write new race data (race_id: %d)!", raceid);
 
 		return 0;
@@ -558,8 +581,9 @@ stock SaveRaceData(playerid)
 	}
 
 	result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) {
-		SendClientMessage(playerid, COLOR_RED, "[ RACE ] Database error!");
+	if (!result) 
+	{
+		SendClientMessageLocalized(playerid, I18N_RACE_DATABASE_ERROR);
 		printf("Database error: cannot write new race coord data (race_id: %d)!", raceid);
 
 		return 0;

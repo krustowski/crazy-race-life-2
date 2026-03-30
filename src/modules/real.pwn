@@ -1675,16 +1675,28 @@ stock CheckRealEstatePickup(playerid, pickupid)
 								{
 									if (!gProperties[i][Occupied])
 									{
-										format(stringToPrint, sizeof(stringToPrint), "Property '%s' for sell.\n\n\tCost: $%d (%.2f mio)\n\n\nProperty code: %d\n\nTo buy this property, enter its code below:", gProperties[i][Label], gProperties[i][Cost], float(gProperties[i][Cost]) / 1000000, gProperties[i][ID]);
+										GetLocalizedString(playerid, I18N_REAL_PROPERTY_FOR_SELL_FMT, stringToPrint, sizeof(stringToPrint));
+										format(stringToPrint, sizeof(stringToPrint), stringToPrint, 
+												gProperties[i][Label], 
+												gProperties[i][Cost], 
+												float(gProperties[i][Cost]) / 1000000, 
+												gProperties[i][ID]
+											);
 										return ShowPlayerDialog(playerid, DIALOG_PROPERTY_BUY, DIALOG_STYLE_INPUT, "Real Estate", stringToPrint, "Buy", "Cancel");
 									}
 
 									if (!IsPlayerOwner(playerid, gProperties[i][ID]))
 									{
-										return SendClientMessage(playerid, COLOR_RED, "[ REAL ] This property has been already sold.");
+										return SendClientMessageLocalized(playerid, I18N_REAL_PROPERTY_ALREADY_SOLD);
 									}
 
-									format(stringToPrint, sizeof(stringToPrint), "Property '%s' is owned by you.\n\nCurrent value: $%d (%.2f mio)\n\n\nProperty code: %d\n\nThe selling fee is set to 10% of the property value.\nEnter its code to sell this property:", gProperties[i][Label], gProperties[i][Cost], float(gProperties[i][Cost]) / 1000000, gProperties[i][ID]);
+									GetLocalizedString(playerid, I18N_REAL_PROPERTY_FOR_SELL_OWNED_FMT, stringToPrint, sizeof(stringToPrint));
+									format(stringToPrint, sizeof(stringToPrint), stringToPrint,
+											gProperties[i][Label], 
+											gProperties[i][Cost], 
+											float(gProperties[i][Cost]) / 1000000, 
+											gProperties[i][ID]
+										);
 									return ShowPlayerDialog(playerid, DIALOG_PROPERTY_SELL, DIALOG_STYLE_INPUT, "Real Estate", stringToPrint, "Sell", "Cancel");
 								}
 							case PROPERTY_TYPE_COMMERCIAL:

@@ -189,6 +189,9 @@ enum
 	I18N_REAL_PROPERTY_LIMIT_REACHED,
 	I18N_REAL_PROPERTY_SAVED,
 	I18N_REAL_PRIVATE_PROPERTY_ENTRANCE_BLOCK,
+	I18N_REAL_PROPERTY_FOR_SELL_FMT,
+	I18N_REAL_PROPERTY_FOR_SELL_OWNED_FMT,
+	I18N_REAL_PROPERTY_ALREADY_SOLD,
 	// Taxi
 	I18N_TAXI_MISS_WRONG_VEHICLE,
 	I18N_TAXI_MISS_NPC_ENTERING,
@@ -354,6 +357,9 @@ new gI18nMessageColor[] =
 	COLOR_LIGHTGREEN,
 	COLOR_RED,
 	COLOR_LIGHTGREEN,
+	COLOR_RED,
+	COLOR_YELLOW,
+	COLOR_YELLOW,
 	COLOR_RED,
 	// Taxi
 	COLOR_RED,
@@ -941,6 +947,18 @@ new gI18nMessages[][PlayerLocale][] =
 	{
 		"[ REAL ] Cannot enter the private property!",
 		"[ REAL ] Soukromy pozemek!"
+	},
+	{
+		"{FFFFFF}Property '%s' for sell.\n\n\tCost: ${00FF00}%d{FFFFFF} (%.2f mio)\n\n\nProperty code: {FFD700}%d{FFFFFF}\n\nTo buy this property, enter its code below:",
+		"{FFFFFF}Nemovitost '%s' je na prodej.\n\n\tCena: ${00FF00}%d{FFFFFF} (%.2f mil)\n\n\nKod nemovitosti: {FFD700}%d{FFFFFF}\n\nZadej kod nemovitosti pro nakup:"
+	},
+	{
+		"{FFFFFF}Property '%s' is owned by you.\n\nCurrent value: ${00FF00}%d{FFFFFF} (%.2f mio)\n\n\nProperty code: {FFD700}%d{FFFFFF}\n\nThe selling fee is set to 10%% of the property value.\nEnter its code to sell this property:",
+		"{FFFFFF}Nemovitost '%s' je v tvem drzeni.\n\nAktualni hodnota: ${00FF00}%d{FFFFFF} (%.2f mil)\n\n\nKod nemovitosti: {FFD700}%d{FFFFFF}\n\nProvize realitni kancelari je 10%% z ceny nemovitosti.\nZadej kod nemovitosti pro prodej:"
+	},
+	{
+		"[ REAL ] This property has been already sold.",
+		"[ REAL ] Tahle nemovitost jiz byla prodana."
 	},
 	//
 	//  Taxi

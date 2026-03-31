@@ -233,6 +233,11 @@ stock OperateTowTruck(playerid)
 			AttachTrailerToVehicle(i, gTowMission[playerid][TruckID]);
 			SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TOW ] New trailer attached successfully!");
 
+			if (gTowMission[playerid][Models][GetVehicleModel(i) - 400])
+			{
+				SendClientMessage(playerid, COLOR_YELLOW, "[ TOW ] This vehicle model has been already towed!");
+			}
+
 			gTowMission[playerid][TowedID] = i;
 			gTowMission[playerid][CheckpointDisabled] = false;
 

@@ -42,6 +42,7 @@ enum PlayerLocale
 enum 
 {
 	I18N_WELCOME_MESSAGE,
+	I18N_CARKILL_VIOLATION_FMT,
 	I18N_PLAYER_DISCONNECT_CRASH,
 	I18N_PLAYER_DISCONNECT_LEFT,
 	I18N_PLAYER_DISCONNECT_KICK_BAN,
@@ -212,6 +213,7 @@ enum
 	I18N_REAL_SKIN_FREE_SLOT,
 	I18N_REAL_SKIN_SET,
 	I18N_REAL_SKIN_DELETED,
+	I18N_REAL_VEHICLE_MOD_SAVED,
 	// Taxi
 	I18N_TAXI_MISS_WRONG_VEHICLE,
 	I18N_TAXI_MISS_NPC_ENTERING,
@@ -231,6 +233,7 @@ enum
 new gI18nMessageColor[] = 
 {
 	COLOR_GREEN,
+	COLOR_RED,
 	COLOR_GREY,
 	COLOR_GREY,
 	COLOR_GREY,
@@ -401,6 +404,7 @@ new gI18nMessageColor[] =
 	COLOR_YELLOW,
 	COLOR_LIGHTGREEN,
 	COLOR_LIGHTGREEN,
+	COLOR_LIGHTGREEN,
 	// Taxi
 	COLOR_RED,
 	COLOR_YELLOW,
@@ -422,6 +426,10 @@ new gI18nMessages[][PlayerLocale][] =
 	{
 		"Welcome to the gamemode CrazyRaceLife2! /help",
 		"Vitej ve hre! /help"
+	},
+	{
+		"[ CARKILL ] Player %s [ID: %d] has just broken the server rules!",
+		"[ CARKILL ] Hrac %s [ID: %d] prave porusil pravidla serveru!"
 	},
 	{
 		"[ i ] Player %s disconnected [crash].",
@@ -1079,6 +1087,10 @@ new gI18nMessages[][PlayerLocale][] =
 	{
 		"[ REAL ] Selected skin model deleted successfully!",
 		"[ REAL ] Zvoleny skin byl smazan!"
+	},
+	{
+		"[ REAL ] Vehicle mod saved!",
+		"[ REAL ] Uprava auta ulozena!"
 	},
 	//
 	//  Taxi

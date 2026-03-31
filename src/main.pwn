@@ -1,4 +1,4 @@
-/*****************************************************************************************************************************************
+/*
  *   
  *    .d8888b.                                    8888888b.                            888      d8b  .d888          .d8888b.  
  *    d88P  Y88b                                   888   Y88b                           888      Y8P d88P"          d88P  Y88b 
@@ -20,8 +20,9 @@
  *  Credits: 	krusty, kompry, DRaGsTeR, amdulka
  *  Language: 	EN, CZ
  *  Version: 	0.10.z
+ *
+ */
 
- *****************************************************************************************************************************************/
 
 //
 //  Generic includes.
@@ -569,8 +570,17 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 			// Hide velocity meters.
 			TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 	
-			format(stringToPrint, sizeof(stringToPrint), "[ CARKILL ] Player %s [ID: %d] has just broken the server rules", killerName, killerid);
-			SendClientMessageToAll(COLOR_RED, stringToPrint);
+			for (new i = 0; i < MAX_PLAYERS; i++)
+			{
+				if (!IsPlayerConnected(i))
+				{
+					continue;
+				}
+
+				GetLocalizedString(i, I18N_CARKILL_VIOLATION_FMT, stringToPrint, sizeof(stringToPrint));
+				format(stringToPrint, sizeof(stringToPrint), stringToPrint, killerName, killerid);
+				SendClientMessage(i, COLOR_RED, stringToPrint);
+			}
 
 			SpawnPlayer(killerid);
 			PlayerPlaySound(killerid, 1056, 0, 0, 0);
@@ -643,15 +653,19 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 	for (new i = 0; i < sizeof(gProperties); i++)
 	{
 		if (gProperties[i][Vehicle][ID] != vehicleid)
+		{
 			continue;
+		}
 
 		new t_CARMODTYPE: componentType = GetVehicleComponentType(componentid);
 
 		if (componentType == CARMODTYPE_NONE)
+		{
 			break;
+		}
 
 		gProperties[i][Vehicle][Components][componentType] = componentid;
-		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ REAL ] Vehicle mod saved");
+		SendClientMessageLocalized(playerid, I18N_REAL_VEHICLE_MOD_SAVED);
 	}
 
 	return 1;
@@ -752,7 +766,8 @@ public OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstat
 
 	if (newstate == PLAYER_STATE_DRIVER || newstate == PLAYER_STATE_PASSENGER)
 	{
-		gVehicleStatesText[playerid] = TextDrawCreate(256, 410, "~w~Health:____%3d_%%~n~~w~Velocity:_%3d");
+		//gVehicleStatesText[playerid] = TextDrawCreate(256, 410, "~w~Health:____%3d_%%~n~~w~Velocity:_%3d");
+		gVehicleStatesText[playerid] = TextDrawCreate(256, 410, "");
 
 		TextDrawLetterSize(gVehicleStatesText[playerid], 0.5, 1.5);
 		TextDrawFont(Text: gVehicleStatesText[playerid], t_TEXT_DRAW_FONT: 3);

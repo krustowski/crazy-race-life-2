@@ -816,11 +816,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		case DIALOG_LOGIN:
 			{
 				if (!response) 
+				{
 					return Kick(playerid);
+				}
 
 				if (SetPlayerAccountLogin(playerid, inputtext))
+				{
+					//return ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Logged in successfully!", "Ok", "");
 					return 1;
-				//return ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Logged in successfully!", "Ok", "");
+				}
 
 				gPlayers[playerid][LoginAttempts]++;
 
@@ -830,23 +834,33 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					Kick(playerid);
 				}
 				else 
+				{
 					ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", "Wrong password!\nEnter a valid password please!", "Login", "Cancel");
+				}
 			}
 		case DIALOG_REGISTER:
 			{
 				if (!response) 
+				{
 					return Kick(playerid);
+				}
 
 				if (strlen(inputtext) <= 5) 
+				{
 					return ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Register", "Enter a password longer than 5 characters!", "Register", "Cancel");
+				}
 
 				if (SetPlayerAccountRegistration(playerid, inputtext))
+				{
 					return 1;
+				}
 			}
 		case DIALOG_PROPERTY_BUY:
 			{
 				if (!response)
+				{
 					return 1;
+				}
 
 				BuyPlayerProperty(playerid, strval(inputtext));
 
@@ -855,14 +869,18 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		case DIALOG_PROPERTY_RENT:
 			{
 				if (!response)
+				{
 					return 1;
+				}
 
 				return RentProperty(playerid, strval(inputtext));
 			}
 		case DIALOG_PROPERTY_SELL:
 			{
 				if (!response)
+				{
 					return 1;
+				}
 
 				SellPlayerProperty(playerid, strval(inputtext));
 
@@ -871,10 +889,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		case DIALOG_PROPERTY_DRUGZ:
 			{
 				if (!response)
+				{
 					return 1;
+				}
 
 				if (!strlen(inputtext))
+				{
 					return SendClientMessage(playerid, COLOR_RED, "[ DRUGZ ] Invalid option.");
+				}
 
 				// Save to the temporary user's var.
 				gPlayers[playerid][Temp] = listitem;
@@ -886,7 +908,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		case DIALOG_PROPERTY_DRUGZ_TRANS:
 			{
 				if (!response)
+				{
 					return 1;
+				}
 
 				new drugID = gPlayers[playerid][Temp], propertyID = gPlayerInteriors[playerid][PropertyArrayID];
 
@@ -1092,12 +1116,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		case DIALOG_PROPERTY_LIST:
 			{
 				if (!response)
+				{
 					return 1;
+				}
 
 				new propertyid = gPlayers[playerid][Properties][listitem];
 
 				if (!propertyid)
+				{
 					return 1;
+				}
 
 				gPlayers[playerid][Temp] = propertyid;
 
@@ -1144,7 +1172,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		case DIALOG_BANK_OPTIONS:
 			{
 				if (!response)
+				{
 					return 1;
+				}
 
 				switch (listitem)
 				{
@@ -1202,25 +1232,33 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		case DIALOG_RACE_LIST:
 			{
 				if (!response)
+				{
 					return 1;
+				}
 
 				SetPlayerRaceState(playerid, listitem + 1);
 
 				if (!gPlayerRace[playerid][listitem + 1])
+				{
 					return 1;
+				}
 
 				/*if (!CheckPlayerRaceState(playerid))
 				  return 1;*/
 
 				if (SetPlayerRaceStartPos(playerid))
+				{
 					return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ RACE ] Warp near the race start used successfully");
+				}
 
 				return 1;
 			}
 		case DIALOG_RACE_OPTIONS:
 			{
 				if (!response)
+				{
 					return 1;
+				}
 
 				switch (listitem)
 				{
@@ -1235,10 +1273,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		case DIALOG_PORT_LIST: 
 			{
 				if (!response)
+				{
 					return 1;
+				}
 
 				if (IsPlayerInAnyVehicle(playerid))
+				{
 					RemovePlayerFromVehicle(playerid);
+				}
 
 				switch (listitem)
 				{
@@ -1302,12 +1344,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		case DIALOG_PLAYER_CLICKED_LIST:
 			{
 				if (!response)
+				{
 					return 1;
+				}
 
 				new clickedplayerid = gPlayers[playerid][Temp];
 
 				if (!IsPlayerConnected(clickedplayerid))
-					return SendClientMessage(playerid, COLOR_RED, "[ ! ] Player not connected!");
+				{
+					return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+				}
 
 				switch (listitem)
 				{
@@ -1391,7 +1437,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							}
 
 							if (playerid == clickedplayerid)
+							{
 								return SendClientMessage(playerid, COLOR_RED, "[ ! ] Invalid player!");
+							}
 
 							TogglePlayerSpectating(playerid, true);
 							PlayerSpectatePlayer(playerid, clickedplayerid);
@@ -1465,7 +1513,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				gPlayers[playerid][Temp] = 0;
 
 				if (!IsPlayerConnected(clickedplayerid))
+				{
 					return SendClientMessage(playerid, COLOR_RED, "[ ! ] Player not connected!");
+				}
 
 				new skinid = strval(inputtext);
 
@@ -1491,7 +1541,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				gPlayers[playerid][Temp] = 0;
 
 				if (!IsPlayerConnected(clickedplayerid))
+				{
 					return SendClientMessage(playerid, COLOR_RED, "[ ! ] Player not connected!");
+				}
 
 				new level = strval(inputtext);
 
@@ -1517,7 +1569,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				gPlayers[playerid][Temp] = 0;
 
 				if (!IsPlayerConnected(clickedplayerid))
+				{
 					return SendClientMessage(playerid, COLOR_RED, "[ ! ] Player not connected!");
+				}
 
 				new weaponid = strval(inputtext);
 
@@ -1541,7 +1595,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				gPlayers[playerid][Temp] = 0;
 
 				if (!IsPlayerConnected(clickedplayerid))
+				{
 					return SendClientMessage(playerid, COLOR_RED, "[ ! ] Player not connected!");
+				}
 
 				SendPlayerMessageToAll(clickedplayerid, inputtext);
 
@@ -1559,7 +1615,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				gPlayers[playerid][Temp] = 0;
 
 				if (!IsPlayerConnected(clickedplayerid))
+				{
 					return SendClientMessage(playerid, COLOR_RED, "[ ! ] Player not connected!");
+				}
 
 				new level = strval(inputtext);
 
@@ -1588,7 +1646,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		case DIALOG_DEATHMATCH_OPTIONS:
 			{
 				if (!response)
+				{
 					return 1;
+				}
 
 				switch (listitem)
 				{
@@ -2518,7 +2578,9 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 {
 	// hotfix due to the logic of EnsurePickupCreated(...) function
 	if (!pickupid)
+	{
 		return 1;
+	}
 
 	//
 	//  Banking
@@ -2527,10 +2589,14 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	for (new i = 0; i < MAX_ATM_PICKUPS; i++)
 	{
 		if (gBankPickups[i] != pickupid)
+		{
 			continue;
+		}
 
 		if (gPlayers[playerid][DialogShown])
+		{
 			continue;
+		}
 
 		ShowBankOptionsDialog(playerid);
 	}

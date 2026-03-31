@@ -43,6 +43,7 @@ enum
 {
 	I18N_WELCOME_MESSAGE,
 	I18N_CARKILL_VIOLATION_FMT,
+	I18N_PLAYER_CONNECTED_FMT,
 	I18N_PLAYER_DISCONNECT_CRASH,
 	I18N_PLAYER_DISCONNECT_LEFT,
 	I18N_PLAYER_DISCONNECT_KICK_BAN,
@@ -234,6 +235,7 @@ new gI18nMessageColor[] =
 {
 	COLOR_GREEN,
 	COLOR_RED,
+	COLOR_GREY,
 	COLOR_GREY,
 	COLOR_GREY,
 	COLOR_GREY,
@@ -430,6 +432,10 @@ new gI18nMessages[][PlayerLocale][] =
 	{
 		"[ CARKILL ] Player %s [ID: %d] has just broken the server rules!",
 		"[ CARKILL ] Hrac %s [ID: %d] prave porusil pravidla serveru!"
+	},
+	{
+		"[ i ] Player %s joined the game!",
+		"[ i ] Hrac %s prisel do hry!"
 	},
 	{
 		"[ i ] Player %s disconnected [crash].",

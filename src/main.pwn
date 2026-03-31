@@ -234,8 +234,6 @@ public OnGameModeExit()
 		gDbConnectionHandle = DB: 0;
 	}
 
-	KillTimer(SetTimer("ShowAdvert", 1000 * 60 * 2, true));
-
 	return 1;
 }
 
@@ -302,9 +300,17 @@ public OnPlayerConnect(playerid)
 		return 1;
 	}
 
-	format(stringToPrint, sizeof(stringToPrint), "[ i ] Player %s joined the game!", playerName);
-	BroadcastMessage(COLOR_GREY, stringToPrint);
-	//SendClientMessageToAll(COLOR_GREY, stringToPrint);
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i))
+		{
+			continue;
+		}
+
+		GetLocalizedString(i, I18N_PLAYER_CONNECTED_FMT, stringToPrint, sizeof(stringToPrint));
+		format(stringToPrint, sizeof(stringToPrint), stringToPrint, playerName);
+		SendClientMessage(i, COLOR_GREY, stringToPrint);
+	}
 
 	SendMessageToWebhook(playerid, "connected", -1);
 

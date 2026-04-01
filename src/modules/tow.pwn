@@ -49,7 +49,8 @@ public UpdateTowMissionText(playerid)
 
 	gTowMission[playerid][TimeElapsed] += 1000;
 
-	format(stringToPrint, sizeof(stringToPrint), gI18nMessages[I18N_TOW_MISS_INFO][ gPlayers[playerid][Locale] ], 
+	GetLocalizedString(playerid, I18N_TOW_MISS_INFO, stringToPrint, sizeof(stringToPrint));
+	format(stringToPrint, sizeof(stringToPrint), stringToPrint, 
 			gTowMission[playerid][ModelCount], 
 			gTowMission[playerid][DoneCount], 
 			gTowMission[playerid][Earned], 

@@ -1139,52 +1139,92 @@ stock ShowHighScoresPlayTimeDialog(playerid)
 
 stock ShowHighScoresPropertiesDialog(playerid)
 {
-	new query[] = "SELECT COUNT(*) AS total FROM properties WHERE type = 2";
-
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result)
+	new areas[4][] = 
 	{
-		print("Database error: cannot read high_scores data for properties (total count)!");
-		print(query);
-		return 0;
-	}
+		"%",
+		"LV: %",
+		"SF: %",
+		"LS: %"
+	};
 
-	new total = DB_GetFieldIntByName(result, "total");
-
-	DB_FreeResultSet(result);
-
-	new 
-		query_rank[] = "SELECT rank, u.nickname, property_count FROM ( SELECT user_id, COUNT(*) AS property_count, RANK() OVER (ORDER BY COUNT(*) DESC) AS rank FROM properties WHERE occupied = 1 AND type = 2 AND user_id > 0 GROUP BY user_id ) JOIN users AS u ON u.id == user_id WHERE rank <= 3",
-		stringToPrint[512] = "{FFD700}Top 3 players by rented property count (whole map):{FFFFFF}\n";
-
-	result = DB_ExecuteQuery(gDbConnectionHandle, query_rank);
-	if (!result)
+	new areaNames[4][] = 
 	{
-		print("Database error: cannot read high_scores data for properties!");
-		print(query);
-		return 0;
-	}
+		"Whole Map",
+		"Las Venturas",
+		"San Fierro",
+		"Los Santos"
+	};
 
-	do
+	new
+		totalArea[4];
+
+	for (new i = 0; i < 4; i++)
 	{
-		new 
-			count = DB_GetFieldIntByName(result, "property_count"), 
-			rank = DB_GetFieldIntByName(result, "rank"), 
-			nickname[MAX_PLAYER_NAME];
+		new
+			query_total[128] = "SELECT COUNT(*) AS total FROM properties WHERE name LIKE '%s' AND type = 2";
 
-		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
-
-		format(stringToPrint, sizeof(stringToPrint), "%s\n%d. {00FF00}%3d{FFFFFF} (%2.2f %%)\t\t{FFD700}%s{FFFFFF}", 
-				stringToPrint, 
-				rank, 
-				count, 
-				floatmul(floatdiv(count, total), 100.0),
-				nickname
+		format(query_total, sizeof(query_total), query_total, 
+				areas[i]
 			);
-	}
-	while (DB_SelectNextRow(result));
 
-	DB_FreeResultSet(result);
+		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query_total);
+		if (!result)
+		{
+			print("Database error: cannot read high_scores data for properties (total count)!");
+			print(query_total);
+			return 0;
+		}
+
+		totalArea[i] = DB_GetFieldIntByName(result, "total");
+
+		DB_FreeResultSet(result);
+	}
+
+	new
+		stringToPrint[1024] = "{FFD700}Top 3 players by rented property count:{FFFFFF}\n";
+
+	for (new i = 0; i < 4; i++)
+	{
+
+		new
+			query_rank_area[512] = "SELECT rank, u.nickname, property_count FROM ( SELECT user_id, COUNT(*) AS property_count, RANK() OVER (ORDER BY COUNT(*) DESC) AS rank FROM properties WHERE name LIKE '%s' AND occupied = 1 AND type = 2 AND user_id > 0 GROUP BY user_id ) JOIN users AS u ON u.id == user_id WHERE rank <= 3";
+
+		format(query_rank_area, sizeof(query_rank_area), query_rank_area, 
+				areas[i]
+			);
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n\n{FFD700}%s{FFFFFF}:\n", stringToPrint, areaNames[i]);
+
+
+		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query_rank_area);
+		if (!result)
+		{
+			print("Database error: cannot read high_scores data for properties!");
+			print(query_rank_area);
+			return 0;
+		}
+
+		do
+		{
+			new 
+				count = DB_GetFieldIntByName(result, "property_count"), 
+				rank = DB_GetFieldIntByName(result, "rank"), 
+				nickname[MAX_PLAYER_NAME];
+
+			DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+
+			format(stringToPrint, sizeof(stringToPrint), "%s\n%d. {00FF00}%3d{FFFFFF} (%2.2f %%)\t\t{FFD700}%s{FFFFFF}", 
+					stringToPrint, 
+					rank, 
+					count, 
+					floatmul(floatdiv(count, totalArea[i]), 100.0),
+					nickname
+				);
+		}
+		while (DB_SelectNextRow(result));
+
+		DB_FreeResultSet(result);
+	}
 
 	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_PROPERTIES, DIALOG_STYLE_MSGBOX, "High Scores: Properties", stringToPrint, "Close", "");
 }

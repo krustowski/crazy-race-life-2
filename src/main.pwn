@@ -777,7 +777,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 
 				// Save to the temporary user's var.
-				gPlayers[playerid][Temp] = listitem;
+				gPlayers[playerid][SelectedDrugID] = listitem;
 
 				ShowPlayerDialog(playerid, DIALOG_PROPERTY_DRUGZ_TRANS, DIALOG_STYLE_LIST, "Drugz", "Deposit at home\nWithdraw the whole amount", "Confirm", "Cancel");
 
@@ -790,7 +790,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				new drugID = gPlayers[playerid][Temp], propertyID = gPlayerInteriors[playerid][PropertyArrayID];
+				new drugID = gPlayers[playerid][SelectedDrugID], propertyID = gPlayerInteriors[playerid][PropertyArrayID];
 
 				switch (listitem)
 				{
@@ -1005,7 +1005,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				gPlayers[playerid][Temp] = propertyid;
+				gPlayers[playerid][PropertyOwnedID] = propertyid;
 
 				ShowPropertyOptionsDialog(playerid);
 
@@ -1015,11 +1015,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				if (!response)
 				{
-					gPlayers[playerid][Temp] = 0;
+					gPlayers[playerid][PropertyOwnedID] = 0;
 					return 1;
 				}
 
-				new propertyid = gPlayers[playerid][Temp];
+				new propertyid = gPlayers[playerid][PropertyOwnedID];
 
 				switch (listitem)
 				{
@@ -1226,7 +1226,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				new clickedplayerid = gPlayers[playerid][Temp];
+				new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
 
 				if (!IsPlayerConnected(clickedplayerid))
 				{
@@ -1383,12 +1383,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				if (!response)
 				{
-					gPlayers[playerid][Temp] = 0;
+					gPlayers[playerid][SelectedSkinID] = INVALID_PLAYER_ID;
 					return 1;
 				}
 
-				new clickedplayerid = gPlayers[playerid][Temp];
-				gPlayers[playerid][Temp] = 0;
+				new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+				gPlayers[playerid][ClickedPlayerID] = INVALID_PLAYER_ID;
 
 				if (!IsPlayerConnected(clickedplayerid))
 				{
@@ -1411,12 +1411,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				if (!response)
 				{
-					gPlayers[playerid][Temp] = 0;
+					gPlayers[playerid][ClickedPlayerID] = INVALID_PLAYER_ID;
 					return 1;
 				}
 
-				new clickedplayerid = gPlayers[playerid][Temp];
-				gPlayers[playerid][Temp] = 0;
+				new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+				gPlayers[playerid][ClickedPlayerID] = INVALID_PLAYER_ID;
 
 				if (!IsPlayerConnected(clickedplayerid))
 				{
@@ -1439,12 +1439,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				if (!response)
 				{
-					gPlayers[playerid][Temp] = 0;
+					gPlayers[playerid][ClickedPlayerID] = INVALID_PLAYER_ID;
 					return 1;
 				}
 
-				new clickedplayerid = gPlayers[playerid][Temp];
-				gPlayers[playerid][Temp] = 0;
+				new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+				gPlayers[playerid][ClickedPlayerID] = INVALID_PLAYER_ID;
 
 				if (!IsPlayerConnected(clickedplayerid))
 				{
@@ -1465,12 +1465,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				if (!response)
 				{
-					gPlayers[playerid][Temp] = 0;
+					gPlayers[playerid][ClickedPlayerID] = INVALID_PLAYER_ID;
 					return 1;
 				}
 
-				new clickedplayerid = gPlayers[playerid][Temp];
-				gPlayers[playerid][Temp] = 0;
+				new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+				gPlayers[playerid][ClickedPlayerID] = INVALID_PLAYER_ID;
 
 				if (!IsPlayerConnected(clickedplayerid))
 				{
@@ -1485,12 +1485,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				if (!response)
 				{
-					gPlayers[playerid][Temp] = 0;
+					gPlayers[playerid][ClickedPlayerID] = INVALID_PLAYER_ID;
 					return 1;
 				}
 
-				new clickedplayerid = gPlayers[playerid][Temp];
-				gPlayers[playerid][Temp] = 0;
+				new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+				gPlayers[playerid][ClickedPlayerID] = INVALID_PLAYER_ID;
 
 				if (!IsPlayerConnected(clickedplayerid))
 				{
@@ -1678,8 +1678,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return ShowPhoneOptionsDialog(playerid);
 				}
 
-				OnPlayerPrivMsg(playerid, gPlayers[playerid][Temp], inputtext);
-				gPlayers[playerid][Temp] = 0;
+				OnPlayerPrivMsg(playerid, gPlayers[playerid][PMTargetID], inputtext);
+				gPlayers[playerid][PMTargetID] = INVALID_PLAYER_ID;
 
 				return ShowPhoneOptionsDialog(playerid);
 			}
@@ -1849,11 +1849,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 							SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Editting mode enabled");
 							gPlayers[playerid][EditingMode] = true;
-							gPlayers[playerid][Temp] = newraceid;
+							gPlayers[playerid][NewRaceID] = newraceid;
 
 							gPlayerRaceEdit[playerid][ID] = newraceid;
 
-							return ShowRaceEditorOptionsDialog(playerid, gPlayers[playerid][Temp]);
+							return ShowRaceEditorOptionsDialog(playerid, gPlayers[playerid][NewRaceID]);
 						}
 					case 1:
 						// List existing races
@@ -1871,9 +1871,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Editting mode enabled");
 				gPlayers[playerid][EditingMode] = true;
-				gPlayers[playerid][Temp] = gRaces[listitem + 1][ID];
+				gPlayers[playerid][NewRaceID] = gRaces[listitem + 1][ID];
 
-				return ShowRaceEditorOptionsDialog(playerid, gPlayers[playerid][Temp]);
+				return ShowRaceEditorOptionsDialog(playerid, gPlayers[playerid][NewRaceID]);
 			}
 		case DIALOG_RACE_EDITOR_OPTIONS:
 			{
@@ -1881,7 +1881,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Editting mode disabled");
 					gPlayers[playerid][EditingMode] = false;
-					gPlayers[playerid][Temp] = -1;
+					gPlayers[playerid][NewRaceID] = -1;
 
 					return 1;
 				}
@@ -2173,20 +2173,20 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				if (!response)
 				{
-					gPlayers[playerid][Temp] = -1;
+					gPlayers[playerid][RacesHSOffset] = -1;
 					return 1;
 				}
 
-				if (gPlayers[playerid][Temp] > 9)
+				if (gPlayers[playerid][RacesHSOffset] > 9)
 				{
-					gPlayers[playerid][Temp] += 10;
+					gPlayers[playerid][RacesHSOffset] += 10;
 				}
 				else
 				{
-					gPlayers[playerid][Temp] = 10;
+					gPlayers[playerid][RacesHSOffset] = 10;
 				}
 
-				return ShowHighScoresRacesDialog(playerid, gPlayers[playerid][Temp]);
+				return ShowHighScoresRacesDialog(playerid, gPlayers[playerid][RacesHSOffset]);
 			}
 		case DIALOG_TAXI_OPTIONS:
 			{
@@ -2208,7 +2208,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					case 0:
 						{
-							gPlayers[playerid][Temp] = 0;
+							gPlayers[playerid][RacesHSOffset] = 0;
 							return ShowHighScoresRacesDialog(playerid, 0);
 						}
 					case 1:

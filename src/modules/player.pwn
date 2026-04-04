@@ -73,7 +73,15 @@ enum Player
 
 	TutorialStats[Tutorial],
 
-	Temp,
+	// Temporary and concurrent vars
+	ClickedPlayerID, 
+	PMTargetID,
+	PropertyOwnedID,
+	SelectedDrugID,
+	SelectedSkinID,
+	NewRaceID,
+	RacesHSOffset,
+
 	SkinOperation: SkinOp
 }
 

@@ -373,7 +373,7 @@ stock ShowPropertyListDialog(playerid)
 stock ShowPropertyOptionsDialog(playerid)
 {
 	new propertyName[64];
-        format(propertyName, sizeof(propertyName), "%s", gProperties[ GetPropertyArrayIDfromID( gPlayers[playerid][Temp] ) ][Label]);
+        format(propertyName, sizeof(propertyName), "%s", gProperties[ GetPropertyArrayIDfromID( gPlayers[playerid][PropertyOwnedID] ) ][Label]);
 
 	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_OPTIONS, DIALOG_STYLE_LIST, propertyName, "Set spawn point\nAttach new vehicle\nRespawn attached vehicle\nSell property", "Select", "Cancel");
 }
@@ -551,7 +551,7 @@ stock ShowPlayerClickedDialog(playerid, clickedplayerid)
 	GetPlayerName(clickedplayerid, playerName);
 	format(title, sizeof(title), "Player '%s' Options", playerName);
 
-	gPlayers[playerid][Temp] = clickedplayerid;
+	gPlayers[playerid][ClickedPlayerID] = clickedplayerid;
 
 	format(stringToPrint, sizeof(stringToPrint), "%s\n%s",
 			"Set 100 HP + armour",
@@ -605,7 +605,7 @@ stock ShowPlayerSkinIDSetDialog(playerid)
 {
 	new playerName[MAX_PLAYER_NAME], title[128];
 
-	new clickedplayerid = gPlayers[playerid][Temp];
+	new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
 
 	GetPlayerName(clickedplayerid, playerName);
 	format(title, sizeof(title), "Player '%s' Options", playerName);
@@ -617,7 +617,7 @@ stock ShowPlayerDrunkLevelSetDialog(playerid)
 {
 	new playerName[MAX_PLAYER_NAME], title[128];
 
-	new clickedplayerid = gPlayers[playerid][Temp];
+	new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
 
 	GetPlayerName(clickedplayerid, playerName);
 	format(title, sizeof(title), "Player '%s' Options", playerName);
@@ -629,7 +629,7 @@ stock ShowPlayerAdminLevelSetDialog(playerid)
 {
 	new playerName[MAX_PLAYER_NAME], title[128];
 
-	new clickedplayerid = gPlayers[playerid][Temp];
+	new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
 
 	GetPlayerName(clickedplayerid, playerName);
 	format(title, sizeof(title), "Player '%s' Options", playerName);
@@ -641,7 +641,7 @@ stock ShowPlayerGiveWeaponDialog(playerid)
 {
 	new playerName[MAX_PLAYER_NAME], title[128];
 
-	new clickedplayerid = gPlayers[playerid][Temp];
+	new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
 
 	GetPlayerName(clickedplayerid, playerName);
 	format(title, sizeof(title), "Player '%s' Options", playerName);
@@ -653,7 +653,7 @@ stock ShowPlayerFakechatDialog(playerid)
 {
 	new playerName[MAX_PLAYER_NAME], title[128];
 
-	new clickedplayerid = gPlayers[playerid][Temp];
+	new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
 
 	GetPlayerName(clickedplayerid, playerName);
 	format(title, sizeof(title), "Player '%s' Options", playerName);
@@ -725,7 +725,7 @@ stock ShowPhonePMTextDialog(playerid, clickedplayerid)
 {
 	new playerName[MAX_PLAYER_NAME], title[128];
 
-	gPlayers[playerid][Temp] = clickedplayerid;
+	gPlayers[playerid][ClickedPlayerID] = clickedplayerid;
 
 	GetPlayerName(clickedplayerid, playerName, sizeof(playerName));
 	format(title, sizeof(title), "New PM to '%s'", playerName);

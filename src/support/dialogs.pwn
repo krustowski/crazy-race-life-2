@@ -116,7 +116,7 @@ stock ShowHighScoresRacesDialog(playerid, offset)
 			continue;
 		}
 
-		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFD700}Race No. %d{FFFFFF}\n\n1st\t{00FF00}%d:%0d{FFFFFF} min\t{FFD700}%s{FFFFFF}\t(model %d)\n", 
+		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFD700}Race No. %d{FFFFFF}\n\n1st\t{00FF00}%d:%02d{FFFFFF} min\t{FFD700}%s{FFFFFF}\t(model %d)\n", 
 				stringToPrint, 
 				i, 
 				(gHighScores[i][Time][0] / 1000) / 60,
@@ -127,7 +127,7 @@ stock ShowHighScoresRacesDialog(playerid, offset)
 
 		if (gHighScores[i][Time][1] != 0)
 		{
-			format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}2nd\t{00FF00}%d:%0d{FFFFFF} min\t{FFD700}%s{FFFFFF}\t(model %d)\n", 
+			format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}2nd\t{00FF00}%d:%02d{FFFFFF} min\t{FFD700}%s{FFFFFF}\t(model %d)\n", 
 					stringToPrint,
 					(gHighScores[i][Time][1] / 1000) / 60,
 					(gHighScores[i][Time][1] / 1000) % 60,
@@ -138,7 +138,7 @@ stock ShowHighScoresRacesDialog(playerid, offset)
 
 		if (gHighScores[i][Time][2] != 0)
 		{
-			format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}3rd\t{00FF00}%d:%0d{FFFFFF} min\t{FFD700}%s{FFFFFF}\t(model %d)\n", 
+			format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}3rd\t{00FF00}%d:%02d{FFFFFF} min\t{FFD700}%s{FFFFFF}\t(model %d)\n", 
 					stringToPrint,
 					(gHighScores[i][Time][2] / 1000) / 60,
 					(gHighScores[i][Time][2] / 1000) % 60,
@@ -270,7 +270,7 @@ stock ShowCommonCommandsDialog(playerid)
 
 stock ShowAdminsOnlineDialog(playerid)
 {
-	new adminCount = 0, stringToPrint[512];
+	new adminCount = 0, stringToPrint[1024];
 
 	format(stringToPrint, sizeof(stringToPrint), "");
 
@@ -340,6 +340,13 @@ stock ShowPropertyListDialog(playerid)
 	{
 		print(query);
 		print("Database error: cannot fetch player's properties");
+		return 1;
+	}
+
+	if (!DB_GetRowCount(result))
+	{
+		print("ShowPropertyListDialog: nothing to load from the database");
+		return 1;
 	}
 
 	do 
@@ -1012,7 +1019,7 @@ stock ShowCreditsDialog(playerid)
 
 stock ShowWantedListDialog(playerid)
 {
-	new playerName[MAX_PLAYER_NAME], stringToPrint[256];
+	new playerName[MAX_PLAYER_NAME], stringToPrint[1024];
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -1109,6 +1116,12 @@ stock ShowHighScoresPlayTimeDialog(playerid)
 		print("Database error: cannot read high_scores data for playtime!");
 		print(query);
 		return 0;
+	}
+
+	if (!DB_GetRowCount(result))
+	{
+		print("ShowHighScoresPlayTimeDialog: nothing to load from the database");
+		return 1;
 	}
 
 	new i = 1, stringToPrint[512] = "{FFD700}Top 10 players by Playtime:{FFFFFF}\n";
@@ -1237,6 +1250,12 @@ stock ShowHighScoresDeathmatchDialog(playerid)
 		print("Database error: cannot read high_scores data for deathmatch!");
 		print(query);
 		return 0;
+	}
+
+	if (!DB_GetRowCount(result))
+	{
+		print("ShowHighScoresDeathmatchDialog: nothing to load from the database");
+		return 1;
 	}
 
 	new i = 1, stringToPrint[512] = "{FFD700}Top 5 Deathmatch winners:{FFFFFF}\n";
@@ -1434,7 +1453,7 @@ stock ShowHighScoresCombatDialog(playerid)
 
 	DB_FreeResultSet(result);
 
-	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_MISSIONS, DIALOG_STYLE_MSGBOX, "High Scores: Missions", stringToPrint, "Close", "");
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_COMBAT, DIALOG_STYLE_MSGBOX, "High Scores: Missions", stringToPrint, "Close", "");
 }
 
 stock ShowCombatListDialog(playerid)
@@ -1446,6 +1465,12 @@ stock ShowCombatListDialog(playerid)
 	{
 		print("Database error: cannot fetch combat mission list");
 		print(query);
+		return 1;
+	}
+
+	if (!DB_GetRowCount(result))
+	{
+		print("ShowCombatListDialog: nothing to load from the database");
 		return 1;
 	}
 
@@ -1505,7 +1530,7 @@ stock ShowTutorialStatsDialog(playerid)
 
 	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Tutorial Stats{FFFFFF}\n\n- Property bought count: {FFD700}%d{FFFFFF}\n- Property rented count: {FFD700}%2d{FFFFFF}\n- Race finished count: {FFD700}%2d{FFFFFF}\n- Joined a team: {FFD700}%s{FFFFFF}\n- Trucking missions done: {FFD700}%2d{FFFFFF}\n- Taxi missions done: {FFD700}%2d{FFFFFF}\n- Sent a PM: {FFD700}%s{FFFFFF}\n- Deposited money to bank: {FFD700}%d{FFFFFF}\n- Played deathmatch: {FFD700}%d{FFFFFF}\n", 
 			gPlayers[playerid][TutorialStats][PropertyBoughtCount],
-			gPlayers[playerid][TutorialStats][PropertyBoughtCount],
+			gPlayers[playerid][TutorialStats][PropertyRentedCount],
 			gPlayers[playerid][TutorialStats][RaceFinishedCount],
 			joinedTeam,
 			gPlayers[playerid][TutorialStats][TruckingMissionsDone],
@@ -1527,6 +1552,12 @@ stock ShowPlayerLocaleListDialog(playerid)
 	{
 		print("Database error: cannot fetch locale lang names");
 		print(query);
+		return 1;
+	}
+
+	if (!DB_GetRowCount(result))
+	{
+		print("ShowPlayerLocaleListDialog: nothing to load from the database");
 		return 1;
 	}
 

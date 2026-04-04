@@ -33,7 +33,7 @@ Test:PlayerRegistration()
 {
 	TEST_START("PlayerRegistration");
 	
-	new playerid = CreateTestPlayer();
+	//new playerid = CreateTestPlayer();
 
 	//SetPlayerAccountRegistration(playerid, "test1234");
     

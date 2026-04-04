@@ -1185,7 +1185,6 @@ stock ShowHighScoresPropertiesDialog(playerid)
 
 	for (new i = 0; i < 4; i++)
 	{
-
 		new
 			query_rank_area[512] = "SELECT rank, u.nickname, property_count FROM ( SELECT user_id, COUNT(*) AS property_count, RANK() OVER (ORDER BY COUNT(*) DESC) AS rank FROM properties WHERE name LIKE '%s' AND occupied = 1 AND type = 2 AND user_id > 0 GROUP BY user_id ) JOIN users AS u ON u.id == user_id WHERE rank <= 3";
 
@@ -1194,7 +1193,6 @@ stock ShowHighScoresPropertiesDialog(playerid)
 			);
 
 		format(stringToPrint, sizeof(stringToPrint), "%s\n\n{FFD700}%s{FFFFFF}:\n", stringToPrint, areaNames[i]);
-
 
 		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query_rank_area);
 		if (!result)

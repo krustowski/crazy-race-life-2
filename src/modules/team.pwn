@@ -51,12 +51,16 @@ forward InitTeams();
 
 public InitTeams()
 {
-	new i = 0, query[512];
+	new 
+		i = 0, 
+		query[512];
 
 	format(query, sizeof(query), "SELECT id,name,color,skins,weapons,ammu,salary_base_dollars,salary_volatile_dollars FROM teams");
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) {
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) 
+	{
 		print("Database error: cannot fetch team data!");
 		return 0;
 	}
@@ -131,7 +135,11 @@ stock HexToInt(const string[])
 
 stock ExtractSkinsFromString(const input[], ints[5])
 {
-	new i = 0, token1[128], token2[128], toSplit[128];
+	new 
+		i = 0, 
+		token1[128], 
+		token2[128], 
+		toSplit[128];
 
 	strcopy(toSplit, input);
 
@@ -148,7 +156,11 @@ stock ExtractSkinsFromString(const input[], ints[5])
 
 stock ExtractWeaponsAmmuFromString(const input[], ints[MAX_TEAM_WEAPONS])
 {
-	new i = 0, token1[128], token2[128], toSplit[128];
+	new 
+		i = 0, 
+		token1[128], 
+		token2[128], 
+		toSplit[128];
 
 	strcopy(toSplit, input);
 

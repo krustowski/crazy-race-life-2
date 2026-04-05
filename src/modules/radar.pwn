@@ -46,7 +46,9 @@ public OnRadarCheckpoint()
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if (!IsPlayerConnected(i) || !IsPlayerInAnyVehicle(i))
+		{
 			continue;
+		}
 
 		new stringToPrint[256], Float:radarValue, Float:radarDistance, Float:radarX, Float:radarY, Float:radarZ, Float:vehicleHelth;
 
@@ -110,5 +112,43 @@ public OnRadarCheckpoint()
 public OffRadarCheckpoint(playerid)
 {
 	gRadarCaught[playerid] = 0;
+}
+
+
+stock HandleCarKill(playerid, killerid, WEAPON:reason)
+{
+	// Adjust the wanted level
+	gPlayers[killerid][WantedLevel]++;
+	SetPlayerWantedLevel(killerid, gPlayers[killerid][WantedLevel]);
+
+	new 
+		t_PLAYER_STATE:killerState = GetPlayerState(killerid),
+		stringToPrint[128];
+
+	if (IsPlayerInAnyVehicle(killerid) && !IsPlayerInAnyVehicle(playerid) && killerState == PLAYER_STATE_DRIVER && reason != WEAPON_VEHICLE)
+	{
+		new killerName[MAX_PLAYER_NAME]; 
+
+		GetPlayerName(killerid, killerName, MAX_PLAYER_NAME);
+
+		// Hide velocity meters.
+		TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
+	
+		for (new i = 0; i < MAX_PLAYERS; i++)
+		{
+			if (!IsPlayerConnected(i))
+			{
+				continue;
+			}
+
+			GetLocalizedString(i, I18N_CARKILL_VIOLATION_FMT, stringToPrint, sizeof(stringToPrint));
+			format(stringToPrint, sizeof(stringToPrint), stringToPrint, killerName, killerid);
+			SendClientMessage(i, COLOR_RED, stringToPrint);
+		}
+
+		SetTimerEx("SpawnPlayerDelayed", 250, false, "i", killerid);
+		PlayerPlaySound(killerid, 1056, 0, 0, 0);
+	}
+
 }
 

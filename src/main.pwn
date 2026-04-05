@@ -231,7 +231,7 @@ public OnPlayerConnect(playerid)
 		gPlayers[playerid][LoginTimer] = Timer: SetTimerEx("ShowAuthDialog", 2500, false, "i", playerid);
 	}
 
-	return 0;
+	return 1;
 }
 
 public OnPlayerDisconnect(playerid, reason)
@@ -249,6 +249,7 @@ public OnPlayerDisconnect(playerid, reason)
 	//TextDrawHideForPlayer(playerid, KPH[playerid]);
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
+	KillTimer(_: gPlayers[playerid][LoginTimer]);
 	KillTimer(_: gPlayerRaceTimer[playerid]);
 	KillTimer(_: gPlayerMissions[playerid][TimerElapsed]);
 	KillTimer(_: gPlayerMissions[playerid][TimerAttachedCheck]);
@@ -259,7 +260,7 @@ public OnPlayerDisconnect(playerid, reason)
 	AbortCombatMission(playerid, false);
 
 	// Save player's data and set such player to unauthorized.
-	if (reason == 1)
+	if (reason == 1 || reason == 2)
 	{
 		SavePlayerData(playerid);
 	}
@@ -290,11 +291,12 @@ public OnPlayerDisconnect(playerid, reason)
 		SendClientMessage(i, COLOR_GREY, stringToPrint);
 	}
 
-	return 0;
+	return 1;
 }
 
 public OnPlayerRequestClass(playerid, classid)
 {
+#pragma unused classid
 	//SetPlayerPos(playerid, 2323.73, 1283.18, 97.60);
 	/*SetPlayerPos(playerid, 1966.1, 1936.1, 127.5);
 	SetPlayerCameraPos(playerid, 1871.3, 1933.6, 127.5);
@@ -397,8 +399,6 @@ public OnNPCDeath(npcid, killerid, WEAPON:reason)
 
 public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 {
-	new stringToPrint[256];
-
 	SendDeathMessage(killerid, playerid, reason);
 
 	// Hide velocity meters.
@@ -415,18 +415,13 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 	if (gCombatMission[playerid][Active])
 	{
 		gCombatMission[playerid][Dead] = true;
-		return AbortCombatMission(playerid, false);
+		AbortCombatMission(playerid, false);
 	}
 
-	if (gTrucking[playerid])
-	{
-		AbortTruckingMission(playerid);
-	}
-
-	if (gTaxiMission[playerid][Active])
-	{
-		AbortPlayerTaxiMission(playerid);
-	}
+	AbortTruckingMission(playerid);
+	AbortTowMission(playerid);
+	AbortPlayerTaxiMission(playerid);
+	//AbortCombatMission(playerid, false);
 
 	new raceid = CheckPlayerRaceState(playerid);
 
@@ -439,36 +434,7 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 
 	if (killerid != INVALID_PLAYER_ID && IsPlayerConnected(killerid) && killerid != playerid) 
 	{
-		// Adjust the wanted level
-		gPlayers[killerid][WantedLevel]++;
-		SetPlayerWantedLevel(killerid, gPlayers[killerid][WantedLevel]);
-
-		new t_PLAYER_STATE:killerState = GetPlayerState(killerid);
-
-		if (IsPlayerInAnyVehicle(killerid) && !IsPlayerInAnyVehicle(playerid) && killerState == PLAYER_STATE_DRIVER && reason != WEAPON_VEHICLE)
-		{
-			new killerName[MAX_PLAYER_NAME]; 
-
-			GetPlayerName(killerid, killerName, MAX_PLAYER_NAME);
-
-			// Hide velocity meters.
-			TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
-	
-			for (new i = 0; i < MAX_PLAYERS; i++)
-			{
-				if (!IsPlayerConnected(i))
-				{
-					continue;
-				}
-
-				GetLocalizedString(i, I18N_CARKILL_VIOLATION_FMT, stringToPrint, sizeof(stringToPrint));
-				format(stringToPrint, sizeof(stringToPrint), stringToPrint, killerName, killerid);
-				SendClientMessage(i, COLOR_RED, stringToPrint);
-			}
-
-			SpawnPlayer(killerid);
-			PlayerPlaySound(killerid, 1056, 0, 0, 0);
-		}
+		HandleCarKill(playerid, killerid, reason);
 	}
 
 	SetPlayerHealth(playerid, 100.0);
@@ -557,7 +523,7 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 
 public OnPlayerText(playerid, text[])
 {
-	if (strlen(text) > 1 && text[0] == '!')
+	if (strlen(text) > 1 && text[0] == '!' && gPlayers[playerid][TeamID])
 	{
 		new stringToPrint[256];
 
@@ -643,20 +609,11 @@ public OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstat
 	// Hide the velocity meter on vehicle exit.
 	if ((oldstate == PLAYER_STATE_DRIVER || oldstate == PLAYER_STATE_PASSENGER) && newstate == PLAYER_STATE_ONFOOT)
 	{
-		//TextDrawHideForPlayer(playerid, KPH[playerid]);
-		//TextDrawHideForPlayer(playerid, KPHR[playerid]);
 		TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 	}
 
 	if (newstate == PLAYER_STATE_DRIVER || newstate == PLAYER_STATE_PASSENGER)
 	{
-		//gVehicleStatesText[playerid] = TextDrawCreate(256, 410, "~w~Health:____%3d_%%~n~~w~Velocity:_%3d");
-		gVehicleStatesText[playerid] = TextDrawCreate(256, 410, "");
-
-		TextDrawLetterSize(gVehicleStatesText[playerid], 0.5, 1.5);
-		TextDrawFont(Text: gVehicleStatesText[playerid], t_TEXT_DRAW_FONT: 3);
-		TextDrawSetOutline(gVehicleStatesText[playerid], 1);
-
 		TextDrawShowForPlayer(playerid, gVehicleStatesText[playerid]);
 	}
 
@@ -1208,7 +1165,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				return MovePlayerToPlayer(playerid, listitem, true);
+				return MovePlayerToPlayer(playerid, gPlayers[playerid][OnlinePlayerList][listitem], true);
 			}
 		case DIALOG_GOTO_LIST:
 			{
@@ -1217,7 +1174,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				return MovePlayerToPlayer(playerid, listitem, false);
+				return MovePlayerToPlayer(playerid, gPlayers[playerid][OnlinePlayerList][listitem], false);
 			}
 		case DIALOG_PLAYER_CLICKED_LIST:
 			{

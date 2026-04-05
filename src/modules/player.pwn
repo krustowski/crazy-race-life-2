@@ -82,6 +82,9 @@ enum Player
 	NewRaceID,
 	RacesHSOffset,
 
+	// To precompile and save the currently online player list mappings to the dialog-controlled listitem values.
+	OnlinePlayerList[MAX_PLAYERS],
+
 	SkinOperation: SkinOp
 }
 
@@ -759,3 +762,10 @@ stock ProcessNewBlackMarketOffer(playerid)
 
 	return SendClientMessageLocalized(playerid, I18N_BLACK_MARKET_OFFER_PLACED);
 }
+
+forward SpawnPlayerDelayed(playerid);
+public SpawnPlayerDelayed(playerid)
+{
+	SpawnPlayer(playerid);
+}
+

@@ -24,10 +24,6 @@
  */
 
 
-//
-//  Generic includes.
-//
-
 #include <open.mp>
 
 #include "support/includes.pwn"
@@ -73,11 +69,6 @@ public OnGameModeInit()
 	InitObjects();
 	InitVehicles();
 	InitTexts();
-
-	//
-	// Start various timers.
-	//
-
 	InitTimers();
 
 	return 1;
@@ -228,7 +219,6 @@ public OnPlayerDisconnect(playerid, reason)
 	gPlayers[playerid][AFK] = false;
 
 	// Hide the vehicle velocity game text.
-	//TextDrawHideForPlayer(playerid, KPH[playerid]);
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
 	KillTimer(_: gPlayers[playerid][LoginTimer]);
@@ -342,6 +332,8 @@ public OnPlayerSpawn(playerid)
 
 		for (new i = 0; i < MAX_TEAM_WEAPONS; i++)
 		{
+			KillTimer(_: gPlayers[playerid][OnDeathGunsTimer][i]);
+
 			if (gTeams[teamid][Weapons][i] && gTeams[teamid][Ammo][i])
 			{
        				gPlayers[playerid][OnDeathGunsTimer][i] = Timer: SetTimerEx("GivePlayerWeaponEx", 2000, false, "i,i,i,i", playerid, i, gTeams[teamid][Weapons][i], gTeams[teamid][Ammo][i]);
@@ -426,7 +418,7 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 
 public OnVehicleSpawn(vehicleid)
 {
-	for (new i = 0; i < sizeof(gProperties); i++)
+	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
 		if (gProperties[i][Vehicle][ID] != vehicleid)
 		{
@@ -529,7 +521,9 @@ public OnPlayerText(playerid, text[])
 public OnPlayerClickPlayer(playerid, clickedplayerid, CLICK_SOURCE:source)
 {
 	if (gPlayers[playerid][AdminLevel] < 1)
+	{
 		return 1;
+	}
 
 	return ShowPlayerClickedDialog(playerid, clickedplayerid);
 }
@@ -693,7 +687,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 			continue;
 		}
 
-		ShowBankOptionsDialog(playerid);
+		return ShowBankOptionsDialog(playerid);
 	}
 
 	//
@@ -856,15 +850,15 @@ public OnTrailerUpdate(playerid, vehicleid)
 
 enum AO
 {
-Float: X,
-       Float: Y,
-       Float: Z,
-       Float: rX,
-       Float: rY,
-       Float: rZ,
-       Float: sX,
-       Float: sY,
-       Float: sZ
+	Float: X,
+	Float: Y,
+	Float: Z,
+	Float: rX,
+	Float: rY,
+	Float: rZ,
+	Float: sX,
+	Float: sY,
+	Float: sZ
 }
 
 new gPlayerAO[MAX_PLAYERS][AO];

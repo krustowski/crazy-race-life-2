@@ -769,3 +769,392 @@ public SpawnPlayerDelayed(playerid)
 	SpawnPlayer(playerid);
 }
 
+#include "modules/trucking.pwn"
+#include "modules/taxi.pwn"
+#include "modules/tow.pwn"
+#include "modules/race.pwn"
+
+stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
+{
+	switch (newkeys)
+	{
+		//case KEY_SPRINT:
+		case KEY_JUMP:
+			{
+				if (!gPlayers[playerid][SwitchedControllers])
+				{
+					return 1;
+				}
+
+				if (!IsPlayerInAnyVehicle(playerid) || GetVehicleModel(GetPlayerVehicleID(playerid)) != 530)
+				{
+					return 1;
+				}
+
+				new vehicleid = GetPlayerVehicleID(playerid);
+
+				new Float:vx, Float:vy, Float:vz;
+				GetVehicleVelocity(vehicleid, vx, vy, vz);
+
+				vx *= 1.125;
+				vy *= 1.125;
+
+				SetVehicleVelocity(vehicleid, vx, vy, vz);
+
+			    	return 1;
+			}
+		case KEY_SECONDARY_ATTACK:
+			{
+				if (!IsPlayerInAnyVehicle(playerid))
+				{
+					new Float:x, Float:y, Float:z, vehicle;
+					GetPlayerPos(playerid, x, y, z);
+					GetVehicleWithinDistance(playerid, x, y, z, 20.0, vehicle);
+					if (IsVehicleRcTram(vehicle))
+					{
+						PutPlayerInVehicle(playerid, vehicle, 0);
+					}
+				}
+				else
+				{
+					new vehicleID = GetPlayerVehicleID(playerid);
+					if (IsVehicleRcTram(vehicleID) || GetVehicleModel(vehicleID) == RC_CAM)
+					{
+						if (GetVehicleModel(vehicleID) == D_TRAM)
+						{
+							new Float:x, Float:y, Float:z;
+							GetPlayerPos(playerid, x, y, z);
+							SetPlayerPos(playerid, x + 0.5, y, z + 1.0);
+
+							SetCameraBehindPlayer(playerid);
+						}
+					}
+				}
+			}
+		case KEY_SUBMISSION:
+			{
+				if (gTrucking[playerid])
+				{
+					return AbortTruckingMission(playerid);
+				}
+
+				if (IsPlayerInTruck(playerid))
+				{
+					return CheckPlayerForTruckingMission(playerid);
+				}
+
+				if (gTaxiMission[playerid][Active])
+				{
+					return AbortPlayerTaxiMission(playerid);
+				}
+
+				if (IsPlayerInTaxiCab(playerid))
+				{
+					return ShowTaxiMissionOptionsDialog(playerid);
+				}
+
+				if (gTowMission[playerid][Active])
+				{
+					return OperateTowTruck(playerid);
+				}
+
+				if (gPlayers[playerid][TeamID] && gTeams[ gPlayers[playerid][TeamID] - 1 ][ID] == TEAM_MECHANICS)
+				{
+					for (new i = 0; i < MAX_PLAYERS; i++)
+					{
+						if (!IsPlayerConnected(i) || !IsPlayerInAnyVehicle(i))
+						{
+							continue;
+						}
+
+						new Float: X, Float: Y, Float: Z;
+						GetPlayerPos(playerid, X, Y, Z);
+
+						if (!IsPlayerInSphere(i, X, Y, Z, 7.5))
+						{
+							continue;
+						}
+
+						new Float: health;
+						GetVehicleHealth(GetPlayerVehicleID(i), health);
+
+						if (health >= 1000.0)
+						{
+							//SendClientMessage(playerid, COLOR_YELLOW, "[ FIX ] No need to repair this vehicle");
+							continue;
+						}
+
+						SetVehicleHealth(GetPlayerVehicleID(i), 1000.0);
+						RepairVehicle(GetPlayerVehicleID(i));
+
+						SendClientMessage(i, COLOR_LIGHTGREEN, "[ FIX ] Vehicle fixed!");
+
+						if (i == playerid)
+						{
+							continue;
+						}
+
+						new commission = 1500 + random(1000), stringToPrint[128];
+						GivePlayerMoney(playerid, commission);
+
+						format(stringToPrint, sizeof(stringToPrint), "[ FIX ] Vehicle fixed, commission earned: $%d", commission);
+
+						SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
+					}
+				}
+			}
+		case KEY_YES:
+			{
+				ApplyAnimation(playerid, "ped", "phone_in", 4.1, false, false, false, true, 0);
+				SetPlayerAttachedObject(playerid, 3, 330, 6, 0.00, 0.00, 0.05, 59.59, 60.19, -30.50, 1.02, 1.00, 1.00);
+
+				ShowPhoneOptionsDialog(playerid);
+			}
+		case KEY_NO:
+			{
+				if (gPlayers[playerid][AdminLevel] < 4)
+				{
+					return 1;
+				}
+
+				if (!gPlayers[playerid][EditingMode])
+				{
+					return 1;
+				}
+
+				if (gPlayerRaceEdit[playerid][ID])
+				{
+					switch (gPlayerRaceEdit[playerid][EditType])
+					{
+						case RACE_EDITOR_START_COORDS:
+							{
+								new Float: X, Float: Y, Float: Z;
+								GetPlayerPos(playerid, X, Y, Z);
+
+								gPlayerRaceEdit[playerid][Start][E_RACE_COORD_X] = X;
+								gPlayerRaceEdit[playerid][Start][E_RACE_COORD_Y] = Y;
+								gPlayerRaceEdit[playerid][Start][E_RACE_COORD_Z] = Z;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Start coords recorded!");
+								return ShowRaceEditorOptionsDialog(playerid, gPlayerRaceEdit[playerid][ID]);
+							}
+						case RACE_EDITOR_TRACK_COORDS:
+							{
+								new Float: X, Float: Y, Float: Z;
+								GetPlayerPos(playerid, X, Y, Z);
+
+								new coord_no = gPlayerRaceEdit[playerid][EditTrackCoordNo];
+
+								gPlayerRaceEditTrackCoords[playerid][coord_no][E_RACE_COORD_X] = X;
+								gPlayerRaceEditTrackCoords[playerid][coord_no][E_RACE_COORD_Y] = Y;
+								gPlayerRaceEditTrackCoords[playerid][coord_no][E_RACE_COORD_Z] = Z;
+
+								gPlayerRaceEdit[playerid][EditTrackCoordNo]++;
+
+								new stringToPrint[128];
+								format(stringToPrint, sizeof(stringToPrint), "[ EDIT ] Track coords no. %d recorded!", coord_no);
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
+
+								return ShowRaceEditorOptionsDialog(playerid, gPlayerRaceEdit[playerid][ID]);
+							}
+					}
+				}
+
+				if (gPropertyEdit[playerid][ID])
+				{
+					new Float: X, Float: Y, Float: Z, Float: R;
+					GetPlayerPos(playerid, X, Y, Z);
+
+					switch (gPropertyEdit[playerid][EditingMode])
+					{
+						case PREDIT_SPAWN_POINT:
+							{
+								gPropertyEdit[playerid][CoordsSpawn][CoordX] = X;
+								gPropertyEdit[playerid][CoordsSpawn][CoordY] = Y;
+								gPropertyEdit[playerid][CoordsSpawn][CoordZ] = Z;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Spawn coords recorded!");
+								gPropertyEdit[playerid][EditingMode] = PREDIT_NONE;
+
+								return ShowPropertyEditDialogMain(playerid);
+							}
+						case PREDIT_ENTRANCE_POINT:
+							{
+								gPropertyEdit[playerid][CoordsEntrance][CoordX] = X;
+								gPropertyEdit[playerid][CoordsEntrance][CoordY] = Y;
+								gPropertyEdit[playerid][CoordsEntrance][CoordZ] = Z;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Entrance coords recorded!");
+								gPropertyEdit[playerid][EditingMode] = PREDIT_NONE;
+
+								return ShowPropertyEditDialogMain(playerid);
+							}
+						case PREDIT_OFFER_POINT:
+							{
+								gPropertyEdit[playerid][CoordsOffer][CoordX] = X;
+								gPropertyEdit[playerid][CoordsOffer][CoordY] = Y;
+								gPropertyEdit[playerid][CoordsOffer][CoordZ] = Z;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Offer coords recorded!");
+								gPropertyEdit[playerid][EditingMode] = PREDIT_NONE;
+
+								return ShowPropertyEditDialogMain(playerid);
+							}
+						case PREDIT_MONEY_POINT:
+							{
+								gPropertyEdit[playerid][CoordsMoney][CoordX] = X;
+								gPropertyEdit[playerid][CoordsMoney][CoordY] = Y;
+								gPropertyEdit[playerid][CoordsMoney][CoordZ] = Z;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Money coords recorded!");
+								gPropertyEdit[playerid][EditingMode] = PREDIT_NONE;
+
+								return ShowPropertyEditDialogMain(playerid);
+							}
+						case PREDIT_SHIRT_POINT:
+							{
+								if (!gPropertyEdit[playerid][CustomInterior])
+								{
+									SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Shirt coords are automatic when the property has no custom interior!");
+									return ShowPropertyEditDialogMain(playerid);
+								}
+
+								gPropertyEdit[playerid][CoordsShirt][CoordX] = X;
+								gPropertyEdit[playerid][CoordsShirt][CoordY] = Y;
+								gPropertyEdit[playerid][CoordsShirt][CoordZ] = Z;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Shirt coords recorded!");
+								gPropertyEdit[playerid][EditingMode] = PREDIT_NONE;
+
+								return ShowPropertyEditDialogMain(playerid);
+							}
+						case PREDIT_VEHICLE_POINT:
+							{
+								GetPlayerFacingAngle(playerid, R);
+
+								gPropertyEdit[playerid][CoordsVehicle][CoordX] = X;
+								gPropertyEdit[playerid][CoordsVehicle][CoordY] = Y;
+								gPropertyEdit[playerid][CoordsVehicle][CoordZ] = Z;
+								gPropertyEdit[playerid][CoordsVehicle][CoordR] = R;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Vehicle coords recorded!");
+								gPropertyEdit[playerid][EditingMode] = PREDIT_NONE;
+
+								return ShowPropertyEditDialogMain(playerid);
+							}
+						default:
+							{
+								return 1;
+							}
+					}
+				}
+
+				if (gBribeEdit[playerid][Type] != BREDIT_NONE)
+				{
+					new Float: X, Float: Y, Float: Z;
+					GetPlayerPos(playerid, X, Y, Z);
+
+					switch (gBribeEdit[playerid][Type])
+					{
+						case BREDIT_NEW:
+							{
+								gBribeEdit[playerid][CoordX] = X;
+								gBribeEdit[playerid][CoordY] = Y;
+								gBribeEdit[playerid][CoordZ] = Z;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Bribe pickup coords presaved!");
+								return ShowBribeEditorNoteDialog(playerid);
+							}
+						case BREDIT_DELETE:
+							{
+								return 1;
+							}
+						default:
+							{
+								return 1;
+							}
+					}
+				}
+
+				if (gTruckingEdit[playerid][ID])
+				{
+					new Float: X, Float: Y, Float: Z, Float: R;
+					GetPlayerPos(playerid, X, Y, Z);
+
+					switch (gTruckingEdit[playerid][EditType])
+					{
+						case TREDIT_CHECKPOINT:
+							{
+								gTruckingEdit[playerid][LocationCheckpoint][CoordX] = X;
+								gTruckingEdit[playerid][LocationCheckpoint][CoordY] = Y;
+								gTruckingEdit[playerid][LocationCheckpoint][CoordZ] = Z;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Checkpoint coords recorded!");
+								return ShowTruckingEditorOptionsDialog(playerid);
+							}
+						case TREDIT_INFO_PICKUP:
+							{
+								gTruckingEdit[playerid][LocationInfoPickup][CoordX] = X;
+								gTruckingEdit[playerid][LocationInfoPickup][CoordY] = Y;
+								gTruckingEdit[playerid][LocationInfoPickup][CoordZ] = Z;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Info pickup coords recorded!");
+								return ShowTruckingEditorOptionsDialog(playerid);
+							}
+						case TREDIT_TRUCK:
+							{
+								GetPlayerFacingAngle(playerid, R);
+
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordX] = X;
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordY] = Y;
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordZ] = Z;
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordR] = R;
+
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Type] = Truck;
+								gTruckingVehiclesIndex++;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Truck vehicle coords recorded!");
+								return ShowTruckingEditorOptionsDialog(playerid);
+							}
+						case TREDIT_GAS:
+							{
+								GetPlayerFacingAngle(playerid, R);
+
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordX] = X;
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordY] = Y;
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordZ] = Z;
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordR] = R;
+
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Type] = Gas;
+								gTruckingVehiclesIndex++;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Gas trailer vehicle coords recorded!");
+								return ShowTruckingEditorOptionsDialog(playerid);
+							}
+						case TREDIT_FREIGHT:
+							{
+								GetPlayerFacingAngle(playerid, R);
+
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordX] = X;
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordY] = Y;
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordZ] = Z;
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Location][CoordR] = R;
+
+								gTruckingVehicles[playerid][gTruckingVehiclesIndex][Type] = Freight;
+								gTruckingVehiclesIndex++;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Freight trailer vehicle coords recorded!");
+								return ShowTruckingEditorOptionsDialog(playerid);
+							}
+						default:
+							{
+								return 1;
+							}
+					}
+				}
+			}
+	}
+
+	return 1;
+}
+

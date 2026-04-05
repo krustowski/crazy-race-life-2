@@ -169,9 +169,6 @@ new gProperties[MAX_PROPERTIES][Property];
 
 new gPropertyCoords[MAX_PROPERTIES][MAX_PROPERTY_PICKUPS][PropertyPickup];
 
-// Utilized by lvl5 admins when editing a property.
-new gPropertyEdit[MAX_PLAYERS][Property];
-
 // Used to flush gPropertyEdit entry when editing is done.
 new gNullProperty[Property] = 
 {

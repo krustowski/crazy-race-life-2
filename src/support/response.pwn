@@ -538,7 +538,7 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				return MovePlayerToPlayer(playerid, listitem, true);
+				return MovePlayerToPlayer(playerid, gPlayers[playerid][OnlinePlayerList][listitem], true);
 			}
 		case DIALOG_GOTO_LIST:
 			{
@@ -547,7 +547,7 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				return MovePlayerToPlayer(playerid, listitem, false);
+				return MovePlayerToPlayer(playerid, gPlayers[playerid][OnlinePlayerList][listitem], false);
 			}
 		case DIALOG_PLAYER_CLICKED_LIST:
 			{

@@ -1563,7 +1563,7 @@ stock ShowBlackMarketItemListDialog(playerid)
 				drug_name,
 				nickname,
 				value,
-				price
+				floatround(price * gBlackMarketRatio)
 			);
 
 		i++;
@@ -1605,7 +1605,12 @@ stock ShowBlackMarketNewDialog(playerid)
 			price = DB_GetFieldIntByName(result, "price");
 		DB_GetFieldStringByName(result, "name", name, sizeof(name));
 
-		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d\t%d", stringToPrint, name, gPlayers[playerid][Drugs][id - 1], price);
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d\t%d", 
+				stringToPrint, 
+				name, 
+				gPlayers[playerid][Drugs][id - 1], 
+				floatround(price * gBlackMarketRatio) 
+			);
 	}
 	while (DB_SelectNextRow(result));
 

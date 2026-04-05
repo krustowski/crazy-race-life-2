@@ -11,6 +11,12 @@
 #define MAX_DRUG_PICKUPS	64
 #define MAX_MARKET_ITEMS	128
 
+#define MARKET_RATIO_MIN	0.001
+#define MARKET_RATIO_MAX	1000.0
+#define MARKET_RATIO_EQULIBRIUM	1.0
+#define MARKET_REVERSION_RATE	0.15
+#define MARKET_STEP_PERCENT	20
+
 #include "support/helpers.pwn"
 #include "support/pickups.pwn"
 
@@ -81,19 +87,27 @@ forward UpdateBlackMarketRatio();
 
 public UpdateBlackMarketRatio()
 {
-	new 
-		sign = random(2),
-		Float: multiplier = floatdiv(random(20) + 1, 10.0);
+	new
+		// Symmetric step: -0.20 to +0.20 of current ratio
+		Float: step = floatdiv(float(random(MARKET_STEP_PERCENT * 2 + 1) - MARKET_STEP_PERCENT), 100.0),
+		// Mean reversion: pull toward equilibrium proportional to distance
+		Float: reversion = floatmul(MARKET_REVERSION_RATE, MARKET_RATIO_EQULIBRIUM - gBlackMarketRatio);
 
-	if (sign)
+	// Update raw value of the market ratio
+	gBlackMarketRatio = gBlackMarketRatio + step + reversion;
+
+	// Hard clamps
+	if (gBlackMarketRatio < MARKET_RATIO_MIN)
 	{
-		gBlackMarketRatio = floatmul(multiplier, gBlackMarketRatio);
+		gBlackMarketRatio = MARKET_RATIO_MIN;
 	}
-	else
+
+	if (gBlackMarketRatio > MARKET_RATIO_MAX)
 	{
-		gBlackMarketRatio = floatdiv(gBlackMarketRatio, multiplier);
+		gBlackMarketRatio = MARKET_RATIO_MAX;
 	}
 	
+	// Ratio update message broadcasting
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if (!IsPlayerConnected(i))
@@ -118,6 +132,13 @@ stock InitDrugValues()
 	if (!result) 
 	{
 		print("Database error: cannot fetch drug prices!");
+		return;
+	}
+
+	if (!DB_GetRowCount(result))
+	{
+		print("Database error: drug_prices table is empty!");
+		DB_FreeResultSet(result);
 		return;
 	}
 

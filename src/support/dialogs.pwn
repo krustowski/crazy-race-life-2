@@ -98,6 +98,7 @@ enum
 };
 
 #include "modules/real.pwn"
+#include "modules/race.pwn"
 
 stock ShowHighScoresRacesDialog(playerid, offset)
 {
@@ -370,14 +371,6 @@ stock ShowPropertyListDialog(playerid)
 	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Property List", stringToPrint, "Select", "Cancel");
 }
 
-stock ShowPropertyOptionsDialog(playerid)
-{
-	new propertyName[64];
-        format(propertyName, sizeof(propertyName), "%s", gProperties[ GetPropertyArrayIDfromID( gPlayers[playerid][PropertyOwnedID] ) ][Label]);
-
-	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_OPTIONS, DIALOG_STYLE_LIST, propertyName, "Set spawn point\nAttach new vehicle\nRespawn attached vehicle\nSell property", "Select", "Cancel");
-}
-
 stock ShowBankOptionsDialog(playerid)
 {
 	return ShowPlayerDialog(playerid, DIALOG_BANK_OPTIONS, DIALOG_STYLE_LIST, "Banking", "Deposit money\nWithdraw money\nAccount balance", "Select", "Cancel");
@@ -428,44 +421,6 @@ stock ShowTruckingPointListDialog(playerid)
 	}
 
 	return ShowPlayerDialog(playerid, DIALOG_TRUCKING_POINT_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Trucking Points", stringToPrint, "Edit", "Cancel");
-}
-
-stock ShowPropertyEditorListPerDialog(playerid)
-{
-	new stringToPrint[3048] = "Property Name\tID";
-
-	for (new i = 0; i < MAX_PROPERTIES; i++)
-	{
-		if (!gProperties[i][ID] || gProperties[i][Type] != PROPERTY_TYPE_PERSONAL)
-			continue;
-
-		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
-				stringToPrint,
-				gProperties[i][Label],
-				gProperties[i][ID]
-			);
-	}
-
-	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_EDITOR_LIST_PER, DIALOG_STYLE_TABLIST_HEADERS, "Property Editor", stringToPrint, "Edit", "Cancel");
-}
-
-stock ShowPropertyEditorListComDialog(playerid)
-{
-	new stringToPrint[3048] = "Property Name\tID";
-
-	for (new i = 0; i < MAX_PROPERTIES; i++)
-	{
-		if (!gProperties[i][ID] || gProperties[i][Type] != PROPERTY_TYPE_COMMERCIAL)
-			continue;
-
-		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
-				stringToPrint,
-				gProperties[i][Label],
-				gProperties[i][ID]
-			);
-	}
-
-	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_EDITOR_LIST_COM, DIALOG_STYLE_TABLIST_HEADERS, "Property Editor", stringToPrint, "Edit", "Cancel");
 }
 
 stock ShowRaceEditorListDialog(playerid)
@@ -953,52 +908,6 @@ stock ShowTruckingEditorTypeDialog(playerid)
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_TRUCKING_EDITOR_TYPE, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
-}
-
-stock ShowPropertySkinMainDialog(playerid, propertyid)
-{
-	new stringToPrint[256], title[128];
-	format(stringToPrint, sizeof(stringToPrint), "%s%s%s",
-			"Save new skin\n",
-			"Select saved skin\n",
-			"Delete saved skin"
-	      );
-
-	format(title, sizeof(title), "Property Skins for '%s'",
-			gProperties[ GetPropertyArrayIDfromID(propertyid) ][Label]
-		);
-
-	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_SKIN_MAIN, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
-}
-
-stock ShowPropertySkinListDialog(playerid)
-{
-	new stringToPrint[256] = "ID\tSkin Model";
-
-	if (!gPlayers[playerid][InsideProperty])
-	{
-		return 1;
-	}
-
-	for (new i = 0; i < MAX_PROPERTY_SKINS; i++)
-	{
-		if (!gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ][Skins][i])
-		{
-			format(stringToPrint, sizeof(stringToPrint), "%s\n%d\t---free slot---",
-					stringToPrint,
-					i
-				);
-			continue;
-		}
-
-		format(stringToPrint, sizeof(stringToPrint), "%s\n%d\t%d",
-				stringToPrint,
-				i,
-				gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ][Skins][i]
-		      );
-	}
-
-	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_SKIN_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Property Skins", stringToPrint, "Select", "Cancel");
 }
 
 stock ShowPrizesInfoDialog(playerid)

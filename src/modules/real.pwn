@@ -71,30 +71,6 @@ enum PropertyPoint
 	BLACK_MARKET_POINT
 }
 
-// Helper enum for the real estate data field parsing.
-enum 
-{
-	FIELD_ID,
-	FIELD_USER_ID,
-	FIELD_VEHICLE_ID,
-	FIELD_NAME,
-	FIELD_COST,
-	FIELD_LOCATION_OFFER_X,
-	FIELD_LOCATION_OFFER_Y,
-	FIELD_LOCATION_OFFER_Z,
-	FIELD_LOCATION_OFFER_ROT,
-	FIELD_LOCATION_ENTRANCE_X,
-	FIELD_LOCATION_ENTRANCE_Y,
-	FIELD_LOCATION_ENTRANCE_Z,
-	FIELD_LOCATION_ENTRANCE_ROT,
-	FIELD_LOCATION_VEHICLE_X,
-	FIELD_LOCATION_VEHICLE_Y,
-	FIELD_LOCATION_VEHICLE_Z,
-	FIELD_LOCATION_VEHICLE_ROT,
-	FIELD_OCCUPIED,
-	FIELD_CUSTOM_INTERIOR
-}
-
 enum 
 {
 	FIELD_VEHICLE_MODEL,
@@ -168,6 +144,9 @@ new gPlayerInteriors[MAX_PLAYERS][PlayerPropertyObject];
 new gProperties[MAX_PROPERTIES][Property];
 
 new gPropertyCoords[MAX_PROPERTIES][MAX_PROPERTY_PICKUPS][PropertyPickup];
+
+// Utilized by lvl5 admins when editing a property.
+new gPropertyEdit[MAX_PLAYERS][Property];
 
 // Used to flush gPropertyEdit entry when editing is done.
 new gNullProperty[Property] = 
@@ -2133,5 +2112,97 @@ stock ShowPlayerDrugzDialog(playerid)
 	}
 
 	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_DRUGZ, DIALOG_STYLE_TABLIST_HEADERS, "Drugz", stringToPrint, "Transfer", "Cancel");
+}
+
+stock ShowPropertyOptionsDialog(playerid)
+{
+	new propertyName[64];
+        format(propertyName, sizeof(propertyName), "%s", gProperties[ GetPropertyArrayIDfromID( gPlayers[playerid][PropertyOwnedID] ) ][Label]);
+
+	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_OPTIONS, DIALOG_STYLE_LIST, propertyName, "Set spawn point\nAttach new vehicle\nRespawn attached vehicle\nSell property", "Select", "Cancel");
+}
+
+stock ShowPropertyEditorListPerDialog(playerid)
+{
+	new stringToPrint[3048] = "Property Name\tID";
+
+	for (new i = 0; i < MAX_PROPERTIES; i++)
+	{
+		if (!gProperties[i][ID] || gProperties[i][Type] != PROPERTY_TYPE_PERSONAL)
+			continue;
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
+				stringToPrint,
+				gProperties[i][Label],
+				gProperties[i][ID]
+			);
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_EDITOR_LIST_PER, DIALOG_STYLE_TABLIST_HEADERS, "Property Editor", stringToPrint, "Edit", "Cancel");
+}
+
+stock ShowPropertyEditorListComDialog(playerid)
+{
+	new stringToPrint[3048] = "Property Name\tID";
+
+	for (new i = 0; i < MAX_PROPERTIES; i++)
+	{
+		if (!gProperties[i][ID] || gProperties[i][Type] != PROPERTY_TYPE_COMMERCIAL)
+			continue;
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
+				stringToPrint,
+				gProperties[i][Label],
+				gProperties[i][ID]
+			);
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_EDITOR_LIST_COM, DIALOG_STYLE_TABLIST_HEADERS, "Property Editor", stringToPrint, "Edit", "Cancel");
+}
+
+stock ShowPropertySkinMainDialog(playerid, propertyid)
+{
+	new stringToPrint[256], title[128];
+	format(stringToPrint, sizeof(stringToPrint), "%s%s%s",
+			"Save new skin\n",
+			"Select saved skin\n",
+			"Delete saved skin"
+	      );
+
+	format(title, sizeof(title), "Property Skins for '%s'",
+			gProperties[ GetPropertyArrayIDfromID(propertyid) ][Label]
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_SKIN_MAIN, DIALOG_STYLE_LIST, title, stringToPrint, "Select", "Cancel");
+}
+
+stock ShowPropertySkinListDialog(playerid)
+{
+	new stringToPrint[256] = "ID\tSkin Model";
+
+	if (!gPlayers[playerid][InsideProperty])
+	{
+		return 1;
+	}
+
+	for (new i = 0; i < MAX_PROPERTY_SKINS; i++)
+	{
+		if (!gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ][Skins][i])
+		{
+			format(stringToPrint, sizeof(stringToPrint), "%s\n%d\t---free slot---",
+					stringToPrint,
+					i
+				);
+			continue;
+		}
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%d\t%d",
+				stringToPrint,
+				i,
+				gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ][Skins][i]
+		      );
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_SKIN_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Property Skins", stringToPrint, "Select", "Cancel");
 }
 

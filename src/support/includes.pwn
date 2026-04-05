@@ -110,6 +110,8 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 #include "support/texts.pwn"
 #include "support/mapicons.pwn"
 #include "support/dialogs.pwn"
+#include "support/response.pwn"
+#include "support/timers.pwn"
 
 //
 //  DCMDs = command set definitions.

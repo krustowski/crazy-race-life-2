@@ -78,25 +78,7 @@ public OnGameModeInit()
 	// Start various timers.
 	//
 
-	SetTimer("AntiCheatWeapon", 30 * SECOND_MS, true);
-	
-	// Breaks connections often while player's in the game menu
-	//SetTimer("AntiFlood", 1 * SECOND_MS, true);
-
-	SetTimer("OnRadarCheckpoint", 300, true);
-
-	SetTimer("AutosaveData", 3 * 60 * SECOND_MS, true);
-	SetTimer("UpdatePlayerPlayTime", 10 * SECOND_MS, true);
-	SetTimer("UpdatePlayerScore", 2 * SECOND_MS, true);
-
-	SetTimer("UpdateBlackMarketRatio", 3 * 60 * SECOND_MS, true);
-
-	SetTimer("SendPlayerSalary", 5 * 60 * SECOND_MS, true);
-	SetTimer("SendRealEstateCommission", 5 * 60 * SECOND_MS, true);
-
-	SetTimer("DrawClockText", 10 * SECOND_MS, true);
-
-	SetTimer("ShowAdvert", 2 * 60 * SECOND_MS, true);
+	InitTimers();
 
 	return 1;
 }
@@ -753,67 +735,9 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	//  Other pickups --- entries,  baggies etc.
 	//
 
-	if (pickupid == gDruggeryEntrance)
+	if (CheckGenericPickup(playerid, pickupid))
 	{
-		new Float: dX, Float: dY, Float: dZ;
-		GetObjectPos(gDruggery, dX, dY, dZ);
-		return SetPlayerPos(playerid, dX, dY, dZ);
-	}
-
-	for (new i = 0; i < MAX_PRIZES; i++)
-	{
-		if (PICKUP: pickupid == gPrizes[i][Pickup])
-		{
-			return UpdatePrize(playerid, i);
-		}
-	}
-
-	if (pickupid == gPickupSFCentrumEnter)
-	{
-		SetPlayerPos(playerid, -1898.89, 486.52, 21.93); 
 		return 1;
-	}
-	else if (pickupid == gPickupSFCentrumExit)
-	{
-		SetPlayerPos(playerid, -1902.57, 486.75, 35.17);
-		return 1;
-	}
-	else if (pickupid == gPickupBankLSEnter)
-	{
-		SetPlayerPos(playerid, 1483.94, -1783.11, 6.70);
-		return 1;
-	}
-	else if (pickupid == gPickupBankLSExit)
-	{
-		SetPlayerPos(playerid, 1481.15, -1765.18, 18.79);
-		return 1;
-	}
-
-	if (pickupid == gAdminRoomHealth)
-	{
-		SetPlayerHealth(playerid, 100.0);
-	}
-	else if (pickupid == gHackerzInteriorEntrance)
-	{
-		SetPlayerPos(playerid, 2845.28, -2125.33, 0.19);
-	}
-	else if (pickupid == gHackerzInteriorExit)
-	{
-		SetPlayerPos(playerid, 2881.27, -2123.99, 4.32);
-	}
-	else if (pickupid == gHackerzMoneyBag)
-	{
-		GivePlayerMoney(playerid, 10000);
-		DestroyPickup(gHackerzMoneyBag);
-		gHackerzMoneyBag = 0;
-	}
-	else if (pickupid == gAdminDoorDown)
-	{
-		SetPlayerPos(playerid, 1007.98, -1164.11, 50.95);
-	}
-	else if (pickupid == gAdminDoorUp)
-	{
-		SetPlayerPos(playerid, 981.84, -1158.15, 23.86);
 	}
 
 	//
@@ -998,8 +922,8 @@ public OnPlayerLeavePlayerGangZone(playerid, zoneid)
 	return 1;
 }
 
-/*************************************************************************************
- *
+/*
+
  *       ______                       ____                  __    _ ____    ___ 
  *      / ____/________ _____  __  __/ __ \____ _________  / /   (_) __/__ |__ \
  *     / /   / ___/ __ `/_  / / / / / /_/ / __ `/ ___/ _ \/ /   / / /_/ _ \__/ /
@@ -1007,9 +931,11 @@ public OnPlayerLeavePlayerGangZone(playerid, zoneid)
  *    \____/_/   \__,_/ /___/\__, /_/ |_|\__,_/\___/\___/_____/_/_/  \___/____/ 
  *                          /____/                                              
 
- *** GameMode CRL2 
- *** Credits: krusty, kompry, DRaGsTeR 
- *** Jan 2025
+ *
 
- *************************************************************************************/
+ *  GameMode CRL2 
+ *  Credits: krusty, kompry, DRaGsTeR, amdulka
+ *  Jan 2025
+
+ */
 

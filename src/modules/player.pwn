@@ -769,13 +769,16 @@ public SpawnPlayerDelayed(playerid)
 	SpawnPlayer(playerid);
 }
 
+#include "modules/real.pwn"
+#include "modules/race.pwn"
 #include "modules/trucking.pwn"
 #include "modules/taxi.pwn"
 #include "modules/tow.pwn"
-#include "modules/race.pwn"
+#include "modules/bribe.pwn"
 
 stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 {
+#pragma unused oldkeys
 	switch (newkeys)
 	{
 		//case KEY_SPRINT:

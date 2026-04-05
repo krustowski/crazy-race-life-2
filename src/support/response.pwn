@@ -39,6 +39,8 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", "Wrong password!\nEnter a valid password please!", "Login", "Cancel");
 				}
+
+				return 1;
 			}
 		case DIALOG_REGISTER:
 			{
@@ -56,6 +58,8 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					return 1;
 				}
+
+				return 1;
 			}
 		case DIALOG_PROPERTY_BUY:
 			{
@@ -1727,10 +1731,10 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 
 		default: 
-			return 0; // dialog ID was not found, search in other scripts
+			{
+				return 0; // dialog ID was not found, search in other scripts
+			}
 	}
-
-	ShowAuthDialog(playerid);
 
 	return 1;
 }

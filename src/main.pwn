@@ -775,16 +775,16 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		return 1;
 	}
 
+	if (CheckPoliceBribePickup(playerid, pickupid))
+	{
+		return 1;
+	}
+
 	//
 	//  Death pickups.
 	//
 
 	if (CheckDeathMoneyPickup(playerid, pickupid))
-	{
-		return 1;
-	}
-
-	if (CheckPoliceBribePickup(playerid, pickupid))
 	{
 		return 1;
 	}

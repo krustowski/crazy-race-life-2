@@ -690,11 +690,23 @@ stock ShowPhonePMPlayerListDialog(playerid)
 
 stock ShowPhonePMTextDialog(playerid, clickedplayerid)
 {
-	new playerName[MAX_PLAYER_NAME], title[128];
+	new 
+		j = 0,
+		playerName[MAX_PLAYER_NAME], title[128];
 
-	gPlayers[playerid][ClickedPlayerID] = clickedplayerid;
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i))
+		{
+			continue;
+		}
+	
+		gPlayers[playerid][OnlinePlayerList][j++] = i;
+	}
 
-	GetPlayerName(clickedplayerid, playerName, sizeof(playerName));
+	gPlayers[playerid][ClickedPlayerID] = gPlayers[playerid][OnlinePlayerList][clickedplayerid];
+
+	GetPlayerName(gPlayers[playerid][ClickedPlayerID], playerName, sizeof(playerName));
 	format(title, sizeof(title), "New PM to '%s'", playerName);
 
 	return ShowPlayerDialog(playerid, DIALOG_PHONE_PM_TEXT, DIALOG_STYLE_INPUT, title, "Write a new PM to selected player:", "Send", "Cancel");

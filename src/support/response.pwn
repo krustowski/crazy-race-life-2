@@ -406,6 +406,8 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							return 1;
 						}
 				}
+
+				return 1;
 			}
 		case DIALOG_BANK_DEPOSIT:
 			{
@@ -1065,6 +1067,8 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							return ShowPrizesInfoDialog(playerid);
 						}
 				}
+
+				return 1;
 			}
 		case DIALOG_EDITOR_LIST:
 			{
@@ -1092,6 +1096,8 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							return ShowBribeEditorMainDialog(playerid);
 						}
 				}
+
+				return 1;
 			}
 		case DIALOG_PROPERTY_EDITOR_MAIN:
 			{
@@ -1118,6 +1124,8 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							return ShowPropertyEditorListComDialog(playerid);
 						}
 				}
+
+				return 1;
 			}
 		case DIALOG_PROPERTY_EDITOR_NEW_ID:
 			{

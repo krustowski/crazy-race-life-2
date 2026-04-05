@@ -102,7 +102,8 @@ enum
 
 stock ShowHighScoresRacesDialog(playerid, offset)
 {
-	new stringToPrint[2048];
+	new 
+		stringToPrint[2048];
 	format(stringToPrint, sizeof(stringToPrint), "");
 	
 	for (new i = offset; i < MAX_RACE_COUNT; i++)
@@ -154,11 +155,14 @@ stock ShowHighScoresRacesDialog(playerid, offset)
 
 stock ShowAdminCommandsDialog(playerid)
 {
-	new stringToPrint[2048];
+	new 
+		stringToPrint[2048];
 	format(stringToPrint, sizeof(stringToPrint), "");
 
 	if (gPlayers[playerid][AdminLevel] < 1)
+	{
 		return 1;
+	}
 
 	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Level 1{FFFFFF}\n\n%s%s%s%s%s%s",
 			"/acmd\t\t\tshows admin commands per level\n",
@@ -170,7 +174,9 @@ stock ShowAdminCommandsDialog(playerid)
 	      );
 
 	if (gPlayers[playerid][AdminLevel] < 2)
+	{
 		return ShowPlayerDialog(playerid, DIALOG_ADMIN_CMDS, DIALOG_STYLE_MSGBOX, "Admin Commands", stringToPrint, "Close", "");
+	}
 
 	format(stringToPrint, sizeof(stringToPrint), "%s\n{FFD700}Level 2{FFFFFF}\n\n%s%s%s%s%s",
 			stringToPrint,
@@ -182,7 +188,9 @@ stock ShowAdminCommandsDialog(playerid)
 	      );
 
 	if (gPlayers[playerid][AdminLevel] < 3)
+	{
 		return ShowPlayerDialog(playerid, DIALOG_ADMIN_CMDS, DIALOG_STYLE_MSGBOX, "Admin Commands", stringToPrint, "Close", "");
+	}
 
 	format(stringToPrint, sizeof(stringToPrint), "%s\n{FFD700}Level 3{FFFFFF}\n\n%s%s%s%s%s%s%s%s%s%s",
 			stringToPrint,
@@ -199,7 +207,9 @@ stock ShowAdminCommandsDialog(playerid)
 		);
 
 	if (gPlayers[playerid][AdminLevel] < 4)
+	{
 		return ShowPlayerDialog(playerid, DIALOG_ADMIN_CMDS, DIALOG_STYLE_MSGBOX, "Admin Commands", stringToPrint, "Close", "");
+	}
 
 	format(stringToPrint, sizeof(stringToPrint), "%s\n{FFD700}Level 4{FFFFFF}\n\n%s%s%s%s%s",
 			stringToPrint,
@@ -215,7 +225,8 @@ stock ShowAdminCommandsDialog(playerid)
 
 stock ShowCommonCommandsDialog(playerid)
 {
-	new stringToPrint[2048];
+	new 
+		stringToPrint[2048];
 
 	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Common Commands{FFFFFF}\n\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
     			"/acc\t\t\tgame account info dump\n",
@@ -271,7 +282,9 @@ stock ShowCommonCommandsDialog(playerid)
 
 stock ShowAdminsOnlineDialog(playerid)
 {
-	new adminCount = 0, stringToPrint[1024];
+	new 
+		adminCount = 0, 
+		stringToPrint[1024];
 
 	format(stringToPrint, sizeof(stringToPrint), "");
 
@@ -282,7 +295,8 @@ stock ShowAdminsOnlineDialog(playerid)
 		{
 			adminCount++;
 
-			new adminName[MAX_PLAYER_NAME];
+			new 
+				adminName[MAX_PLAYER_NAME];
 
 			// Omit RCON admin(s) in the output for now...
 			if (gPlayers[i][AdminLevel] > 0) 
@@ -303,11 +317,13 @@ stock ShowAdminsOnlineDialog(playerid)
 
 stock ShowPlayerPocketDrugzDialog(playerid)
 {
-	new stringToPrint[512] = "Substance/stuff\tIn pockets";
+	new 
+		stringToPrint[512] = "Substance/stuff\tIn pockets";
 
 	for (new i = 0; i < MAX_DRUG_TYPES; i++)
 	{
-		new partial[64];
+		new 
+			partial[64];
 
 		format(partial, sizeof(partial), "\n%s\t%d", gDrugz[i][DrugName], gPlayers[playerid][Drugs][i]);
 		strcat(stringToPrint, partial, sizeof(stringToPrint));
@@ -318,12 +334,15 @@ stock ShowPlayerPocketDrugzDialog(playerid)
 
 stock ShowRaceListDialog(playerid)
 {
-	new stringToPrint[1024] = "Race ID and Name\tCost ($)\tPrize ($)";
+	new 
+		stringToPrint[1024] = "Race ID and Name\tCost ($)\tPrize ($)";
 
 	for (new i = 1; i < MAX_RACE_COUNT; i++)
 	{
 		if (gRaces[i][CostDollars] == 0)
+		{
 			continue;
+		}
 
 		format(stringToPrint, sizeof(stringToPrint), "%s\n%2d: %s\t%d\t%d", stringToPrint, i, gRaces[i][Name], gRaces[i][CostDollars], gRaces[i][PrizeDollars]);
 	}
@@ -333,10 +352,14 @@ stock ShowRaceListDialog(playerid)
 
 stock ShowPropertyListDialog(playerid)
 {
-	new stringToPrint[256] = "Property Name\tID", query[128];
+	new 
+		stringToPrint[256] = "Property Name\tID", 
+		query[128];
+
 	format(query, sizeof(query), "select id, name from properties where user_id = %d and type = 1 LIMIT 5", gPlayers[playerid][OrmID]);
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
 	{
 		print(query);
@@ -352,8 +375,9 @@ stock ShowPropertyListDialog(playerid)
 
 	do 
 	{
-		new propertyid = DB_GetFieldIntByName(result, "id");
-		new name[64];
+		new 
+			propertyid = DB_GetFieldIntByName(result, "id"),
+			name[64];
 
 		DB_GetFieldStringByName(result, "name", name, sizeof(name));
 
@@ -388,7 +412,8 @@ stock ShowBankWithdrawDialog(playerid)
 
 stock ShowPortListDialog(playerid)
 {
-	new portList[256];
+	new 
+		portList[256];
 
 	format(portList, sizeof(portList), "%s\n%s\n%s\n%s\n%s",
 			"Las Venturas Escalators",
@@ -406,12 +431,15 @@ stock ShowPortListDialog(playerid)
 
 stock ShowTruckingPointListDialog(playerid)
 {
-	new stringToPrint[1024] = "Point Name\tID";
+	new 
+		stringToPrint[1024] = "Point Name\tID";
 
 	for (new i = 0; i < MAX_TRUCKING_POINTS; i++)
 	{
 		if (!gTruckingPoints[i][Type] || !gTruckingPoints[i][ID])
+		{
 			continue;
+		}
 
 		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
 				stringToPrint,
@@ -425,7 +453,8 @@ stock ShowTruckingPointListDialog(playerid)
 
 stock ShowRaceEditorListDialog(playerid)
 {
-	new stringToPrint[1024] = "Race Name\tID";
+	new 
+		stringToPrint[1024] = "Race Name\tID";
 
 	for (new i = 0; i < MAX_RACE_COUNT; i++)
 	{
@@ -446,7 +475,8 @@ stock ShowRaceEditorListDialog(playerid)
 
 stock ShowRaceOptionsDialog(playerid, raceid)
 {
-	new title[70];
+	new 
+		title[70];
 	format(title, sizeof(title), "Race '%s'", gRaces[raceid][Name]);
 
 	return ShowPlayerDialog(playerid, DIALOG_RACE_OPTIONS, DIALOG_STYLE_LIST, title, "Exit race", "Select", "Cancel");
@@ -465,7 +495,8 @@ stock ShowGetPlayerListDialog(playerid)
 			continue;
 		}
 
-		new playerName[MAX_PLAYER_NAME];
+		new 
+			playerName[MAX_PLAYER_NAME];
 		GetPlayerName(i, playerName);
 
 		gPlayers[playerid][OnlinePlayerList][j++] = i;
@@ -493,7 +524,8 @@ stock ShowGotoPlayerListDialog(playerid)
 			continue;
 		}
 
-		new playerName[MAX_PLAYER_NAME];
+		new 
+			playerName[MAX_PLAYER_NAME];
 		GetPlayerName(i, playerName);
 
 		gPlayers[playerid][OnlinePlayerList][j++] = i;
@@ -510,10 +542,15 @@ stock ShowGotoPlayerListDialog(playerid)
 
 stock ShowPlayerClickedDialog(playerid, clickedplayerid)
 {
-	new playerName[MAX_PLAYER_NAME], stringToPrint[512], title[MAX_PLAYER_NAME + 17];
+	new 
+		playerName[MAX_PLAYER_NAME], 
+		stringToPrint[512], 
+		title[MAX_PLAYER_NAME + 17];
 
 	if (!IsPlayerConnected(clickedplayerid) || gPlayers[playerid][AdminLevel] < 1)
+	{
 		return 1;
+	}
 
 	GetPlayerName(clickedplayerid, playerName);
 	format(title, sizeof(title), "Player '%s' Options", playerName);
@@ -570,9 +607,10 @@ stock ShowPlayerClickedDialog(playerid, clickedplayerid)
 
 stock ShowPlayerSkinIDSetDialog(playerid)
 {
-	new playerName[MAX_PLAYER_NAME], title[128];
-
-	new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+	new 
+		clickedplayerid = gPlayers[playerid][ClickedPlayerID],
+		playerName[MAX_PLAYER_NAME], 
+		title[128];
 
 	GetPlayerName(clickedplayerid, playerName);
 	format(title, sizeof(title), "Player '%s' Options", playerName);
@@ -582,9 +620,10 @@ stock ShowPlayerSkinIDSetDialog(playerid)
 
 stock ShowPlayerDrunkLevelSetDialog(playerid)
 {
-	new playerName[MAX_PLAYER_NAME], title[128];
-
-	new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+	new 
+		clickedplayerid = gPlayers[playerid][ClickedPlayerID],
+		playerName[MAX_PLAYER_NAME], 
+		title[128];
 
 	GetPlayerName(clickedplayerid, playerName);
 	format(title, sizeof(title), "Player '%s' Options", playerName);
@@ -594,9 +633,10 @@ stock ShowPlayerDrunkLevelSetDialog(playerid)
 
 stock ShowPlayerAdminLevelSetDialog(playerid)
 {
-	new playerName[MAX_PLAYER_NAME], title[128];
-
-	new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+	new 
+		clickedplayerid = gPlayers[playerid][ClickedPlayerID],
+		playerName[MAX_PLAYER_NAME], 
+		title[128];
 
 	GetPlayerName(clickedplayerid, playerName);
 	format(title, sizeof(title), "Player '%s' Options", playerName);
@@ -606,9 +646,10 @@ stock ShowPlayerAdminLevelSetDialog(playerid)
 
 stock ShowPlayerGiveWeaponDialog(playerid)
 {
-	new playerName[MAX_PLAYER_NAME], title[128];
-
-	new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+	new 
+		clickedplayerid = gPlayers[playerid][ClickedPlayerID],
+		playerName[MAX_PLAYER_NAME], 
+		title[128];
 
 	GetPlayerName(clickedplayerid, playerName);
 	format(title, sizeof(title), "Player '%s' Options", playerName);
@@ -618,9 +659,10 @@ stock ShowPlayerGiveWeaponDialog(playerid)
 
 stock ShowPlayerFakechatDialog(playerid)
 {
-	new playerName[MAX_PLAYER_NAME], title[128];
-
-	new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+	new 
+		clickedplayerid = gPlayers[playerid][ClickedPlayerID],
+		playerName[MAX_PLAYER_NAME], 
+		title[128];
 
 	GetPlayerName(clickedplayerid, playerName);
 	format(title, sizeof(title), "Player '%s' Options", playerName);
@@ -632,7 +674,8 @@ stock ShowPlayerFakechatDialog(playerid)
 
 stock ShowDeathmatchOptionsDialog(playerid)
 {
-	new stringToPrint[256];
+	new 
+		stringToPrint[256];
 
 	if (!gDeathmatch[playerid][IsRegistered] && !gDeathmatch[playerid][InGame])
 	{
@@ -652,7 +695,8 @@ stock ShowDeathmatchOptionsDialog(playerid)
 
 stock ShowPhoneOptionsDialog(playerid)
 {
-	new stringToPrint[256];
+	new 
+		stringToPrint[256];
 
 	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s\n%s\n%s",
 			"Check Bank account balance",
@@ -668,14 +712,18 @@ stock ShowPhoneOptionsDialog(playerid)
 
 stock ShowPhonePMPlayerListDialog(playerid)
 {
-	new stringToPrint[512] = "Name\tID";
+	new 
+		stringToPrint[512] = "Name\tID";
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if (!IsPlayerConnected(i))
+		{
 			continue;
+		}
 
-		new playerName[MAX_PLAYER_NAME];
+		new 
+			playerName[MAX_PLAYER_NAME];
 		GetPlayerName(i, playerName);
 
 		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
@@ -692,7 +740,8 @@ stock ShowPhonePMTextDialog(playerid, clickedplayerid)
 {
 	new 
 		j = 0,
-		playerName[MAX_PLAYER_NAME], title[128];
+		playerName[MAX_PLAYER_NAME], 
+		title[128];
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -714,9 +763,9 @@ stock ShowPhonePMTextDialog(playerid, clickedplayerid)
 
 stock ShowPlayerAccountDialog(playerid)
 {
-	new stringToPrint[512];
-
-	new team_name[64];
+	new 
+		stringToPrint[512],
+		team_name[64];
 
 	if (gPlayers[playerid][TeamID])
 	{
@@ -727,7 +776,8 @@ stock ShowPlayerAccountDialog(playerid)
 		team_name = "None";
 	}
 
-	new version[16];
+	new 
+		version[16];
 	GetPlayerVersion(playerid, version, sizeof(version));
 
 	format(stringToPrint, sizeof(stringToPrint), "Account details:\n\n{FFFFFF}Cash: \t\t{00FF00}${FFD700}%d{FFFFFF}\nTeam: \t\t{FFD700}%s{FFFFFF} (ID: {FFD700}%d{FFFFFF})\nSkin ID:\t\t{FFD700}%d{FFFFFF}\nAdmin level: \t{FFD700}%d{FFFFFF}\nWanted level: \t{FFD700}%d{FFFFFF}\nPlayTime: \t{FFD700}%3d h %3d min %2d sec{FFFFFF}\n\nClient version: \t{FFD700}%s{FFFFFF}",
@@ -748,7 +798,8 @@ stock ShowPlayerAccountDialog(playerid)
 
 stock ShowServerHelpListDialog(playerid)
 {
-	new stringToPrint[512];
+	new 
+		stringToPrint[512];
 	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
 			"Show Player Commands",
 			"Show Admin Commands",
@@ -768,7 +819,8 @@ stock ShowServerHelpListDialog(playerid)
 
 stock ShowServerRulesDialog(playerid)
 {
-	new stringToPrint[512];
+	new 
+		stringToPrint[512];
 	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Game Server Rules{FFFFFF}\n\n1. No Carkill, Helikill, or Bikekill\n2. No Minigun or Jetpack usage\n3. No Cheating\n\nAnti-Cheat filterscript enabled (cheating => kick, or ban)");
 
 	return ShowPlayerDialog(playerid, DIALOG_SERVER_RULES, DIALOG_STYLE_MSGBOX, "Server Rules", stringToPrint, "Close", "");
@@ -776,7 +828,8 @@ stock ShowServerRulesDialog(playerid)
 
 stock ShowGameEditorListDialog(playerid)
 {
-	new stringToPrint[256];
+	new 
+		stringToPrint[256];
 	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s",
 			"Property Editor",
 			"Trucking Editor",
@@ -789,7 +842,8 @@ stock ShowGameEditorListDialog(playerid)
 
 stock ShowBribeEditorMainDialog(playerid)
 {
-	new stringToPrint[256];
+	new 
+		stringToPrint[256];
 	format(stringToPrint, sizeof(stringToPrint), "Add new bribe pickup\nDelete a pickup");
 
 	return ShowPlayerDialog(playerid, DIALOG_BRIBE_MAIN, DIALOG_STYLE_LIST, "Police Bribe Editor", stringToPrint, "Select", "Cancel");
@@ -797,7 +851,8 @@ stock ShowBribeEditorMainDialog(playerid)
 
 stock ShowBribeEditorNoteDialog(playerid)
 {
-	new stringToPrint[256];
+	new 
+		stringToPrint[256];
 	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Police Bribe Pickup Note{FFFFFF}\n\nAdd a note for a new police bribe pickup:\n");
 
 	return ShowPlayerDialog(playerid, DIALOG_BRIBE_NOTE, DIALOG_STYLE_INPUT, "Police Bribe Editor", stringToPrint, "Apply", "Cancel");
@@ -805,7 +860,8 @@ stock ShowBribeEditorNoteDialog(playerid)
 
 stock ShowPropertyEditorMainDialog(playerid)
 {
-	new stringToPrint[256];
+	new 
+		stringToPrint[256];
 	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s",
 			"Draft New Property",
 			"List Existing Properties (personal)",
@@ -822,7 +878,8 @@ stock ShowPropertyEditorNewIDDialog(playerid)
 
 stock ShowRaceEditorMainDialog(playerid)
 {
-	new stringToPrint[128];
+	new 
+		stringToPrint[128];
 	format(stringToPrint, sizeof(stringToPrint), "%s\n%s",
 			"Draft New Race",
 			"List Existing Races"
@@ -833,10 +890,12 @@ stock ShowRaceEditorMainDialog(playerid)
 
 stock ShowRaceEditorOptionsDialog(playerid, raceid)
 {
-	new title[70];
+	new 
+		stringToPrint[256],
+		title[70];
+
 	format(title, sizeof(title), "Race '%s'", gRaces[raceid][Name]);
 
-	new stringToPrint[256];
 	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s\n%s\n%s",
 			"Change Name",
 			"Change Cost in Dollars",
@@ -866,7 +925,8 @@ stock ShowRaceEditorPrizeChangeDialog(playerid)
 
 stock ShowTruckingEditorMainDialog(playerid)
 {
-	new stringToPrint[256];
+	new 
+		stringToPrint[256];
 	format(stringToPrint, sizeof(stringToPrint), "%s%s",
 			"New Trucking Point\n",
 			"List Existing Points"
@@ -877,7 +937,10 @@ stock ShowTruckingEditorMainDialog(playerid)
 
 stock ShowTruckingEditorOptionsDialog(playerid)
 {
-	new stringToPrint[256], title[128];
+	new 
+		stringToPrint[256], 
+		title[128];
+
 	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%s%s%s%s",
 			"Change Name\n",
 			"Change Type\n",
@@ -899,7 +962,9 @@ stock ShowTruckingEditorOptionsDialog(playerid)
 
 stock ShowTruckingEditorNameDialog(playerid)
 {
-	new title[128];
+	new 
+		title[128];
+
 	format(title, sizeof(title), "Trucking Point ID: %d",
 			gTruckingEdit[playerid][ID]
 		);
@@ -909,7 +974,10 @@ stock ShowTruckingEditorNameDialog(playerid)
 
 stock ShowTruckingEditorTypeDialog(playerid)
 {
-	new stringToPrint[128], title[128];
+	new 
+		stringToPrint[128], 
+		title[128];
+
 	format(stringToPrint, sizeof(stringToPrint), "%s%s",
 			"Petrol Station\n",
 			"Generic Freight Point"
@@ -924,7 +992,8 @@ stock ShowTruckingEditorTypeDialog(playerid)
 
 stock ShowPrizesInfoDialog(playerid)
 {
-	new stringToPrint[512];
+	new 
+		stringToPrint[512];
 
 	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Tiki Pickups{FFFFFF}\n\nTiki prizes have form of a small green sculpture pickup (Tiki).\nThese pickups are placed in the Los Santos area.\n\nPrize: ${00FF00}10M{FFFFFF} + a potential to receive the Admin level\n\n{FFD700}Pumpkin Pickups{FFFFFF}\n\nPumpkin prizes have form of a orange pumpkin pickups.\nThese are located mainly in the Bone County (desert) area.\n\nPrize: ${00FF00}1.5M{FFFFFF}");
 		
@@ -935,7 +1004,8 @@ stock ShowPrizesInfoDialog(playerid)
 
 stock ShowCreditsDialog(playerid)
 {
-	new stringToPrint[1024];
+	new 
+		stringToPrint[1024];
 
 	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%d.%d.%d",
 			"{FFD700}CrazyRaceLife2{FFFFFF} (CRL2)\n\n",
@@ -952,7 +1022,9 @@ stock ShowCreditsDialog(playerid)
 
 stock ShowWantedListDialog(playerid)
 {
-	new playerName[MAX_PLAYER_NAME], stringToPrint[1024];
+	new 
+		playerName[MAX_PLAYER_NAME], 
+		stringToPrint[1024];
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -971,49 +1043,56 @@ stock ShowWantedListDialog(playerid)
 
 stock ShowTaxiHelpDialog(playerid)
 {
-	new stringToPrint[1024] = "{FFD700}Taxi Missions{FFFFFF}\n\nA mission can be invoked using the {FFD700}/taxi{FFFFFF} command.\nFor the mission to start, player needs to be in any taxi cab.\nThese vehicles are located at train stations and at airports all across the map.\n\n{FFD700}Commissions{FFFFFF}\n\nA commission is calculated using the done missions count and using a special distance coefficient:\nthe more missions driven and the more distance between a start and destination point, the more the commission.";
+	new 
+		stringToPrint[1024] = "{FFD700}Taxi Missions{FFFFFF}\n\nA mission can be invoked using the {FFD700}/taxi{FFFFFF} command.\nFor the mission to start, player needs to be in any taxi cab.\nThese vehicles are located at train stations and at airports all across the map.\n\n{FFD700}Commissions{FFFFFF}\n\nA commission is calculated using the done missions count and using a special distance coefficient:\nthe more missions driven and the more distance between a start and destination point, the more the commission.";
 
 	return ShowPlayerDialog(playerid, DIALOG_TAXI_HELP, DIALOG_STYLE_MSGBOX, "Taxi Missions", stringToPrint, "Close", "");
 }
 
 stock ShowTowHelpDialog(playerid)
 {
-	new stringToPrint[1024] = "{FFD700}Tow Missions{FFFFFF}\n\nFor a mission to be started, a player needs to be driving any tow truck.\nThese vehicles are located at SF docks, where the car impound checkpoint is located too. A mission is started using the {FFD700}/tow{FFFFFF} command.\nPlayer should be using the controls for the hook rising and downing.\nThe hook must be full risen to tow any vehicle and using the {FFD700}SUBMISSION_KEY{FFFFFF} a vehicle is towed.\n\n{FFD700}Commissions{FFFFFF}\n\nA commission is calculated using the done missions count and using the special distance coefficient:\nthe more missions done and the more distance between the a mission start and the checkpoint, the more commission is earned.";
+	new 
+		stringToPrint[1024] = "{FFD700}Tow Missions{FFFFFF}\n\nFor a mission to be started, a player needs to be driving any tow truck.\nThese vehicles are located at SF docks, where the car impound checkpoint is located too. A mission is started using the {FFD700}/tow{FFFFFF} command.\nPlayer should be using the controls for the hook rising and downing.\nThe hook must be full risen to tow any vehicle and using the {FFD700}SUBMISSION_KEY{FFFFFF} a vehicle is towed.\n\n{FFD700}Commissions{FFFFFF}\n\nA commission is calculated using the done missions count and using the special distance coefficient:\nthe more missions done and the more distance between the a mission start and the checkpoint, the more commission is earned.";
 
 	return ShowPlayerDialog(playerid, DIALOG_TOW_HELP, DIALOG_STYLE_MSGBOX, "Tow Missions", stringToPrint, "Close", "");
 }
 
 stock ShowTruckingHelpDialog(playerid)
 {
-	new stringToPrint[1024] = "{FFD700}Trucking Missions{FFFFFF}\n\nA mission can be started using the {FFD700}/truck{FFFFFF} command.\nTo start the mission properly, player needs to drive a truck with a proper trailer attached.\nTrucks and trailers are usually located at petrol stations all across the map.\nA mission cannot be done without a trailer, so it needs to be attached the whole time.\n\n{FFD700}Commissions{FFFFFF}\n\nA trucking mission commission is calculated the similar way as at the taxi missions:\nthere is a base ($10k) and bonus taken from the mission done count and distance between the start and destination points.";
+	new 
+		stringToPrint[1024] = "{FFD700}Trucking Missions{FFFFFF}\n\nA mission can be started using the {FFD700}/truck{FFFFFF} command.\nTo start the mission properly, player needs to drive a truck with a proper trailer attached.\nTrucks and trailers are usually located at petrol stations all across the map.\nA mission cannot be done without a trailer, so it needs to be attached the whole time.\n\n{FFD700}Commissions{FFFFFF}\n\nA trucking mission commission is calculated the similar way as at the taxi missions:\nthere is a base ($10k) and bonus taken from the mission done count and distance between the start and destination points.";
 
 	return ShowPlayerDialog(playerid, DIALOG_TRUCKING_HELP, DIALOG_STYLE_MSGBOX, "Trucking Missions", stringToPrint, "Close", "");
 }
 
 stock ShowCombatHelpDialog(playerid)
 {
-	new stringToPrint[1024] = "{FFD700}Combat Missions{FFFFFF}\n\nA combat mission cna be invoked using the {FFD700}/combat{FFFFFF} command.\nCurrent settings spawn around 21 NPCs inside the LV Planning Centre interior.\nThe goal is to pick up as many briefcases as possible before leaving the interior at the top of the interior.\nThen, using a helicopter, a player is to carry the briefcases to the docks in LS to exchange them with money ($0.5M per briefcases).";
+	new 
+		stringToPrint[1024] = "{FFD700}Combat Missions{FFFFFF}\n\nA combat mission cna be invoked using the {FFD700}/combat{FFFFFF} command.\nCurrent settings spawn around 21 NPCs inside the LV Planning Centre interior.\nThe goal is to pick up as many briefcases as possible before leaving the interior at the top of the interior.\nThen, using a helicopter, a player is to carry the briefcases to the docks in LS to exchange them with money ($0.5M per briefcases).";
 
 	return ShowPlayerDialog(playerid, DIALOG_COMBAT_HELP, DIALOG_STYLE_MSGBOX, "Combat Missions", stringToPrint, "Close", "");
 }
 
 stock ShowPropertyHelpDialog(playerid)
 {
-	new stringToPrint[2048] = "{FFD700}Properties{FFFFFF}\n\nA property is a special type of building that can be either bought (a personal property), or rented (a commercial one).\n\n{FFD700}Personal properties{FFFFFF}\n\nA personal property can be bought using a custom dialog window that is shown to player when enterying a green house pickup.\nThe cost of the personal property is set a bit high, but according to other costs/commissions in the game it is still affordabele.\nThe perosnal property has a common private interior with a palette of pickups (health, skins, drugz and the exit pickup).\nThe property can be sold too, but a 10% commission is taken by the real estate broker.\nA list of personal properties can be invoked using the {FFD700}/property{FFFFFF} command.\nThe personal property can be used as a spawn point and a custom vehicle can be attached to it as well.\n\n{FFD700}Commercial properties{FFFFFF}\n\nA commercial property is for rent only. It is usually a business located all across the map.\nWhen a player rents this type of property, a rent-lock is activated. This means that no player can rent it away from such player for 3 days.\nThe rented property generates a periodic commission, which is given to player in cash with a custom salary altogether.";
+	new 
+		stringToPrint[2048] = "{FFD700}Properties{FFFFFF}\n\nA property is a special type of building that can be either bought (a personal property), or rented (a commercial one).\n\n{FFD700}Personal properties{FFFFFF}\n\nA personal property can be bought using a custom dialog window that is shown to player when enterying a green house pickup.\nThe cost of the personal property is set a bit high, but according to other costs/commissions in the game it is still affordabele.\nThe perosnal property has a common private interior with a palette of pickups (health, skins, drugz and the exit pickup).\nThe property can be sold too, but a 10% commission is taken by the real estate broker.\nA list of personal properties can be invoked using the {FFD700}/property{FFFFFF} command.\nThe personal property can be used as a spawn point and a custom vehicle can be attached to it as well.\n\n{FFD700}Commercial properties{FFFFFF}\n\nA commercial property is for rent only. It is usually a business located all across the map.\nWhen a player rents this type of property, a rent-lock is activated. This means that no player can rent it away from such player for 3 days.\nThe rented property generates a periodic commission, which is given to player in cash with a custom salary altogether.";
 
 	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_HELP, DIALOG_STYLE_MSGBOX, "Properties Info", stringToPrint, "Close", "");
 }
 
 stock ShowRaceHelpDialog(playerid)
 {
-	new stringToPrint[2048] = "{FFD700}Racing{FFFFFF}\n\nThis gamemode introduces a variety of racing options. A list of all races available can be invoked using the {FFD700}/race{FFFFFF} command.\nEach race has its start/register cost and a prize in dollars.\nThere are 3 types of races: air, ground and naval.\nBefore selecting a race, a player has to be inside any (suitable) vehicle as a driver.\nWhen a race is selected, the player is ported/warped to the starting point of such race.\nThe race starts when a player reaches the first race checkpoint.\nTo finish a race, all checkpoints have to be reached.\nDuring a race, the vehicle cannot be fixed using the {FFD700}/fix{FFFFFF} command, but a car mechanic can repair the vehicle though (so consider taking one with you when racing).\nThere is no limitation for vehicles (yet), this means that the race can be finished on foot too (after leaving a vehicle after a player registers themselves to the race).\nA race can be left prematurely by the {FFD700}/race{FFFFFF} command too.\n\n{FFD700}High Scores{FFFFFF}\n\nEach race being finished is listed in the high scores table: try the {FFD700}/scores{FFFFFF} command to invoke it.\nEach table shows the first 3 positions of racers ordered by the time elapsed when finishing such race (the lower, the better).";
+	new 
+		stringToPrint[2048] = "{FFD700}Racing{FFFFFF}\n\nThis gamemode introduces a variety of racing options. A list of all races available can be invoked using the {FFD700}/race{FFFFFF} command.\nEach race has its start/register cost and a prize in dollars.\nThere are 3 types of races: air, ground and naval.\nBefore selecting a race, a player has to be inside any (suitable) vehicle as a driver.\nWhen a race is selected, the player is ported/warped to the starting point of such race.\nThe race starts when a player reaches the first race checkpoint.\nTo finish a race, all checkpoints have to be reached.\nDuring a race, the vehicle cannot be fixed using the {FFD700}/fix{FFFFFF} command, but a car mechanic can repair the vehicle though (so consider taking one with you when racing).\nThere is no limitation for vehicles (yet), this means that the race can be finished on foot too (after leaving a vehicle after a player registers themselves to the race).\nA race can be left prematurely by the {FFD700}/race{FFFFFF} command too.\n\n{FFD700}High Scores{FFFFFF}\n\nEach race being finished is listed in the high scores table: try the {FFD700}/scores{FFFFFF} command to invoke it.\nEach table shows the first 3 positions of racers ordered by the time elapsed when finishing such race (the lower, the better).";
 
 	return ShowPlayerDialog(playerid, DIALOG_RACE_HELP, DIALOG_STYLE_MSGBOX, "Racing Info", stringToPrint, "Close", "");
 }
 
 stock ShowTaxiMissionOptionsDialog(playerid)
 {
-	new stringToPrint[256];
+	new 
+		stringToPrint[256];
 	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s",
 			"Las Venturas\n",
 			"San Fierro\n",
@@ -1026,7 +1105,8 @@ stock ShowTaxiMissionOptionsDialog(playerid)
 
 stock ShowHighScoresOptionsDialog(playerid)
 {
-	new stringToPrint[256];
+	new 
+		stringToPrint[256];
 	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%s%s",
 			"Races\n",
 			"Deathmatch\n",
@@ -1041,9 +1121,11 @@ stock ShowHighScoresOptionsDialog(playerid)
 
 stock ShowHighScoresPlayTimeDialog(playerid)
 {
-	new query[512] = "SELECT id, nickname, playtime FROM users WHERE playtime IS NOT 0 ORDER BY playtime DESC LIMIT 10";
+	new 
+		query[512] = "SELECT id, nickname, playtime FROM users WHERE playtime IS NOT 0 ORDER BY playtime DESC LIMIT 10";
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
 	{
 		print("Database error: cannot read high_scores data for playtime!");
@@ -1057,11 +1139,15 @@ stock ShowHighScoresPlayTimeDialog(playerid)
 		return 1;
 	}
 
-	new i = 1, stringToPrint[512] = "{FFD700}Top 10 players by Playtime:{FFFFFF}\n";
+	new 
+		i = 1, 
+		stringToPrint[512] = "{FFD700}Top 10 players by Playtime:{FFFFFF}\n";
 
 	do
 	{
-		new nickname[MAX_PLAYER_NAME], value;
+		new 
+			nickname[MAX_PLAYER_NAME], 
+			value;
 
 		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
 		value = DB_GetFieldIntByName(result, "playtime");
@@ -1113,7 +1199,8 @@ stock ShowHighScoresPropertiesDialog(playerid)
 				areas[i]
 			);
 
-		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query_total);
+		new 
+			DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query_total);
 		if (!result)
 		{
 			print("Database error: cannot read high_scores data for properties (total count)!");
@@ -1140,7 +1227,8 @@ stock ShowHighScoresPropertiesDialog(playerid)
 
 		format(stringToPrint, sizeof(stringToPrint), "%s\n\n{FFD700}%s{FFFFFF}:\n", stringToPrint, areaNames[i]);
 
-		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query_rank_area);
+		new 
+			DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query_rank_area);
 		if (!result)
 		{
 			print("Database error: cannot read high_scores data for properties!");
@@ -1175,9 +1263,11 @@ stock ShowHighScoresPropertiesDialog(playerid)
 
 stock ShowHighScoresDeathmatchDialog(playerid)
 {
-	new query[512] = "SELECT s.value, u.nickname FROM ( SELECT type, value, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value ASC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 2 ORDER BY s.value DESC, s.rank";
+	new 
+		query[512] = "SELECT s.value, u.nickname FROM ( SELECT type, value, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value ASC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 2 ORDER BY s.value DESC, s.rank";
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
 	{
 		print("Database error: cannot read high_scores data for deathmatch!");
@@ -1195,7 +1285,9 @@ stock ShowHighScoresDeathmatchDialog(playerid)
 
 	do
 	{
-		new nickname[MAX_PLAYER_NAME], value;
+		new 
+			nickname[MAX_PLAYER_NAME], 
+			value;
 
 		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
 		value = DB_GetFieldIntByName(result, "value");
@@ -1214,9 +1306,11 @@ stock ShowHighScoresDeathmatchDialog(playerid)
 
 stock ShowHighScoresMissionsDialog(playerid)
 {
-	new query[512] = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 10 AND s.type = 3 ORDER BY s.value DESC, s.rank";
+	new 
+		query[512] = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 10 AND s.type = 3 ORDER BY s.value DESC, s.rank";
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
 	{
 		print("Database error: cannot read high_scores data for taxi missions!");
@@ -1224,11 +1318,17 @@ stock ShowHighScoresMissionsDialog(playerid)
 		return 0;
 	}
 
-	new i = 1, stringToPrint[2048] = "{FFD700}Top 10 Taxi Mission players{FFFFFF}\n";
+	new 
+		i = 1, 
+		stringToPrint[2048] = "{FFD700}Top 10 Taxi Mission players{FFFFFF}\n";
 
 	do
 	{
-		new nickname[MAX_PLAYER_NAME], areaid, area[32], value;
+		new 
+			nickname[MAX_PLAYER_NAME], 
+			areaid, 
+			area[32], 
+			value;
 
 		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
 		value = DB_GetFieldIntByName(result, "value");
@@ -1281,7 +1381,9 @@ stock ShowHighScoresMissionsDialog(playerid)
 
 	do
 	{
-		new nickname[MAX_PLAYER_NAME], value;
+		new 
+			nickname[MAX_PLAYER_NAME], 
+			value;
 
 		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
 		value = DB_GetFieldIntByName(result, "value");
@@ -1313,7 +1415,10 @@ stock ShowHighScoresMissionsDialog(playerid)
 
 	do
 	{
-		new nickname[MAX_PLAYER_NAME], done, models;
+		new 
+			nickname[MAX_PLAYER_NAME], 
+			done, 
+			models;
 
 		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
 		models = DB_GetFieldIntByName(result, "spec_id");
@@ -1334,9 +1439,11 @@ stock ShowHighScoresMissionsDialog(playerid)
 
 stock ShowHighScoresCombatDialog(playerid)
 {
-	new query[512] = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 5 ORDER BY s.value DESC, s.rank", stringToPrint[1024];
+	new 
+		query[512] = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 5 ORDER BY s.value DESC, s.rank", stringToPrint[1024];
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
 	{
 		print("Database error: cannot read high_scores data for combat missions!");
@@ -1344,10 +1451,15 @@ stock ShowHighScoresCombatDialog(playerid)
 		return 0;
 	}
 
-	new i = 1, s = 0;
+	new 
+		i = 1, 
+		s = 0;
 	do
 	{
-		new nickname[MAX_PLAYER_NAME], value, missionid;
+		new 
+			nickname[MAX_PLAYER_NAME], 
+			value, 
+			missionid;
 
 		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
 		missionid = DB_GetFieldIntByName(result, "spec_id");
@@ -1391,9 +1503,12 @@ stock ShowHighScoresCombatDialog(playerid)
 
 stock ShowCombatListDialog(playerid)
 {
-	new stringToPrint[512], query[256] = "select id, name from combat_mission where id > 0";
+	new 
+		stringToPrint[512], 
+		query[256] = "select id, name from combat_mission where id > 0";
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
 	{
 		print("Database error: cannot fetch combat mission list");
@@ -1409,7 +1524,9 @@ stock ShowCombatListDialog(playerid)
 
 	do
 	{
-		new id, name[64];
+		new 
+			id, 
+			name[64];
 
 		id = DB_GetFieldIntByName(result, "id");
 		DB_GetFieldStringByName(result, "name", name, sizeof(name));
@@ -1425,7 +1542,8 @@ stock ShowCombatListDialog(playerid)
 
 stock ShowTutorialMainDialog(playerid)
 {
-	new stringToPrint[256];
+	new 
+		stringToPrint[256];
 
 	if (!gPlayers[playerid][TutorialStats][Active])
 	{
@@ -1441,7 +1559,10 @@ stock ShowTutorialMainDialog(playerid)
 
 stock ShowTutorialStatsDialog(playerid)
 {
-	new stringToPrint[512], joinedTeam[6], sentPM[6];
+	new 
+		stringToPrint[512], 
+		joinedTeam[6], 
+		sentPM[6];
 
 	if (gPlayers[playerid][TutorialStats][JoinedTeam])
 	{
@@ -1478,9 +1599,12 @@ stock ShowTutorialStatsDialog(playerid)
 
 stock ShowPlayerLocaleListDialog(playerid)
 {
-	new stringToPrint[128], query[64] = "SELECT lang_name FROM locale_types";
+	new 
+		stringToPrint[128], 
+		query[64] = "SELECT lang_name FROM locale_types";
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
 	{
 		print("Database error: cannot fetch locale lang names");
@@ -1496,7 +1620,8 @@ stock ShowPlayerLocaleListDialog(playerid)
 
 	do
 	{
-		new name[64];
+		new 
+			name[64];
 
 		DB_GetFieldStringByName(result, "lang_name", name, sizeof(name));
 
@@ -1511,7 +1636,8 @@ stock ShowPlayerLocaleListDialog(playerid)
 
 stock ShowBlackMarketItemListDialog(playerid)
 {
-	new stringToPrint[1024],
+	new 
+		stringToPrint[1024],
 		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, 
 			"SELECT i.id, u.id AS uid, u.nickname, t.id AS tid, t.name, i.amount, i.value, p.price FROM (SELECT id, drug_type, settler_id, amount, value FROM black_market_items) i JOIN users u ON u.id = i.settler_id JOIN drug_types t ON t.id = i.drug_type JOIN drug_prices p ON p.id = i.drug_type");
 	if (!result) {
@@ -1524,7 +1650,8 @@ stock ShowBlackMarketItemListDialog(playerid)
 		return SendClientMessage(playerid, COLOR_YELLOW, "[ MARKET ] No offers set on market!");
 	}
 
-	new i = 0;
+	new 
+		i = 0;
 
 	do
 	{
@@ -1577,24 +1704,28 @@ stock ShowBlackMarketItemListDialog(playerid)
 
 stock ShowBlackMarketMainDialog(playerid)
 {
-	new stringToPrint[128] = "List actual market items\nPlace new offer";
+	new 
+		stringToPrint[128] = "List actual market items\nPlace new offer";
 
 	return ShowPlayerDialog(playerid, DIALOG_BLACK_MARKET_MAIN, DIALOG_STYLE_LIST, "Black Market Mainmenu", stringToPrint, "Select", "Close");
 }
 
 stock ShowBlackMarketNewDialog(playerid)
 {
-	new stringToPrint[512] = "Substance/stuff\tIn pockets\tMarket price";
+	new 
+		stringToPrint[512] = "Substance/stuff\tIn pockets\tMarket price";
 
 	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, "SELECT id, name, price FROM drug_prices");
-	if (!result) {
+	if (!result) 
+	{
 		print("Database error: cannot fetch drug type names and prices!");
 		return 1;
 	}
 
 	do
 	{
-		new id = DB_GetFieldIntByName(result, "id");
+		new 
+			id = DB_GetFieldIntByName(result, "id");
 		if (!id)
 		{
 			continue;
@@ -1603,6 +1734,7 @@ stock ShowBlackMarketNewDialog(playerid)
 		new 
 			name[64],
 			price = DB_GetFieldIntByName(result, "price");
+
 		DB_GetFieldStringByName(result, "name", name, sizeof(name));
 
 		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d\t%d", 
@@ -1621,14 +1753,16 @@ stock ShowBlackMarketNewDialog(playerid)
 
 stock ShowBlackMarketAmountDialog(playerid)
 {
-	new stringToPrint[256] = "{FFD700}New Market Offer{FFFFFF}\n\nSet the amount you want to place in offer:";
+	new 
+		stringToPrint[256] = "{FFD700}New Market Offer{FFFFFF}\n\nSet the amount you want to place in offer:";
 
 	return ShowPlayerDialog(playerid, DIALOG_BLACK_MARKET_AMOUNT, DIALOG_STYLE_INPUT, "Black Market New Offer", stringToPrint, "Set", "Close");
 }
 
 stock ShowBlackMarketValueDialog(playerid)
 {
-	new stringToPrint[256] = "{FFD700}New Market Offer{FFFFFF}\n\nSet the value per unit you want to place in offer:";
+	new 
+		stringToPrint[256] = "{FFD700}New Market Offer{FFFFFF}\n\nSet the value per unit you want to place in offer:";
 
 	return ShowPlayerDialog(playerid, DIALOG_BLACK_MARKET_VALUE, DIALOG_STYLE_INPUT, "Black Market New Offer", stringToPrint, "Set", "Close");
 }

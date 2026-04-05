@@ -88,7 +88,8 @@ enum Player
 	SkinOperation: SkinOp
 }
 
-new gPlayers[MAX_PLAYERS][Player];
+new 
+	gPlayers[MAX_PLAYERS][Player];
 
 //
 //
@@ -132,10 +133,12 @@ public LoadPlayerData(playerid)
 		SendClientMessageLocalized(playerid, I18N_USER_DATA_LOAD);
 		SetPlayerColor(playerid, COLOR_INVISIBLE);
 
-		new query[512];
+		new 
+			query[512];
 		format(query, sizeof(query), "SELECT id, cash, bank, adminlvl, wanted, team, class, health, armour, spawn, properties, locale, playtime FROM users WHERE nickname = '%s';", gPlayers[playerid][Name]);
 
-		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		new 
+			DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result) 
 		{
 			print("Database error: cannot fetch user data!");
@@ -169,7 +172,8 @@ public LoadPlayerData(playerid)
 
 		format(query, sizeof(query), "SELECT cocaine, heroin, meth, fent, zaza, tobacco, pcp, paper, lighter, joint FROM drugz WHERE owner_id = %d AND owner_type = 1", gPlayers[playerid][OrmID]);
 
-		new DBResult: result_drugz = DB_ExecuteQuery(gDbConnectionHandle, query);
+		new 
+			DBResult: result_drugz = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result_drugz) 
 		{
 			print("Database error: cannot fetch user data (drugz)!");
@@ -194,7 +198,8 @@ public LoadPlayerData(playerid)
 
 		format(query, sizeof(query), "SELECT active, property_rented_count, property_bought_count, race_finished_count, joined_team, trucking_missions_done, taxi_missions_done, sent_pm, deposited_money_to_bank, deathmatch_played FROM tutorials WHERE user_id = %d", gPlayers[playerid][OrmID]);
 
-		new DBResult: result_tutorial = DB_ExecuteQuery(gDbConnectionHandle, query);
+		new 
+			DBResult: result_tutorial = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result_tutorial) 
 		{
 			print("Database error: cannot fetch user data (tutorial)!");
@@ -242,7 +247,11 @@ public LoadPlayerData(playerid)
 
 stock ExtractPropperties(const input[], properties[MAX_PLAYER_PROPERTIES])
 {
-	new i = 0, token1[128], token2[128], toSplit[128];
+	new 
+		i = 0, 
+		token1[128], 
+		token2[128], 
+		toSplit[128];
 
 	strcopy(toSplit, input);
 
@@ -265,7 +274,9 @@ public SavePlayerData(playerid)
 	{
 		SendClientMessageLocalized(playerid, I18N_AUTOSAVE_START);
 
-		new Float:armour, Float:health;
+		new 
+			Float: armour, 
+			Float: health;
 
 		GetPlayerArmour(playerid, armour);
 		GetPlayerHealth(playerid, health);
@@ -287,7 +298,8 @@ public SavePlayerData(playerid)
 
 		//writecfg(gPlayers[playerid][Name], "", "properties", propertiesString);
 
-		new query[1024];
+		new 
+			query[1024];
 
 		format(query, sizeof(query), "UPDATE users SET cash = %d, bank = %d, adminlvl = %d, wanted = %d, team = %d, class = %d, health = %d, armour = %d, spawn = %d, properties = '%s', locale = %d, playtime = %d WHERE nickname = '%s';", 
 				GetPlayerMoney(playerid), 
@@ -305,7 +317,8 @@ public SavePlayerData(playerid)
 				gPlayers[playerid][Name]
 		);
 
-		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		new 
+			DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result) 
 		{
 			printf("Database error: cannot write user data (%s)!", gPlayers[playerid][Name]);
@@ -333,7 +346,8 @@ public SavePlayerData(playerid)
 				gPlayers[playerid][Drugs][JOINT]
 			);
 
-		new DBResult: result_drugz = DB_ExecuteQuery(gDbConnectionHandle, query);
+		new 
+			DBResult: result_drugz = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result_drugz) 
 		{
 			printf("Database error: cannot write user data (drugz, ID: %d)!", gPlayers[playerid][OrmID]);
@@ -360,7 +374,8 @@ public SavePlayerData(playerid)
 			gPlayers[playerid][TutorialStats][DeathmatchPlayed]
 		);
 
-		new DBResult: result_tutorial = DB_ExecuteQuery(gDbConnectionHandle, query);
+		new 
+			DBResult: result_tutorial = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result_tutorial) 
 		{
 			printf("Database error: cannot write user data (tutorial, ID: %d)!", gPlayers[playerid][OrmID]);
@@ -377,7 +392,10 @@ public SavePlayerData(playerid)
 
 public SendPlayerSalary()
 {
-	new gameText[128], stringToPrint[256], teamSalary;
+	new 
+		gameText[128], 
+		stringToPrint[256], 
+		teamSalary;
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -458,7 +476,9 @@ stock OnPlayerPrivMsg(playerid, receiverid, text[])
 		return 0;
 	}
 
-	new stringForReceiver[256], stringForSender[256]; 
+	new 
+		stringForReceiver[256], 
+		stringForSender[256]; 
 
 	GetLocalizedString(receiverid, I18N_PRIV_MSG_RECEIVED_FMT, stringForReceiver, sizeof(stringForReceiver));
 	format(stringForReceiver, sizeof(stringForReceiver), stringForReceiver, 
@@ -481,7 +501,9 @@ stock OnPlayerPrivMsg(playerid, receiverid, text[])
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0); 
 	PlayerPlaySound(receiverid, 1057, 0.0, 0.0, 0.0);
 
-	new gameTextSent[32], gameTextReceived[32];
+	new 
+		gameTextSent[32], 
+		gameTextReceived[32];
 
 	GetLocalizedString(playerid, I18N_PRIV_MSG_SENT_GAMETEXT, gameTextSent, sizeof(gameTextSent));
 	GetLocalizedString(receiverid, I18N_PRIV_MSG_RECEIVED_GAMETEXT, gameTextReceived, sizeof(gameTextReceived));
@@ -534,7 +556,9 @@ stock MovePlayerToPlayer(playerid, targetid, bool: reversed)
 		return SendClientMessageLocalized(playerid, I18N_MOVE_TO_PLAYER_IN_MINIGAME_BLOCK);
 	}
 
-	new portedPlayerState = GetPlayerState(portedid), portedVehicleId = GetPlayerVehicleID(portedid);
+	new 
+		portedPlayerState = GetPlayerState(portedid), 
+		portedVehicleId = GetPlayerVehicleID(portedid);
 
 	SetPlayerInterior(portedid, interior);
 
@@ -608,7 +632,8 @@ stock DepositMoneyToBankAccount(playerid, amount)
 	gPlayers[playerid][Bank] += amount;
 	GivePlayerMoney(playerid, -amount);
 
-	new stringToPrint[256];
+	new 
+		stringToPrint[256];
 
 	GetLocalizedString(playerid, I18N_ATM_DEPOSITED_FMT, stringToPrint, sizeof(stringToPrint));
 	format(stringToPrint, sizeof(stringToPrint), stringToPrint, amount, gPlayers[playerid][Bank]);
@@ -627,7 +652,8 @@ stock WithdrawMoneyFromBankAccount(playerid, amount)
 	gPlayers[playerid][Bank] -= amount;
 	GivePlayerMoney(playerid, amount);
 
-	new stringToPrint[256];
+	new 
+		stringToPrint[256];
 
 	GetLocalizedString(playerid, I18N_ATM_WITHDRAWAL_FMT, stringToPrint, sizeof(stringToPrint));
 	format(stringToPrint, sizeof(stringToPrint), stringToPrint, amount, gPlayers[playerid][Bank]);
@@ -645,7 +671,10 @@ stock CheckDrugzPickup(playerid, pickupid)
 			continue;
 		}
 
-		new amount = random(10), type = _: gDrugPickups[i][Type], stringToPrint[128];
+		new 
+			amount = random(10), 
+			type = _: gDrugPickups[i][Type], 
+			stringToPrint[128];
 
 		gPlayers[playerid][Drugs][type - 1] += amount;
 
@@ -677,13 +706,15 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 		return SendClientMessageLocalized(playerid, I18N_BLACK_MARKET_NO_MONEY);
 	}
 
-	new query[64];
+	new 
+		query[64];
 	format(query, sizeof(query), "UPDATE users SET bank = bank + %d WHERE id = %d", 
 			price,
 			settler_id
 		);
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		printf("Database error: cannot update players bank account (offer ID %d, settler_id: %d)!", offerid, settler_id);
@@ -699,7 +730,8 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 			gPlayers[i][Bank] += price;
 			//GivePlayerMoney(i, price);
 
-			new msg[64];
+			new 
+				msg[64];
 			GetLocalizedString(i, I18N_BLACK_MARKET_OFFER_ACCEPTED_FMT, msg, sizeof(msg));
 			format(msg, sizeof(msg), msg, price);
 			SendClientMessage(i, COLOR_ORANGE, msg);
@@ -717,7 +749,9 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 	gBlackMarketItems[listitem][Value] = 0;
 	gBlackMarketItems[listitem][Type] = DrugType: TYPE_NONE;
 
-	new msg[64];
+	new 
+		msg[64];
+
 	GetLocalizedString(playerid, I18N_BLACK_MARKET_OFFER_PROCESSED_FMT, msg, sizeof(msg));
 	format(msg, sizeof(msg), msg, offerid, price);
 	SendClientMessage(playerid, COLOR_ORANGE, msg);
@@ -737,7 +771,8 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 
 stock ProcessNewBlackMarketOffer(playerid)
 {
-	new query[256];
+	new 
+		query[256];
 	format(query, sizeof(query), "INSERT INTO black_market_items (settler_id, drug_type, amount, value) VALUES (%d, %d, %f, %d)",
 			gPlayers[playerid][OrmID],
 			_: gBlackMarketItemOffer[playerid][Type],
@@ -745,7 +780,8 @@ stock ProcessNewBlackMarketOffer(playerid)
 			gBlackMarketItemOffer[playerid][Value]
 		);
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
 		printf("Database error: cannot write new market item!");
 		return 1;
@@ -793,9 +829,12 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 					return 1;
 				}
 
-				new vehicleid = GetPlayerVehicleID(playerid);
+				new 
+					vehicleid = GetPlayerVehicleID(playerid),
+					Float: vx, 
+					Float: vy, 
+					Float: vz;
 
-				new Float:vx, Float:vy, Float:vz;
 				GetVehicleVelocity(vehicleid, vx, vy, vz);
 
 				vx *= 1.125;
@@ -809,9 +848,15 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 			{
 				if (!IsPlayerInAnyVehicle(playerid))
 				{
-					new Float:x, Float:y, Float:z, vehicle;
+					new 
+						Float: x, 
+						Float: y, 
+						Float: z, 
+						vehicle;
+
 					GetPlayerPos(playerid, x, y, z);
 					GetVehicleWithinDistance(playerid, x, y, z, 20.0, vehicle);
+
 					if (IsVehicleRcTram(vehicle))
 					{
 						PutPlayerInVehicle(playerid, vehicle, 0);
@@ -824,7 +869,11 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 					{
 						if (GetVehicleModel(vehicleID) == D_TRAM)
 						{
-							new Float:x, Float:y, Float:z;
+							new 
+								Float: x, 
+								Float: y, 
+								Float: z;
+
 							GetPlayerPos(playerid, x, y, z);
 							SetPlayerPos(playerid, x + 0.5, y, z + 1.0);
 
@@ -869,7 +918,12 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 							continue;
 						}
 
-						new Float: X, Float: Y, Float: Z;
+						new 
+							Float: X, 
+							Float: Y, 
+							Float: Z,
+							Float: health;
+
 						GetPlayerPos(playerid, X, Y, Z);
 
 						if (!IsPlayerInSphere(i, X, Y, Z, 7.5))
@@ -877,7 +931,6 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 							continue;
 						}
 
-						new Float: health;
 						GetVehicleHealth(GetPlayerVehicleID(i), health);
 
 						if (health >= 1000.0)
@@ -930,7 +983,11 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 					{
 						case RACE_EDITOR_START_COORDS:
 							{
-								new Float: X, Float: Y, Float: Z;
+								new 
+									Float: X, 
+									Float: Y, 
+									Float: Z;
+
 								GetPlayerPos(playerid, X, Y, Z);
 
 								gPlayerRaceEdit[playerid][Start][E_RACE_COORD_X] = X;
@@ -942,10 +999,16 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 							}
 						case RACE_EDITOR_TRACK_COORDS:
 							{
-								new Float: X, Float: Y, Float: Z;
+								new 
+									Float: X, 
+									Float: Y, 
+									Float: Z;
+
 								GetPlayerPos(playerid, X, Y, Z);
 
-								new coord_no = gPlayerRaceEdit[playerid][EditTrackCoordNo];
+								new 
+									coord_no = gPlayerRaceEdit[playerid][EditTrackCoordNo],
+									stringToPrint[128];
 
 								gPlayerRaceEditTrackCoords[playerid][coord_no][E_RACE_COORD_X] = X;
 								gPlayerRaceEditTrackCoords[playerid][coord_no][E_RACE_COORD_Y] = Y;
@@ -953,7 +1016,6 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 
 								gPlayerRaceEdit[playerid][EditTrackCoordNo]++;
 
-								new stringToPrint[128];
 								format(stringToPrint, sizeof(stringToPrint), "[ EDIT ] Track coords no. %d recorded!", coord_no);
 								SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 
@@ -964,7 +1026,12 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 
 				if (gPropertyEdit[playerid][ID])
 				{
-					new Float: X, Float: Y, Float: Z, Float: R;
+					new 
+						Float: X, 
+						Float: Y, 
+						Float: Z, 
+						Float: R;
+
 					GetPlayerPos(playerid, X, Y, Z);
 
 					switch (gPropertyEdit[playerid][EditingMode])
@@ -1053,7 +1120,11 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 
 				if (gBribeEdit[playerid][Type] != BREDIT_NONE)
 				{
-					new Float: X, Float: Y, Float: Z;
+					new 
+						Float: X, 
+						Float: Y, 
+						Float: Z;
+
 					GetPlayerPos(playerid, X, Y, Z);
 
 					switch (gBribeEdit[playerid][Type])
@@ -1080,7 +1151,12 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 
 				if (gTruckingEdit[playerid][ID])
 				{
-					new Float: X, Float: Y, Float: Z, Float: R;
+					new 
+						Float: X, 
+						Float: Y, 
+						Float: Z, 
+						Float: R;
+
 					GetPlayerPos(playerid, X, Y, Z);
 
 					switch (gTruckingEdit[playerid][EditType])

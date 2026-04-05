@@ -59,26 +59,35 @@ enum CombatMission
 	Timer: TimerBriefcaseMan
 }
 
-new gCombatNPC[MAX_COMBAT_NPCS];
-new gCombatMission[MAX_PLAYERS][CombatMission];
-new gCombatPickups[MAX_COMBAT_PICKUPS][CombatPickup];
-new gCombatVehicles[MAX_COMBAT_VEHICLES];
+new 
+	gCombatNPC[MAX_COMBAT_NPCS],
+	gCombatMission[MAX_PLAYERS][CombatMission],
+	gCombatPickups[MAX_COMBAT_PICKUPS][CombatPickup],
+	gCombatVehicles[MAX_COMBAT_VEHICLES];
 
 forward CheckBriefcaseManProximity(playerid, npcid);
 forward UpdateCombatMissionInfoText(playerid);
 
 public CheckBriefcaseManProximity(playerid, npcid)
 {
-	new Float: pX, Float: pY, Float: pZ;
+	new 
+		Float: pX, 
+		Float: pY, 
+		Float: pZ;
 
 	GetPlayerPos(npcid, pX, pY, pZ);
-	new interior = GetPlayerInterior(playerid);
+
+	new 
+		interior = GetPlayerInterior(playerid);
 
 	if (interior == 0 && IsPlayerInSphere(playerid, pX, pY, pZ, 4.0))
 	{
 		KillTimer(_: gCombatMission[playerid][TimerBriefcaseMan]);
 
-		new prize = gCombatMission[playerid][BriefcaseCount] * COMPAT_BRIEFCASE_DOLLARS, stringToPrint[128];
+		new 
+			prize = gCombatMission[playerid][BriefcaseCount] * COMPAT_BRIEFCASE_DOLLARS, 
+			stringToPrint[128];
+
 		format(stringToPrint, sizeof(stringToPrint), "[ COMBAT ] Briefcases exchanged for money ($%d)!", prize);
 		SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint); 
 
@@ -93,7 +102,8 @@ public CheckBriefcaseManProximity(playerid, npcid)
 
 public UpdateCombatMissionInfoText(playerid)
 {
-	new stringToPrint[256];
+	new 
+		stringToPrint[256];
 
 	gCombatMission[playerid][TimeElapsed] += 1000;
 
@@ -148,7 +158,9 @@ stock CheckCombatPickup(playerid, pickupid)
 				{
 					gCombatMission[playerid][BriefcaseCount]++;
 
-					new stringToPrint[128];
+					new 
+						stringToPrint[128];
+
 					format(stringToPrint, sizeof(stringToPrint), "[ COMBAT ] You found briefcase no. %d", gCombatMission[playerid][BriefcaseCount]);
 					return SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 				}
@@ -188,10 +200,13 @@ stock PrepareCombatInterior(playerid, missionid)
 		return 0;
 	}
 
-	new query[256];
+	new 
+		query[256];
+
 	format(query, sizeof(query), "SELECT type, x, y, z FROM combat_coords WHERE mission_id = %d", missionid);
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
 	{
 		print("Database error: cannot list combat coords");
@@ -199,14 +214,18 @@ stock PrepareCombatInterior(playerid, missionid)
 		return 0;
 	}
 
-	new npcid = 0;
-	new pickupid = 0;
-	new vehicleid = 0;
+	new 
+		npcid = 0,
+		pickupid = 0,
+		vehicleid = 0;
 
 	do
 	{
-		new type = DB_GetFieldIntByName(result, "type");
-		new Float: X, Float: Y, Float: Z;
+		new 
+			type = DB_GetFieldIntByName(result, "type"),
+			Float: X, 
+			Float: Y, 
+			Float: Z;
 
 		X = DB_GetFieldFloatByName(result, "x");
 		Y = DB_GetFieldFloatByName(result, "y");
@@ -222,7 +241,9 @@ stock PrepareCombatInterior(playerid, missionid)
 				}
 			case COMBAT_COORD_NPC:
 				{
-					new npc_name[MAX_PLAYER_NAME];
+					new 
+						npc_name[MAX_PLAYER_NAME];
+
 					format(npc_name, sizeof(npc_name), "[NPC]combat%d", npcid);
 					gCombatNPC[npcid] = NPC_Create(npc_name);
 
@@ -235,7 +256,11 @@ stock PrepareCombatInterior(playerid, missionid)
 					NPC_EnableInfiniteAmmo(gCombatNPC[npcid], true);
 					NPC_SetWeaponAccuracy(gCombatNPC[npcid], WEAPON:29, COMBAT_ACCURACY);
 
-					new Float: pX, Float: pY, Float: pZ;
+					new 
+						Float: pX, 
+						Float: pY, 
+						Float: pZ;
+
 					GetPlayerPos(playerid, pX, pY, pZ);
 
 					NPC_AimAtPlayer(gCombatNPC[npcid], playerid, true, 0, true, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
@@ -285,7 +310,9 @@ stock PrepareCombatInterior(playerid, missionid)
 				}
 			case COMBAT_COORD_NPC_MAN:
 				{
-					new npc_name[MAX_PLAYER_NAME];
+					new 
+						npc_name[MAX_PLAYER_NAME];
+
 					format(npc_name, sizeof(npc_name), "[NPC]bcman%d", npcid);
 					gCombatNPC[npcid] = NPC_Create(npc_name);
 
@@ -379,7 +406,8 @@ stock SaveCombatMissionScore(playerid)
 		return 1;
 	}
 
-	new query[256];
+	new 
+		query[256];
 
 	format(query, sizeof(query), "INSERT INTO high_scores (type, spec_id, value, user_id) VALUES (%d, %d, %d, %d)",
 			5,
@@ -388,7 +416,8 @@ stock SaveCombatMissionScore(playerid)
 			gPlayers[playerid][OrmID]
 	      );
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
 	{
 		print("Database error: cannot write high scores data for combat!");

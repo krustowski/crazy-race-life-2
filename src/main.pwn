@@ -90,7 +90,9 @@ public OnGameModeExit()
 
 public OnPlayerConnect(playerid)
 {
-	new playerName[MAX_PLAYER_NAME], stringToPrint[128];
+	new 
+		playerName[MAX_PLAYER_NAME], 
+		stringToPrint[128];
 
 	//LoadPlayerDataDB(playerid);
 
@@ -243,7 +245,8 @@ public OnPlayerDisconnect(playerid, reason)
 
 	SendMessageToWebhook(playerid, "disconnected", reason);
 
-	new stringToPrint[128];
+	new 
+		stringToPrint[128];
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -324,7 +327,8 @@ public OnPlayerSpawn(playerid)
 
 	if (gPlayers[playerid][TeamID])
 	{
-		new teamid = gPlayers[playerid][TeamID] - 1;
+		new 
+			teamid = gPlayers[playerid][TeamID] - 1;
 
 		SetPlayerColor(playerid, gTeams[teamid][Color]);
 
@@ -397,7 +401,8 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 	AbortPlayerTaxiMission(playerid);
 	//AbortCombatMission(playerid, false);
 
-	new raceid = CheckPlayerRaceState(playerid);
+	new 
+		raceid = CheckPlayerRaceState(playerid);
 
 	if (raceid)
 	{
@@ -499,7 +504,8 @@ public OnPlayerText(playerid, text[])
 {
 	if (strlen(text) > 1 && text[0] == '!' && gPlayers[playerid][TeamID])
 	{
-		new stringToPrint[256];
+		new 
+			stringToPrint[256];
 
 		text[0] = ' ';
 		format(stringToPrint, sizeof(stringToPrint), "%s [Team Chat]:%s", gPlayers[playerid][Name], text);
@@ -684,7 +690,7 @@ public OnPlayerObjectMoved(playerid, objectid)
 
 public OnPlayerPickUpPickup(playerid, pickupid)
 {
-	// hotfix due to the logic of EnsurePickupCreated(...) function
+	// Hotfix due to the logic of EnsurePickupCreated(...) function
 	if (!pickupid)
 	{
 		return 1;
@@ -794,7 +800,9 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 public OnPlayerSelectedMenuRow(playerid, row)
 {
-	new Menu:currentMenu = GetPlayerMenu(playerid), stringToPrint[256];
+	new 
+		Menu: currentMenu = GetPlayerMenu(playerid), 
+		stringToPrint[256];
 
 	if (row == 2)
 	{

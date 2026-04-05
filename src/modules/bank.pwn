@@ -11,11 +11,13 @@ new Float: gBankLocation[19][4];
 
 stock InitBankLocations()
 {
-	new query[128];
+	new 
+		query[128];
 
 	format(query, sizeof(query), "SELECT id, x, y, z FROM atm_coords");
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		printf("Database error: cannot list ATM coords!");
@@ -24,7 +26,8 @@ stock InitBankLocations()
 		return 0;
 	}
 
-	new i = 0;
+	new 
+		i = 0;
 
 	do
 	{

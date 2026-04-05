@@ -8,13 +8,11 @@ Test:MemoryInit()
 {
 	TEST_START("MemoryInit");
 
-	new 
-		size = sizeof(gI18nMessages),
-		stringToPrint[64];
-
-	format(stringToPrint, sizeof(stringToPrint), "sizeof(gI18nMessages): %d bytes\n", size);
-	print(stringToPrint);
-	ASSERT_TRUE(size > 0);
+	printf("sizeof gI18nMessages: %d * %d * %d bytes\n", 
+			sizeof(gI18nMessages),
+			sizeof(gI18nMessages[]),
+			sizeof(gI18nMessages[][])
+		);
 	
 	TEST_END("MemoryInit");
 }

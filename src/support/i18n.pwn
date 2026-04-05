@@ -33,13 +33,15 @@
 #define COLOR_INVISIBLE 	0x4682B400
 #define COLOR_BEIGE          	0xFFF8DCAA
 
+#define MAX_MESSAGE_LEN		512
+
 enum PlayerLocale
 {
 	LOCALE_EN,
 	LOCALE_CZ
 }
 
-enum 
+enum
 {
 	I18N_WELCOME_MESSAGE,
 	I18N_CARKILL_VIOLATION_FMT,
@@ -423,7 +425,7 @@ new gI18nMessageColor[] =
 	COLOR_INVISIBLE
 };
 
-new gI18nMessages[][PlayerLocale][] = 
+new gI18nMessages[][PlayerLocale][MAX_MESSAGE_LEN] = 
 {
 	{
 		"Welcome to the gamemode CrazyRaceLife2! /help",

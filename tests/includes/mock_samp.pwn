@@ -121,9 +121,9 @@ stock Mock_GetVehicleDriver(vehicleid)
 	return 1;
 }
 
-stock Mock_NPC_EnterVehicle(npcid, vehicleid, seatid)
+stock Mock_NPC_EnterVehicle(npcid, vehicleid, seatid, NPC_MOVE_TYPE: type)
 {
-#pragma unused npcid, vehicleid, seatid
+#pragma unused npcid, vehicleid, seatid, type
 	return 1;
 }
 
@@ -133,9 +133,9 @@ stock bool: Mock_IsValidTimer(timer)
 	return false;
 }
 
-stock bool: Mock_NPC_IsEnteringVehicle(npcid, vehicleid)
+stock bool: Mock_NPC_IsEnteringVehicle(npcid)
 {
-#pragma unused npcid, vehicleid
+#pragma unused npcid
 	return false;
 }
 

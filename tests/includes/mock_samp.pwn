@@ -34,13 +34,13 @@ stock Mock_DB_SelectNextRow(DBResult: result)
 stock Mock_DB_GetFieldString(DBResult: result, id, str[], size = sizeof(str))
 {
 #pragma unused result, id, str, size
-	return 1
+	return 1;
 }
 
 stock Mock_DB_GetFieldStringByName(DBResult: result, const name[], str[], size = sizeof(str))
 {
 #pragma unused result, name, str, size
-	return 1
+	return 1;
 }
 
 stock Mock_DB_GetFieldInt(DBResult: result, id)
@@ -52,13 +52,13 @@ stock Mock_DB_GetFieldInt(DBResult: result, id)
 stock Mock_DB_GetFieldIntByName(DBResult: result, const name[])
 {
 #pragma unused result, name
-	return 1
+	return 1;
 }
     
 stock Float: Mock_DB_GetFieldFloatByName(DBResult: result, const name[])
 {
 #pragma unused result, name
-	return Float: 1
+	return Float: 1;
 }
     
 stock Mock_DB_FreeResultSet(DBResult: result)

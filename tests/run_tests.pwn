@@ -16,16 +16,20 @@
 #include "includes/test_helpers.pwn"
 
 #include "test_memory.pwn"
+#include "test_pickup.pwn"
 #include "test_player.pwn"
 //#include "test_vehicle.pwn"
 //#include "test_business.pwn"
 
-public OnGameModeInit()
+//public OnGameModeInit()
+main()
 {
 	print("\n=== Starting SA-MP Pawn Tests ===\n");
 
 	// Run all tests
 	RUN_TEST(MemoryInit);
+	
+	RUN_TEST(PickupCreate);
     
 	RUN_TEST(PlayerConnect);
 	RUN_TEST(PlayerRegistration);
@@ -46,8 +50,3 @@ public OnGameModeInit()
 	return 1;
 }
 
-forward ExitAfterTests();
-public ExitAfterTests()
-{
-	return SendRconCommand("exit");
-}

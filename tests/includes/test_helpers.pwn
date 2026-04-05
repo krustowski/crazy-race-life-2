@@ -1,6 +1,11 @@
-/*
- *  test_helpers.pwn
- */
+#if defined _CRL2_TEST_HELPERS
+	#endinput
+#endif
+#define _CRL2_TEST_HELPERS
+
+//
+//  test_helpers.pwn
+//
 
 // Test statistics
 new gTestsPassed = 0;
@@ -8,6 +13,10 @@ new gTestsFailed = 0;
 new gTotalTests = 0;
 
 new bool:gCurrentTestFailed = false;
+
+//
+//  Macros
+//
 
 #define TEST_START(%1) printf("\n=== Starting test: %s ===", %1)
 #define TEST_END(%1) printf("=== Finished test: %s ===\n", %1)
@@ -43,6 +52,20 @@ stock bool:_FloatEq(Float:a, Float:b, Float:epsilon = FLOAT_EQ_EPSILON) {
 
 #define ASSERT_FLOAT_EQ(%1,%2)      	ASSERT(_FloatEq(Float:%1, Float:%2))
 #define ASSERT_FLOAT_EQ_EPS(%1,%2,%3) 	ASSERT(_FloatEq(Float:%1, Float:%2, Float:%3))
+
+//
+//  Public
+//
+
+forward ExitAfterTests();
+public ExitAfterTests()
+{
+	return SendRconCommand("exit");
+}
+
+//
+//  Stock helpers
+// 
 
 // Mock player for testing
 static gTestPlayer = INVALID_PLAYER_ID;

@@ -262,7 +262,9 @@ stock PrintAsciiLogoToLogs()
 // GPT-generated
 stock UnixToDateTime(timestamp, &year, &month, &day, &hour, &minute, &second)
 {
-	new days, secs;
+	new 
+		days, 
+		secs;
 
 	secs = timestamp % 86400;
 	days = timestamp / 86400;
@@ -271,12 +273,14 @@ stock UnixToDateTime(timestamp, &year, &month, &day, &hour, &minute, &second)
 	secs %= 3600;
 	minute = secs / 60;
 	second = secs % 60;
-
 	year = 1970;
+
 	for (;;)
 	{
-		new leap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
-		new year_days = leap ? 366 : 365;
+		new 
+			leap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)),
+			year_days = leap ? 366 : 365;
+
 		if (days >= year_days)
 		{
 			days -= year_days;
@@ -291,11 +295,16 @@ stock UnixToDateTime(timestamp, &year, &month, &day, &hour, &minute, &second)
 	};
 
 	// Adjust February for leap year
-	new is_leap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+	new 
+		is_leap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
 	if (is_leap) 
+	{
 		month_days[1] = 29; 
+	}
 	else 
+	{
 		month_days[1] = 28;
+	}
 
 	month = 1;
 	for (new i = 0; i < 12; i++)
@@ -328,11 +337,13 @@ stock BroadcastMessage(color, const str[])
 		SendClientMessage(i, color, str);
 	}
 
+	return 1;
 }
 
 stock SendUsageMessage(playerid, const usage[])
 {
-	new msg[64];
+	new 
+		msg[64];
 	GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
 	format(msg, sizeof(msg), msg, usage);
 	return SendClientMessage(playerid, COLOR_YELLOW, msg);

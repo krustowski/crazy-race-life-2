@@ -80,6 +80,8 @@ public OnGameModeExit()
 	printf(" ");
 	printf(" * Shutting down...");
 
+	KillTimers();
+
 	if (DB_Close(gDbConnectionHandle))
 	{
 		gDbConnectionHandle = DB: 0;
@@ -93,8 +95,6 @@ public OnPlayerConnect(playerid)
 	new 
 		playerName[MAX_PLAYER_NAME], 
 		stringToPrint[128];
-
-	//LoadPlayerDataDB(playerid);
 
 	// Reset the auth status for a new player.
 	gPlayers[playerid][IsLogged] = false;
@@ -417,7 +417,9 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 	}
 
 	SetPlayerHealth(playerid, 100.0);
-	SpawnPlayer(playerid);
+
+	SetTimerEx("SpawnPlayerDelayed", 250, false, "i", playerid);
+
 	return 1;
 }
 
@@ -938,7 +940,8 @@ public OnPlayerEditAttachedObject(playerid, EDIT_RESPONSE:response, index, model
 			{
 				SetPlayerAttachedObject(playerid, index, modelid, boneid, gPlayerAO[playerid][X], gPlayerAO[playerid][Y], gPlayerAO[playerid][Z], gPlayerAO[playerid][rX], gPlayerAO[playerid][rY], gPlayerAO[playerid][rZ], gPlayerAO[playerid][sX], gPlayerAO[playerid][sY], gPlayerAO[playerid][sZ]);
 
-				new stringToPrint[512];
+				new 
+					stringToPrint[512];
 				format(stringToPrint, sizeof(stringToPrint), "AO: X: %.2f, Y: %.2f, Z: %.2f, rX: %.2f, rY: %.2f, rZ: %.2f, sX: %.2f, sY: %.2f, sZ: %.2f", 
 						gPlayerAO[playerid][X],
 						gPlayerAO[playerid][Y],
@@ -963,7 +966,8 @@ public OnPlayerLeavePlayerGangZone(playerid, zoneid)
 {
 	if (zoneid == gDeathmatchGangZone[playerid])
 	{
-		new stringToPrint[64];
+		new 
+			stringToPrint[64];
 		format(stringToPrint, sizeof(stringToPrint), "[ DEATHMATCH ] Get back to the arena!");
 		SendClientMessage(playerid, COLOR_RED, stringToPrint);
 	}

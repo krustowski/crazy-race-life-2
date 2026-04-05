@@ -127,7 +127,8 @@ stock HandleCarKill(playerid, killerid, WEAPON:reason)
 
 	if (IsPlayerInAnyVehicle(killerid) && !IsPlayerInAnyVehicle(playerid) && killerState == PLAYER_STATE_DRIVER && reason != WEAPON_VEHICLE)
 	{
-		new killerName[MAX_PLAYER_NAME]; 
+		new 
+			killerName[MAX_PLAYER_NAME]; 
 
 		GetPlayerName(killerid, killerName, MAX_PLAYER_NAME);
 
@@ -150,5 +151,6 @@ stock HandleCarKill(playerid, killerid, WEAPON:reason)
 		PlayerPlaySound(killerid, 1056, 0, 0, 0);
 	}
 
+	return 1;
 }
 

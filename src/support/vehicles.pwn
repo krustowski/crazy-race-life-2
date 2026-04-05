@@ -3,7 +3,8 @@
 #endif
 #define _CRL2_VEHICLES
 
-new const VEHICLE_PLATE[] = "--CRL2--";
+new 
+	const VEHICLE_PLATE[] = "--CRL2--";
 
 forward InitVehicles();
 

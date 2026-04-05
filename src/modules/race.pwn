@@ -411,7 +411,9 @@ public UpdateRaceInfoText(playerid)
 stock CheckRaceCheckpoint(playerid)
 {
 	if (!CheckPlayerRaceState(playerid))
+	{
 		return 0;
+	}
 
 	if (!gPlayerRaceTimer[playerid])
 	{

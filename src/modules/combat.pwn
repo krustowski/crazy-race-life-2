@@ -117,7 +117,7 @@ stock CheckCombatCheckpoint(playerid)
 {
 	if (!gCombatMission[playerid][Active])
 	{
-		return 1;
+		return 0;
 	}
 
 	DisablePlayerRaceCheckpoint(playerid);
@@ -132,7 +132,7 @@ stock CheckCombatPickup(playerid, pickupid)
 	
 	if (!gCombatMission[playerid][Active])
 	{
-		return 1;
+		return 0;
 	}
 
 	for (new i = 0; i < MAX_COMBAT_PICKUPS; i++)
@@ -150,11 +150,11 @@ stock CheckCombatPickup(playerid, pickupid)
 
 					new stringToPrint[128];
 					format(stringToPrint, sizeof(stringToPrint), "[ COMBAT ] You found briefcase no. %d", gCombatMission[playerid][BriefcaseCount]);
-					SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
+					return SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 				}
 			case (CombatPickupType: TYPE_HEALTH):
 				{
-					SetPlayerHealth(playerid, 100.0);
+					return SetPlayerHealth(playerid, 100.0);
 				}
 			case TYPE_EXIT:
 				{
@@ -171,11 +171,13 @@ stock CheckCombatPickup(playerid, pickupid)
 						SendClientMessage(playerid, COLOR_ORANGE, "[ COMBAT ] Take the helicopter and follow the checkpoint on the minimap!");
 						SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, gCombatPickups[j][Point][CoordX], gCombatPickups[j][Point][CoordY], gCombatPickups[j][Point][CoordZ], 0.0, 0.0, 0.0, 10.0);
 					}
+
+					return 1;
 				}
 		}
 	}
 
-	return 1;
+	return 0;
 }
 
 stock PrepareCombatInterior(playerid, missionid)

@@ -139,18 +139,18 @@ stock CheckDeathmatchPickups(playerid, pickupid)
 		{
 			case (DeathmatchPickupType: TYPE_HEALTH):
 						    {
-							    SetPlayerHealth(playerid, 100.0);
-							    break;
+							    return SetPlayerHealth(playerid, 100.0);
 						    }
 			case TYPE_ARMOUR:
 						    {
-							    SetPlayerArmour(playerid, 100.0);
-							    break;
+							    return SetPlayerArmour(playerid, 100.0);
 						    }
 			default:
 						    {}
 		}
 	}
+
+	return 0;
 }
 
 public EndDeathmatch()

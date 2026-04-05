@@ -147,6 +147,8 @@ stock CheckPoliceBribePickup(playerid, pickupid)
 		gPoliceBribeStars[i][PickupID] = 0;
 
 		SetPlayerWantedLevel(playerid, --gPlayers[playerid][WantedLevel]);
-		SendClientMessage(playerid, COLOR_YELLOW, "[ BRIBE ] Your wanted level lowered by 1!");
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ BRIBE ] Your wanted level lowered by 1!");
 	}
+
+	return 0;
 }

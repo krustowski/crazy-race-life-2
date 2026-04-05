@@ -1643,7 +1643,9 @@ stock CheckRealEstatePickup(playerid, pickupid)
 				case OFFER_POINT:
 					{
 						if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
-							return 1;
+						{
+							return 0;
+						}
 
 						switch (gProperties[i][Type])
 						{
@@ -1724,14 +1726,18 @@ stock CheckRealEstatePickup(playerid, pickupid)
 	for (new i = 0; i < SPAWN_PICKUP_COUNT; i++)
 	{
 		if (pickupid != gPlayerInteriors[playerid][Pickups][i])
+		{
 			continue;
+		}
 
 		switch (i) 
 		{
 			case PICKUP_TYPE_SHIRT:
 				{
 					if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
+					{
 						break;
+					}
 
 					return ShowPropertySkinMainDialog(playerid, gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ][ID]);
 				}
@@ -1745,7 +1751,9 @@ stock CheckRealEstatePickup(playerid, pickupid)
 			case PICKUP_TYPE_PILLS:
 				{
 					if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
+					{
 						break;
+					}
 
 					ShowPlayerDrugzDialog(playerid);
 					return 1;
@@ -1778,6 +1786,8 @@ stock CheckRealEstatePickup(playerid, pickupid)
 
 					DestroyPropertyInterior(playerid);
 					gPlayers[playerid][InsideProperty] = false;
+
+					return 1;
 				}
 			case PICKUP_TYPE_INFO:
 				{
@@ -1786,7 +1796,7 @@ stock CheckRealEstatePickup(playerid, pickupid)
 		}
 	}
 
-	return 1;
+	return 0;
 }
 
 stock RespawnPropertyVehicle(playerid, propertyid)

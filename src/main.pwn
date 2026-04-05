@@ -634,11 +634,30 @@ public OnPlayerLeaveCheckpoint(playerid)
 
 public OnPlayerEnterRaceCheckpoint(playerid)
 {
-	CheckRaceCheckpoint(playerid);
-	CheckTowMissionCheckpoint(playerid);
-	CheckTruckingCheckpoint(playerid);
-	CheckTaxiMissionCheckpoint(playerid);
-	CheckCombatCheckpoint(playerid);
+	if (CheckRaceCheckpoint(playerid))
+	{
+		return 1;
+	}
+
+	if (CheckTowMissionCheckpoint(playerid))
+	{
+		return 1;
+	}
+	
+	if (CheckTruckingCheckpoint(playerid))
+	{
+		return 1;
+	}
+
+	if (CheckTaxiMissionCheckpoint(playerid))
+	{
+		return 1;
+	}
+
+	if (CheckCombatCheckpoint(playerid))
+	{
+		return 1;
+	}
 
 	return 1;
 }
@@ -682,10 +701,15 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 			continue;
 		}
 
-		if (gPlayers[playerid][DialogShown])
+		if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
+		{
+			break;
+		}
+
+		/*if (gPlayers[playerid][DialogShown])
 		{
 			continue;
-		}
+		}*/
 
 		return ShowBankOptionsDialog(playerid);
 	}
@@ -709,21 +733,38 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	//  Combat pickups
 	//
 
-	CheckCombatPickup(playerid, pickupid);
-	CheckDeathmatchPickups(playerid, pickupid);
+	if (CheckCombatPickup(playerid, pickupid))
+	{
+		return 1;
+	}
+
+	if (CheckDeathmatchPickups(playerid, pickupid))
+	{
+		return 1;
+	}
 
 	//
 	//  Real Estate pickups.
 	//
 
-	CheckRealEstatePickup(playerid, pickupid);
+	if (CheckRealEstatePickup(playerid, pickupid))
+	{
+		return 1;
+	}
 
 	//
 	//  Drugz.
 	//
 
-	CheckDrugzPickup(playerid, pickupid);
-	CheckBlackMarketPickup(playerid, pickupid);
+	if (CheckDrugzPickup(playerid, pickupid))
+	{
+		return 1;
+	}
+
+	if (CheckBlackMarketPickup(playerid, pickupid))
+	{
+		return 1;
+	}
 
 	//
 	//  Other pickups --- entries,  baggies etc.
@@ -738,9 +779,15 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	//  Death pickups.
 	//
 
-	CheckDeathMoneyPickup(playerid, pickupid);
+	if (CheckDeathMoneyPickup(playerid, pickupid))
+	{
+		return 1;
+	}
 
-	CheckPoliceBribePickup(playerid, pickupid);
+	if (CheckPoliceBribePickup(playerid, pickupid))
+	{
+		return 1;
+	}
 
 	return 1;
 }

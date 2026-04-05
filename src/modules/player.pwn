@@ -651,11 +651,10 @@ stock CheckDrugzPickup(playerid, pickupid)
 
 		GetLocalizedString(playerid, I18N_DRUGZ_PICKUP_FMT, stringToPrint, sizeof(stringToPrint));
 		format(stringToPrint, sizeof(stringToPrint), stringToPrint, amount, gDrugz[type - 1][DrugName]);
-		SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
-		break;
+		return SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 	}
 
-	return 1;
+	return 0;
 }
 
 stock ProcessBlackMarketOffer(playerid, listitem)

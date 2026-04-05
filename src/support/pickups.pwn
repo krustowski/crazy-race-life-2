@@ -354,7 +354,11 @@ stock CheckDeathMoneyPickup(playerid, pickupid)
 
 		GivePlayerMoney(playerid, gDeathMoneyPickups[i][Amount]);
 		gDeathMoneyPickups[i][Amount] = 0;
+
+		return 1;
 	}
+
+	return 0;
 }
 
 stock CheckBlackMarketPickup(playerid, pickupid)

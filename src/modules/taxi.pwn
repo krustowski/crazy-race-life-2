@@ -199,7 +199,7 @@ stock CheckTaxiMissionCheckpoint(playerid)
 {
 	if (!gTaxiMission[playerid][Active])
 	{
-		return 1;
+		return 0;
 	}
 
 	DisablePlayerRaceCheckpoint(playerid);

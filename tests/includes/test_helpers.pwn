@@ -14,6 +14,9 @@ new gTotalTests = 0;
 
 new bool:gCurrentTestFailed = false;
 
+// Mock player for testing
+static gTestPlayer = INVALID_PLAYER_ID;
+
 //
 //  Macros
 //
@@ -46,7 +49,8 @@ new bool:gCurrentTestFailed = false;
 	#define FLOAT_EQ_EPSILON (0.0001)
 #endif
 
-stock bool:_FloatEq(Float:a, Float:b, Float:epsilon = FLOAT_EQ_EPSILON) {
+stock bool: _FloatEq(Float: a, Float: b, Float: epsilon = FLOAT_EQ_EPSILON)
+{
 	return (floatabs(a - b) < epsilon);
 }
 
@@ -66,9 +70,6 @@ public ExitAfterTests()
 //
 //  Stock helpers
 // 
-
-// Mock player for testing
-static gTestPlayer = INVALID_PLAYER_ID;
 
 stock CreateTestPlayer()
 {

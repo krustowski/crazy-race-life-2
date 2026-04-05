@@ -137,7 +137,9 @@ public UpdateMissionInfoText(playerid)
 stock CheckTruckingCheckpoint(playerid)
 {
 	if (!gTrucking[playerid])
+	{
 		return 0;
+	}
 
 	DisablePlayerRaceCheckpoint(playerid);
 

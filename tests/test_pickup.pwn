@@ -8,7 +8,8 @@ Test:PickupCreate()
 {
 	TEST_START("PickupCreate");
 	
-	new id = EnsurePickupCreated(1272, 1, 0.0, 0.0, 0.0);
+	new 
+		id = EnsurePickupCreated(1272, 1, 0.0, 0.0, 0.0);
 
 	ASSERT_TRUE(id > 0);
 

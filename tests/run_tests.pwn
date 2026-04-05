@@ -39,7 +39,7 @@ main()
 	//RUN_TEST(BankingSystem);
     
 	// Print summary
-	printf("\n=== Test Summary ===");
+	printf("\n\n=== Test Summary ===\n");
 	printf("Total Tests: %d", gTotalTests);
 	printf("Passed: %d", gTestsPassed);
 	printf("Failed: %d", gTestsFailed);

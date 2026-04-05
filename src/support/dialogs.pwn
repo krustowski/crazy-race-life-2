@@ -499,15 +499,21 @@ stock ShowRaceOptionsDialog(playerid, raceid)
 
 stock ShowGetPlayerListDialog(playerid)
 {
-	new stringToPrint[512] = "Name\tID";
+	new 
+		j = 0,
+		stringToPrint[512] = "Name\tID";
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if (!IsPlayerConnected(i))
+		{
 			continue;
+		}
 
 		new playerName[MAX_PLAYER_NAME];
 		GetPlayerName(i, playerName);
+
+		gPlayers[playerid][OnlinePlayerList][j++] = i;
 
 		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
 				stringToPrint,
@@ -521,15 +527,21 @@ stock ShowGetPlayerListDialog(playerid)
 
 stock ShowGotoPlayerListDialog(playerid)
 {
-	new stringToPrint[1024] = "Name\tID";
+	new 
+		j = 0,
+		stringToPrint[1024] = "Name\tID";
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if (!IsPlayerConnected(i))
+		{
 			continue;
+		}
 
 		new playerName[MAX_PLAYER_NAME];
 		GetPlayerName(i, playerName);
+
+		gPlayers[playerid][OnlinePlayerList][j++] = i;
 
 		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
 				stringToPrint,

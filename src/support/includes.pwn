@@ -91,8 +91,8 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 //  Radar + Vehicle velocity/props.
 //
 
-#include "modules/radar.pwn"
 #include "support/helpers.pwn"
+#include "modules/radar.pwn"
 
 //
 //  Banking.

@@ -38,10 +38,15 @@ public AddTexts(playerid)
 		return 1;
 	}
 
+	gVehicleStatesText[playerid] = TextDrawCreate(256, 410, "");
 	gRaceInfoText[playerid] = TextDrawCreate(460.0, 400.0, "");
 	gMissionInfoText[playerid] = TextDrawCreate(460.0, 400.0, "");
 	gTowMissionText[playerid] = TextDrawCreate(460.0, 380.0, "");
 	gDeathmatchText[playerid] = TextDrawCreate(400.0, 400.0, "");
+
+	TextDrawLetterSize(gVehicleStatesText[playerid], 0.5, 1.5);
+	TextDrawFont(Text: gVehicleStatesText[playerid], t_TEXT_DRAW_FONT: 3);
+	TextDrawSetOutline(gVehicleStatesText[playerid], 1);
 
 	TextDrawLetterSize(gRaceInfoText[playerid], 0.5, 1.5);
 	TextDrawFont(gRaceInfoText[playerid], t_TEXT_DRAW_FONT: 3);

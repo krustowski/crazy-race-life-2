@@ -98,7 +98,7 @@ public OnPlayerConnect(playerid)
 
 	// Reset the auth status for a new player.
 	gPlayers[playerid][IsLogged] = false;
-	gPlayers[playerid][TeamID] = 0;
+	gPlayers[playerid][TeamID] = TEAM_NONE;
 
 	gPlayers[playerid][InMinigame] = false;
 	gPlayers[playerid][SwitchedControllers] = false;
@@ -328,7 +328,7 @@ public OnPlayerSpawn(playerid)
 	if (gPlayers[playerid][TeamID])
 	{
 		new 
-			teamid = gPlayers[playerid][TeamID] - 1;
+			teamid = _: (gPlayers[playerid][TeamID] - PLAYER_TEAM: 1);
 
 		SetPlayerColor(playerid, gTeams[teamid][Color]);
 
@@ -516,7 +516,7 @@ public OnPlayerText(playerid, text[])
 		{
 			if (IsPlayerConnected(i) && gPlayers[i][TeamID] == gPlayers[playerid][TeamID])
 			{
-				SendClientMessage(i, gTeams[ gPlayers[i][TeamID] - 1 ][Color], stringToPrint);
+				SendClientMessage(i, gTeams[ _: gPlayers[i][TeamID] - 1 ][Color], stringToPrint);
 			}
 		}
 
@@ -838,7 +838,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 			SetPlayerSkin(playerid, gTeams[i][Skins][0]);
 			SetPlayerTeam(playerid, gTeams[i][ID]);
 
-			gPlayers[playerid][TeamID] = gTeams[i][ID];
+			gPlayers[playerid][TeamID] = PLAYER_TEAM: gTeams[i][ID];
 
 			format(stringToPrint, sizeof(stringToPrint), "[ TEAM ] Player %s joined the %s team!", gPlayers[playerid][Name], gTeams[i][TeamName]);
 			SendClientMessageToAll(COLOR_YELLOW, stringToPrint);

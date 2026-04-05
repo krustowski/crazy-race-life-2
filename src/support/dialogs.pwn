@@ -30,7 +30,6 @@ enum
 	DIALOG_PROPERTY_EDIT_NAME,
 	DIALOG_PROPERTY_EDIT_TYPE,
 	DIALOG_PROPERTY_EDIT_COST,
-	DIALOG_PROPERTY_LIST,
 	DIALOG_PROPERTY_OPTIONS,
 	DIALOG_PROPERTY_SKIN_MAIN,
 	DIALOG_PROPERTY_SKIN_LIST,
@@ -101,6 +100,7 @@ enum
 	DIALOG_GET_LIST = 0x80,
 	DIALOG_GOTO_LIST,
 	DIALOG_PORT_LIST,
+	DIALOG_PROPERTY_LIST,
 	DIALOG_PRIZE_LIST,
 	DIALOG_WANTED_LIST,
 	DIALOG_COMBAT_LIST,
@@ -814,7 +814,9 @@ stock ShowPlayerAccountDialog(playerid)
 
 	if (gPlayers[playerid][TeamID])
 	{
-		format(team_name, sizeof(team_name), "%s", gTeams[ gPlayers[playerid][TeamID] - 1 ][TeamName]);
+		format(team_name, sizeof(team_name), "%s", 
+				gTeams[ _: gPlayers[playerid][TeamID] - 1 ][TeamName]
+			);
 	}
 	else
 	{
@@ -828,7 +830,7 @@ stock ShowPlayerAccountDialog(playerid)
 	format(stringToPrint, sizeof(stringToPrint), "Account details:\n\n{FFFFFF}Cash: \t\t{00FF00}${FFD700}%d{FFFFFF}\nTeam: \t\t{FFD700}%s{FFFFFF} (ID: {FFD700}%d{FFFFFF})\nSkin ID:\t\t{FFD700}%d{FFFFFF}\nAdmin level: \t{FFD700}%d{FFFFFF}\nWanted level: \t{FFD700}%d{FFFFFF}\nPlayTime: \t{FFD700}%3d h %3d min %2d sec{FFFFFF}\n\nClient version: \t{FFD700}%s{FFFFFF}",
 			GetPlayerMoney(playerid),
 			team_name,
-			gPlayers[playerid][TeamID],
+			_: gPlayers[playerid][TeamID],
 			GetPlayerSkin(playerid),
 			gPlayers[playerid][AdminLevel],
 			GetPlayerWantedLevel(playerid),

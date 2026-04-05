@@ -169,12 +169,16 @@ public AddMapicons(playerid)
 
 	do
 	{
-		new Float: X, Float: Y, Float: Z, team_id;
+		new 
+			Float: X, 
+			Float: Y, 
+			Float: Z, 
+			PLAYER_TEAM: team_id;
 
 		X = DB_GetFieldFloatByName(result, "x");
 		Y = DB_GetFieldFloatByName(result, "y");
 		Z = DB_GetFieldFloatByName(result, "z");
-		team_id = DB_GetFieldIntByName(result, "team_id");
+		team_id = PLAYER_TEAM: DB_GetFieldIntByName(result, "team_id");
 
 		switch (team_id)
 		{

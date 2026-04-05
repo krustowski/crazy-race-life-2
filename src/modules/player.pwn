@@ -38,7 +38,7 @@ enum Player
 	PasswordSalt[17],
 	LoginAttempts,
 
-	TeamID,
+	PLAYER_TEAM: TeamID,
 	Skin,
 	Cash,
 	Bank,
@@ -152,7 +152,7 @@ public LoadPlayerData(playerid)
 		gPlayers[playerid][Bank] = DB_GetFieldIntByName(result, "bank");
 		gPlayers[playerid][AdminLevel] = DB_GetFieldIntByName(result, "adminlvl");
 		gPlayers[playerid][WantedLevel] = DB_GetFieldIntByName(result, "wanted");
-		gPlayers[playerid][TeamID] = DB_GetFieldIntByName(result, "team");
+		gPlayers[playerid][TeamID] = PLAYER_TEAM: DB_GetFieldIntByName(result, "team");
 		gPlayers[playerid][Skin] = DB_GetFieldIntByName(result, "class");
 		gPlayers[playerid][Health] = DB_GetFieldIntByName(result, "health");
 		gPlayers[playerid][Armour] = DB_GetFieldIntByName(result, "armour");
@@ -225,12 +225,12 @@ public LoadPlayerData(playerid)
 		SetPlayerHealth(playerid, gPlayers[playerid][Health]);
 		SetPlayerArmour(playerid, gPlayers[playerid][Armour]);
 		SetPlayerSkin(playerid, gPlayers[playerid][Skin]);
-		SetPlayerTeam(playerid, gPlayers[playerid][TeamID]);
+		SetPlayerTeam(playerid, _: gPlayers[playerid][TeamID]);
 		SetPlayerWantedLevel(playerid, gPlayers[playerid][WantedLevel]);
 
 		if (gPlayers[playerid][TeamID])
 		{
-			SetPlayerColor(playerid, gTeams[ gPlayers[playerid][TeamID] ][Color]);
+			SetPlayerColor(playerid, gTeams[ _: gPlayers[playerid][TeamID] ][Color]);
 		}
 		else
 		{
@@ -306,7 +306,7 @@ public SavePlayerData(playerid)
 				gPlayers[playerid][Bank], 
 				gPlayers[playerid][AdminLevel], 
 				GetPlayerWantedLevel(playerid),
-				gPlayers[playerid][TeamID], 
+				_: gPlayers[playerid][TeamID], 
 				GetPlayerSkin(playerid), 
 				floatround(health), 
 				floatround(armour), 
@@ -404,7 +404,7 @@ public SendPlayerSalary()
 			continue;
 		}
 
-		if (gPlayers[i][TeamID] == 0)
+		if (gPlayers[i][TeamID] == TEAM_NONE)
 		{
 			continue;
 		}
@@ -414,7 +414,7 @@ public SendPlayerSalary()
 			continue;
 		}
 
-		teamSalary = gTeams[ gPlayers[i][TeamID] - 1 ][SalaryBase] + random(gTeams[ gPlayers[i][TeamID] - 1 ][SalaryVolatile]);
+		teamSalary = gTeams[ _: gPlayers[i][TeamID] - 1 ][SalaryBase] + random(gTeams[ _: gPlayers[i][TeamID] - 1 ][SalaryVolatile]);
 
 		// Send localized client message to a player
 		GetLocalizedString(i, I18N_PLAYER_SALARY_FMT, stringToPrint, sizeof(stringToPrint));
@@ -798,6 +798,21 @@ stock ProcessNewBlackMarketOffer(playerid)
 	return SendClientMessageLocalized(playerid, I18N_BLACK_MARKET_OFFER_PLACED);
 }
 
+stock bool: IsPlayerInTeam(playerid, PLAYER_TEAM: teamid)
+{
+	if (!gPlayers[playerid][TeamID])
+	{
+		return false;
+	}
+
+	if (PLAYER_TEAM: gTeams[ _: gPlayers[playerid][TeamID] - 1 ][ID] == teamid)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 forward SpawnPlayerDelayed(playerid);
 public SpawnPlayerDelayed(playerid)
 {
@@ -909,7 +924,7 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 					return OperateTowTruck(playerid);
 				}
 
-				if (gPlayers[playerid][TeamID] && gTeams[ gPlayers[playerid][TeamID] - 1 ][ID] == TEAM_MECHANICS)
+				if (IsPlayerInTeam(playerid, TEAM_MECHANICS))
 				{
 					for (new i = 0; i < MAX_PLAYERS; i++)
 					{

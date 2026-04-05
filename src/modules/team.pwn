@@ -14,7 +14,7 @@
 
 #include "db/sql.pwn"
 
-enum 
+enum PLAYER_TEAM
 {
 	TEAM_NONE,
 	TEAM_MECHANICS,
@@ -45,7 +45,7 @@ enum Team
 	Menu: Menus[MAX_TEAM_MENUS]
 }
 
-new gTeams[MAX_TEAMS][Team];
+new PLAYER_TEAM: gTeams[MAX_TEAMS][Team];
 
 forward InitTeams();
 

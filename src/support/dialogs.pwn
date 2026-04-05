@@ -370,6 +370,7 @@ stock ShowPropertyListDialog(playerid)
 	if (!DB_GetRowCount(result))
 	{
 		print("ShowPropertyListDialog: nothing to load from the database");
+		DB_FreeResultSet(result);
 		return 1;
 	}
 

@@ -1,8 +1,6 @@
-#include <open.mp>
-
-#include "includes/test_helpers.pwn"
-
-#include "support/includes.pwn"
+//
+//  test_pickup.pwn
+//
 
 Test:PickupCreate()
 {

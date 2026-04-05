@@ -5,7 +5,7 @@
 
 //
 //  response.pwn
-//  Custom responses mapped to dialogs
+//  Custom responses (backend) mapped to dialogs
 //
 
 stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])

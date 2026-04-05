@@ -2,9 +2,7 @@
 
 #include "includes/test_helpers.pwn"
 
-//#include "support/i18n.pwn"
-//#include "modules/player.pwn"
-//#include "modules/auth.pwn"
+#include "support/includes.pwn"
 
 Test:PlayerConnect()
 {

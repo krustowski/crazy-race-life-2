@@ -898,7 +898,7 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							{
 								new vehicleid = gProperties[i][Vehicle][ID];
 								new isowner = IsPlayerOwner(playerid, gProperties[i][ID]);
-								new ishacker = gTeams[ gPlayers[playerid][TeamID] - 1 ][ID] == TEAM_HACKERS;
+								new ishacker = gPlayers[playerid][TeamID] ? gTeams[ gPlayers[playerid][TeamID] - 1 ][ID] == TEAM_HACKERS : false;
 
 								if (!vehicleid) 
 								{

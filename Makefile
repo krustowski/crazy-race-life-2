@@ -30,11 +30,11 @@ tests:
 		${PWD}/tests/run_tests.pwn \
 		-D${PWD}/src \
 		-D${PWD}/tests \
-		-o${PWD}/gamemodes/crl2_tests.amx \
+		-o${PWD}/gamemodes/crl2test.amx \
 		-d3 \
 		-Z+ \
 		-i${PWD} \
 		-i${PWD}/src \
 		-i${PWD}/dependencies/omp-stdlib
-	@./samp03svr -c configs/test_server.cfg
+	@./samp03svr -C configs/test_server.cfg
 

@@ -1,11 +1,12 @@
 new DB: gDbConnectionHandle;
 
+#if !defined _CRL2_TEST_BUILD
 new gDbFile[16] = "crl2_data.db";
+#endif
 
-forward InitDB();
-
-public InitDB() 
+stock InitDB() 
 {
+#if !defined _CRL2_TEST_BUILD
 	gDbConnectionHandle = DB_Open(gDbFile);
 
 	if (gDbConnectionHandle) 
@@ -16,4 +17,7 @@ public InitDB()
 	{
 		print("Failed to connect to database!");
 	}
+#else
+	print("[TEST] InitDB stubbed");
+#endif
 }

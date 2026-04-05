@@ -1,8 +1,8 @@
 #include <open.mp>
 
-#include "includes/test_helpers.pwn"
-
 #include "support/includes.pwn"
+
+#include "includes/test_helpers.pwn"
 
 Test:MemoryInit()
 {

@@ -1,11 +1,18 @@
-/*
- *  run_tests.pwn - Compile and run tests
- */
+#define _CRL2_TEST_BUILD
+
+//
+//  run_tests.pwn
+//  Compile and run tests
+//
 
 #define RUNNING_TESTS
 #define FILTERSCRIPT
 
 #include <open.mp>
+
+#include "includes/mock_samp.pwn"
+#include "support/includes.pwn"
+
 #include "includes/test_helpers.pwn"
 
 #include "test_memory.pwn"

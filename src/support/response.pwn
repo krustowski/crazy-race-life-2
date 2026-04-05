@@ -118,7 +118,9 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				new drugID = gPlayers[playerid][SelectedDrugID], propertyID = gPlayerInteriors[playerid][PropertyArrayID];
+				new 
+					drugID = gPlayers[playerid][SelectedDrugID], 
+					propertyID = gPlayerInteriors[playerid][PropertyArrayID];
 
 				switch (listitem)
 				{
@@ -356,17 +358,17 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							SetSpawnPointAtProperty(playerid, propertyid);
 						}
-						// New vehicle attachment
+					// New vehicle attachment
 					case 1:
 						{
 							AttachVehicleToProperty(playerid, propertyid);
 						}
-						// Respawn attached car
+					// Respawn attached car
 					case 2: 
 						{
 							RespawnPropertyVehicle(playerid, propertyid);
 						}
-						// Property selling
+					// Property selling
 					case 3: 
 						{
 							SellPlayerProperty(playerid, propertyid);
@@ -421,7 +423,6 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				gPlayers[playerid][DialogShown] = false;
 
 				return 1;
-
 			}
 		case DIALOG_BANK_WITHDRAW:
 			{
@@ -435,7 +436,6 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				gPlayers[playerid][DialogShown] = false;
 
 				return 1;
-
 			}
 		case DIALOG_RACE_LIST:
 			{
@@ -1568,7 +1568,6 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							return ShowHighScoresPropertiesDialog(playerid);
 						}
 				}
-
 			}
 		case DIALOG_COMBAT_LIST:
 			{
@@ -1632,7 +1631,6 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							return 1;
 						}
 				}
-				
 			}
 		case DIALOG_BRIBE_NOTE:
 			{

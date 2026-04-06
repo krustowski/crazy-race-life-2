@@ -45,7 +45,10 @@
 //  Global static team objects.
 //
 
-new gAdminRoomHealth;
+new 
+	gAdminRoomHealth,
+	gAdminDoorDown,
+	gAdminDoorUp;
 
 new 
 	gHackerzInteriorEntrance,
@@ -53,15 +56,12 @@ new
 	gHackerzMoneyBag,
 	gHackerBlackMarket;
 
-new gAdminDoorDown;
-new gAdminDoorUp;
-
-new gDruggery;
-new gDruggeryMarket;
-new gDruggeryEntrance;
-
+new 
+	gDruggery,
+	gDruggeryMarket,
+	gDruggeryEntrance,
 #pragma unused gDruggeryExit
-new gDruggeryExit;
+	gDruggeryExit;
 
 //new gPlayerWeaponPickup[MAX_PLAYERS];
 

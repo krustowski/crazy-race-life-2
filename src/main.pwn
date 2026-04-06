@@ -14,10 +14,8 @@
 
  *  GameMode CRL2
 
- *
-
  *  Created: 	Jan 2025 (Extends legacy GameMode CRL (2008-2010))
- *  Credits: 	krusty, kompry, DRaGsTeR, amdulka, cranyy
+ *  Credits: 	krusty, kompry, DRaGsTeR, amdulka, cranyy, tack
  *  Language: 	EN, CZ
  *  Version: 	0.10.z
  *
@@ -987,7 +985,7 @@ public OnPlayerLeavePlayerGangZone(playerid, zoneid)
  *
 
  *  GameMode CRL2 
- *  Credits: krusty, kompry, DRaGsTeR, amdulka
+ *  Credits: krusty, kompry, DRaGsTeR, amdulka, cranyy, tack
  *  Jan 2025
 
  */

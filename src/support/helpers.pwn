@@ -19,7 +19,7 @@ enum Coords
        	Float: CoordR
 }
 
-new const GAMEMODE_CREDITS[] = "{FFD700}krusty, kompry, DRaGsTeR {FFFFFF}(2008-2010), {FFD700}amdulka, cranyy {FFFFFF}(2025-)";
+new const GAMEMODE_CREDITS[] = "{FFD700}krusty, kompry, DRaGsTeR {FFFFFF}(2008-2010), {FFD700}amdulka, cranyy, tack {FFFFFF}(2025-)";
 
 forward AutosaveData();
 forward StartServerReset();

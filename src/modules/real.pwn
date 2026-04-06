@@ -190,7 +190,9 @@ public InitRealEstateProperties()
 	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
 		if (!gProperties[i][ID])
+		{
 			continue;
+		}
 		
 		SpawnProperty(i);
 	}
@@ -277,13 +279,15 @@ public SendRealEstateCommission()
 
 stock SpawnProperty(propertyId)
 {
-	new query[256];
+	new 
+		query[256];
 
 	format(query, sizeof(query), "SELECT type,primary_x,primary_y,primary_z,primary_rot,secondary_x,secondary_y,secondary_z,secondary_rot FROM property_coords WHERE property_id = %d", 
 			gProperties[propertyId][ID]
 	);
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		printf("Database error: cannot list property coords (ID: %d: %d)!", propertyId, gProperties[propertyId][ID]);
@@ -292,11 +296,13 @@ stock SpawnProperty(propertyId)
 		return 0;
 	}
 
-	new i = 0;
+	new 
+		i = 0;
 
 	do 
 	{
-		new PropertyPoint: type = PropertyPoint: DB_GetFieldIntByName(result, "type");
+		new 
+			PropertyPoint: type = PropertyPoint: DB_GetFieldIntByName(result, "type");
 
 		new 
 			Float: pX = DB_GetFieldFloatByName(result, "primary_x"),
@@ -525,13 +531,15 @@ stock SpawnProperty(propertyId)
 
 stock GetOwnerName(userId, playerName[MAX_PLAYER_NAME])
 {
-	new query[256];
+	new 
+		query[256];
 
 	format(query, sizeof(query), "SELECT nickname FROM users WHERE id = %d", 
 			userId
 	      );
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		printf("Database error: cannot fetch user nickname (userID: %d)!", userId);
@@ -549,14 +557,16 @@ stock GetOwnerName(userId, playerName[MAX_PLAYER_NAME])
 
 stock LoadPlayerProperties(playerid)
 {
-	new query[256];
+	new 
+		query[256];
 
 	format(query, sizeof(query), "SELECT id FROM properties WHERE user_id = %d AND occupied = 1 AND type = %d", 
 			gPlayers[playerid][OrmID],
 			_: PROPERTY_TYPE_PERSONAL
 	      );
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		printf("Database error: cannot list player's properties (ID: %d)!", playerid);
@@ -565,7 +575,8 @@ stock LoadPlayerProperties(playerid)
 		return 0;
 	}
 
-	new i = 0;
+	new 
+		i = 0;
 
 	do
 	{

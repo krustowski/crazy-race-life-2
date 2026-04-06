@@ -92,7 +92,11 @@ enum
 {
 	DIALOG_LOCALE_LIST = 0x70,
 	DIALOG_PLAYER_DRUGZ,
-	DIALOG_PLAYER_ACCOUNT
+	DIALOG_PLAYER_ACCOUNT,
+	DIALOG_DEAL_MAIN,
+	DIALOG_DEAL_PLAYER_LIST,
+	DIALOG_DEAL_AMOUNT,
+	DIALOG_DEAL_VALUE
 }
 
 enum
@@ -1812,5 +1816,91 @@ stock ShowBlackMarketValueDialog(playerid)
 		stringToPrint[256] = "{FFD700}New Market Offer{FFFFFF}\n\nSet the value per unit you want to place in offer:";
 
 	return ShowPlayerDialog(playerid, DIALOG_BLACK_MARKET_VALUE, DIALOG_STYLE_INPUT, "Black Market New Offer", stringToPrint, "Set", "Close");
+}
+
+stock ShowDealMainDialog(playerid)
+{
+	new 
+		stringToPrint[512] = "Substance/stuff\tIn pockets\tMarket price";
+
+	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, "SELECT id, name, price FROM drug_prices");
+	if (!result) 
+	{
+		print("Database error: cannot fetch drug type names and prices!");
+		return 1;
+	}
+
+	do
+	{
+		new 
+			id = DB_GetFieldIntByName(result, "id");
+		if (!id)
+		{
+			continue;
+		}
+
+		new 
+			name[64],
+			price = DB_GetFieldIntByName(result, "price");
+
+		DB_GetFieldStringByName(result, "name", name, sizeof(name));
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d\t%d", 
+				stringToPrint, 
+				name, 
+				gPlayers[playerid][Drugs][id - 1], 
+				floatround(price * gBlackMarketRatio) 
+			);
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	return ShowPlayerDialog(playerid, DIALOG_DEAL_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "New Deal Offer", stringToPrint, "Select", "Close");
+}
+
+stock ShowDealAmountDialog(playerid)
+{
+	new 
+		stringToPrint[256] = "{FFD700}New Deal Offer{FFFFFF}\n\nSet the amount you want to place in offer:";
+
+	return ShowPlayerDialog(playerid, DIALOG_DEAL_AMOUNT, DIALOG_STYLE_INPUT, "Deal New Offer", stringToPrint, "Set", "Close");
+}
+
+stock ShowDealValueDialog(playerid)
+{
+	new 
+		stringToPrint[256] = "{FFD700}New Deal Offer{FFFFFF}\n\nSet the value per unit you want to place in offer:";
+
+	return ShowPlayerDialog(playerid, DIALOG_DEAL_VALUE, DIALOG_STYLE_INPUT, "Deal New Offer", stringToPrint, "Set", "Close");
+}
+
+stock ShowDealPlayerListDialog(playerid)
+{
+	new 
+		j = 0,
+		stringToPrint[1024] = "Name\tID";
+
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i))
+		{
+			continue;
+		}
+
+		new 
+			playerName[MAX_PLAYER_NAME];
+		GetPlayerName(i, playerName);
+
+		gPlayers[playerid][OnlinePlayerList][j++] = i;
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
+				stringToPrint,
+				playerName,
+				i
+		      );
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_DEAL_PLAYER_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Player List", stringToPrint, "Goto", "Cancel");
 }
 

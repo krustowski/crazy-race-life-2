@@ -11,7 +11,7 @@ Test:MemoryInit()
 			sizeof(gI18nMessages[]),
 			sizeof(gI18nMessages[][])
 		);
-	
+
 	TEST_END("MemoryInit");
 }
 

@@ -262,46 +262,7 @@ dcmd_deal(playerid, const params[])
 		return SendClientMessage(playerid, COLOR_RED, "[ CMD ] Dealerz-only reserved command!");
 	}
 
-	if (!strlen(params) || (!IsNumeric(token1) && !IsNumeric(token2) && !strcmp(token1, "list")) || (strcmp(token1, "list") && IsNumeric(token2)))
-	{
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /deal [playerID] [drugID]");
-		SendClientMessage(playerid, COLOR_YELLOW, "[ CMD ] Usage: /deal list");
-		return 1;
-	}
-
-	if (IsNumeric(token1) && IsNumeric(token2))
-	{
-		new targetId = strval(token1);// targetAmount = strval(token2);
-
-		if (targetId == playerid)
-		{
-			return SendClientMessage(playerid, COLOR_RED, "[ ! ] Cannot deal to such player!");
-		}
-
-		if (!IsPlayerConnected(targetId))
-		{
-			return SendClientMessage(playerid, COLOR_YELLOW, "[ ! ] No such player online!");
-		}
-
-		//
-		//
-		//
-
-	}
-	else if (!strcmp(token1, "list"))
-	{
-		new stringToPrint[128];
-
-		SendClientMessage(playerid, COLOR_ORANGE, "[ DRUGZ ] Drug and stuff list:");
-
-		for (new i = 0; i < MAX_DRUG_TYPES; i++)
-		{
-			format(stringToPrint, sizeof(stringToPrint), "-> [ID %2d]: %s (got %d g/pcs)", i, gDrugz[i][DrugName], gPlayers[playerid][Drugs][i]);
-			SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
-		}
-	}
-
-	return 1;
+	return ShowDealMainDialog(playerid);
 }
 
 dcmd_deathmatch(playerid, const params[])

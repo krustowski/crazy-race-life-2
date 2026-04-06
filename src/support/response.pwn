@@ -105,7 +105,7 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 
 				// Save to the temporary user's var.
-				gPlayers[playerid][SelectedDrugID] = listitem;
+				gPlayers[playerid][SelectedDrugID] = DrugType: listitem;
 
 				ShowPlayerDialog(playerid, DIALOG_PROPERTY_DRUGZ_TRANS, DIALOG_STYLE_LIST, "Drugz", "Deposit at home\nWithdraw the whole amount", "Confirm", "Cancel");
 
@@ -119,7 +119,7 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 
 				new 
-					drugID = gPlayers[playerid][SelectedDrugID], 
+					drugID = _: gPlayers[playerid][SelectedDrugID], 
 					propertyID = gPlayerInteriors[playerid][PropertyArrayID];
 
 				switch (listitem)
@@ -1735,6 +1735,67 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				SendClientMessage(playerid, COLOR_YELLOW, "[ MARKET ] Value set!");
 
 				return ProcessNewBlackMarketOffer(playerid);
+			}
+		case DIALOG_DEAL_MAIN:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				gPlayers[playerid][SelectedDrugID] = DrugType: (listitem + 1);
+
+				return ShowDealAmountDialog(playerid);
+			}
+		case DIALOG_DEAL_AMOUNT:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				if (!IsNumeric(inputtext) || strval(inputtext) < 0)
+				{
+					SendClientMessage(playerid, COLOR_RED, "[ DEAL ] Wrong amount set!");
+					return ShowDealAmountDialog(playerid);
+				}
+
+				if (gPlayers[playerid][Drugs][_: gPlayers[playerid][SelectedDrugID] - 1 ] < strval(inputtext))
+				{
+					return SendClientMessage(playerid, COLOR_RED, "[ DEAL ] Not such amount of such item in pockets!");
+				}
+
+				gPlayers[playerid][SelectedDrugAmount] = strval(inputtext);
+				SendClientMessage(playerid, COLOR_YELLOW, "[ DEAL ] Amount set!");
+
+				return ShowDealValueDialog(playerid);
+			}
+		case DIALOG_DEAL_VALUE:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				if (!IsNumeric(inputtext) || strval(inputtext) < 0)
+				{
+					SendClientMessage(playerid, COLOR_RED, "[ DEAL ] Wrong value set!");
+					return ShowDealValueDialog(playerid);
+				}
+
+				gPlayers[playerid][SelectedDrugValue] = strval(inputtext);
+				SendClientMessage(playerid, COLOR_YELLOW, "[ DEAL ] Value set!");
+
+				return ShowDealPlayerListDialog(playerid);
+			}
+		case DIALOG_DEAL_PLAYER_LIST:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				return ProcessDealOffer(playerid);
 			}
 
 		default: 

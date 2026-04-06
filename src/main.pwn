@@ -361,7 +361,8 @@ public OnPlayerSpawn(playerid)
 	}
 
 	// Default location to spawrn a player (LV pyramid).
-	SetPlayerPos(playerid, 2323.73, 1283.18, 97.60);
+	//SetPlayerPos(playerid, 2323.73, 1283.18, 97.60);
+	SetPlayerPos(playerid, 2248.22, 1239.58, 10.82);
 
 	return 1;
 }

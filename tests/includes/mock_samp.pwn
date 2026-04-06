@@ -212,6 +212,16 @@ stock Mock_NPC_Spawn(npcid)
 #define		NPC_Spawn		Mock_NPC_Spawn
 #define		DB_GetFieldString	Mock_DB_GetFieldString
 #define		DB_GetFieldInt		Mock_DB_GetFieldInt
+
+// Make IsPlayerConnected always return true for test player IDs
+#define 	IsPlayerConnected(%0) 	((%0) < MAX_PLAYERS)
+
+// Stub GetPlayerName to fill a predictable value
+#define 	GetPlayerName(%0,%1,%2) (format(%1, %2, "TestPlayer_%d", %0))
+
+// Stub TextDraw calls to no-ops
+#define 	TextDrawHideForPlayer(%0,%1) (0)
+#define 	TextDrawShowForPlayer(%0,%1) (0)
     
 #else
 // Use real SA-MP functions

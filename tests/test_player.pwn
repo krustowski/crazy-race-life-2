@@ -50,3 +50,38 @@ Test:PlayerRegistration()
 
 	TEST_END("PlayerRegistration");
 }
+
+Test:PlayerDealConfirmation()
+{
+	TEST_START("PlayerDealConfirmation");
+
+	new
+		deal,
+		testAmount = 0,
+		playerid = CreateTestPlayer(),
+		dealerid = CreateTestPlayer();
+
+	//printf("playerid: %d (%d), dealerid: %d (%d)", playerid, IsPlayerConnected(playerid), dealerid, IsPlayerConnected(dealerid));
+
+	MockPlayerDealState(playerid, dealerid);
+
+	// Not enough money
+	deal = ProcessDealOffer(playerid);
+	ASSERT_TRUE(deal == 0);
+
+	MockPlayerDealState(playerid, dealerid);
+	GivePlayerMoney(playerid, 10000);
+
+	// Successful deal
+	deal = ProcessDealOffer(playerid);
+	ASSERT_TRUE(deal == 1);
+
+	// Test the deal amount received
+	testAmount = gPlayers[playerid][Drugs][TYPE_ZAZA];
+	ASSERT_EQ(testAmount, 100);
+
+	DestroyTestPlayer();
+	DestroyTestPlayer();
+
+	TEST_END("PlayerDealConfirmation");
+}

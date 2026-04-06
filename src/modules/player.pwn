@@ -702,17 +702,23 @@ stock ProcessDealOffer(playerid)
 
 	if (!IsPlayerConnected(dealerid))
 	{
-		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+		//print("[TEST] Dealer not connected");
+		SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+		return 0;
 	}
 
 	if (GetPlayerMoney(playerid) < price)
 	{
-		return SendClientMessageLocalized(playerid, I18N_DEAL_NO_MONEY);
+		//print("[TEST] Not enough money");
+		SendClientMessageLocalized(playerid, I18N_DEAL_NO_MONEY);
+		return 0;
 	}
 
 	if (!gPlayers[playerid][AcceptedDeal])
 	{
-		return SendClientMessageLocalized(playerid, I18N_DEAL_NOT_ACCEPTED);
+		//print("[TEST] Deal declined");
+		SendClientMessageLocalized(playerid, I18N_DEAL_NOT_ACCEPTED);
+		return 0;
 	}
 
 	// Make the deal
@@ -1312,3 +1318,51 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 	return 1;
 }
 
+stock ResetPlayerState(playerid)
+{
+	// Reset the auth status for a new player.
+	gPlayers[playerid][IsLogged] = false;
+	gPlayers[playerid][TeamID] = TEAM_NONE;
+
+	gPlayers[playerid][InMinigame] = false;
+	gPlayers[playerid][SwitchedControllers] = false;
+
+	// Reset the deathmatch states.
+	gDeathmatch[playerid][IsRegistered] = false;
+	gDeathmatch[playerid][InGame] = false;
+	gDeathmatch[playerid][Score] = 0;
+
+	// Reset trucking
+	gTrucking[playerid] = false;
+	gPlayerMissions[playerid][TimeElapsed] = 0;
+	gPlayerMissions[playerid][Earned] = 0;
+	gPlayerMissions[playerid][DoneCount] = 0;
+	TextDrawHideForPlayer(playerid, gMissionInfoText[playerid]);
+
+	// Reset towing
+	gTowMission[playerid][TruckID] = INVALID_VEHICLE_ID;
+	gTowMission[playerid][TowedID] = INVALID_VEHICLE_ID;
+	gTowMission[playerid][Active] = false;
+	TextDrawHideForPlayer(playerid, gTowMissionText[playerid]);
+
+	// Reset racing
+	gPlayerRaceTimer[playerid] = Timer: 0;
+	gPlayerRaceTime[playerid] = 0;
+	TextDrawHideForPlayer(playerid, gRaceInfoText[playerid]);
+
+	for (new i = 0; i < MAX_RACE_COUNT; i++)
+	{
+		gPlayerRace[playerid][i] = 0;
+	}
+
+	// Combat mission
+	gCombatMission[playerid][Active] = false;
+
+	// Taxi mission
+	gTaxiMission[playerid][Active] = false;
+
+	// Reset locale to English
+	gPlayers[playerid][Locale] = LOCALE_EN;
+
+	return 1;
+}

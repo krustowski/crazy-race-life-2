@@ -94,52 +94,10 @@ public OnPlayerConnect(playerid)
 		playerName[MAX_PLAYER_NAME], 
 		stringToPrint[128];
 
-	// Reset the auth status for a new player.
-	gPlayers[playerid][IsLogged] = false;
-	gPlayers[playerid][TeamID] = TEAM_NONE;
-
-	gPlayers[playerid][InMinigame] = false;
-	gPlayers[playerid][SwitchedControllers] = false;
-
-	// Reset the deathmatch states.
-	gDeathmatch[playerid][IsRegistered] = false;
-	gDeathmatch[playerid][InGame] = false;
-	gDeathmatch[playerid][Score] = 0;
-
-	// Reset trucking
-	gTrucking[playerid] = false;
-	gPlayerMissions[playerid][TimeElapsed] = 0;
-	gPlayerMissions[playerid][Earned] = 0;
-	gPlayerMissions[playerid][DoneCount] = 0;
-	TextDrawHideForPlayer(playerid, gMissionInfoText[playerid]);
-
-	// Reset towing
-	gTowMission[playerid][TruckID] = INVALID_VEHICLE_ID;
-	gTowMission[playerid][TowedID] = INVALID_VEHICLE_ID;
-	gTowMission[playerid][Active] = false;
-	TextDrawHideForPlayer(playerid, gTowMissionText[playerid]);
-
-	// Reset racing
-	gPlayerRaceTimer[playerid] = Timer: 0;
-	gPlayerRaceTime[playerid] = 0;
-	TextDrawHideForPlayer(playerid, gRaceInfoText[playerid]);
-
-	for (new i = 0; i < MAX_RACE_COUNT; i++)
-	{
-		gPlayerRace[playerid][i] = 0;
-	}
-
-	// Combat mission
-	gCombatMission[playerid][Active] = false;
-
-	// Taxi mission
-	gTaxiMission[playerid][Active] = false;
+	ResetPlayerState(playerid);
 
 	// Text inits.
 	AddTexts(playerid);
-
-	// Reset locale to English
-	gPlayers[playerid][Locale] = LOCALE_EN;
 
 	// Fetch player's name and print it out to outhers online.
 	GetPlayerName(playerid, playerName, sizeof(playerName));

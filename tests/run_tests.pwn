@@ -33,6 +33,7 @@ main()
     
 	RUN_TEST(PlayerConnect);
 	RUN_TEST(PlayerRegistration);
+	RUN_TEST(PlayerDealConfirmation);
 	//RUN_TEST(PlayerInventory);
 	//RUN_TEST(VehicleCreation);
 	//RUN_TEST(PlayerVehicleInteraction);

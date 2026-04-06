@@ -14,9 +14,6 @@ new gTotalTests = 0;
 
 new bool:gCurrentTestFailed = false;
 
-// Mock player for testing
-static gTestPlayer = INVALID_PLAYER_ID;
-
 //
 //  Macros
 //
@@ -71,21 +68,25 @@ public ExitAfterTests()
 //  Stock helpers
 // 
 
+// Mock player for testing
+static gTestPlayer = 0;
+
 stock CreateTestPlayer()
 {
-	// Simulate player connection
-	gTestPlayer = 0; // Use player 0 as test player
-	CallLocalFunction("OnPlayerConnect", "d", gTestPlayer);
+	new 
+		playerid = gTestPlayer++;
+
+	ResetPlayerState(playerid);
+	format(gPlayers[playerid][Name], MAX_PLAYER_NAME, "TestPlayer%d", playerid);
     
-	return gTestPlayer;
+	return gTestPlayer++;
 }
 
 stock DestroyTestPlayer()
 {
 	if (gTestPlayer != INVALID_PLAYER_ID)
 	{
-		CallLocalFunction("OnPlayerDisconnect", "dd", gTestPlayer, 0);
-		gTestPlayer = INVALID_PLAYER_ID;
+		CallLocalFunction("OnPlayerDisconnect", "dd", --gTestPlayer, 0);
 	}
 
 	return 1;
@@ -108,4 +109,20 @@ TeardownTest()
 {
 	// Clean up any created objects
 	// Reset mock data
+}
+
+stock MockPlayerDealState(playerid, dealerid)
+{
+	gPlayers[playerid][AcceptedDeal] = true;
+
+	gPlayers[playerid][SelectedDrugAmount] = 100;
+	gPlayers[dealerid][SelectedDrugAmount] = 100;
+	gPlayers[playerid][SelectedDrugValue] = 100;
+	gPlayers[dealerid][SelectedDrugValue] = 100;
+	gPlayers[playerid][SelectedDrugID] = DrugType: 1;
+	gPlayers[dealerid][SelectedDrugID] = DrugType: 1;
+	gPlayers[playerid][DealPlayerTargetID] = dealerid;
+	gPlayers[dealerid][DealPlayerTargetID] = playerid;
+
+	return 1;
 }

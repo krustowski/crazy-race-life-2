@@ -61,6 +61,7 @@ enum Player
 	bool: Listening,
 	bool: InMinigame,
 	bool: SwitchedControllers,
+	bool: AcceptedDeal,
 
 	PlayTime,
 
@@ -77,6 +78,7 @@ enum Player
 	ClickedPlayerID, 
 	PMTargetID,
 	PropertyOwnedID,
+	DealPlayerTargetID,
 	DrugType: SelectedDrugID,
 	SelectedDrugAmount,
 	SelectedDrugValue,
@@ -688,6 +690,62 @@ stock CheckDrugzPickup(playerid, pickupid)
 	return 0;
 }
 
+stock ProcessDealOffer(playerid)
+{
+	new
+		amount = gPlayers[playerid][SelectedDrugAmount],
+		value = gPlayers[playerid][SelectedDrugValue],
+		price = amount * value,
+		DrugType: drugid = gPlayers[playerid][SelectedDrugID],
+		targetidraw = gPlayers[playerid][DealPlayerTargetID],
+		dealerid = gPlayers[playerid][OnlinePlayerList][targetidraw];
+
+	if (!IsPlayerConnected(dealerid))
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
+
+	if (GetPlayerMoney(playerid) < price)
+	{
+		return SendClientMessageLocalized(playerid, I18N_DEAL_NO_MONEY);
+	}
+
+	if (!gPlayers[playerid][AcceptedDeal])
+	{
+		return SendClientMessageLocalized(playerid, I18N_DEAL_NOT_ACCEPTED);
+	}
+
+	// Make the deal
+	GivePlayerMoney(playerid, -price);
+	GivePlayerMoney(dealerid, price);
+	gPlayers[playerid][Drugs][_: drugid] += floatround(amount);
+	gPlayers[dealerid][Drugs][_: drugid] -= floatround(amount);
+
+	SendClientMessageLocalized(playerid, I18N_DEAL_ACCPTED_TARGET);
+	SendClientMessageLocalized(dealerid, I18N_DEAL_ACCPTED_DEALER);
+
+	// Cleanup
+	gPlayers[playerid][AcceptedDeal] = false;
+
+	CleanDealCounterparts(playerid, dealerid);
+
+	return 1;
+}
+
+stock CleanDealCounterparts(playerid, dealerid)
+{
+	gPlayers[playerid][SelectedDrugAmount] = 0;
+	gPlayers[dealerid][SelectedDrugAmount] = 0;
+	gPlayers[playerid][SelectedDrugValue] = 0;
+	gPlayers[dealerid][SelectedDrugValue] = 0;
+	gPlayers[playerid][SelectedDrugID] = DrugType: 0;
+	gPlayers[dealerid][SelectedDrugID] = DrugType: 0;
+	gPlayers[playerid][DealPlayerTargetID] = INVALID_PLAYER_ID;
+	gPlayers[dealerid][DealPlayerTargetID] = INVALID_PLAYER_ID;
+
+	return 1;
+}
+
 stock ProcessBlackMarketOffer(playerid, listitem)
 {
 	if (!gBlackMarketItems[listitem][OrmID])
@@ -741,6 +799,7 @@ stock ProcessBlackMarketOffer(playerid, listitem)
 		}
 	}
 
+	// Make the deal
 	GivePlayerMoney(playerid, -price);
 	gPlayers[playerid][Drugs][_: type] += floatround(amount);
 

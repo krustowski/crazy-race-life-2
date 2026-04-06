@@ -96,7 +96,8 @@ enum
 	DIALOG_DEAL_MAIN,
 	DIALOG_DEAL_PLAYER_LIST,
 	DIALOG_DEAL_AMOUNT,
-	DIALOG_DEAL_VALUE
+	DIALOG_DEAL_VALUE,
+	DIALOG_DEAL_CONFIRMATION
 }
 
 enum
@@ -1902,5 +1903,23 @@ stock ShowDealPlayerListDialog(playerid)
 	}
 
 	return ShowPlayerDialog(playerid, DIALOG_DEAL_PLAYER_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Player List", stringToPrint, "Goto", "Cancel");
+}
+
+stock ShowDealConfirmationDialog(playerid)
+{
+	if (!gPlayers[playerid][SelectedDrugID])
+	{
+		return 1;
+	}
+
+	new
+		stringToPrint[256];
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}New Deal Offer{FFFFFF}\n\nSubstance: {FFD700}%s{FFFFFF}\nAmount: {00FF00}%d{FFFFFF}\nValue (per unit): {00FF00}%d{FFFFFF}\n\nAre you accepting such offer?",
+			gDrugz[ _: gPlayers[playerid][SelectedDrugID] - 1 ][DrugName],
+			gPlayers[playerid][SelectedDrugAmount],
+			gPlayers[playerid][SelectedDrugValue]
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_DEAL_CONFIRMATION, DIALOG_STYLE_MSGBOX, "Deal Confirmation", stringToPrint, "Accept", "Decline");
 }
 

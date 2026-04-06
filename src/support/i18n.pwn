@@ -132,6 +132,13 @@ enum
 	I18N_AE_MOVE_UP,
 	I18N_AE_MOVE_DOWN,
 	I18N_AE_MOVE_STOP,
+	// Deals
+	I18N_DEAL_NO_MONEY,
+	I18N_DEAL_NOT_ACCEPTED,
+	I18N_DEAL_OFFER_PLACED,
+	I18N_DEAL_ACCPTED_TARGET,
+	I18N_DEAL_ACCPTED_DEALER,
+	I18N_DEAL_DECLINED,
 	// Black Market
 	I18N_BLACK_MARKET_RATIO_UPDATE,
 	I18N_BLACK_MARKET_ALREADY_PROCESSED,
@@ -323,6 +330,13 @@ new gI18nMessageColor[] =
 	// Admin elevator
 	COLOR_YELLOW,
 	COLOR_YELLOW,
+	COLOR_YELLOW,
+	// Deals
+	COLOR_RED,
+	COLOR_YELLOW,
+	COLOR_ORANGE,
+	COLOR_ORANGE,
+	COLOR_ORANGE,
 	COLOR_YELLOW,
 	// Black Market
 	COLOR_ORANGE,
@@ -779,6 +793,33 @@ new gI18nMessages[][PlayerLocale][MAX_MESSAGE_LEN] =
 	{
 		"[ AE ] Admin elevator stopped due to a technical malfunction!",
 		"[ AE ] Vytah admin se zasekl kvuli poruse zarizeni!"
+	},
+	//
+	//  Deals
+	//
+	{
+		"[ DEAL ] Player got no money for such deal!",
+		"[ DEAL ] Hrac nema dostatek penez pro danou transakci!"
+	},
+	{
+		"[ DEAL ] Deal was not accepted.",
+		"[ DEAL ] Nabidka byla odmitnuta."
+	},
+	{
+		"[ DEAL ] The offer was sent to target player!",
+		"[ DEAL ] Nabidka byla odeslana hraci!"
+	},
+	{
+		"[ DEAL ] The offer was accepted and processed!",
+		"[ DEAL ] Nabidka byla prijata a zprocesovana!"
+	},
+	{
+		"[ DEAL ] The offer was accepted and processed!",
+		"[ DEAL ] Nabidka byla prijata a zprocesovana!"
+	},
+	{
+		"[ DEAL ] The offer was declined!",
+		"[ DEAL ] Nabidka byla hracem odmitnuta!"
 	},
 	//
 	//  Black Market

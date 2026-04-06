@@ -1795,6 +1795,32 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
+				gPlayers[playerid][DealPlayerTargetID] = listitem;
+
+				new
+					targetid = gPlayers[playerid][OnlinePlayerList][listitem];
+
+				gPlayers[targetid][SelectedDrugID] = gPlayers[playerid][SelectedDrugID];
+				gPlayers[targetid][SelectedDrugAmount] = gPlayers[playerid][SelectedDrugAmount];
+				gPlayers[targetid][SelectedDrugValue] = gPlayers[playerid][SelectedDrugValue];
+				gPlayers[targetid][DealPlayerTargetID] = playerid;
+
+				SendClientMessageLocalized(playerid, I18N_DEAL_OFFER_PLACED);
+
+				return ShowDealConfirmationDialog(targetid);
+			}
+		case DIALOG_DEAL_CONFIRMATION:
+			{
+				if (!response)
+				{
+					new
+						dealerid = gPlayers[playerid][DealPlayerTargetID];
+
+					CleanDealCounterparts(playerid, dealerid);
+					return SendClientMessageLocalized(dealerid, I18N_DEAL_DECLINED);
+				}
+				
+				gPlayers[playerid][AcceptedDeal] = true;
 				return ProcessDealOffer(playerid);
 			}
 

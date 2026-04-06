@@ -79,9 +79,11 @@ enum DrugPickup
 	Point[Coords]
 }
 
-new gDrugPickups[MAX_DRUG_PICKUPS][DrugPickup];
+new 
+	gDrugPickups[MAX_DRUG_PICKUPS][DrugPickup];
 
-new gDrugz[MAX_DRUG_TYPES][Drug];
+new 
+	gDrugz[MAX_DRUG_TYPES][Drug];
 
 forward UpdateBlackMarketRatio();
 

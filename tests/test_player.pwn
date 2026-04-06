@@ -34,12 +34,16 @@ Test:PlayerRegistration()
 	
 	new 
 		playerid = CreateTestPlayer(),
-		reg = SetPlayerAccountRegistration(playerid, "test1234");
-    
+		reg;
+
+	InitDB();
+
+	format(gPlayers[playerid][Name], MAX_PLAYER_NAME, "tester");
+
+	reg = SetPlayerAccountRegistration(playerid, "test1234");
 	ASSERT_TRUE(reg == 1);
 
 	reg = SetPlayerAccountRegistration(playerid, "test1234");
-
 	ASSERT_TRUE(reg == 0);
 
 	DestroyTestPlayer();

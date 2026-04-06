@@ -15,4 +15,3 @@ Test:MemoryInit()
 	TEST_END("MemoryInit");
 }
 
-

@@ -56,7 +56,29 @@ stock SetPlayerAccountLogin(playerid, const text[])
 
 stock SetPlayerAccountRegistration(playerid, const text[])
 {
-	new hashedPwd[65], salt[17];
+	new
+		query_test[64];
+
+	format(query_test, sizeof(query_test), "SELECT pwdhash, salt FROM users WHERE nickname = '%s'", gPlayers[playerid][Name]);
+
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query_test);
+	if (!result) 
+	{
+		print("Database error: cannot fetch user data!");
+		return 0;
+	}
+
+	if (DB_GetRowCount(result))
+	{
+		return 0;
+	}
+
+	DB_FreeResultSet(result);
+
+	new 
+		hashedPwd[65], 
+		salt[17];
 
 	// 16 random characters from 33 to 126 (in ASCII) for the salt
 	for (new i = 0; i < 16; i++) 
@@ -83,7 +105,7 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 			"0,0,0,0,0"
 	);
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		print("Database error: cannot write (register) user data!");

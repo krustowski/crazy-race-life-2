@@ -13,8 +13,10 @@ enum E_POSITION
 }
 
 // Global variables to track the player's position and state.
-new gPlayerPosition[MAX_PLAYERS][E_POSITION];
-new gRadarCaught[MAX_PLAYERS];
+new 
+	gPlayerPosition[MAX_PLAYERS][E_POSITION],
+	gRadarCaught[MAX_PLAYERS],
+	bool: gRadarEnabled = false;
 
 // Text variables to show on player's screen.
 //new Text:KPH[MAX_PLAYERS];
@@ -31,7 +33,7 @@ new Float: gRadarPositions[][4] =
 	{2507.3359, 1880.9712, 10.6719, 15.0},
 	{2260.2791, 1373.3129, 10.6719, 15.0},
 	{2427.2900, 1257.8555, 10.7901, 15.0},
-	{2210.5552, 973.2725, 10.6719, 15.0},
+	{2210.5552,  973.2725, 10.6719, 15.0},
 	{1536.0039, 1133.1715, 10.6719, 15.0},
 	{1007.3343, 1540.1764, 10.6719, 15.0},
 	{1448.2607, 2589.8904, 10.6719, 15.0},
@@ -77,6 +79,11 @@ public OnRadarCheckpoint()
 		gPlayerPosition[i][E_POSITION_X] = radarX;
 		gPlayerPosition[i][E_POSITION_Y] = radarY;
 		gPlayerPosition[i][E_POSITION_Z] = radarZ;
+
+		if (!gRadarEnabled)
+		{
+			return 1;
+		}
 
 		for (new j = 0; j < sizeof(gRadarPositions); j++)
 		{

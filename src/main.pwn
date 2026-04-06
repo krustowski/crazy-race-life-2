@@ -176,10 +176,9 @@ public OnPlayerConnect(playerid)
 			"{FFD700}CrazyRaceLife2{FFFFFF} (CRL2)"
 	      );
 	SendClientMessage(playerid, COLOR_GREY, stringToPrint);
-	format(stringToPrint, sizeof(stringToPrint), "%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s%s",
 			"Credits: {00FF00}",
-			GAMEMODE_CREDITS,
-			"{FFFFFF} (2008-2010, 2025-){FFFFFF}"
+			GAMEMODE_CREDITS
 	      );
 	SendClientMessage(playerid, COLOR_GREY, stringToPrint);
 	format(stringToPrint, sizeof(stringToPrint), "%s%d.%d.%d (%s)",

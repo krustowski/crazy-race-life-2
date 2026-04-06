@@ -47,9 +47,11 @@
 
 new gAdminRoomHealth;
 
-new gHackerzInteriorEntrance;
-new gHackerzInteriorExit;
-new gHackerzMoneyBag;
+new 
+	gHackerzInteriorEntrance,
+	gHackerzInteriorExit,
+	gHackerzMoneyBag,
+	gHackerBlackMarket;
 
 new gAdminDoorDown;
 new gAdminDoorUp;
@@ -99,6 +101,7 @@ public InitPickups()
 	gHackerzInteriorEntrance = EnsurePickupCreated(1318, 1, 2866.62, -2125.24, 5.72);
 	gHackerzInteriorExit = EnsurePickupCreated(1318, 1, 2853.09, -2125.16, 0.19);
 	gHackerzMoneyBag = EnsurePickupCreated(1550, 1, 2838.59, -2141.25, 0.19);
+	gHackerBlackMarket = EnsurePickupCreated(PICKUP_SKULL, 1, 2836.32, -2137.32, 0.19);
 
 	// ???
 	//picktunel = EnsurePickupCreated(1318, 1, 2263.41, -755.52, 38.04);
@@ -423,6 +426,15 @@ stock CheckGenericPickup(playerid, pickupid)
 	{
 		SetPlayerPos(playerid, 2881.27, -2123.99, 4.32);
 		return 1;
+	}
+	else if (pickupid == gHackerBlackMarket)
+	{
+		if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
+		{
+			return 1;
+		}
+
+		return ShowBlackMarketMainDialog(playerid);
 	}
 
 	else if (pickupid == gHackerzMoneyBag)

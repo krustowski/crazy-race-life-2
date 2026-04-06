@@ -7,19 +7,17 @@ Test:PlayerConnect()
 	TEST_START("PlayerConnect");
 	
 	new 
+		Float: health,
+		name[MAX_PLAYER_NAME],
 		playerid = CreateTestPlayer();
     
 	// Test registration system
-	new 
-		name[MAX_PLAYER_NAME];
 	GetPlayerName(playerid, name, sizeof(name));
 	ASSERT_TRUE(strlen(name) > 0);
     
 	// Test default values
 	ASSERT_EQ(GetPlayerMoney(playerid), 0);
 
-	new 
-		Float:health;
 	GetPlayerHealth(playerid, health);
 	ASSERT_FLOAT_EQ(health, 0.0);
     
@@ -69,6 +67,10 @@ Test:PlayerDealConfirmation()
 	deal = ProcessDealOffer(playerid);
 	ASSERT_TRUE(deal == 0);
 
+	// Test the deal amount received
+	testAmount = gPlayers[playerid][Drugs][_: TYPE_ZAZA];
+	ASSERT_EQ(testAmount, 0);
+
 	MockPlayerDealState(playerid, dealerid);
 	GivePlayerMoney(playerid, 10000);
 
@@ -77,7 +79,7 @@ Test:PlayerDealConfirmation()
 	ASSERT_TRUE(deal == 1);
 
 	// Test the deal amount received
-	testAmount = gPlayers[playerid][Drugs][TYPE_ZAZA];
+	testAmount = gPlayers[playerid][Drugs][_: TYPE_ZAZA];
 	ASSERT_EQ(testAmount, 100);
 
 	DestroyTestPlayer();

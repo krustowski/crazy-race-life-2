@@ -92,25 +92,6 @@ stock DestroyTestPlayer()
 	return 1;
 }
 
-SetupTest()
-{
-    	// Reset global state
-	for (new i = 0; i < MAX_PLAYERS; i++)
-	{
-		gPlayerLoggedIn[i] = false;
-	}
-
-    	// Clear test data
-	ClearProperties();
-    	ClearVehicles();
-}
-
-TeardownTest()
-{
-	// Clean up any created objects
-	// Reset mock data
-}
-
 stock MockPlayerDealState(playerid, dealerid)
 {
 	gPlayers[playerid][AcceptedDeal] = true;

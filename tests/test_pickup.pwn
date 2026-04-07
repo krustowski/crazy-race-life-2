@@ -2,7 +2,7 @@
 //  test_pickup.pwn
 //
 
-Test:PickupCreate()
+Test: PickupCreate()
 {
 	TEST_START("PickupCreate");
 	

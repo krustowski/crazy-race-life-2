@@ -2,7 +2,7 @@
 //  test_player.pwn
 //
 
-Test:PlayerConnect()
+Test: PlayerConnect()
 {
 	TEST_START("PlayerConnect");
 	
@@ -26,7 +26,7 @@ Test:PlayerConnect()
 	TEST_END("PlayerConnect");
 }
 
-Test:PlayerRegistration()
+Test: PlayerRegistration()
 {
 	TEST_START("PlayerRegistration");
 	
@@ -49,7 +49,7 @@ Test:PlayerRegistration()
 	TEST_END("PlayerRegistration");
 }
 
-Test:PlayerDealConfirmation()
+Test: PlayerDealConfirmation()
 {
 	TEST_START("PlayerDealConfirmation");
 

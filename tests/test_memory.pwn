@@ -2,7 +2,7 @@
 //  test_memory.pwn
 //
 
-Test:MemoryInit()
+Test: MemoryInit()
 {
 	TEST_START("MemoryInit");
 

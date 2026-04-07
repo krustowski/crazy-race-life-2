@@ -78,6 +78,7 @@ stock CreateTestPlayer()
 
 	ResetPlayerState(playerid);
 	format(gPlayers[playerid][Name], MAX_PLAYER_NAME, "TestPlayer%d", playerid);
+	SetPlayerName(playerid, gPlayers[playerid][Name]);
     
 	return gTestPlayer++;
 }

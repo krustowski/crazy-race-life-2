@@ -93,7 +93,7 @@ public CheckPlayerTowTrailerAttached(playerid)
 		SetVehicleParamsForPlayer(vehicleid, playerid, true, false);
 
 		new
-			gameText[32];
+			gameText[128];
 
 		GetLocalizedString(playerid, I18N_TOW_RETURN_TO_TRUCK_FMT, gameText, sizeof(gameText));
 		GameTextForPlayer(playerid, gameText, 1000, 3); 

@@ -34,7 +34,9 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 #include "support/i18n.pwn"
 #include "support/net.pwn"
 #include "support/http.pwn"
-#include "sampctl_build_file.inc"
+
+#include "includes/crazy_race_life_2_version.inc"
+#include "includes/sampctl_build_file.inc"
 
 //
 //  Advertisement.

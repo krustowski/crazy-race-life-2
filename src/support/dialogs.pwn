@@ -1054,7 +1054,7 @@ stock ShowPrizesInfoDialog(playerid)
 	return ShowPlayerDialog(playerid, DIALOG_PRIZE_LIST, DIALOG_STYLE_MSGBOX, "Prizes Info", stringToPrint, "Close", "");
 }
 
-#include "crazy_race_life_2_version.inc"
+#include "includes/crazy_race_life_2_version.inc"
 
 stock ShowCreditsDialog(playerid)
 {

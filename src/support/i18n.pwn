@@ -224,6 +224,17 @@ enum
 	I18N_REAL_SKIN_SET,
 	I18N_REAL_SKIN_DELETED,
 	I18N_REAL_VEHICLE_MOD_SAVED,
+	// Combat
+	I18N_COMBAT_BRIEFCASES_EXCHANGED_FMT,
+	I18N_COMBAT_INFO_FMT,
+	I18N_COMBAT_FOLLOW_MARKER_BRIEFCASEMAN,
+	I18N_COMBAT_FOUND_BRIEFCASE_FMT,
+	I18N_COMBAT_HELICOPTER_INSTRUCTIONS,
+	I18N_COMBAT_IN_MINIGAME_BLOCK,
+	I18N_COMBAT_GENERIC_ERROR_NEW_MISS,
+	I18N_COMBAT_MISS_START,
+	I18N_COMBAT_MISS_ABORT,
+	I18N_COMBAT_MISS_FINISHED,
 	// Taxi
 	I18N_TAXI_MISS_WRONG_VEHICLE,
 	I18N_TAXI_MISS_NPC_ENTERING,
@@ -423,6 +434,17 @@ new gI18nMessageColor[] =
 	COLOR_LIGHTGREEN,
 	COLOR_LIGHTGREEN,
 	COLOR_LIGHTGREEN,
+	// Combat
+	COLOR_ORANGE,
+	COLOR_YELLOW,
+	COLOR_YELLOW,
+	COLOR_ORANGE,
+	COLOR_YELLOW,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_YELLOW,
+	COLOR_YELLOW,
+	COLOR_YELLOW,
 	// Taxi
 	COLOR_RED,
 	COLOR_YELLOW,
@@ -1140,6 +1162,49 @@ new gI18nMessages[][PlayerLocale][MAX_MESSAGE_LEN] =
 	{
 		"[ REAL ] Vehicle mod saved!",
 		"[ REAL ] Uprava auta ulozena!"
+	},
+	//
+	//  Combat
+	//
+	{
+		"[ COMBAT ] Briefcases exchanged for money ($%d)!",
+		"[ COMBAT ] Kufriky vymeneny za prachy ($%d)!"
+	},
+	{
+		"~w~Briefcase:_~g~%d~n~~w~Time:______~b~%d~y~:~b~%02d",
+		"~w~Kufriky:___~g~%d~n~~w~Cas:_______~b~%d~y~:~b~%02d"
+	},
+	{
+		"[ COMBAT ] Follow the yellow marker on map to give the briefcase man the briefcases!",
+		"[ COMBAT ] Nasleduj zluty stitek na mape, ktery te zavede za kufikovym typkem!"
+	},
+	{
+		"[ COMBAT ] You found briefcase no. %d",
+		"[ COMBAT ] Nasel jsi kufrik cislo %d"
+	},
+	{
+		"[ COMBAT ] Take the helicopter and follow the checkpoint on the minimap!",
+		"[ COMBAT ] Vem vrtulnik a nasleduj cerveny checkpoint na minimape!"
+	},
+	{
+		"[ COMBAT ] Another minigame started, close it to start the combat mission!",
+		"[ COMBAT ] Jina minihra je aktivni, ukonci ji, abys mohl zacit combat misi!"
+	},
+	{
+		"[ COMBAT ] Error setting new combat mission!",
+		"[ COMBAT ] Nepodarilo se nastavit novou misi!"
+	},
+	{
+		"~w~Combat Mission ~g~Started",
+		"~w~Combat Mise ~g~Zahajena"
+	},
+	{
+		"~w~Combat Mission ~r~Aborted",
+		"~w~Combat Mise ~r~Zrusena"
+	},
+	{
+		"~w~Combat Mission ~g~Finished",
+		"~w~Combat Mise ~g~Dokoncena"
 	},
 	//
 	//  Taxi

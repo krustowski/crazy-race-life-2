@@ -88,7 +88,8 @@ public CheckBriefcaseManProximity(playerid, npcid)
 			prize = gCombatMission[playerid][BriefcaseCount] * COMPAT_BRIEFCASE_DOLLARS, 
 			stringToPrint[128];
 
-		format(stringToPrint, sizeof(stringToPrint), "[ COMBAT ] Briefcases exchanged for money ($%d)!", prize);
+		GetLocalizedString(playerid, I18N_COMBAT_BRIEFCASES_EXCHANGED_FMT, stringToPrint, sizeof(stringToPrint));
+		format(stringToPrint, sizeof(stringToPrint), stringToPrint, prize);
 		SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint); 
 
 		GivePlayerMoney(playerid, prize);
@@ -107,15 +108,12 @@ public UpdateCombatMissionInfoText(playerid)
 
 	gCombatMission[playerid][TimeElapsed] += 1000;
 
-	switch (gPlayers[playerid][Locale]) 
-	{
-		case LOCALE_CZ:
-			//
-			{}
-
-		default:
-			format(stringToPrint, sizeof(stringToPrint), "~w~Briefcase:_~g~%d~n~~w~Time:______~b~%d~y~:~b~%2d", gCombatMission[playerid][BriefcaseCount], floatround(floatround(gCombatMission[playerid][TimeElapsed] / 1000) / 60), floatround(gCombatMission[playerid][TimeElapsed] / 1000) % 60);
-	}
+	GetLocalizedString(playerid, I18N_COMBAT_INFO_FMT, stringToPrint, sizeof(stringToPrint));
+	format(stringToPrint, sizeof(stringToPrint), stringToPrint,
+			gCombatMission[playerid][BriefcaseCount], 
+			floatround(floatround(gCombatMission[playerid][TimeElapsed] / 1000) / 60), 
+			floatround(gCombatMission[playerid][TimeElapsed] / 1000) % 60
+		);
 
 	TextDrawSetString(gCombatMission[playerid][InfoText], stringToPrint);
 	TextDrawShowForPlayer(playerid, gCombatMission[playerid][InfoText]);
@@ -132,14 +130,13 @@ stock CheckCombatCheckpoint(playerid)
 
 	DisablePlayerRaceCheckpoint(playerid);
 
-	SendClientMessage(playerid, COLOR_ORANGE, "[ COMBAT ] Follow the yellow marker on map to give the briefcase man the briefcases!");
+	SendClientMessageLocalized(playerid, I18N_COMBAT_FOLLOW_MARKER_BRIEFCASEMAN);
 
 	return 1;
 }
 
 stock CheckCombatPickup(playerid, pickupid)
 {
-	
 	if (!gCombatMission[playerid][Active])
 	{
 		return 0;
@@ -161,7 +158,11 @@ stock CheckCombatPickup(playerid, pickupid)
 					new 
 						stringToPrint[128];
 
-					format(stringToPrint, sizeof(stringToPrint), "[ COMBAT ] You found briefcase no. %d", gCombatMission[playerid][BriefcaseCount]);
+					GetLocalizedString(playerid, I18N_COMBAT_FOUND_BRIEFCASE_FMT, stringToPrint, sizeof(stringToPrint));
+					format(stringToPrint, sizeof(stringToPrint), stringToPrint, 
+							gCombatMission[playerid][BriefcaseCount]
+						);
+
 					return SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
 				}
 			case (CombatPickupType: TYPE_HEALTH):
@@ -180,7 +181,8 @@ stock CheckCombatPickup(playerid, pickupid)
 							continue;
 						}
 
-						SendClientMessage(playerid, COLOR_ORANGE, "[ COMBAT ] Take the helicopter and follow the checkpoint on the minimap!");
+						SendClientMessageLocalized(playerid, I18N_COMBAT_HELICOPTER_INSTRUCTIONS);
+
 						SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, gCombatPickups[j][Point][CoordX], gCombatPickups[j][Point][CoordY], gCombatPickups[j][Point][CoordZ], 0.0, 0.0, 0.0, 10.0);
 					}
 
@@ -355,12 +357,12 @@ stock SetCombatMission(playerid, missionid)
 
 	if (gPlayers[playerid][InMinigame])
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ COMBAT ] Another minigame started, close it to start the combat mission!");
+		return SendClientMessageLocalized(playerid, I18N_COMBAT_IN_MINIGAME_BLOCK);
 	}
 
 	if (!PrepareCombatInterior(playerid, missionid))
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ COMBAT ] Error setting new combat mission!");
+		return SendClientMessageLocalized(playerid, I18N_COMBAT_GENERIC_ERROR_NEW_MISS);
 	}
 
 	gPlayers[playerid][InMinigame] = true;
@@ -381,7 +383,11 @@ stock SetCombatMission(playerid, missionid)
 
 	gCombatMission[playerid][TimerUpdate] = Timer: SetTimerEx("UpdateCombatMissionInfoText", 1000, true, "i", playerid);
 
-	GameTextForPlayer(playerid, "~w~Combat Mission ~g~Started", 3000, 3); 
+	new 
+		gameText[32];
+
+	GetLocalizedString(playerid, I18N_COMBAT_MISS_START, gameText, sizeof(gameText));
+	GameTextForPlayer(playerid, gameText, 3000, 3); 
 
 	switch (missionid)
 	{
@@ -454,14 +460,21 @@ stock AbortCombatMission(playerid, bool: success)
 
 	TextDrawHideForPlayer(playerid, gCombatMission[playerid][InfoText]);
 
+	new 
+		gameText[32];
+
 	if (success)
 	{
-		GameTextForPlayer(playerid, "~w~Combat Mission ~g~Done", 3000, 3); 
+		GetLocalizedString(playerid, I18N_COMBAT_MISS_FINISHED, gameText, sizeof(gameText));
+
+		GameTextForPlayer(playerid, gameText, 3000, 3); 
 		SaveCombatMissionScore(playerid);
 	}
 	else
 	{
-		GameTextForPlayer(playerid, "~w~Combat Mission ~r~Aborted", 3000, 3); 
+		GetLocalizedString(playerid, I18N_COMBAT_MISS_ABORT, gameText, sizeof(gameText));
+
+		GameTextForPlayer(playerid, gameText, 3000, 3); 
 	}
 
 	gPlayers[playerid][InMinigame] = false;

@@ -139,14 +139,14 @@ enum PlayerPropertyObject
 	Pickups[SPAWN_PICKUP_COUNT]
 }
 
-new gPlayerInteriors[MAX_PLAYERS][PlayerPropertyObject];
-
-new gProperties[MAX_PROPERTIES][Property];
-
-new gPropertyCoords[MAX_PROPERTIES][MAX_PROPERTY_PICKUPS][PropertyPickup];
+new 
+	gPlayerInteriors[MAX_PLAYERS][PlayerPropertyObject],
+	gProperties[MAX_PROPERTIES][Property],
+	gPropertyCoords[MAX_PROPERTIES][MAX_PROPERTY_PICKUPS][PropertyPickup];
 
 // Utilized by lvl5 admins when editing a property.
-new gPropertyEdit[MAX_PLAYERS][Property];
+new 
+	gPropertyEdit[MAX_PLAYERS][Property];
 
 // Used to flush gPropertyEdit entry when editing is done.
 new gNullProperty[Property] = 
@@ -209,13 +209,15 @@ public SendRealEstateCommission()
 			continue;
 		}
 
-		new query[256];
+		new 
+			query[256];
 		format(query, sizeof(query), "SELECT cost FROM properties WHERE user_id = %d AND type = %d",
 				gPlayers[i][OrmID],
 				_: PROPERTY_TYPE_COMMERCIAL
 			);
 
-		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		new 
+			DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result) 
 		{
 			printf("Database error: cannot fetch commercial properties by user (user_id: %d)!", gPlayers[i][OrmID]);
@@ -230,11 +232,13 @@ public SendRealEstateCommission()
 			continue;
 		}
 
-		new commission;
+		new 
+			commission;
 
 		do
 		{
-			new cost = DB_GetFieldIntByName(result, "cost");
+			new 
+				cost = DB_GetFieldIntByName(result, "cost");
 			commission += floatround(cost / 50) + random(cost / 100);
 		}
 		while (DB_SelectNextRow(result));
@@ -243,7 +247,8 @@ public SendRealEstateCommission()
 
 		if (commission > 0)
 		{
-			new stringToPrint[128];
+			new 
+				stringToPrint[128];
 			GetLocalizedString(i, I18N_REAL_PERIODIC_COMMISSION_FMT, stringToPrint, sizeof(stringToPrint));
 			format(stringToPrint, sizeof(stringToPrint), stringToPrint, commission);
 
@@ -302,9 +307,7 @@ stock SpawnProperty(propertyId)
 	do 
 	{
 		new 
-			PropertyPoint: type = PropertyPoint: DB_GetFieldIntByName(result, "type");
-
-		new 
+			PropertyPoint: type = PropertyPoint: DB_GetFieldIntByName(result, "type"),
 			Float: pX = DB_GetFieldFloatByName(result, "primary_x"),
 			Float: pY = DB_GetFieldFloatByName(result, "primary_y"),
 			Float: pZ = DB_GetFieldFloatByName(result, "primary_z"),
@@ -315,8 +318,6 @@ stock SpawnProperty(propertyId)
 			Float: sR = DB_GetFieldFloatByName(result, "secondary_rot");
 
 		gPropertyCoords[propertyId][i][PickupType] = PropertyPoint: type;
-
-		//printf("stock SpawnProperty(): i = %d", i);
 
 		switch (type)
 		{
@@ -460,7 +461,8 @@ stock SpawnProperty(propertyId)
 								{
 									gPropertyCoords[propertyId][i][Pickup] = EnsurePickupCreated(PICKUP_HOUSE_RED, 1, pX, pY, pZ);
 
-									new playerName[MAX_PLAYER_NAME];
+									new 
+										playerName[MAX_PLAYER_NAME];
 									GetOwnerName(gProperties[propertyId][UserID], playerName);
 
 									if (strcmp(playerName, ""))
@@ -480,7 +482,9 @@ stock SpawnProperty(propertyId)
 
 								if (gProperties[propertyId][Occupied])
 								{
-									new playerName[MAX_PLAYER_NAME], text[128];
+									new 
+										playerName[MAX_PLAYER_NAME], 
+										text[128];
 									GetOwnerName(gProperties[propertyId][UserID], playerName);
 
 									format(text, sizeof(text), "property is rented by %s",
@@ -489,7 +493,13 @@ stock SpawnProperty(propertyId)
 
 									if (gProperties[propertyId][LockedUntilTime] && gettime() < gProperties[propertyId][LockedUntilTime])
 									{
-										new day, month, year, hour, minute, second;
+										new 
+											day, 
+											month, 
+											year, 
+											hour, 
+											minute, 
+											second;
 										UnixToDateTime(gProperties[propertyId][LockedUntilTime], year, month, day, hour, minute, second);
 
 										format(text, sizeof(text), "%s\n\nlocked until %02d/%02d/%4d %02d:%02d:%02d UTC",
@@ -506,7 +516,9 @@ stock SpawnProperty(propertyId)
 									if (strcmp(playerName, ""))
 									{
 										if (gPropertyCoords[propertyId][i][Text])
+										{
 											Delete3DTextLabel(gPropertyCoords[propertyId][i][Text]);
+										}
 
 										gPropertyCoords[propertyId][i][Text] = Create3DTextLabel(text, COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false);
 									}
@@ -580,10 +592,11 @@ stock LoadPlayerProperties(playerid)
 
 	do
 	{
-		new propertyid = DB_GetFieldIntByName(result, "id");
-		gPlayers[playerid][Properties][i] = propertyid;
+		new 
+			propertyid = DB_GetFieldIntByName(result, "id"),
+			vehicleid = gProperties[ GetPropertyArrayIDfromID(propertyid) ][Vehicle][ID];
 
-		new vehicleid = gProperties[ GetPropertyArrayIDfromID(propertyid) ][Vehicle][ID];
+		gPlayers[playerid][Properties][i] = propertyid;
 
 		if (vehicleid)
 		{
@@ -603,14 +616,16 @@ stock LoadPlayerProperties(playerid)
 
 stock IsPlayerOwner(playerid, propertyId)
 {
-	new query[256];
+	new 
+		query[256];
 
 	format(query, sizeof(query), "SELECT occupied FROM properties WHERE user_id = %d AND occupied = 1 AND id = %d", 
 			gPlayers[playerid][OrmID], 
 			propertyId
 	      );
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		printf("Database error: cannot verify property ownership (ID: %d)!", propertyId);
@@ -625,32 +640,29 @@ stock IsPlayerOwner(playerid, propertyId)
 
 	DB_FreeResultSet(result);
 	return false;
-
-	/*for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
-	  {
-	  if (gPlayers[playerid][Properties][i] == propertyId)
-	  return true;
-	  }
-
-	  return false;*/
 }
 
 stock SaveRealEstateData()
 {
-	new query[1024];
+	new 
+		query[1024];
 
 	for (new i = 0; i < sizeof(gProperties); i++)
 	{
-		new vehicle_id = 0;
+		new 
+			vehicle_id = 0;
 
 		if (!gProperties[i][ID])
+		{
 			continue;
+		}
 
 		if (gProperties[i][Vehicle][Model])
 		{
 			vehicle_id = gProperties[i][ID];
 
-			new componentsString[128];
+			new 
+				componentsString[128];
 
 			for (new j = 0; j < 16; j++)
 			{
@@ -672,8 +684,10 @@ stock SaveRealEstateData()
 					gProperties[i][Vehicle][Paintjob]
 			      );
 
-			new DBResult: result_vehicle = DB_ExecuteQuery(gDbConnectionHandle, query);
-			if (!result_vehicle) {
+			new 
+				DBResult: result_vehicle = DB_ExecuteQuery(gDbConnectionHandle, query);
+			if (!result_vehicle) 
+			{
 				printf("Database error: cannot write property data (vehicle, ID: %d)!", gProperties[i][ID]);
 				print(query);
 			}
@@ -693,8 +707,10 @@ stock SaveRealEstateData()
 				gProperties[i][LockedUntilTime]
 		      );
 
-		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result) {
+		new 
+			DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result)
+		{
 			printf("Database error: cannot write property data (ID: %d)!", gProperties[i][ID]);
 			print(query);
 		}
@@ -720,8 +736,10 @@ stock SaveRealEstateData()
 				gProperties[i][Drugs][JOINT]
 		      );
 
-		new DBResult: result_drugz = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result_drugz) {
+		new 
+			DBResult: result_drugz = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result_drugz)
+		{
 			printf("Database error: cannot write property data (drugz, ID: %d)!", gProperties[i][ID]);
 			print(query);
 		}
@@ -734,7 +752,11 @@ stock SaveRealEstateData()
 
 stock ExtractIntsFromString(const input[], ints[16])
 {
-	new i = 0, token1[128], token2[128], toSplit[128];
+	new 
+		i = 0, 
+		token1[128], 
+		token2[128], 
+		toSplit[128];
 
 	strcopy(toSplit, input);
 
@@ -751,11 +773,14 @@ stock ExtractIntsFromString(const input[], ints[16])
 
 stock LoadRealEstateData()
 {
-	new i = 0, query[512];
+	new 
+		i = 0, 
+		query[512];
 
 	format(query, sizeof(query), "SELECT id,type,user_id,vehicle_id,name,cost,occupied,custom_interior,locked_until_timestamp FROM properties");
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		print("Database error: cannot fetch property data!");
@@ -764,9 +789,8 @@ stock LoadRealEstateData()
 
 	do
 	{
-		//printf("stock LoadRealEstateData(): i = %d", i);
-
-		new name[64];
+		new 
+			name[64];
 
 		gProperties[i][ID] = DB_GetFieldIntByName(result, "id");
 		gProperties[i][Type] = PropertyType: DB_GetFieldIntByName(result, "type");
@@ -784,7 +808,8 @@ stock LoadRealEstateData()
 		//  Vehicle props extraction
 		//
 
-		new vehicle_id;
+		new 
+			vehicle_id;
 
 		vehicle_id = DB_GetFieldIntByName(result, "vehicle_id");
 
@@ -796,7 +821,8 @@ stock LoadRealEstateData()
 
 		format(query, sizeof(query), "SELECT model,color1,color2,components,paintjob FROM vehicles WHERE id = %d", vehicle_id);
 
-		new DBResult: result_vehicle = DB_ExecuteQuery(gDbConnectionHandle, query);
+		new 
+			DBResult: result_vehicle = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result_vehicle) 
 		{
 			print("Database error: cannot fetch property data (vehicle)!");
@@ -805,7 +831,9 @@ stock LoadRealEstateData()
 			continue;
 		}
 
-		new componentsString[256], components[16];
+		new 
+			componentsString[256], 
+			components[16];
 
 		DB_GetFieldString(result_vehicle, FIELD_VEHICLE_COMPONENTS, componentsString, sizeof(componentsString));
 
@@ -829,7 +857,8 @@ stock LoadRealEstateData()
 				gProperties[i][ID]
 		      );
 
-		new DBResult: result_skins = DB_ExecuteQuery(gDbConnectionHandle, query);
+		new 
+			DBResult: result_skins = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result_skins) 
 		{
 			print("Database error: cannot fetch property skins!");
@@ -838,7 +867,8 @@ stock LoadRealEstateData()
 		{
 			if (DB_GetRowCount(result_skins))
 			{
-				new skin_no = 0;
+				new 
+					skin_no = 0;
 
 				do
 				{
@@ -857,7 +887,8 @@ stock LoadRealEstateData()
 
 		format(query, sizeof(query), "SELECT cocaine, heroin, meth, fent, zaza, tobacco, pcp, paper, lighter, joint FROM drugz WHERE owner_id = %d AND owner_type = 2", gProperties[i][ID]);
 
-		new DBResult: result_drugz = DB_ExecuteQuery(gDbConnectionHandle, query);
+		new 
+			DBResult: result_drugz = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result_drugz) 
 		{
 			print("Database error: cannot fetch property data (drugz)!");
@@ -890,7 +921,11 @@ stock LoadRealEstateData()
 
 stock ExtractCoordsFromString(const input[], Float: coords[Coords])
 {
-	new i = 0, token1[128], token2[128], toSplit[128];
+	new 
+		i = 0, 
+		token1[128], 
+		token2[128], 
+		toSplit[128];
 
 	strcopy(toSplit, input);
 
@@ -908,14 +943,21 @@ stock ExtractCoordsFromString(const input[], Float: coords[Coords])
 stock SpawnPropertyInterior(playerid, arrayID)
 {
 	if (gPlayers[playerid][InsideProperty])
+	{
 		return 0;
+	}
 
 	if (gProperties[arrayID][CustomInterior])
+	{
 		return 1;
+	}
 
 	gPlayerInteriors[playerid][PropertyArrayID] = arrayID;
 
-	new Float:X, Float:Y, Float:Z;
+	new 
+		Float: X, 
+		Float: Y, 
+		Float: Z;
 
 	GetPlayerPos(playerid, X, Y, Z);
 
@@ -924,8 +966,9 @@ stock SpawnPropertyInterior(playerid, arrayID)
 	// The very room object.
 	gPlayerInteriors[playerid][Objects][0] = CreatePlayerObject(playerid, 14859, Float:X, Float:Y, Float:Z, 0.0, 0.0, 0.0, 0.0);
 
-	new pickupIds[4] = {PICKUP_SHIRT, PICKUP_HEART, PICKUP_PILL, PICKUP_ARROW};
-	new Float: pickupCoords[4][3];
+	new 
+		pickupIds[4] = {PICKUP_SHIRT, PICKUP_HEART, PICKUP_PILL, PICKUP_ARROW},
+		Float: pickupCoords[4][3];
 
 	// Shirt pickup.
 	pickupCoords[0][0] = X+2.50; pickupCoords[0][1] = Y+2.20; pickupCoords[0][2] = Z-1.0;
@@ -1015,7 +1058,9 @@ stock GetPropertyArrayIDfromID(propertyID)
 	for (new i = 0; i < sizeof(gProperties); i++)
 	{
 		if (gProperties[i][ID] == propertyID)
+		{
 			return i;
+		}
 	}
 
 	return -1;
@@ -1023,7 +1068,8 @@ stock GetPropertyArrayIDfromID(propertyID)
 
 stock RentProperty(playerid, propertyID)
 {
-	new arrayid = GetPropertyArrayIDfromID(propertyID);
+	new 
+		arrayid = GetPropertyArrayIDfromID(propertyID);
 
 	if (arrayid == -1 || !propertyID)
 	{
@@ -1042,7 +1088,8 @@ stock RentProperty(playerid, propertyID)
 
 	if (gProperties[arrayid][LockedUntilTime])
 	{
-		new timestamp = gettime();
+		new 
+			timestamp = gettime();
 
 		if (timestamp < gProperties[arrayid][LockedUntilTime])
 		{
@@ -1054,13 +1101,15 @@ stock RentProperty(playerid, propertyID)
 	//  Proceed
 	//
 
-	new query[256];
+	new 
+		query[256];
 	format(query, sizeof(query), "UPDATE properties SET user_id = %d, occupied = 1 WHERE id = %d",
 			gPlayers[playerid][OrmID],
 			propertyID
 	      );
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
 	{
 		SendClientMessageLocalized(playerid, I18N_REAL_DATABASE_ERROR);
@@ -1071,7 +1120,8 @@ stock RentProperty(playerid, propertyID)
 
 	DB_FreeResultSet(result);
 
-	new exTenant = gProperties[arrayid][UserID];
+	new 
+		exTenant = gProperties[arrayid][UserID];
 
 	gProperties[arrayid][Occupied] = true;
 	gProperties[arrayid][UserID] = gPlayers[playerid][OrmID];
@@ -1083,7 +1133,6 @@ stock RentProperty(playerid, propertyID)
 	SendClientMessageLocalized(playerid, I18N_REAL_RENTED_SUCCESSFULLY);
 
 	// Send message to ex-tenant if online
-
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if (!IsPlayerConnected(i) || !gPlayers[i][IsLogged])
@@ -1102,7 +1151,9 @@ stock RentProperty(playerid, propertyID)
 
 stock BuyPlayerProperty(playerid, propertyID)
 {
-	new arrayID, freeSlot = -1;
+	new 
+		arrayID, 
+		freeSlot = -1;
 
 	arrayID = GetPropertyArrayIDfromID(propertyID);
 
@@ -1159,18 +1210,20 @@ stock BuyPlayerProperty(playerid, propertyID)
 			gPropertyCoords[arrayID][i][Pickup] = 0;
 			gPropertyCoords[arrayID][i][Pickup] = EnsurePickupCreated(PICKUP_HOUSE_RED, 1, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ]);
 
-			new playerName[MAX_PLAYER_NAME];
+			new 
+				playerName[MAX_PLAYER_NAME];
 			GetOwnerName(gProperties[arrayID][UserID], playerName);
 
 			if (strcmp(playerName, ""))
+			{
 				gPropertyCoords[arrayID][i][Text] = Create3DTextLabel("%s owns this property", COLOR_ORANGE, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ], 15.0, -1, false, playerName);
+			}
 		}
 
 		if (gPropertyCoords[arrayID][i][PickupType] == ENTRANCE_POINT)
 		{
 			gPropertyCoords[arrayID][i][Pickup] = EnsurePickupCreated(PICKUP_ARROW, 1, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ]);
 		}
-
 	}
 
 	gProperties[arrayID][Occupied] = true;
@@ -1188,25 +1241,34 @@ stock BuyPlayerProperty(playerid, propertyID)
 
 stock SellPlayerProperty(playerid, propertyID)
 {
-	new arrayID;
+	new 
+		arrayID;
 
 	arrayID = GetPropertyArrayIDfromID(propertyID);
 
 	if (arrayID == INVALID_PROPERTY_ID || !propertyID)
+	{
 		return SendClientMessageLocalized(playerid, I18N_REAL_INVALID_CODE);
+	}
 
 	if (!gProperties[arrayID][Occupied])
+	{
 		return SendClientMessageLocalized(playerid, I18N_REAL_SELL_NOT_OCCUPIED);
+	}
 
 	if (!IsPlayerOwner(playerid, propertyID))
+	{
 		return SendClientMessageLocalized(playerid, I18N_REAL_SELL_NOT_OWNED);
+	}
 
 	//
 	//  Ok, sell the property.
 	//
 
 	if (gPlayers[playerid][SpawnPoint] == propertyID)
+	{
 		gPlayers[playerid][SpawnPoint] = 0;
+	}
 
 	// Free the property slot.
 	for (new j = 0; j < MAX_PLAYER_PROPERTIES; j++)
@@ -1228,7 +1290,9 @@ stock SellPlayerProperty(playerid, propertyID)
 		if (gPropertyCoords[arrayID][i][PickupType] == OFFER_POINT)
 		{
 			if (!IsPlayerInSphere(playerid, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ], 15.0))
+			{
 				return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);
+			}
 
 			DestroyPickup(gPropertyCoords[arrayID][i][Pickup]);
 			Delete3DTextLabel(gPropertyCoords[arrayID][i][Text]);
@@ -1257,16 +1321,22 @@ stock SellPlayerProperty(playerid, propertyID)
 stock UpdatePropertyVehiclePaintjob(playerid, vehicleid, paintjobid)
 {
 	if (!IsPlayerInAnyVehicle(playerid))
+	{
 		return 0;
+	}
 
-	new arrayID, bool: modelMatch = false;
+	new 
+		arrayID, 
+		bool: modelMatch = false;
 
 	for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
 	{
 		arrayID = GetPropertyArrayIDfromID(gPlayers[playerid][Properties][i]);
 
 		if (arrayID == -1)
+		{
 			continue;
+		}
 
 		if (GetVehicleModel(vehicleid) == gProperties[arrayID][Vehicle][Model] && vehicleid == gProperties[arrayID][Vehicle][ID])
 		{
@@ -1290,23 +1360,32 @@ stock UpdatePropertyVehiclePaintjob(playerid, vehicleid, paintjobid)
 stock UpdatePropertyVehicle(playerid)
 {
 	if (!IsPlayerInAnyVehicle(playerid))
+	{
 		return 0;
+	}
 
-	new arrayID, bool: modelMatch = false, vehicleID;
+	new 
+		arrayID, 
+		bool: modelMatch = false, vehicleID;
 
 	vehicleID = GetPlayerVehicleID(playerid);
 
 	for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
 	{
-		new propertyID = gPlayers[playerid][Properties][i];
+		new 
+			propertyID = gPlayers[playerid][Properties][i];
 
 		if (!propertyID)
+		{
 			continue;
+		}
 
 		arrayID = GetPropertyArrayIDfromID(propertyID);
 
 		if (arrayID == -1)
+		{
 			continue;
+		}
 
 		if (GetVehicleModel(vehicleID) == gProperties[arrayID][Vehicle][Model] && vehicleID == gProperties[arrayID][Vehicle][ID])
 		{
@@ -1316,9 +1395,14 @@ stock UpdatePropertyVehicle(playerid)
 	}
 
 	if (!modelMatch)
+	{
 		return 0;
+	}
 
-	new colour1, colour2, paintjobid;
+	new 
+		colour1, 
+		colour2, 
+		paintjobid;
 
 	GetVehicleColours(vehicleID, colour1, colour2);
 	paintjobid = GetVehiclePaintjob(vehicleID);
@@ -1343,7 +1427,8 @@ stock UpdatePropertyVehicle(playerid)
 
 stock EditProperty(playerid)
 {
-	new propertyid = gPropertyEdit[playerid][ID];
+	new 
+		propertyid = gPropertyEdit[playerid][ID];
 
 	if (!propertyid || propertyid < 10101)
 	{
@@ -1351,7 +1436,9 @@ stock EditProperty(playerid)
 		return 0;
 	}	
 
-	new arrayid = GetPropertyArrayIDfromID(propertyid), bool: existingRecord = false;
+	new 
+		arrayid = GetPropertyArrayIDfromID(propertyid), 
+		bool: existingRecord = false;
 
 	if (arrayid >= 0) 
 	{
@@ -1364,7 +1451,9 @@ stock EditProperty(playerid)
 	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
 		if (gProperties[i][ID])
+		{
 			propertyPoolSize++;
+		}
 	}
 
 	if (propertyPoolSize == MAX_PROPERTIES)
@@ -1372,7 +1461,8 @@ stock EditProperty(playerid)
 		return SendClientMessageLocalized(playerid, I18N_REAL_PROPERTY_LIMIT_REACHED);
 	}
 
-	new query[2048];
+	new 
+		query[2048];
 
 	format(query, sizeof(query), "INSERT INTO properties (id, type, user_id, name, cost, occupied, custom_interior, locked_until_timestamp) VALUES (%d, %d, %d, '%s', %d, %d, %d, %d) ON CONFLICT(id) DO UPDATE SET user_id = excluded.user_id, name = excluded.name, cost = excluded.cost, occupied = excluded.occupied, custom_interior = excluded.custom_interior, locked_until_timestamp = excluded.locked_until_timestamp",
 			gPropertyEdit[playerid][ID],
@@ -1385,8 +1475,10 @@ stock EditProperty(playerid)
 			gPropertyEdit[playerid][LockedUntilTime]
 	      );
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) {
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
 		SendClientMessageLocalized(playerid, I18N_REAL_DATABASE_ERROR);
 		printf("Database error: cannot write property data (ID: %d)!", propertyid);
 		print(query);
@@ -1408,7 +1500,8 @@ stock EditProperty(playerid)
 		      );
 
 		result = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result) {
+		if (!result)
+		{
 			SendClientMessageLocalized(playerid, I18N_REAL_DATABASE_ERROR);
 			printf("Database error: cannot write property data: new spawn point (ID: %d)!", gPropertyEdit[playerid][ID]);
 			print(query);
@@ -1431,7 +1524,8 @@ stock EditProperty(playerid)
 		      );
 
 		result = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result) {
+		if (!result)
+		{
 			SendClientMessageLocalized(playerid, I18N_REAL_DATABASE_ERROR);
 			printf("Database error: cannot write property data: new entrance point (ID: %d)!", gPropertyEdit[playerid][ID]);
 			print(query);
@@ -1454,7 +1548,8 @@ stock EditProperty(playerid)
 		      );
 
 		result = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result) {
+		if (!result)
+		{
 			SendClientMessageLocalized(playerid, I18N_REAL_DATABASE_ERROR);
 			printf("Database error: cannot write property data: new offer point (ID: %d)!", gPropertyEdit[playerid][ID]);
 			print(query);
@@ -1477,7 +1572,8 @@ stock EditProperty(playerid)
 		      );
 
 		result = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result) {
+		if (!result)
+		{
 			SendClientMessageLocalized(playerid, I18N_REAL_DATABASE_ERROR);
 			printf("Database error: cannot write property data: new money point (ID: %d)!", gPropertyEdit[playerid][ID]);
 			print(query);
@@ -1500,7 +1596,8 @@ stock EditProperty(playerid)
 		      );
 
 		result = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result) {
+		if (!result)
+		{
 			SendClientMessageLocalized(playerid, I18N_REAL_DATABASE_ERROR);
 			printf("Database error: cannot write property data: new shirt point (ID: %d)!", gPropertyEdit[playerid][ID]);
 			print(query);
@@ -1523,7 +1620,8 @@ stock EditProperty(playerid)
 		      );
 
 		result = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result) {
+		if (!result)
+		{
 			SendClientMessageLocalized(playerid, I18N_REAL_DATABASE_ERROR);
 			printf("Database error: cannot write property data: new vehicle point (ID: %d)!", gPropertyEdit[playerid][ID]);
 			print(query);
@@ -1558,7 +1656,8 @@ stock EditProperty(playerid)
 
 stock CheckRealEstatePickup(playerid, pickupid)
 {
-	new stringToPrint[512];
+	new 
+		stringToPrint[512];
 
 	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
@@ -1686,6 +1785,7 @@ stock CheckRealEstatePickup(playerid, pickupid)
 											float(gProperties[i][Cost]) / 1000000, 
 											gProperties[i][ID]
 										);
+
 									return ShowPlayerDialog(playerid, DIALOG_PROPERTY_SELL, DIALOG_STYLE_INPUT, "Real Estate", stringToPrint, "Sell", "Cancel");
 								}
 							case PROPERTY_TYPE_COMMERCIAL:
@@ -1699,6 +1799,7 @@ stock CheckRealEstatePickup(playerid, pickupid)
 												float(gProperties[i][Cost]) / 1000000, 
 												gProperties[i][ID]
 											);
+
 										return ShowPlayerDialog(playerid, DIALOG_PROPERTY_RENT, DIALOG_STYLE_INPUT, "Real Estate (Commercial)", stringToPrint, "Rent", "Cancel");
 									}
 
@@ -1712,7 +1813,8 @@ stock CheckRealEstatePickup(playerid, pickupid)
 										return SendClientMessageLocalized(playerid, I18N_REAL_STILL_LOCKED);
 									}
 
-									new playerName[MAX_PLAYER_NAME];
+									new 
+										playerName[MAX_PLAYER_NAME];
 									GetOwnerName(gProperties[i][UserID], playerName);
 
 									GetLocalizedString(playerid, I18N_REAL_PROPERTY_FOR_RENT_OWNED_FMT, stringToPrint, sizeof(stringToPrint));
@@ -1723,6 +1825,7 @@ stock CheckRealEstatePickup(playerid, pickupid)
 											float(gProperties[i][Cost]) / 1000000, 
 											gProperties[i][ID]
 										);
+
 									return ShowPlayerDialog(playerid, DIALOG_PROPERTY_RENT, DIALOG_STYLE_INPUT, "Real Estate (Commercial)", stringToPrint, "Rent", "Cancel");
 								}
 							default:
@@ -1766,18 +1869,19 @@ stock CheckRealEstatePickup(playerid, pickupid)
 						break;
 					}
 
-					ShowPlayerDrugzDialog(playerid);
-					return 1;
+					return ShowPlayerDrugzDialog(playerid);
 				}
 			case PICKUP_TYPE_EXIT:
 				{
-					new query[256];
+					new 
+						query[256];
 
 					format(query, sizeof(query), "SELECT primary_x,primary_y,primary_z FROM property_coords WHERE property_id = %d AND type = 1", 
 							gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ][ID]
 					      );
 
-					new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+					new 
+						DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 					if (!result) 
 					{
 						printf("Database error: cannot fetch spawn point (property ID: %d)!", gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ]);
@@ -1817,8 +1921,9 @@ stock RespawnPropertyVehicle(playerid, propertyid)
 		return 0;
 	}
 
-	new arrayid = GetPropertyArrayIDfromID(propertyid);
-	new vehicleid = gProperties[arrayid][Vehicle][ID];
+	new 
+		arrayid = GetPropertyArrayIDfromID(propertyid),
+		vehicleid = gProperties[arrayid][Vehicle][ID];
 
 	if (vehicleid)
 	{
@@ -1852,15 +1957,18 @@ stock AttachVehicleToProperty(playerid, propertyid)
 			return SendClientMessageLocalized(playerid, I18N_REAL_NOT_DRIVING_VEHICLE);
 		}
 
-		new vehicleId = GetPlayerVehicleID(playerid);
-		new modelId = GetVehicleModel(vehicleId);
+		new 
+			vehicleId = GetPlayerVehicleID(playerid),
+			modelId = GetVehicleModel(vehicleId);
 
 		if (gProperties[i][Vehicle][Model] == modelId)
 		{
 			return SendClientMessageLocalized(playerid, I18N_REAL_VEHICLE_MODEL_ALREADY_ATTACHED);
 		}
 
-		new vehiclePickupID = 0, pickupFound = false;
+		new 
+			vehiclePickupID = 0, 
+			pickupFound = false;
 
 		for (new j = 0; j < MAX_PROPERTY_PICKUPS; j++)
 		{
@@ -1880,7 +1988,10 @@ stock AttachVehicleToProperty(playerid, propertyid)
 
 		gProperties[i][Vehicle][Model] = modelId;
 
-		new colour1, colour2, paintjob;
+		new 
+			colour1, 
+			colour2, 
+			paintjob;
 
 		GetVehicleColours(vehicleId, colour1, colour2);
 		paintjob = GetVehiclePaintjob(vehicleId);
@@ -1898,7 +2009,11 @@ stock AttachVehicleToProperty(playerid, propertyid)
 			DestroyVehicle(gProperties[i][Vehicle][ID]);
 		}
 
-		new Float: pX, Float: pY, Float: pZ, Float: pR;
+		new 
+			Float: pX, 
+			Float: pY, 
+			Float: pZ, 
+			Float: pR;
 
 		pX = gPropertyCoords[i][vehiclePickupID][Primary][CoordX],
 		pY = gPropertyCoords[i][vehiclePickupID][Primary][CoordY],
@@ -1958,7 +2073,10 @@ stock SavePropertySkin(playerid)
 		return SendClientMessageLocalized(playerid, I18N_REAL_NOT_OWNED_BY_PLAYER);
 	}
 
-	new arrayid = gPlayerInteriors[playerid][PropertyArrayID], freeSlot = -1, skin_model = GetPlayerSkin(playerid);
+	new 
+		arrayid = gPlayerInteriors[playerid][PropertyArrayID], 
+		freeSlot = -1, 
+		skin_model = GetPlayerSkin(playerid);
 
 	for (new i = 0; i < MAX_PROPERTY_SKINS; i++)
 	{
@@ -1981,14 +2099,17 @@ stock SavePropertySkin(playerid)
 		return SendClientMessageLocalized(playerid, I18N_REAL_SKIN_NO_FREE_SLOT);
 	}
 
-	new query[256];
+	new 
+		query[256];
 	format(query, sizeof(query), "INSERT INTO property_skins (property_id, skin_id) VALUES (%d, %d)",
 			gProperties[arrayid][ID],
 			skin_model
 	      );
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) {
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
 		printf("Database error: cannot save new property skin (property_id: %d)!", gProperties[arrayid][ID]);
 		return 0;
 	}
@@ -2006,7 +2127,8 @@ stock SelectPropertySkin(playerid, skinid)
 		return SendClientMessageLocalized(playerid, I18N_REAL_PLAYER_NOT_INSIDE);
 	}
 
-	new arrayid = gPlayerInteriors[playerid][PropertyArrayID];
+	new 
+		arrayid = gPlayerInteriors[playerid][PropertyArrayID];
 
 	if (!IsPlayerOwner(playerid, gProperties[arrayid][ID]))
 	{
@@ -2029,7 +2151,8 @@ stock DeletePropertySkin(playerid, skinid)
 		return SendClientMessageLocalized(playerid, I18N_REAL_PLAYER_NOT_INSIDE);
 	}
 
-	new arrayid = gPlayerInteriors[playerid][PropertyArrayID];
+	new 
+		arrayid = gPlayerInteriors[playerid][PropertyArrayID];
 
 	if (!IsPlayerOwner(playerid, gProperties[arrayid][ID]))
 	{
@@ -2041,14 +2164,17 @@ stock DeletePropertySkin(playerid, skinid)
 		return SendClientMessageLocalized(playerid, I18N_REAL_SKIN_FREE_SLOT);
 	}
 
-	new query[256];
+	new 
+		query[256];
 	format(query, sizeof(query), "DELETE FROM property_skins WHERE property_id = %d AND skin_id = %d",
 			gProperties[arrayid][ID],
 			gProperties[arrayid][Skins][skinid]
 	      );
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) {
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
 		SendClientMessageLocalized(playerid, I18N_REAL_DATABASE_ERROR);
 		printf("Database error: cannot write property data)!");
 		print(query);
@@ -2068,7 +2194,10 @@ stock DeletePropertySkin(playerid, skinid)
 
 stock ShowPropertyEditDialogMain(playerid)
 {
-	new propertyid = gPropertyEdit[playerid][ID], stringToPrint[256], title[32];
+	new 
+		propertyid = gPropertyEdit[playerid][ID], 
+		stringToPrint[256], 
+		title[32];
 
 	format(title, sizeof(title), "Edit property ID: %d", propertyid);
 	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%s%s%s%s%s%s%s%s",
@@ -2091,7 +2220,9 @@ stock ShowPropertyEditDialogMain(playerid)
 
 stock ShowPropertyEditDialogName(playerid)
 {
-	new propertyid = gPropertyEdit[playerid][ID], title[32];
+	new 
+		propertyid = gPropertyEdit[playerid][ID], 
+		title[32];
 
 	format(title, sizeof(title), "Edit property ID: %d", propertyid);
 
@@ -2100,7 +2231,11 @@ stock ShowPropertyEditDialogName(playerid)
 
 stock ShowPropertyEditDialogType(playerid)
 {
-	new propertyid = gPropertyEdit[playerid][ID], stringToPrint[128], title[32];
+	new 
+		propertyid = gPropertyEdit[playerid][ID], 
+		stringToPrint[128], 
+		title[32];
+
 	format(stringToPrint, sizeof(stringToPrint), "%s%s",
 			"Personal Property\n",
 			"Commercial Property"
@@ -2113,7 +2248,9 @@ stock ShowPropertyEditDialogType(playerid)
 
 stock ShowPropertyEditDialogCost(playerid)
 {
-	new propertyid = gPropertyEdit[playerid][ID], title[32];
+	new 
+		propertyid = gPropertyEdit[playerid][ID], 
+		title[32];
 
 	format(title, sizeof(title), "Edit property ID: %d", propertyid);
 
@@ -2122,11 +2259,14 @@ stock ShowPropertyEditDialogCost(playerid)
 
 stock ShowPlayerDrugzDialog(playerid)
 {
-	new stringToPrint[512] = "Substance/stuff\tIn pockets\tAt home";
+	new 
+		stringToPrint[512] = "Substance/stuff\tIn pockets\tAt home";
 
 	for (new i = 0; i < MAX_DRUG_TYPES; i++)
 	{
-		new partial[64], propertyID = gPlayerInteriors[playerid][PropertyArrayID];
+		new 
+			partial[64], 
+			propertyID = gPlayerInteriors[playerid][PropertyArrayID];
 
 		format(partial, sizeof(partial), "\n%s\t%d\t%d", gDrugz[i][DrugName], gPlayers[playerid][Drugs][i], gProperties[propertyID][Drugs][i]);
 		strcat(stringToPrint, partial, sizeof(stringToPrint));
@@ -2137,7 +2277,9 @@ stock ShowPlayerDrugzDialog(playerid)
 
 stock ShowPropertyOptionsDialog(playerid)
 {
-	new propertyName[64];
+	new 
+		propertyName[64];
+
         format(propertyName, sizeof(propertyName), "%s", gProperties[ GetPropertyArrayIDfromID( gPlayers[playerid][PropertyOwnedID] ) ][Label]);
 
 	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_OPTIONS, DIALOG_STYLE_LIST, propertyName, "Set spawn point\nAttach new vehicle\nRespawn attached vehicle\nSell property", "Select", "Cancel");
@@ -2145,12 +2287,15 @@ stock ShowPropertyOptionsDialog(playerid)
 
 stock ShowPropertyEditorListPerDialog(playerid)
 {
-	new stringToPrint[3048] = "Property Name\tID";
+	new 
+		stringToPrint[3048] = "Property Name\tID";
 
 	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
 		if (!gProperties[i][ID] || gProperties[i][Type] != PROPERTY_TYPE_PERSONAL)
+		{
 			continue;
+		}
 
 		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
 				stringToPrint,
@@ -2164,12 +2309,15 @@ stock ShowPropertyEditorListPerDialog(playerid)
 
 stock ShowPropertyEditorListComDialog(playerid)
 {
-	new stringToPrint[3048] = "Property Name\tID";
+	new 
+		stringToPrint[3048] = "Property Name\tID";
 
 	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
 		if (!gProperties[i][ID] || gProperties[i][Type] != PROPERTY_TYPE_COMMERCIAL)
+		{
 			continue;
+		}
 
 		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d",
 				stringToPrint,
@@ -2183,7 +2331,10 @@ stock ShowPropertyEditorListComDialog(playerid)
 
 stock ShowPropertySkinMainDialog(playerid, propertyid)
 {
-	new stringToPrint[256], title[128];
+	new 
+		stringToPrint[256], 
+		title[128];
+
 	format(stringToPrint, sizeof(stringToPrint), "%s%s%s",
 			"Save new skin\n",
 			"Select saved skin\n",
@@ -2199,7 +2350,8 @@ stock ShowPropertySkinMainDialog(playerid, propertyid)
 
 stock ShowPropertySkinListDialog(playerid)
 {
-	new stringToPrint[256] = "ID\tSkin Model";
+	new 
+		stringToPrint[256] = "ID\tSkin Model";
 
 	if (!gPlayers[playerid][InsideProperty])
 	{

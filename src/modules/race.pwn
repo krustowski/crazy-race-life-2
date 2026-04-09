@@ -14,9 +14,9 @@
 
 enum E_RACE_COORD
 {
-Float: E_RACE_COORD_X,
-       Float: E_RACE_COORD_Y,
-       Float: E_RACE_COORD_Z
+	Float: E_RACE_COORD_X,
+	Float: E_RACE_COORD_Y,
+	Float: E_RACE_COORD_Z
 }
 
 enum E_RACE_EDIT_TYPE
@@ -40,19 +40,21 @@ enum Race
 	EditTrackCoordNo
 }
 
-new gRaces[MAX_RACE_COUNT][Race];
+new 
+	gRaces[MAX_RACE_COUNT][Race],
+	// gPlayerRace holds a reference to the state of a player's registration to such race. Thus if registered, a value for such RACE_ID should return true (1).
+	gPlayerRace[MAX_PLAYERS][MAX_RACE_COUNT];
 
-// gPlayerRace hold a reference to the state of a player's registration to such race. Thus if registered, a value for such RACE_ID should return true (1).
-new gPlayerRace[MAX_PLAYERS][MAX_RACE_COUNT];
+new 
+	gPlayerRaceEdit[MAX_PLAYERS][Race],
+	gPlayerRaceEditTrackCoords[MAX_PLAYERS][MAX_RACE_CP][E_RACE_COORD];
 
-new gPlayerRaceEdit[MAX_PLAYERS][Race];
-new gPlayerRaceEditTrackCoords[MAX_PLAYERS][MAX_RACE_CP][E_RACE_COORD];
+new 
+	Timer: gPlayerRaceTimer[MAX_PLAYERS],
+	Text: gRaceInfoText[MAX_PLAYERS];
 
-new Timer:gPlayerRaceTimer[MAX_PLAYERS];
-
-new Text:gRaceInfoText[MAX_PLAYERS];
-
-new gPlayerRaceTime[MAX_PLAYERS];
+new 
+	gPlayerRaceTime[MAX_PLAYERS];
 
 //
 //  Race-related functions.
@@ -66,11 +68,14 @@ forward UpdateRaceInfoText(playerid);
 
 public InitRaces() 
 {
-	new i = 1, query[512];
+	new 
+		i = 1, 
+		query[512];
 
 	format(query, sizeof(query), "SELECT id, name, type, cost_dollars, prize_dollars, start_x, start_y, start_z FROM races");
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		print("Database error: cannot fetch race data!");
@@ -79,7 +84,8 @@ public InitRaces()
 
 	while (DB_SelectNextRow(result))
 	{
-		new name[MAX_RACE_NAME];
+		new 
+			name[MAX_RACE_NAME];
 		DB_GetFieldStringByName(result, "name", name, sizeof(name));
 		gRaces[i][Name] = name;
 
@@ -116,17 +122,31 @@ public InitRaces()
 stock SetPlayerRaceSingle(playerid, raceId, const Float:coords[][E_RACE_COORD], len)
 {
 	// Fetch the relative position in such race (position of checkpoints).
-	new lastCpNo = len - 1, raceCpPosition = gPlayerRace[playerid][raceId] - 1, raceType = gRaces[raceId][Type];
+	new 
+		lastCpNo = len - 1, 
+		raceCpPosition = gPlayerRace[playerid][raceId] - 1, 
+		raceType = gRaces[raceId][Type];
 
 	// Prepare the coords to show a race checkpoint.
-	new Float: x0, Float: y0, Float: z0, Float: x1, Float: y1, Float: z1, t_CP_TYPE: cpType;
+	new 
+		Float: x0, 
+		Float: y0, 
+		Float: z0, 
+		Float: x1, 
+		Float: y1, 
+		Float: z1, 
+		t_CP_TYPE: cpType;
 
 	switch (raceType) 
 	{
 		case 1:
-			cpType = CP_TYPE_GROUND_NORMAL;
+			{
+				cpType = CP_TYPE_GROUND_NORMAL;
+			}
 		case 2:
-			cpType = CP_TYPE_AIR_NORMAL;
+			{
+				cpType = CP_TYPE_AIR_NORMAL;
+			}
 	}
 
 	// End the race.
@@ -151,9 +171,13 @@ stock SetPlayerRaceSingle(playerid, raceId, const Float:coords[][E_RACE_COORD], 
 		switch (raceType)
 		{
 			case 1:
-				cpType = CP_TYPE_GROUND_FINISH;
+				{
+					cpType = CP_TYPE_GROUND_FINISH;
+				}
 			case 2:
-				cpType = CP_TYPE_AIR_FINISH;
+				{
+					cpType = CP_TYPE_AIR_FINISH;
+				}
 		}
 	}
 
@@ -163,28 +187,23 @@ stock SetPlayerRaceSingle(playerid, raceId, const Float:coords[][E_RACE_COORD], 
 	return 1;
 }
 
-stock UpdateRaceCoords(raceId)
-{
-	new query[512];
-
-	format(query, sizeof(query), "");
-
-	return 1;
-}
-
 stock SetPlayerRace(playerid, raceId)
 {
 	// Check if player has joined such race
 	if (!IsPlayerConnected(playerid) || raceId == 0 || !gPlayerRace[playerid][raceId])
+	{
 		return 0;
+	}
 
-	new Float: coords[MAX_RACE_CP][E_RACE_COORD];
-
-	new len = 0, query[512];
+	new 
+		Float: coords[MAX_RACE_CP][E_RACE_COORD],
+		len = 0, 
+		query[512];
 
 	format(query, sizeof(query), "SELECT seq_no, x, y, z, rot FROM race_coords WHERE race_id = %d", raceId);
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		print("Database error: cannot fetch race coords data!");
@@ -199,7 +218,8 @@ stock SetPlayerRace(playerid, raceId)
 
 	while (DB_SelectNextRow(result))
 	{
-		new seq_no = DB_GetFieldIntByName(result, "seq_no");
+		new 
+			seq_no = DB_GetFieldIntByName(result, "seq_no");
 
 		coords[seq_no - 1][E_RACE_COORD_X] = DB_GetFieldFloatByName(result, "x");
 		coords[seq_no - 1][E_RACE_COORD_Y] = DB_GetFieldFloatByName(result, "y");
@@ -219,7 +239,8 @@ stock SetPlayerRace(playerid, raceId)
 
 stock SetPlayerRaceState(playerid, raceId)
 {
-	new stringToPrint[256];
+	new 
+		stringToPrint[256];
 
 	if (gPlayers[playerid][InMinigame])
 	{
@@ -285,13 +306,16 @@ stock ResetPlayerRaceState(playerid, raceId, finishedSuccessfully)
 	gPlayerRaceTimer[playerid] = Timer: 0;
 	gPlayers[playerid][InMinigame] = false;
 
-	new gameText[32];
+	new 
+		gameText[32];
 
 	if (finishedSuccessfully)
 	{
 		SendClientMessageLocalized(playerid, I18N_RACE_ENDED_SUCCESSFULLY);
 
-		new playerName[MAX_PLAYER_NAME], stringToPrint[256];
+		new 
+			playerName[MAX_PLAYER_NAME], 
+			stringToPrint[256];
 
 		GetPlayerName(playerid, playerName, sizeof(playerName));
 		GivePlayerMoney(playerid, gRaces[raceId][PrizeDollars]);
@@ -356,7 +380,8 @@ stock CheckPlayerRaceState(playerid)
 
 stock SetPlayerRaceStartPos(playerid)
 {
-	new raceId = CheckPlayerRaceState(playerid);
+	new 
+		raceId = CheckPlayerRaceState(playerid);
 
 	if (!raceId)
 	{
@@ -449,40 +474,50 @@ enum HighScores
 	VehicleModel[3]
 };
 
-new gHighScores[MAX_RACE_COUNT][HighScores];
+new 
+	gHighScores[MAX_RACE_COUNT][HighScores];
 
 stock InitHighScores()
 {
-	new query[512];
+	new 
+		query[512];
 
 	format(query, sizeof(query), "select spec_id, nickname, value, vehicle_model from ( select spec_id, u.nickname, value, vehicle_model, row_number() over ( PARTITION by spec_id ORDER by value ASC ) as rank from high_scores join users as u on u.id = user_id where type = 1 ) ranked where rank <= 3 order by spec_id, rank;");
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		print("Database error: cannot fetch high scores data!");
 		return 0;
 	}
 
-	new raceIds[MAX_RACE_COUNT];
+	new 
+		raceIds[MAX_RACE_COUNT];
 
 	do
 	{
-		new raceId = DB_GetFieldIntByName(result, "spec_id");
+		new 
+			raceId = DB_GetFieldIntByName(result, "spec_id"),
+			i = raceIds[raceId],
+			name[64];
 
-		new i = raceIds[raceId];
-
-		new name[64];
 		DB_GetFieldStringByName(result, "nickname", name, sizeof(name));
 
 		switch (i)
 		{
 			case 0:
-				gHighScores[raceId][Nickname1] = name;
+				{
+					gHighScores[raceId][Nickname1] = name;
+				}
 			case 1:
-				gHighScores[raceId][Nickname2] = name;
+				{
+					gHighScores[raceId][Nickname2] = name;
+				}
 			case 2:
-				gHighScores[raceId][Nickname3] = name;
+				{
+					gHighScores[raceId][Nickname3] = name;
+				}
 		}
 
 		gHighScores[raceId][Time][i] = DB_GetFieldIntByName(result, "value");
@@ -501,10 +536,12 @@ stock InitHighScores()
 
 stock SaveNewScore(raceId, playerid, time, vehicleModel)
 {
-	new nickname[MAX_PLAYER_NAME];
+	new 
+		nickname[MAX_PLAYER_NAME];
 	GetPlayerName(playerid, nickname);
 
-	new query[256];
+	new 
+		query[256];
 	format(query, sizeof(query), "INSERT INTO high_scores (type, spec_id, user_id, value, vehicle_model, time) VALUES (%d, %d, %d, %d, %d, %d)", 
 			1,
 			raceId, 
@@ -514,7 +551,8 @@ stock SaveNewScore(raceId, playerid, time, vehicleModel)
 			time
 		);
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		SendClientMessageLocalized(playerid, I18N_RACE_DATABASE_ERROR);
@@ -532,14 +570,16 @@ stock SaveNewScore(raceId, playerid, time, vehicleModel)
 
 stock SaveRaceData(playerid)
 {
-	new raceid = gPlayerRaceEdit[playerid][ID];
+	new 
+		raceid = gPlayerRaceEdit[playerid][ID];
 
 	if (raceid == -1)
 	{
 		return 1;
 	}
 
-	new query[2048];
+	new 
+		query[2048];
 	format(query, sizeof(query), "INSERT INTO races (id, name, type, cost_dollars, prize_dollars, start_x, start_y, start_z) VALUES (%d, '%s', %d, %d, %d, %.2f, %.2f, %.2f)",
 			gPlayerRaceEdit[playerid][ID],
 			gPlayerRaceEdit[playerid][Name],
@@ -551,7 +591,8 @@ stock SaveRaceData(playerid)
 			gPlayerRaceEdit[playerid][Start][E_RACE_COORD_Z]
 		);
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		SendClientMessageLocalized(playerid, I18N_RACE_DATABASE_ERROR);
@@ -601,3 +642,4 @@ stock SaveRaceData(playerid)
 
 	return 1;
 }
+

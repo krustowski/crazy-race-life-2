@@ -29,11 +29,10 @@ enum BlackMarketItem
 	DrugType: Type
 };
 
-new gBlackMarketItems[MAX_MARKET_ITEMS][BlackMarketItem];
-
-new gBlackMarketItemOffer[MAX_PLAYERS][BlackMarketItem];
-
-new Float: gBlackMarketRatio = 1.0;
+new 
+	gBlackMarketItems[MAX_MARKET_ITEMS][BlackMarketItem],
+	gBlackMarketItemOffer[MAX_PLAYERS][BlackMarketItem],
+	Float: gBlackMarketRatio = 1.0;
 
 enum
 {
@@ -80,9 +79,7 @@ enum DrugPickup
 }
 
 new 
-	gDrugPickups[MAX_DRUG_PICKUPS][DrugPickup];
-
-new 
+	gDrugPickups[MAX_DRUG_PICKUPS][DrugPickup],
 	gDrugz[MAX_DRUG_TYPES][Drug];
 
 forward UpdateBlackMarketRatio();
@@ -179,21 +176,24 @@ stock InitDrugValues()
 
 stock InitDrugPickups()
 {
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, "SELECT type, x, y, z FROM drug_coords");
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, "SELECT type, x, y, z FROM drug_coords");
 	if (!result) 
 	{
 		print("Database error: cannot fetch drug coords!");
 		return;
 	}
 
-	new i = 0;
+	new 
+		i = 0;
 
 	do
 	{
-		new DrugType: type = DrugType: DB_GetFieldIntByName(result, "type"),
-		    Float: X,
-		    Float: Y,
-		    Float: Z;
+		new 
+			DrugType: type = DrugType: DB_GetFieldIntByName(result, "type"),
+			Float: X,
+			Float: Y,
+			Float: Z;
 
 		X = DB_GetFieldFloatByName(result, "x");
 		Y = DB_GetFieldFloatByName(result, "y");

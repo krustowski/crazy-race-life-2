@@ -263,7 +263,18 @@ enum
 	I18N_TRUCK_UNKNOWN_TRAILER_MODEL,
 	I18N_TRUCK_VEHICLES_REGISTERED,
 	// Tow
-	I18N_TOW_MISS_INFO
+	I18N_TOW_MISS_INFO,
+	I18N_TOW_RETURN_TO_TRUCK_FMT,
+	I18N_TOW_MISS_START,
+	I18N_TOW_MISS_ABORT,
+	I18N_TOW_IN_MINIGAME_BLOCK,
+	I18N_TOW_NOT_DRIVER,
+	I18N_TOW_INVALID_VEHICLE,
+	I18N_TOW_VEHICLE_ATTACHED,
+	I18N_TOW_VEHICLE_DETACHED,
+	I18N_TOW_VEHICLE_ALREADY_TOWED,
+	I18N_TOW_VEHICLE_MODEL_BONUS,
+	I18N_TOW_VEHICLE_TOWED_COMMISSION_FMT
 }
 
 new gI18nMessageColor[] = 
@@ -488,7 +499,18 @@ new gI18nMessageColor[] =
 	COLOR_RED,
 	COLOR_LIGHTGREEN,
 	// Tow
-	COLOR_INVISIBLE
+	COLOR_INVISIBLE,
+	COLOR_INVISIBLE,
+	COLOR_INVISIBLE,
+	COLOR_INVISIBLE,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_LIGHTGREEN,
+	COLOR_LIGHTGREEN,
+	COLOR_YELLOW,
+	COLOR_LIGHTGREEN,
+	COLOR_LIGHTGREEN
 };
 
 new gI18nMessages[][PlayerLocale][MAX_MESSAGE_LEN] = 
@@ -1348,6 +1370,50 @@ new gI18nMessages[][PlayerLocale][MAX_MESSAGE_LEN] =
 	{
 		"~w~Models:_~g~%d~n~~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%02d",
 		"~w~Modely:_~g~%d~n~~w~Zavezeno:_~g~%d~n~~w~Vydelek:__~g~$~y~%d~n~~w~Cas:_____~b~%d~y~:~b~%02d"
+	},
+	{
+		"~w~Return to ~y~the truck ~w~to continue ~y~the tow mission!",
+		"~w~Vrat se do ~y~odtahovky ~w~pro pokracovani ~y~mise!"
+	},
+	{
+		"~w~Tow Mission ~g~Started",
+		"~w~Odtahova mise ~g~Zahajena"
+	},
+	{
+		"~w~Tow Mission ~r~Aborted",
+		"~w~Odtahova mise ~r~Zrusena"
+	},
+	{
+		"[ TOW ] Another minigame started, close it to start the towing mission!",
+		"[ TOW ] Jina minihra je aktivni, ukonci ji, abys zahajil odtahovou misi!"
+	},
+	{
+		"[ TOW ] You must be driving the Tow Truck!",
+		"[ TOW ] Nejsi ridicem odtahovky!"
+	},
+	{
+		"[ TOW ] Invalid car!",
+		"[ TOW ] Neplatne vozidlo!"
+	},
+	{
+		"[ TOW ] New trailer attached successfully!",
+		"[ TOW ] Nove vozidlo uspesne pripojeno!"
+	},
+	{
+		"[ TOW ] Trailer detached successfully!",
+		"[ TOW ] Vozidlo uspesne odpojeno!"
+	},
+	{
+		"[ TOW ] This vehicle model has been already towed!",
+		"[ TOW ] Tento model vozidla jiz byl odtazen!"
+	},
+	{
+		"[ TOW ] New vehicle model towed! A bonus to commission of $2500!",
+		"[ TOW ] Novy model vozidla odtazen! Bonus $2500!"
+	},
+	{
+		"[ TOW ] Mission completed! Commision earned: $%d",
+		"[ TOW ] Dobra prace! Provize: $%d"
 	}
 };
 

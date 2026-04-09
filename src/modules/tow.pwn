@@ -92,14 +92,15 @@ public CheckPlayerTowTrailerAttached(playerid)
 		// Mark the tower truck vehicle
 		SetVehicleParamsForPlayer(vehicleid, playerid, true, false);
 
-		GameTextForPlayer(playerid, "~w~Return to ~y~the truck ~w~to continue ~y~the tow mission!", 1000, 3); 
+		new
+			gameText[32];
+
+		GetLocalizedString(playerid, I18N_TOW_RETURN_TO_TRUCK_FMT, gameText, sizeof(gameText));
+		GameTextForPlayer(playerid, gameText, 1000, 3); 
 		return 1;
 	}
 
 	SetVehicleParamsForPlayer(vehicleid, playerid, false, false);
-
-	//GameTextForPlayer(playerid, "~w~Trailer ~r~Detached! ~w~Reattach to continue!", 1000, 3); 
-
 	return 1;
 }
 
@@ -153,7 +154,11 @@ stock AbortTowMission(playerid)
 	SetVehicleParamsForPlayer(gTowMission[playerid][TruckID], playerid, false, false);
 	SetVehicleParamsForPlayer(gTowMission[playerid][TowedID], playerid, false, false);
 
-	return GameTextForPlayer(playerid, "~w~Tow Mission ~r~Aborted", 3000, 3); 
+	new 
+		gameText[32];
+
+	GetLocalizedString(playerid, I18N_TOW_MISS_ABORT, gameText, sizeof(gameText));
+	return GameTextForPlayer(playerid, gameText, 3000, 3); 
 }
 
 stock ToggleTowMission(playerid)
@@ -165,12 +170,12 @@ stock ToggleTowMission(playerid)
 
 	if (gPlayers[playerid][InMinigame])
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ TOW ] Another minigame started, close it to start the towing mission!");
+		return SendClientMessageLocalized(playerid, I18N_TOW_IN_MINIGAME_BLOCK);
 	}
 	
 	if (!IsPlayerInAnyVehicle(playerid) || GetVehicleModel(GetPlayerVehicleID(playerid)) != VEHICLE_ID_TOW_TRUCK)
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ TOW ] You must be driving the Tow Truck!");
+		return SendClientMessageLocalized(playerid, I18N_TOW_NOT_DRIVER);
 	}
 
 	gPlayers[playerid][InMinigame] = true;
@@ -191,7 +196,11 @@ stock ToggleTowMission(playerid)
 	gTowMission[playerid][TimerElapsed] = SetTimerEx("UpdateTowMissionText", 1000, true, "i", playerid);
 	gTowMission[playerid][TimerAttachedCheck] = SetTimerEx("CheckPlayerTowTrailerAttached", 1500, true, "i", playerid);
 
-	GameTextForPlayer(playerid, "~w~Tow Mission ~g~Started", 3000, 3); 
+	new
+		gameText[32];
+
+	GetLocalizedString(playerid, I18N_TOW_MISS_START, gameText, sizeof(gameText));
+	GameTextForPlayer(playerid, gameText, 3000, 3); 
 
 	return 1;
 }
@@ -200,7 +209,7 @@ stock OperateTowTruck(playerid)
 {
 	if (!gTowMission[playerid][Active] || !gTowMission[playerid][TruckID] || gTowMission[playerid][TruckID] == INVALID_VEHICLE_ID)
 	{
-		SendClientMessage(playerid, COLOR_RED, "[ TOW ] Invalid car!");
+		SendClientMessageLocalized(playerid, I18N_TOW_INVALID_VEHICLE);
 		return 0;
 	}
 
@@ -209,7 +218,7 @@ stock OperateTowTruck(playerid)
 		DetachTrailerFromVehicle(gTowMission[playerid][TruckID]);
 		gTowMission[playerid][TowedID] = INVALID_VEHICLE_ID;
 
-		return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TOW ] Trailer detached successfully!");
+		return SendClientMessageLocalized(playerid, I18N_TOW_VEHICLE_DETACHED);
 	}
 
 	new Float: vX, Float: vY, Float: vZ, Float: velocity[3];
@@ -232,17 +241,21 @@ stock OperateTowTruck(playerid)
 		if (IsPlayerInSphere(playerid, vX, vY, vZ, 9.0) && velocity[0] == 0.0 && velocity[1] == 0.0)
 		{
 			AttachTrailerToVehicle(i, gTowMission[playerid][TruckID]);
-			SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TOW ] New trailer attached successfully!");
+			SendClientMessageLocalized(playerid, I18N_TOW_VEHICLE_ATTACHED);
 
 			if (gTowMission[playerid][Models][GetVehicleModel(i) - 400])
 			{
-				SendClientMessage(playerid, COLOR_YELLOW, "[ TOW ] This vehicle model has been already towed!");
+				SendClientMessageLocalized(playerid, I18N_TOW_VEHICLE_ALREADY_TOWED);
 			}
 
 			gTowMission[playerid][TowedID] = i;
 			gTowMission[playerid][CheckpointDisabled] = false;
 
-			new Float: X, Float: Y, Float: Z;
+			new 
+				Float: X, 
+				Float: Y, 
+				Float: Z;
+
 			GetPlayerPos(playerid, X, Y, Z);
 
 			gTowMission[playerid][CommissionBonusWeight] = (floatabs(X - Float: DOCK_SF_X) / 3000 + floatabs(Y - Float: DOCK_SF_Y) / 3000) / 2;
@@ -270,12 +283,14 @@ stock CheckTowMissionCheckpoint(playerid)
 		return 0;
 	}
 
-	new commission = 0, stringToPrint[128];
+	new 
+		commission = 0, 
+		stringToPrint[128];
 
 	if (CheckVehicleModelTowed(playerid, GetVehicleModel(gTowMission[playerid][TowedID])))
 	{
 		commission += 2500;
-		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TOW ] New vehicle model towed! A bonus to commission of $2500!");
+		SendClientMessageLocalized(playerid, I18N_TOW_VEHICLE_MODEL_BONUS);
 	}
 
 	DetachTrailerFromVehicle(gTowMission[playerid][TruckID]);
@@ -289,7 +304,10 @@ stock CheckTowMissionCheckpoint(playerid)
 	gTowMission[playerid][TimeElapsed] = 0;
 	//gTowMission[playerid][DoneCount] += 1;
 
-	format(stringToPrint, sizeof(stringToPrint), "[ TOW ] Mission completed! Commision earned: $%d", commission);
+	GetLocalizedString(playerid, I18N_TOW_VEHICLE_TOWED_COMMISSION_FMT, stringToPrint, sizeof(stringToPrint));
+	format(stringToPrint, sizeof(stringToPrint), stringToPrint, 
+			commission
+		);
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 
 	return 1;

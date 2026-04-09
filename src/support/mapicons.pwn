@@ -77,7 +77,8 @@ forward AddMapicons(playerid);
 
 public AddMapicons(playerid)
 {
-	new mapiconid = 0;
+	new 
+		mapiconid = 0;
 
 	// The very global spawn point in LV.
 	SetPlayerMapIcon(playerid, mapiconid++, 2323.73, 1283.18, 97.60, E_MAPICON_ID_ENEMY_ATTACK, 0, MAPICON_LOCAL);
@@ -92,7 +93,9 @@ public AddMapicons(playerid)
 	for (new i = 1; i < MAX_RACE_COUNT; i++)
 	{
 		if (!strcmp(gRaces[i][Name], ""))
+		{
 			continue;
+		}
 
 		new 
 			Float: pX = gRaces[i][Start][E_RACE_COORD_X],
@@ -128,7 +131,10 @@ public AddMapicons(playerid)
 			continue;
 		}
 
-		new Float: pX, Float: pY, Float: pZ;
+		new 
+			Float: pX, 
+			Float: pY, 
+			Float: pZ;
 
 		for (new j = 0; j < MAX_PROPERTY_PICKUPS; j++)
 		{
@@ -154,11 +160,13 @@ public AddMapicons(playerid)
 
 	// Jobs.
 
-	new query[256];
+	new 
+		query[256];
 
 	format(query, sizeof(query), "SELECT c.team_id, c.x, c.y, c.z FROM team_coords AS c JOIN teams AS t ON t.id = c.team_id ORDER BY c.team_id ASC");
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		printf("Database error: cannot list team coords");
@@ -223,7 +231,10 @@ public AddMapicons(playerid)
 
 	do 
 	{
-		new Float: X, Float: Y, Float: Z;
+		new 
+			Float: X, 
+			Float: Y, 
+			Float: Z;
 
 		X = DB_GetFieldFloatByName(result, "x");
 		Y = DB_GetFieldFloatByName(result, "y");

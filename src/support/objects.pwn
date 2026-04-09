@@ -9,7 +9,8 @@
 
 #include "support/parkour.pwn"
 
-new gAdminElevator;
+new 
+	gAdminElevator;
 
 forward InitObjects();
 

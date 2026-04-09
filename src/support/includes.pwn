@@ -20,7 +20,7 @@
 //  Basic definitions.
 //
 
-#define BUG_SYSTEM 	true
+#define DEBUG_ENABLED 	true
 #define SECOND_MS	1000
 
 #define SOUND_MUSIC10

@@ -13,8 +13,10 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	switch (dialogid)
 	{
 		case DIALOG_UNUSED: 
-			return 1; // Useful for dialogs that contain only information and we do nothing depending on whether they responded or not
-
+			{
+				// Useful for dialogs that contain only information and we do nothing depending on whether they responded or not
+				return 1; 
+			}
 		case DIALOG_LOGIN:
 			{
 				if (!response) 
@@ -240,7 +242,9 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return ShowPropertyEditDialogMain(playerid);
 				}
 
-				new label[64];
+				new 
+					label[64];
+
 				format(label, sizeof(label), "%s", inputtext);
 
 				gPropertyEdit[playerid][Label] = label;
@@ -328,7 +332,8 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				new propertyid = gPlayers[playerid][Properties][listitem];
+				new 
+					propertyid = gPlayers[playerid][Properties][listitem];
 
 				if (!propertyid)
 				{
@@ -345,11 +350,12 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				if (!response)
 				{
-					gPlayers[playerid][PropertyOwnedID] = 0;
+					gPlayers[playerid][PropertyOwnedID] = -1;
 					return 1;
 				}
 
-				new propertyid = gPlayers[playerid][PropertyOwnedID];
+				new 
+					propertyid = gPlayers[playerid][PropertyOwnedID];
 
 				switch (listitem)
 				{
@@ -399,7 +405,8 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 					case 2: 
 						{
-							new stringToPrint[256];
+							new 
+								stringToPrint[256];
 
 							format(stringToPrint, sizeof(stringToPrint), "[ ATM ] Account balance: $%d!", gPlayers[playerid][Bank]);
 							SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
@@ -556,7 +563,8 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+				new 
+					clickedplayerid = gPlayers[playerid][ClickedPlayerID];
 
 				if (!IsPlayerConnected(clickedplayerid))
 				{
@@ -606,7 +614,10 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 6:
 						// Kick from server
 						{
-							new adminName[MAX_PLAYER_NAME], kickedName[MAX_PLAYER_NAME], stringToPrint[128];
+							new 
+								adminName[MAX_PLAYER_NAME], 
+								kickedName[MAX_PLAYER_NAME], 
+								stringToPrint[128];
 
 							GetPlayerName(playerid, adminName, sizeof(adminName));
 							GetPlayerName(clickedplayerid, kickedName, sizeof(kickedName));
@@ -685,7 +696,10 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 12:
 						// Ban
 						{
-							new adminName[MAX_PLAYER_NAME], bannedName[MAX_PLAYER_NAME], stringToPrint[128];
+							new 
+								adminName[MAX_PLAYER_NAME], 
+								bannedName[MAX_PLAYER_NAME], 
+								stringToPrint[128];
 
 							GetPlayerName(playerid, adminName, sizeof(adminName));
 							GetPlayerName(clickedplayerid, bannedName, sizeof(bannedName));
@@ -717,7 +731,9 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+				new 
+					clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+
 				gPlayers[playerid][ClickedPlayerID] = INVALID_PLAYER_ID;
 
 				if (!IsPlayerConnected(clickedplayerid))
@@ -725,7 +741,8 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return SendClientMessage(playerid, COLOR_RED, "[ ! ] Player not connected!");
 				}
 
-				new skinid = strval(inputtext);
+				new 
+					skinid = strval(inputtext);
 
 				if (!IsNumeric(inputtext) || skinid < 0 || skinid > 311)
 				{
@@ -745,7 +762,9 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+				new 
+					clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+
 				gPlayers[playerid][ClickedPlayerID] = INVALID_PLAYER_ID;
 
 				if (!IsPlayerConnected(clickedplayerid))
@@ -773,7 +792,9 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+				new 
+					clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+
 				gPlayers[playerid][ClickedPlayerID] = INVALID_PLAYER_ID;
 
 				if (!IsPlayerConnected(clickedplayerid))
@@ -781,7 +802,8 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return SendClientMessage(playerid, COLOR_RED, "[ ! ] Player not connected!");
 				}
 
-				new weaponid = strval(inputtext);
+				new 
+					weaponid = strval(inputtext);
 
 				if (!IsNumeric(inputtext) || weaponid < 0 || weaponid > 46)
 				{
@@ -789,6 +811,7 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 
 				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ ADMIN ] Weapon sent");
+
 				return GivePlayerWeapon(clickedplayerid, t_WEAPON: weaponid, 1000);
 			}
 		case DIALOG_PLAYER_FAKECHAT:
@@ -799,7 +822,9 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+				new 
+					clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+
 				gPlayers[playerid][ClickedPlayerID] = INVALID_PLAYER_ID;
 
 				if (!IsPlayerConnected(clickedplayerid))
@@ -819,7 +844,9 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				new clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+				new 
+					clickedplayerid = gPlayers[playerid][ClickedPlayerID];
+
 				gPlayers[playerid][ClickedPlayerID] = INVALID_PLAYER_ID;
 
 				if (!IsPlayerConnected(clickedplayerid))
@@ -890,7 +917,8 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 0:
 						// Account balance
 						{
-							new stringToPrint[256];
+							new 
+								stringToPrint[256];
 
 							format(stringToPrint, sizeof(stringToPrint), "[ PHONE ] Account balance: $%d!", gPlayers[playerid][Bank]);
 							SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
@@ -917,12 +945,24 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 									continue;
 								}
 
-								new Float: X, Float: Y, Float: Z;
+								new 
+									Float: X, 
+									Float: Y, 
+									Float: Z;
+
 								GetVehiclePos(vehicleid, X, Y, Z);
 
 								if (IsPlayerInSphere(playerid, X, Y, Z, 7.5))
 								{
-									new engine, lights, alarm, doors, bonnet, boot, objective;
+									new 
+										engine, 
+										lights, 
+										alarm, 
+										doors, 
+										bonnet, 
+										boot, 
+										objective;
+
 									GetVehicleParamsEx(vehicleid, engine, lights, alarm, doors, bonnet, boot, objective);
 
 									if (!isowner && ishacker && (alarm || random(4) == 3))
@@ -988,6 +1028,7 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				ApplyAnimation(playerid, "ped", "phone_out", 4.1, false, false, false, false, 0);
 				//ClearAnimations(playerid);
 				RemovePlayerAttachedObject(playerid, 3);
+
 				return 1;
 			}
 		case DIALOG_PHONE_PM_PLAYER_LIST:
@@ -1141,7 +1182,8 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return SendClientMessage(playerid, COLOR_RED, "[ EDIT ] The entered property ID already exists!");
 				}
 
-				new propertyid = strval(inputtext);
+				new 
+					propertyid = strval(inputtext);
 
 				if (propertyid < 10101 || propertyid > 59999)
 				{
@@ -1169,7 +1211,9 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 0:
 						// Draft new race
 						{
-							new newraceid = -1;
+							new 
+								newraceid = -1;
+
 							for (new i = 1; i < MAX_RACE_COUNT; i++)
 							{
 								if (!strcmp(gRaces[i][Name], ""))
@@ -1257,7 +1301,6 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							return SaveRaceData(playerid);
 						}
-
 				}
 
 				return 1;
@@ -1310,7 +1353,9 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 0:
 						// New trucking point
 						{
-							new truckingid = -1;
+							new 
+								truckingid = -1;
+
 							for (new i = 1; i < MAX_TRUCKING_POINTS; i++)
 							{
 								if (!strcmp(gTruckingPoints[i][Name], ""))
@@ -1409,7 +1454,9 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						// Save
 						{
 							if (SetTruckingPoint(playerid))
+							{
 								return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Trucking point and vehicles saved successfully!");
+							}
 
 							return SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Database error occured while saving trucking data!");
 						}
@@ -1777,7 +1824,7 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				if (!IsNumeric(inputtext) || strval(inputtext) < 0)
+				if (!IsNumeric(inputtext) || strval(inputtext) <= 0)
 				{
 					SendClientMessage(playerid, COLOR_RED, "[ DEAL ] Wrong value set!");
 					return ShowDealValueDialog(playerid);
@@ -1826,7 +1873,8 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 		default: 
 			{
-				return 0; // dialog ID was not found, search in other scripts
+				// Dialog ID was not found, search in other scripts
+				return 0; 
 			}
 	}
 

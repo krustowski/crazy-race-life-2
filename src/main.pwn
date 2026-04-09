@@ -940,8 +940,6 @@ public OnPlayerLeavePlayerGangZone(playerid, zoneid)
  *    \____/_/   \__,_/ /___/\__, /_/ |_|\__,_/\___/\___/_____/_/_/  \___/____/ 
  *                          /____/                                              
 
- *
-
  *  GameMode CRL2 
  *  Credits: krusty, kompry, DRaGsTeR, amdulka, cranyy, tack
  *  Jan 2025

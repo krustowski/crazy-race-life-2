@@ -19,7 +19,8 @@ enum Coords
        	Float: CoordR
 }
 
-new const GAMEMODE_CREDITS[] = "{FFD700}krusty, kompry, DRaGsTeR {FFFFFF}(2008-2010), {FFD700}amdulka, cranyy, tack {FFFFFF}(2025-)";
+new 
+	const GAMEMODE_CREDITS[] = "{FFD700}krusty, kompry, DRaGsTeR {FFFFFF}(2008-2010), {FFD700}amdulka, cranyy, tack {FFFFFF}(2025-)";
 
 forward AutosaveData();
 forward StartServerReset();
@@ -42,12 +43,15 @@ public StartServerReset()
 
 stock chrfind(n, h[], s = 0)
 {
-	new l = strlen(h);
+	new 
+		l = strlen(h);
+
 	while (s < l)
 	{
 		if (h[s] == n) return s;
 		s++;
 	}
+
 	return -1;
 }
 
@@ -88,7 +92,9 @@ stock IsNumeric(const input[])
 	for (new i = 0, j = strlen(input); i < j; i++) 
 	{
 		if (input[i] > '9' || input[i] < '0') 
+		{
 			return 0;
+		}
 	}
 
 	return 1;
@@ -118,15 +124,22 @@ stock IsPlayerInSphere(playerid, Float:x, Float:y, Float:z, Float:radius)
 	{
 		return 1;
 	}
+
 	return 0;
 }
 
 stock GetPlayerDistanceToPointEx(playerid, Float:x, Float:y, Float:z)
 {
-	new Float:x1, Float:y1, Float:z1;
-	new Float:tmpdis;
+	new 
+		Float:x1, 
+		Float:y1, 
+		Float:z1,
+		Float:tmpdis;
+
 	GetPlayerPos(playerid, x1, y1, z1);
+
 	tmpdis = floatsqroot(floatpower(floatabs(floatsub(x, x1)), 2) + floatpower(floatabs(floatsub(y, y1)), 2) + floatpower(floatabs(floatsub(z, z1)), 2));
+
 	return floatround(tmpdis);
 }
 
@@ -141,17 +154,22 @@ stock bool: IsPlayerInValidNosVehicle(playerid, vehicleid)
 		452, 446, 454, 590, 569, 537, 538, 570, 449, 522, 520
 	};
 
-	new vehicleIdCheck = GetPlayerVehicleID(playerid);
+	new 
+		vehicleIdCheck = GetPlayerVehicleID(playerid);
 
 	// Return when the target player changed vehicles meanwhile, or has exited the target vehicle.
 	if (vehicleid != vehicleIdCheck || !IsPlayerInVehicle(playerid, vehicleid))
+	{
 		return false;
+	}
 
 	// Loop over permitted NoS vehicles.
 	for (new i = 0; i < MAX_INVALID_NOS_VEHICLES; i++)
 	{
 		if (GetVehicleModel(vehicleid) == InvalidNosVehicles[i])
+		{
 			return false;
+		}
 	}
 
 	return true;
@@ -161,40 +179,61 @@ stock GetVehicleWithinDistance(playerid, Float:x1, Float:y1, Float:z1, Float:dis
 {
 	for (new i = 1; i < MAX_VEHICLES; i++)
 	{
-		if (GetVehicleModel(i) > 0)
+		if (!GetVehicleModel(i))
 		{
-			if (GetPlayerVehicleID(playerid) != i)
+			return 0;
+		}
+
+		if (GetPlayerVehicleID(playerid) != i)
+		{
+			new 
+				Float: x, 
+				Float: y, 
+				Float: z,
+				Float: x2, 
+				Float: y2, 
+				Float: z2;
+
+			GetVehiclePos(i, x, y, z);
+
+			x2 = x1 - x;
+			y2 = y1 - y;
+			z2 = z1 - z;
+
+			new 
+				Float: vDist = (x2 * x2 + y2 * y2 + z2 * z2);
+
+			if (vDist < dist)
 			{
-				new Float:x, Float:y, Float:z;
-				new Float:x2, Float:y2, Float:z2;
-				GetVehiclePos(i, x, y, z);
-				x2 = x1 - x;
-				y2 = y1 - y;
-				z2 = z1 - z;
-				new Float:vDist = (x2 * x2 + y2 * y2 + z2 * z2);
-				if (vDist < dist)
-				{
-					veh = i;
-					dist = vDist;
-				}
+				veh = i;
+				dist = vDist;
 			}
 		}
 	}
+
+	return 0;
 }
 
 stock EnsurePickupCreated(model, type, Float:X, Float:Y, Float:Z)
 {
-	new i = 0, MAX_ITERATIONS = 50, pId;
+	new 
+		i = 0, 
+		MAX_ITERATIONS = 50, 
+		pId;
 
 	for (;;)
 	{
 		pId = CreatePickup(model, type, Float:X, Float:Y, Float:Z);
 
 		if (pId)
+		{
 			break;
+		}
 
 		if (i == MAX_ITERATIONS)
+		{
 			break;
+		}
 
 		i++;
 	}
@@ -204,20 +243,29 @@ stock EnsurePickupCreated(model, type, Float:X, Float:Y, Float:Z)
 
 stock IsVehicleRcTram(vehicleid)
 {
-	new model = GetVehicleModel(vehicleid);
+	new 
+		model = GetVehicleModel(vehicleid);
+
 	switch (model)
 	{
 		case D_TRAM, RC_GOBLIN, RC_BARON, RC_BANDIT, RC_RAIDER, RC_TANK:
-			return 1;
+			{
+				return 1;
+			}
 		default:
-			return 0;
+			{
+				return 0;
+			}
 	}
+
 	return 0;
 }
 
 stock SplitIntoTwo(const input[], token1[], token2[], tokenSize, const delimiter[2] = " ")
 {
-	new spacePos = strfind(input, delimiter);
+	new 
+		spacePos = strfind(input, delimiter);
+
 	if (spacePos == -1)
 	{
 		strmid(token1, input, 0, strlen(input), tokenSize);
@@ -232,12 +280,12 @@ stock SplitIntoTwo(const input[], token1[], token2[], tokenSize, const delimiter
 	return 2;
 }
 
-stock TestPrint(print[])
+stock DebugPrint(const str[])
 {
-#if BUG_SYSTEM
-	printf(" BS | %s ", print);
+#if DEBUG_ENABLED
+	printf("[DEBUG]: %s ", str);
 #else
-#pragma unused print
+#pragma unused str
 #endif
 }
 
@@ -297,6 +345,7 @@ stock UnixToDateTime(timestamp, &year, &month, &day, &hour, &minute, &second)
 	// Adjust February for leap year
 	new 
 		is_leap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+
 	if (is_leap) 
 	{
 		month_days[1] = 29; 
@@ -307,6 +356,7 @@ stock UnixToDateTime(timestamp, &year, &month, &day, &hour, &minute, &second)
 	}
 
 	month = 1;
+
 	for (new i = 0; i < 12; i++)
 	{
 		if (days >= month_days[i])
@@ -344,8 +394,10 @@ stock SendUsageMessage(playerid, const usage[])
 {
 	new 
 		msg[64];
+
 	GetLocalizedString(playerid, I18N_CMD_USAGE_FMT, msg, sizeof(msg));
 	format(msg, sizeof(msg), msg, usage);
+
 	return SendClientMessage(playerid, COLOR_YELLOW, msg);
 }
 

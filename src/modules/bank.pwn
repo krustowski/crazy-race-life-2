@@ -3,11 +3,15 @@
 #endif
 #define _CRL2_BANK
 
+//
+//  bank.pwn
+//
+
 #define MAX_ATM_PICKUPS 20
 
-new gBankPickups[MAX_ATM_PICKUPS];
-
-new Float: gBankLocation[19][4];
+new 
+	gBankPickups[MAX_ATM_PICKUPS],
+	Float: gBankLocation[19][4];
 
 stock InitBankLocations()
 {
@@ -20,7 +24,7 @@ stock InitBankLocations()
 		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
-		printf("Database error: cannot list ATM coords!");
+		print("Database error: cannot list ATM coords!");
 		print(query);
 
 		return 0;
@@ -28,6 +32,13 @@ stock InitBankLocations()
 
 	new 
 		i = 0;
+
+	if (!DB_GetRowCount(result))
+	{
+		print("Database warning: no ATM coords to load");
+		DB_FreeResultSet(result);
+		return 0;
+	}
 
 	do
 	{
@@ -42,14 +53,12 @@ stock InitBankLocations()
 
 	DB_FreeResultSet(result);
 
-	printf("ATM location coords initialized!");
+	print("ATM location coords initialized!");
 
 	return 1;
 }
 
-forward CheckPlayerBankLocation(playerid);
-
-public CheckPlayerBankLocation(playerid)
+stock CheckPlayerBankLocation(playerid)
 {
 	for (new i = 0; i < sizeof(gBankLocation); i++)
 	{

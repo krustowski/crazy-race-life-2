@@ -65,10 +65,11 @@ new
 
 //new gPlayerWeaponPickup[MAX_PLAYERS];
 
-new gPickupSFCentrumEnter;
-new gPickupSFCentrumExit;
-new gPickupBankLSEnter;
-new gPickupBankLSExit;
+new 
+	gPickupSFCentrumEnter,
+	gPickupSFCentrumExit,
+	gPickupBankLSEnter,
+	gPickupBankLSExit;
 
 enum PrizeType
 {
@@ -146,11 +147,13 @@ public InitPickups()
 	//  Jobs/Teams.
 	//
 
-	new query[256];
+	new 
+		query[256];
 
 	format(query, sizeof(query), "SELECT c.team_id, c.x, c.y, c.z FROM team_coords AS c JOIN teams AS t ON t.id = c.team_id ORDER BY c.team_id ASC");
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		printf("Database error: cannot list team coords");
@@ -159,12 +162,15 @@ public InitPickups()
 		return 0;
 	}
 
-	new team_id = 0, pickupid = 0;
+	new 
+		team_id = 0, 
+		pickupid = 0;
 
 	do
 	{
-		new id = 0, 
-		    name[64],
+		new 
+			id = 0, 
+		    	name[64],
 			Float: X,
 			Float: Y,
 			Float: Z;
@@ -200,7 +206,7 @@ public InitPickups()
 
 	DB_FreeResultSet(result);
 
-	/*NEMOVITOSTI*/
+	/* NEMOVITOSTI --- TBD */
 
 	//2.barak
 	CreatePickup(1318,1,1789.27,-2129.97,7.64);  //z baraku
@@ -232,17 +238,23 @@ public InitPickups()
 
 stock InitPrizes()
 {
-	new i = 0, query[256];
+	new 
+		i = 0, 
+		query[256];
 
 	format(query, sizeof(query), "SELECT id, type, x, y, z FROM prize_coords WHERE hidden = 0");
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
 		print("Database error: cannot load prize coords!");
 		return 0;
 	}
 
-	new Float:X, Float:Y, Float:Z;
+	new 
+		Float: X, 
+		Float: Y, 
+		Float: Z;
 
 	do
 	{
@@ -279,11 +291,13 @@ stock InitPrizes()
 
 stock UpdatePrize(playerid, prizeid)
 {
-	new query[128];
+	new 
+		query[128];
 
 	format(query, sizeof(query), "UPDATE prize_coords SET hidden = 1 WHERE id = %d", gPrizes[prizeid][ID]);
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) {
 		print("Database error: cannot write prize update!");
 		return 0;
@@ -316,14 +330,19 @@ enum DeathMoneyPickup
 	Amount
 }
 
-new gDeathMoneyPickups[MAX_DEATH_MONEY_PICKUPS][DeathMoneyPickup];
-new gDeathMoneyPickupsPointer = 0;
+new 
+	gDeathMoneyPickups[MAX_DEATH_MONEY_PICKUPS][DeathMoneyPickup],
+	gDeathMoneyPickupsPointer = 0;
 
 stock CreateDeathMoneyPickup(playerid)
 {
 	if (GetPlayerMoney(playerid) > 0)
 	{
-		new Float: X, Float: Y, Float: Z;
+		new 
+			Float: X, 
+			Float: Y, 
+			Float: Z;
+
 		GetPlayerPos(playerid, X, Y, Z);
 
 		if (gDeathMoneyPickupsPointer == MAX_DEATH_MONEY_PICKUPS)
@@ -378,7 +397,11 @@ stock CheckGenericPickup(playerid, pickupid)
 {
 	if (pickupid == gDruggeryEntrance)
 	{
-		new Float: dX, Float: dY, Float: dZ;
+		new 
+			Float: dX, 
+			Float: dY, 
+			Float: dZ;
+
 		GetObjectPos(gDruggery, dX, dY, dZ);
 		return SetPlayerPos(playerid, dX, dY, dZ);
 	}

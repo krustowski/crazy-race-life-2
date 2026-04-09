@@ -7,7 +7,8 @@
 //  Texts.
 //
 
-new Text: gGameModeText;
+new 
+	Text: gGameModeText;
 
 forward AddTexts(playerid);
 forward InitTexts();
@@ -33,7 +34,7 @@ public InitTexts()
 
 public AddTexts(playerid)
 {
-	if (NPC_IsValid(playerid))
+	if (NPC_IsValid(playerid) || IsPlayerNPC(playerid))
 	{
 		return 1;
 	}

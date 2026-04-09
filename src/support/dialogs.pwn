@@ -4,7 +4,8 @@
 #define _CRL2_DIALOGS
 
 //
-//  Everything dialogs.
+//  dialogs.pwn
+//  Dialogs frontend logic
 //
 
 enum
@@ -979,6 +980,7 @@ stock ShowTruckingEditorMainDialog(playerid)
 {
 	new 
 		stringToPrint[256];
+
 	format(stringToPrint, sizeof(stringToPrint), "%s%s",
 			"New Trucking Point\n",
 			"List Existing Points"

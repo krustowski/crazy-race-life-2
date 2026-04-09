@@ -45,11 +45,10 @@ enum Team
 	Menu: Menus[MAX_TEAM_MENUS]
 }
 
-new PLAYER_TEAM: gTeams[MAX_TEAMS][Team];
+new 
+	PLAYER_TEAM: gTeams[MAX_TEAMS][Team];
 
-forward InitTeams();
-
-public InitTeams()
+stock InitTeams()
 {
 	new 
 		i = 0, 
@@ -130,6 +129,7 @@ stock HexToInt(const string[])
         res += cur * (string[i - 1] - ((string[i - 1] < 58) ? (48) : (55)));
         cur = cur * 16;
     }
+
     return res;
 }
 
@@ -189,3 +189,4 @@ stock CheckPizzaguysOnline()
 {
 	return 0;
 }
+

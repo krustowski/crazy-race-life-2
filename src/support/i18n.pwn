@@ -247,6 +247,21 @@ enum
 	I18N_TAXI_MISS_NEXT_DESTINATION,
 	I18N_TAXI_MISS_START,
 	I18N_TAXI_MISS_ABORT,
+	// Trucking
+	I18N_TRUCK_MISS_INFO_FMT,
+	I18N_TRUCK_MISS_COMMISSION_FMT,
+	I18N_TRUCK_NEW_MISS_ERROR,
+	I18N_TRUCK_RETURN_TO_TRUCK_FMT,
+	I18N_TRUCK_TRAILER_DETACHED_FMT,
+	I18N_TRUCK_NEXT_DESTINATION_FMT,
+	I18N_TRUCK_MISS_START_FMT,
+	I18N_TRUCK_MISS_ABORT_FMT,
+	I18N_TRUCK_MISS_ABORT,
+	I18N_TRUCK_IN_MINIGAME_BLOCK,
+	I18N_TRUCK_NOT_DRIVER,
+	I18N_TRUCK_NO_TRAILER,
+	I18N_TRUCK_UNKNOWN_TRAILER_MODEL,
+	I18N_TRUCK_VEHICLES_REGISTERED,
 	// Tow
 	I18N_TOW_MISS_INFO
 }
@@ -457,6 +472,21 @@ new gI18nMessageColor[] =
 	COLOR_INVISIBLE,
 	COLOR_INVISIBLE,
 	COLOR_INVISIBLE,
+	// Trucking
+	COLOR_INVISIBLE,
+	COLOR_LIGHTGREEN,
+	COLOR_RED,
+	COLOR_INVISIBLE,
+	COLOR_INVISIBLE,
+	COLOR_INVISIBLE,
+	COLOR_INVISIBLE,
+	COLOR_INVISIBLE,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_LIGHTGREEN,
 	// Tow
 	COLOR_INVISIBLE
 };
@@ -1253,9 +1283,71 @@ new gI18nMessages[][PlayerLocale][MAX_MESSAGE_LEN] =
 		"~w~Taxi Mission ~r~Aborted!",
 		"~w~Taxi Mise ~r~Ukoncena!"
 	},
+	//
+	//  Trucking
+	//
 	{
-		"~w~Models:_~g~%d~n~~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%2d",
-		"~w~Modely:_~g~%d~n~~w~Zavezeno:_~g~%d~n~~w~Vydelek:__~g~$~y~%d~n~~w~Cas:_____~b~%d~y~:~b~%2d"
+		"~w~Done:___________~g~%3d~n~~w~Earned:__~g~$~y~%7d~n~~w~Time:______~b~%4d~y~:~b~%02d",
+		"~w~Jizd:___________~g~%3d~n~~w~Vydelek:_~g~$~y~%7d~n~~w~Cas:_______~b~%4d~y~:~b~%02d"
+	},
+	{
+		"[ TRUCK ] Mission completed! Commission earned: $%d",
+		"[ TRUCK ] Dobra prace! Provize: $%d"
+	},
+	{
+		"[ TRUCK ] Error setting new mission!",
+		"[ TRUCK ] Nepodarilo se nastavit novou misi!"
+	},
+	{
+		"~w~Return to ~y~the truck ~w~to continue ~y~the mission!",
+		"~w~Vrat se do ~y~kabiny nakladaku ~w~pro pokracovani ~y~mise!"
+	},
+	{
+		"~w~Trailer ~r~Detached! ~w~Reattach to continue the mission!",
+		"~w~Prives ~r~Odpojen! ~w~Pripoj jej zpet pro pokracovani mise!"
+	},
+	{
+		"~w~Next destination: ~y~%s",
+		"~w~Dalsi destinace: ~y~%s"
+	},
+	{
+		"~w~Trucking Mission ~g~Started",
+		"~w~Trucking mise ~g~Zahajena"
+	},
+	{
+		"~w~Trucking Mission ~r~Aborted",
+		"~w~Trucking mise ~r~Zrusena"
+	},
+	{
+		"[ TRUCK ] Mission aborted",
+		"[ TRUCK ] Mise zrusena"
+	},
+	{
+		"[ TRUCK ] Another minigame started, close it to start the trucking mission!",
+		"[ TRUCK ] Jina minihra je aktivni, ukonci ji, abys mohl zacit trucking misi!"
+	},
+	{
+		"[ TRUCK ] You have to be in a truck as driver!",
+		"[ TRUCK ] Musis byt ridicem kamionu!"
+	},
+	{
+		"[ TRUCK ] No trailer attached!",
+		"[ TRUCK ] Nemas pripojeny zadny naves!"
+	},
+	{
+		"[ TRUCK ] Unknown trailer model",
+		"[ TRUCK ] Neznamy model navesul"
+	},
+	{
+		"[ TRUCK ] Vehicle and trailer registered successfully",
+		"[ TRUCK ] Kamion a naves uspesne zaregistrovany k misi"
+	},
+	//
+	//  Tow
+	//
+	{
+		"~w~Models:_~g~%d~n~~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%02d",
+		"~w~Modely:_~g~%d~n~~w~Zavezeno:_~g~%d~n~~w~Vydelek:__~g~$~y~%d~n~~w~Cas:_____~b~%d~y~:~b~%02d"
 	}
 };
 

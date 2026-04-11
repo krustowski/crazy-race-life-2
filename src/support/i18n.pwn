@@ -283,7 +283,7 @@ enum
 	I18N_TOW_VEHICLE_ATTACHED,
 	I18N_TOW_VEHICLE_DETACHED,
 	I18N_TOW_VEHICLE_ALREADY_TOWED,
-	I18N_TOW_VEHICLE_MODEL_BONUS,
+	I18N_TOW_VEHICLE_MODEL_BONUS_FMT,
 	I18N_TOW_VEHICLE_TOWED_COMMISSION_FMT
 }
 
@@ -1468,8 +1468,8 @@ new gI18nMessages[][PlayerLocale][MAX_MESSAGE_LEN] =
 		"[ TOW ] Tento model vozidla jiz byl odtazen!"
 	},
 	{
-		"[ TOW ] New vehicle model towed! A bonus to commission of $2500!",
-		"[ TOW ] Novy model vozidla odtazen! Bonus $2500!"
+		"[ TOW ] New vehicle model (%s) towed! A bonus to commission of $2500!",
+		"[ TOW ] Novy model vozidla (%s) odtazen! Bonus $2500!"
 	},
 	{
 		"[ TOW ] Mission completed! Commision earned: $%d",

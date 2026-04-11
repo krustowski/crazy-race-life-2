@@ -528,6 +528,21 @@ public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 		SetVehicleParamsForPlayer(vehicleid, playerid, false, false);
 	}
 
+	if (!ispassenger)
+	{
+		new
+			gameText[24],
+			modelid = GetVehicleModel(vehicleid);
+
+		if (modelid < 400 || modelid > 611)
+		{
+			return 1;
+		}
+		
+		format(gameText, sizeof(gameText), "~w~%s", gVehicleNames[ modelid - 400 ]);
+		GameTextForPlayer(playerid, gameText, 4000, 1);
+	}
+
 	return 1;
 }
 

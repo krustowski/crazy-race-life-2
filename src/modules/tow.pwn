@@ -269,6 +269,8 @@ stock OperateTowTruck(playerid)
 	return 1;
 }
 
+#include "support/vehicles.pwn"
+
 stock CheckTowMissionCheckpoint(playerid)
 {
 	if (!gTowMission[playerid][Active])
@@ -290,7 +292,10 @@ stock CheckTowMissionCheckpoint(playerid)
 	if (CheckVehicleModelTowed(playerid, GetVehicleModel(gTowMission[playerid][TowedID])))
 	{
 		commission += 2500;
-		SendClientMessageLocalized(playerid, I18N_TOW_VEHICLE_MODEL_BONUS);
+		
+		GetLocalizedString(playerid, I18N_TOW_VEHICLE_MODEL_BONUS_FMT, stringToPrint, sizeof(stringToPrint));
+		format(stringToPrint, sizeof(stringToPrint), stringToPrint, gVehicleNames[ GetVehicleModel(gTowMission[playerid][TowedID]) - 400 ]);
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 	}
 
 	DetachTrailerFromVehicle(gTowMission[playerid][TruckID]);

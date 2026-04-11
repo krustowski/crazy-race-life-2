@@ -13,7 +13,7 @@ forward AntiJetPack();
 
 public AntiCheatWeapon()
 {
-	for (new i = 0; i <= GetMaxPlayers(); i++)
+	for (new i = 0; i < GetMaxPlayers(); i++)
 	{
 		if (IsPlayerConnected(i) && !IsPlayerAdmin(i))
 		{
@@ -42,7 +42,7 @@ public AntiCheatWeapon()
 
 public AntiJetPack()
 {
-	for (new i = 0; i <= GetMaxPlayers(); i++)
+	for (new i = 0; i < GetMaxPlayers(); i++)
 	{
 		if (IsPlayerConnected(i) && !IsPlayerAdmin(i))
 		{
@@ -67,7 +67,7 @@ public AntiJetPack()
 
 public AntiFlood()
 {
-	for (new i = 0; i <= GetMaxPlayers(); i++)
+	for (new i = 0; i < GetMaxPlayers(); i++)
 	{
 		if (IsPlayerConnected(i) && GetPlayerPing(i) == 0 && !IsPlayerNPC(i))
 		{

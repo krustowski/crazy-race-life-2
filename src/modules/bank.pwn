@@ -11,7 +11,7 @@
 
 new 
 	gBankPickups[MAX_ATM_PICKUPS],
-	Float: gBankLocation[19][4];
+	Float: gBankLocation[MAX_ATM_PICKUPS][4];
 
 stock InitBankLocations()
 {
@@ -48,6 +48,12 @@ stock InitBankLocations()
 		gBankLocation[i][3] = 15.0;
 
 		i++;
+
+		if (i == MAX_ATM_PICKUPS)
+		{
+			printf("Database warning: too much ATM items (i = %d), stopping", i);
+			break;
+		}
 	}
 	while (DB_SelectNextRow(result));
 

@@ -40,8 +40,8 @@ new
 	gPoliceBribeStarCount = 0,
 	gPoliceBribeStarLastOrmID = 0;
 
-forward HidePoliceBrikeTimer(bribeid);
-public HidePoliceBrikeTimer(bribeid)
+forward HidePoliceBribeTimer(bribeid);
+public HidePoliceBribeTimer(bribeid)
 {
 	new 
 		ormid = gPoliceBribeStars[bribeid][OrmID],
@@ -151,7 +151,7 @@ stock CheckPoliceBribePickup(playerid, pickupid)
 			break;
 		}
 
-		gPoliceBribeStars[i][HiddenTimer] = Timer: SetTimerEx("HidePoliceBrikeTimer", 60 * 1000, false, "i", i);
+		gPoliceBribeStars[i][HiddenTimer] = Timer: SetTimerEx("HidePoliceBribeTimer", 60 * 1000, false, "i", i);
 
 		HidePickupForPlayer(playerid, pickupid);
 		DestroyPickup(pickupid);

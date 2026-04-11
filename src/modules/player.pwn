@@ -101,8 +101,6 @@ new
 
 forward BatchSavePlayerData();
 forward GivePlayerWeaponEx(playerid, timerid, weaponid, ammo);
-forward LoadPlayerData(playerid);
-forward SavePlayerData(playerid);
 forward SendPlayerSalary();
 forward UpdatePlayerPlayTime();
 forward UpdatePlayerScore();
@@ -130,7 +128,7 @@ public GivePlayerWeaponEx(playerid, timerid, weaponid, ammo)
 	GivePlayerWeapon(playerid, t_WEAPON: weaponid, ammo);
 }
 
-public LoadPlayerData(playerid)
+stock LoadPlayerData(playerid)
 {
 	if (IsPlayerConnected(playerid) && gPlayers[playerid][IsLogged])
 	{
@@ -272,7 +270,7 @@ stock ExtractPropperties(const input[], properties[MAX_PLAYER_PROPERTIES])
 	return properties;
 }
 
-public SavePlayerData(playerid)
+stock SavePlayerData(playerid)
 {
 	if (IsPlayerConnected(playerid) && gPlayers[playerid][IsLogged])
 	{

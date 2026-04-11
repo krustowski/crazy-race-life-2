@@ -100,19 +100,6 @@ stock IsNumeric(const input[])
 	return 1;
 }
 
-stock SendMessageToAdmins(colorId, const messageString[])
-{
-	for (new i = 0; i <= MAX_PLAYERS; i++)
-	{
-		if (IsPlayerConnected(i) && (IsPlayerAdmin(i) || gPlayerData[i][E_PLAYER_DATA_ADMIN_LVL] >= 3))
-		{
-			SendClientMessage(i, colorId, messageString);
-		}
-	}
-
-	return 1;
-}
-
 stock InvalidCommand(playerid)
 {
 	return SendClientMessageLocalized(playerid, I18N_NO_SUCH_COMMAND);
@@ -401,3 +388,23 @@ stock SendUsageMessage(playerid, const usage[])
 	return SendClientMessage(playerid, COLOR_YELLOW, msg);
 }
 
+stock SanitizeString(input[], output[], size)
+{
+	 new 
+		 j = 0;
+
+	 for (new i = 0; i < strlen(input) && j < size - 1; i++)
+	{
+		if (input[i] == '\'')
+		{ 
+			output[j++] = '\''; 
+			output[j++] = '\'';
+		}
+		else 
+		{
+			output[j++] = input[i];
+		}
+	}
+    
+	output[j] = '\0';
+}

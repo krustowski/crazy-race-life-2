@@ -38,3 +38,5 @@ tests:
 		-i${PWD}/dependencies/omp-stdlib
 	@./samp03svr -C configs/test_server.cfg
 
+plot:
+	@gnuplot < configs/gnuplot.cfg > gnuplot.html

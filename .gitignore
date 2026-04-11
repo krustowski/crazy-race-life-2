@@ -57,3 +57,4 @@ crl2_data.db
 scriptfiles/
 */*/*.pem
 tmp/
+gnuplot.html

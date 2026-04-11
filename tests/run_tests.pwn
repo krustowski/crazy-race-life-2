@@ -18,8 +18,7 @@
 #include "test_memory.pwn"
 #include "test_pickup.pwn"
 #include "test_player.pwn"
-//#include "test_vehicle.pwn"
-//#include "test_business.pwn"
+#include "test_drugz.pwn"
 
 //public OnGameModeInit()
 main()
@@ -34,10 +33,8 @@ main()
 	RUN_TEST(PlayerConnect);
 	RUN_TEST(PlayerRegistration);
 	RUN_TEST(PlayerDealConfirmation);
-	//RUN_TEST(PlayerInventory);
-	//RUN_TEST(VehicleCreation);
-	//RUN_TEST(PlayerVehicleInteraction);
-	//RUN_TEST(BankingSystem);
+
+	RUN_TEST(BlackMarketRatioTrend);
     
 	// Print summary
 	printf("\n\n=== Test Summary ===\n");

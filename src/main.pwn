@@ -105,7 +105,7 @@ public OnPlayerConnect(playerid)
 	SanitizeString(playerNameRaw, playerName, MAX_PLAYER_NAME);
 	gPlayers[playerid][Name] = playerName;
 
-	if (IsPlayerNPC(playerid))
+	if (IsPlayerNPC(playerid) || NPC_IsValid(playerid))
 	{
 		SpawnPlayer(playerid);
 		return 1;
@@ -168,7 +168,7 @@ public OnPlayerConnect(playerid)
 
 public OnPlayerDisconnect(playerid, reason)
 {
-	if (IsPlayerNPC(playerid))
+	if (IsPlayerNPC(playerid) || NPC_IsValid(playerid))
 	{
 		return 1;
 	}
@@ -257,7 +257,7 @@ public OnPlayerRequestSpawn(playerid)
 
 public OnPlayerSpawn(playerid)
 {
-	if (IsPlayerNPC(playerid))
+	if (IsPlayerNPC(playerid) || NPC_IsValid(playerid))
 	{
 		NPC_SetSkin(playerid, 89);
 		NPC_SetInvulnerable(playerid, false);

@@ -81,7 +81,8 @@ public AddMapicons(playerid)
 		mapiconid = 0;
 
 	// The very global spawn point in LV.
-	SetPlayerMapIcon(playerid, mapiconid++, 2323.73, 1283.18, 97.60, E_MAPICON_ID_ENEMY_ATTACK, 0, MAPICON_LOCAL);
+	//SetPlayerMapIcon(playerid, mapiconid++, 2323.73, 1283.18, 97.60, E_MAPICON_ID_ENEMY_ATTACK, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, mapiconid++, 2248.22, 1239.58, 10.82, E_MAPICON_ID_ENEMY_ATTACK, 0, MAPICON_LOCAL);
 
 	// ATMs.
 	for (new i = 0; i < sizeof(gBankLocation); i++)

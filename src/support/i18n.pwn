@@ -1328,8 +1328,8 @@ new gI18nMessages[][PlayerLocale][MAX_MESSAGE_LEN] =
 		"[ TAXI ] Jina minihra jiz bezi, ukonci ji pro zahajeni taxi mise!"
 	},
 	{
-		"~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%2d", 
-		"~w~Jizd:_____~g~%d~n~~w~Vydelek:_~g~$~y~%d~n~~w~Cas:_____~b~%d~y~:~b~%2d"
+		"~w~Done:____~g~%d~n~~w~Earned:__~g~$~y~%d~n~~w~Time:____~b~%d~y~:~b~%02d", 
+		"~w~Jizd:_____~g~%d~n~~w~Vydelek:_~g~$~y~%d~n~~w~Cas:_____~b~%d~y~:~b~%02d"
 	},
 	{
 		"~w~Return to the ~y~taxi cab ~w~to continue the ~y~mission!",

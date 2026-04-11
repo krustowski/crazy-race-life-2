@@ -47,7 +47,7 @@ public OnRadarCheckpoint()
 {
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if (!IsPlayerConnected(i) || !IsPlayerInAnyVehicle(i))
+		if (!IsPlayerConnected(i) || !IsPlayerInAnyVehicle(i) || IsPlayerNPC(i) || NPC_IsValid(i))
 		{
 			continue;
 		}

@@ -516,7 +516,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 
 public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 {
-	if (IsPlayerNPC(playerid))
+	if (IsPlayerNPC(playerid) || NPC_IsValid(playerid))
 	{
 		return 1;
 	}
@@ -546,6 +546,12 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 
 public OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstate)
 {
+	if (IsPlayerNPC(playerid) || NPC_IsValid(playerid))
+	{
+		TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
+		return 1;
+	}
+
 	// Hide the velocity meter on vehicle exit.
 	if ((oldstate == PLAYER_STATE_DRIVER || oldstate == PLAYER_STATE_PASSENGER) && newstate == PLAYER_STATE_ONFOOT)
 	{
@@ -555,12 +561,6 @@ public OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstat
 	if (newstate == PLAYER_STATE_DRIVER || newstate == PLAYER_STATE_PASSENGER)
 	{
 		TextDrawShowForPlayer(playerid, gVehicleStatesText[playerid]);
-	}
-
-	if (IsPlayerNPC(playerid) || NPC_IsValid(playerid))
-	{
-		TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
-		return 1;
 	}
 
 	/*if (newstate == PLAYER_STATE_DRIVER && GetPlayerVehicleID(playerid) == gAdminAuto)

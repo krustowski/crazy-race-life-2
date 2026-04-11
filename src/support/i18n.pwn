@@ -177,6 +177,13 @@ enum
 	// Deathmatch
 	I18N_DEATHMATCH_STARTED,
 	I18N_DEATHMATCH_INGAME_BLOCK,
+	I18N_DEATHMATCH_NO_PLAYERS,
+	I18N_DEATHMATCH_INFO_FMT,
+	I18N_DEATHMATCH_ALREADY_STARTED,
+	I18N_DEATHMATCH_IN_MINIGAME_BLOCK,
+	I18N_DEATHMATCH_PRESTARTED,
+	I18N_DEATHMATCH_WAITING_FOR_OTHERS,
+	I18N_DEATHMATCH_PLAYER_LEFT,
 	// Player
 	I18N_DEATH_MONEY_LOCALITY,
 	// Real estate
@@ -413,6 +420,13 @@ new gI18nMessageColor[] =
 	// Deathmatch
 	COLOR_YELLOW,
 	COLOR_RED,
+	COLOR_GREY,
+	COLOR_INVISIBLE,
+	COLOR_GREY,
+	COLOR_RED,
+	COLOR_YELLOW,
+	COLOR_INVISIBLE,
+	COLOR_YELLOW,
 	// Player
 	COLOR_YELLOW,
 	// Real estate
@@ -1031,6 +1045,34 @@ new gI18nMessages[][PlayerLocale][MAX_MESSAGE_LEN] =
 	{
 		"[ DEATHMATCH ] The player is currently in a deathmatch minigame, try again later!",
 		"[ DEATHMATCH ] Hrac zrovna hraje utkani deathmatch, zkus to pozdeji!"
+	},
+	{
+		"[ DEATHMATCH ] No players registered, resetting the minigame.",
+		"[ DEATHMATCH ] Zadni hraci ve hre, resetuju minihru."
+	},
+	{
+		"~w~Players:_~g~%d~n~~w~Lead:_~y~%s:_~g~%d~n~~w~Time:____~b~%d~y~:~b~%02d",
+		"~w~Hracu:___~g~%d~n~~w~Vede:_~y~%s:_~g~%d~n~~w~Cas:_____~b~%d~y~:~b~%02d"
+	},
+	{
+		"[ DEATHMATCH ] The game already started, try again later!",
+		"[ DEATHMATCH ] Hra jiz zacala, zkus znovu pozdeji!"
+	},
+	{
+		"[ DEATHMATCH ] Another minigame started, close it to start the deathmatch minigame!",
+		"[ DEATHMATCH ] Jina minihra je aktivni, ukonci ji, abys mohl zacit deathmatch minihru!"
+	},
+	{
+		"[ DEATHMATCH ] Deathmatch starts in 45 seconds! Join /deathmatch!",
+		"[ DEATHMATCH ] Deathmatch zacina za 45 sekund! Pridej se pomoci /deathmatch!"
+	},
+	{
+		"~w~Waiting for others to join",
+		"~w~Cekani na ostatni hrace"
+	},
+	{
+		"[ DEATHMATCH ] Player %s left the /deathmatch!",
+		"[ DEATHMATCH ] Hrac %s opsutil /deathmatch!"
 	},
 	{
 		"[ CASH ] You dropped your money at the death position!",

@@ -32,30 +32,35 @@ enum BribePickup
 	Timer: HiddenTimer
 }
 
-new gBribeEdit[MAX_PLAYERS][BribeEdit];
+new 
+	gBribeEdit[MAX_PLAYERS][BribeEdit];
 
-new gPoliceBribeStars[MAX_BRIBE_COUNT][BribePickup];
-new gPoliceBribeStarCount = 0;
-new gPoliceBribeStarLastOrmID = 0;
+new 
+	gPoliceBribeStars[MAX_BRIBE_COUNT][BribePickup],
+	gPoliceBribeStarCount = 0,
+	gPoliceBribeStarLastOrmID = 0;
 
 forward HidePoliceBrikeTimer(bribeid);
 public HidePoliceBrikeTimer(bribeid)
 {
-	new ormid = gPoliceBribeStars[bribeid][OrmID];
+	new 
+		ormid = gPoliceBribeStars[bribeid][OrmID],
+		query[64];
 
-	new query[64];
 	format(query, sizeof(query), "SELECT x, y, z FROM police_bribe_coords WHERE id = %d", ormid);
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		printf("Database error: cannot read hidden police bribe (OrmID: %d)", ormid);
 		return 0;
 	}
 
-	new Float: X = DB_GetFieldFloatByName(result, "x");
-	new Float: Y = DB_GetFieldFloatByName(result, "y");
-	new Float: Z = DB_GetFieldFloatByName(result, "z");
+	new 
+		Float: X = DB_GetFieldFloatByName(result, "x"),
+		Float: Y = DB_GetFieldFloatByName(result, "y"),
+		Float: Z = DB_GetFieldFloatByName(result, "z");
 
 	gPoliceBribeStars[bribeid][PickupID] = EnsurePickupCreated(PICKUP_STAR, 19, X, Y, Z);
 
@@ -69,9 +74,11 @@ public HidePoliceBrikeTimer(bribeid)
 
 stock InitPoliceBribePickups()
 {
-	new query[64] = "SELECT id, x, y, z FROM police_bribe_coords";
+	new 
+		query[64] = "SELECT id, x, y, z FROM police_bribe_coords";
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		print("Database error: cannot load police bribe pickups");
@@ -80,10 +87,11 @@ stock InitPoliceBribePickups()
 
 	do 
 	{
-		new ormid = DB_GetFieldIntByName(result, "id");
-		new Float: X = DB_GetFieldFloatByName(result, "x");
-		new Float: Y = DB_GetFieldFloatByName(result, "y");
-		new Float: Z = DB_GetFieldFloatByName(result, "z");
+		new 
+			ormid = DB_GetFieldIntByName(result, "id"),
+			Float: X = DB_GetFieldFloatByName(result, "x"),
+			Float: Y = DB_GetFieldFloatByName(result, "y"),
+			Float: Z = DB_GetFieldFloatByName(result, "z");
 
 		gPoliceBribeStars[gPoliceBribeStarCount][PickupID] = EnsurePickupCreated(PICKUP_STAR, 19, X, Y, Z);
 		gPoliceBribeStars[gPoliceBribeStarCount++][OrmID] = ormid;
@@ -98,7 +106,9 @@ stock InitPoliceBribePickups()
 
 stock SaveNewPoliceBribePickup(playerid)
 {
-	new query[256];
+	new 
+		query[256];
+
 	format(query, sizeof(query), "INSERT INTO police_bribe_coords (x, y, z, note) VALUES (%.2f, %.2f, %.2f, '%s')", 
 			gBribeEdit[playerid][CoordX],
 			gBribeEdit[playerid][CoordY],
@@ -106,7 +116,8 @@ stock SaveNewPoliceBribePickup(playerid)
 			gBribeEdit[playerid][Note]
 		);
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		printf("Database error: cannot write new police bribe (user_id: %d)", playerid);

@@ -38,12 +38,12 @@ enum DeathmatchPickupType
 	TYPE_ARMOUR
 }
 
-new gDeathmatch[MAX_PLAYERS][Deathmatch];
-new gDeathmatchTimers[DeathmatchTimers];
-new gDeathmatchPickups[MAX_DEATHMATCH_PICKUPS][DeathmatchPickup];
-new Text: gDeathmatchText[MAX_PLAYERS];
-
-new gDeathmatchGangZone[MAX_PLAYERS];
+new 
+	gDeathmatch[MAX_PLAYERS][Deathmatch],
+	gDeathmatchTimers[DeathmatchTimers],
+	gDeathmatchPickups[MAX_DEATHMATCH_PICKUPS][DeathmatchPickup],
+	Text: gDeathmatchText[MAX_PLAYERS],
+	gDeathmatchGangZone[MAX_PLAYERS];
 
 new Float: deathmatchPickups[6][3] = {
         { -1380.62, -2346.69, 35.01 },
@@ -63,7 +63,8 @@ public StartDeathmatch()
 	KillTimer(_: gDeathmatchTimers[Start]);
 	gDeathmatchTimers[Start] = Timer: 0;
 
-	new totalPlayers;
+	new 
+		totalPlayers;
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -102,7 +103,16 @@ public StartDeathmatch()
 	}
 	else
 	{
-		SendClientMessageToAll(COLOR_GREY, "[ DEATHMATCH ] No players registered, resetting the minigame.");
+		for (new i = 0; i < MAX_PLAYERS; i++)
+		{
+			if (!IsPlayerConnected(i))
+			{
+				continue;
+			}
+
+			SendClientMessageLocalized(i, I18N_DEATHMATCH_NO_PLAYERS);
+		}
+
 		EndDeathmatch();
 	}
 
@@ -138,15 +148,15 @@ stock CheckDeathmatchPickups(playerid, pickupid)
 		switch (gDeathmatchPickups[i][Type])
 		{
 			case (DeathmatchPickupType: TYPE_HEALTH):
-						    {
-							    return SetPlayerHealth(playerid, 100.0);
-						    }
+			{
+				return SetPlayerHealth(playerid, 100.0);
+			}
 			case TYPE_ARMOUR:
-						    {
-							    return SetPlayerArmour(playerid, 100.0);
-						    }
+			{
+				return SetPlayerArmour(playerid, 100.0);
+			}
 			default:
-						    {}
+			{}
 		}
 	}
 
@@ -189,17 +199,26 @@ public EndDeathmatch()
 
 public UpdateDeathmatchScoreboard()
 {
-	new stringToPrint[256], topPlayer, topPlayerName[MAX_PLAYER_NAME], topScore, totalPlayers;
+	new 
+		stringToPrint[256], 
+		topPlayer, 
+		topPlayerName[MAX_PLAYER_NAME], 
+		topScore, 
+		totalPlayers;
 
 	gDeathmatchTimers[TimeElapsed] -= 1000;
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if (!IsPlayerConnected(i))
+		{
 			continue;
+		}
 
 		if (!gDeathmatch[i][InGame])
+		{
 			continue;
+		}
 
 		totalPlayers++;
 
@@ -218,7 +237,14 @@ public UpdateDeathmatchScoreboard()
 			continue;
 		}
 
-		format(stringToPrint, sizeof(stringToPrint), "~w~Players:_~g~%d~n~~w~Lead:_~y~%s:_~g~%d~n~~w~Time:____~b~%d~y~:~b~%2d", totalPlayers, topPlayerName, topScore, floatround(floatround(gDeathmatchTimers[TimeElapsed] / 1000) / 60), floatround(gDeathmatchTimers[TimeElapsed] / 1000) % 60);
+		GetLocalizedString(i, I18N_DEATHMATCH_INFO_FMT, stringToPrint, sizeof(stringToPrint));
+		format(stringToPrint, sizeof(stringToPrint), stringToPrint, 
+				totalPlayers, 
+				topPlayerName, 
+				topScore, 
+				floatround(floatround(gDeathmatchTimers[TimeElapsed] / 1000) / 60), 
+				floatround(gDeathmatchTimers[TimeElapsed] / 1000) % 60
+			);
 
 		TextDrawSetString(gDeathmatchText[i], stringToPrint);
 		TextDrawShowForPlayer(i, gDeathmatchText[i]);
@@ -230,7 +256,17 @@ public UpdateDeathmatchScoreboard()
 		KillTimer(_: gDeathmatchTimers[Game]);
 
 		if (gDeathmatchTimers[TimeElapsed])
-			SendClientMessageToAll(COLOR_GREY, "[ DEATHMATCH ] No players in game, resetting the minigame.");
+		{
+			for (new i = 0; i < MAX_PLAYERS; i++)
+			{
+				if (!IsPlayerConnected(i))
+				{
+					continue;
+				}
+
+				SendClientMessageLocalized(i, I18N_DEATHMATCH_NO_PLAYERS);
+			}
+		}
 	}
 
 	return 1;
@@ -238,7 +274,9 @@ public UpdateDeathmatchScoreboard()
 
 stock SaveScores()
 {
-	new topScore = 0, topPlayerID;
+	new 
+		topScore = 0, 
+		topPlayerID;
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -269,7 +307,8 @@ stock SaveScores()
 			topPlayerID
 	      );
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
 	{
 		print("Database error: cannot write high scores data!");
@@ -297,12 +336,12 @@ stock RegisterToDeathmatch(playerid)
 {
 	if (IsValidTimer(_: gDeathmatchTimers[Game]))
 	{
-		return SendClientMessage(playerid, COLOR_GREY, "[ DEATHMATCH ] The game already started, try again later!");
+		return SendClientMessageLocalized(playerid, I18N_DEATHMATCH_ALREADY_STARTED);
 	}
 
 	if (gPlayers[playerid][InMinigame])
 	{
-		return SendClientMessage(playerid, COLOR_RED, "[ DEATHMATCH ] Another minigame started, close it to start the deathmatch minigame!");
+		return SendClientMessageLocalized(playerid, I18N_DEATHMATCH_IN_MINIGAME_BLOCK);
 	}
 
 	gDeathmatch[playerid][Score] = 0;
@@ -315,11 +354,24 @@ stock RegisterToDeathmatch(playerid)
 
 	if (!gDeathmatchTimers[Start])
 	{
-		SendClientMessageToAll(COLOR_YELLOW, "[ DEATHMATCH ] Deathmatch starts in 45 seconds! Join /deathmatch!");
+		for (new i = 0; i < MAX_PLAYERS; i++)
+		{
+			if (!IsPlayerConnected(i))
+			{
+				continue;
+			}
+
+			SendClientMessageLocalized(i, I18N_DEATHMATCH_PRESTARTED);
+		}
+
 		gDeathmatchTimers[Start] = Timer: SetTimer("StartDeathmatch", 45 * 1000, false);
 	}
 
-	GameTextForPlayer(playerid, "~w~Waiting for others to join", 45000, 3); 
+	new 
+		gameText[64];
+
+	GetLocalizedString(playerid, I18N_DEATHMATCH_WAITING_FOR_OTHERS, gameText, sizeof(gameText));
+	GameTextForPlayer(playerid, gameText, 45000, 3); 
 
 	return 1;
 }
@@ -328,12 +380,22 @@ stock LeaveDeathmatch(playerid)
 {
 	if (gDeathmatch[playerid][InGame] || gDeathmatch[playerid][IsRegistered])
 	{
-		new playerName[MAX_PLAYER_NAME], stringToPrint[128];
+		new 
+			playerName[MAX_PLAYER_NAME], 
+			stringToPrint[128];
 
 		GetPlayerName(playerid, playerName, sizeof(playerName));
 
-		format(stringToPrint, sizeof(stringToPrint), "[ DEATHMATCH ] Player %s left the /deathmatch!", playerName);
-		SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+		for (new i = 0; i < MAX_PLAYERS; i++)
+		{
+			if (!IsPlayerConnected(i))
+			{
+				continue;
+			}
+
+			GetLocalizedString(i, I18N_DEATHMATCH_PLAYER_LEFT, stringToPrint, sizeof(stringToPrint));
+			format(stringToPrint, sizeof(stringToPrint), stringToPrint, playerName);
+		}
 
 		PlayerGangZoneHide(playerid, gDeathmatchGangZone[playerid]);
 		UsePlayerGangZoneCheck(playerid, gDeathmatchGangZone[playerid], false);

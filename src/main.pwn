@@ -91,6 +91,7 @@ public OnGameModeExit()
 public OnPlayerConnect(playerid)
 {
 	new 
+		playerNameRaw[MAX_PLAYER_NAME], 
 		playerName[MAX_PLAYER_NAME], 
 		stringToPrint[128];
 
@@ -100,7 +101,8 @@ public OnPlayerConnect(playerid)
 	AddTexts(playerid);
 
 	// Fetch player's name and print it out to outhers online.
-	GetPlayerName(playerid, playerName, sizeof(playerName));
+	GetPlayerName(playerid, playerNameRaw, sizeof(playerNameRaw));
+	SanitizeString(playerNameRaw, playerName, MAX_PLAYER_NAME);
 	gPlayers[playerid][Name] = playerName;
 
 	if (IsPlayerNPC(playerid))
@@ -731,7 +733,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	}
 
 	//
-	//  Other pickups --- entries,  baggies etc.
+	//  Other pickups --- entries, baggies etc.
 	//
 
 	if (CheckGenericPickup(playerid, pickupid))

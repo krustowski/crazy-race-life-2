@@ -388,12 +388,12 @@ stock SendUsageMessage(playerid, const usage[])
 	return SendClientMessage(playerid, COLOR_YELLOW, msg);
 }
 
-stock SanitizeString(input[], output[], size)
+stock SanitizeString(const input[], output[], size)
 {
-	 new 
-		 j = 0;
+	new 
+		j = 0;
 
-	 for (new i = 0; i < strlen(input) && j < size - 1; i++)
+	for (new i = 0; i < strlen(input) && j < size - 1; i++)
 	{
 		if (input[i] == '\'')
 		{ 

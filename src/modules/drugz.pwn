@@ -11,10 +11,10 @@
 #define MAX_DRUG_PICKUPS	64
 #define MAX_MARKET_ITEMS	128
 
-#define MARKET_RATIO_MIN	0.001
-#define MARKET_RATIO_MAX	1000.0
+#define MARKET_RATIO_MIN	0.01
+#define MARKET_RATIO_MAX	100.0
 #define MARKET_RATIO_EQULIBRIUM	1.0
-#define MARKET_REVERSION_RATE	0.15
+#define MARKET_REVERSION_RATE	0.005
 #define MARKET_STEP_PERCENT	20
 
 #include "support/helpers.pwn"
@@ -105,7 +105,7 @@ public UpdateBlackMarketRatio()
 	{
 		gBlackMarketRatio = MARKET_RATIO_MAX;
 	}
-	
+
 	// Ratio update message broadcasting
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{

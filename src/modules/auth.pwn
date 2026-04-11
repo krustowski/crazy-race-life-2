@@ -12,7 +12,11 @@
 // SetPlayerAccountLogin sets the IsLogged Player value to 'true' if the <text> input, hashed, is equal to the hash stored in database.
 stock SetPlayerAccountLogin(playerid, const text[])
 {
-	new hashedPwd[65], hashedPwdDb[65], saltDb[17], query[256];
+	new 
+		hashedPwd[65], 
+		hashedPwdDb[65], 
+		saltDb[17], 
+		query[256];
 
 	// Fetch the sha256 hash and salt from DB
 	format(query, sizeof(query), "SELECT id, pwdhash, salt FROM users WHERE nickname = '%s'", gPlayers[playerid][Name]);

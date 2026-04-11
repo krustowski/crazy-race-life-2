@@ -44,7 +44,10 @@ enum PlayerLocale
 enum
 {
 	I18N_WELCOME_MESSAGE,
+	I18N_WEAPON_CHEAT_VIOLATION_FMT,
+	I18N_JETPACK_VIOLATION_FMT,
 	I18N_CARKILL_VIOLATION_FMT,
+	I18N_IP_FLOOD_VIOLATION_FMT,
 	I18N_PLAYER_CONNECTED_FMT,
 	I18N_PLAYER_DISCONNECT_CRASH,
 	I18N_PLAYER_DISCONNECT_LEFT,
@@ -287,6 +290,9 @@ enum
 new gI18nMessageColor[] = 
 {
 	COLOR_GREEN,
+	COLOR_RED,
+	COLOR_RED,
+	COLOR_RED,
 	COLOR_RED,
 	COLOR_GREY,
 	COLOR_GREY,
@@ -534,8 +540,20 @@ new gI18nMessages[][PlayerLocale][MAX_MESSAGE_LEN] =
 		"Vitej ve hre! /help"
 	},
 	{
+		"[ ! ] Player %s violated the weapon cheat rule and was kicked from the server!",
+		"[ ! ] Hrac %s byl(a) vyhozen(a) za weapon cheat!"
+	},
+	{
+		"[ ! ] Player %s violated the no JetPack rule and was kicked from the server!",
+		"[ ! ] Hrac %s byl(a) vyhozen(a) za poruseni pravidel! [JetPack]"
+	},
+	{
 		"[ CARKILL ] Player %s [ID: %d] has just broken the server rules!",
 		"[ CARKILL ] Hrac %s [ID: %d] prave porusil pravidla serveru!"
+	},
+	{
+		"[ ! ] IP %s tried to flood the server and was banned.",
+		"[ ! ] IP %s se pokousela floodovat server. Byl udelen ban."
 	},
 	{
 		"[ i ] Player %s joined the game!",

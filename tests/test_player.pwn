@@ -82,6 +82,9 @@ Test: PlayerDealConfirmation()
 	testAmount = gPlayers[playerid][Drugs][_: TYPE_ZAZA];
 	ASSERT_EQ(testAmount, 100);
 
+	testAmount = gPlayers[dealerid][Drugs][_: TYPE_ZAZA];
+	ASSERT_EQ(testAmount, 0);
+
 	DestroyTestPlayer();
 	DestroyTestPlayer();
 

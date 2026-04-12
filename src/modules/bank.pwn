@@ -7,7 +7,7 @@
 //  bank.pwn
 //
 
-#define MAX_ATM_PICKUPS 20
+#define MAX_ATM_PICKUPS 19
 
 new 
 	gBankPickups[MAX_ATM_PICKUPS],

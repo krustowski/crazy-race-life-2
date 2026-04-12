@@ -32,4 +32,3 @@ Test: BlackMarketRatioTrend()
 	TEST_END("BlackMarketRatioTrend");
 }
 
-

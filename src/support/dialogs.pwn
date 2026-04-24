@@ -1195,7 +1195,7 @@ stock ShowHighScoresPlayTimeDialog(playerid)
 
 	new 
 		i = 1, 
-		stringToPrint[512] = "{FFD700}Top 10 players by Playtime:{FFFFFF}\n";
+		stringToPrint[1024] = "{FFD700}Top 10 players by Playtime:{FFFFFF}\n";
 
 	do
 	{
@@ -1206,7 +1206,7 @@ stock ShowHighScoresPlayTimeDialog(playerid)
 		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
 		value = DB_GetFieldIntByName(result, "playtime");
 
-		format(stringToPrint, sizeof(stringToPrint), "%s\n%d: %3d h %2d min %2d sec \t\t {FFD700}%s{FFFFFF}", 
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%2d: %3d h %2d min %2d sec \t\t {FFD700}%s{FFFFFF}", 
 				stringToPrint, 
 				i, 
 				value / 1000 / 3600,

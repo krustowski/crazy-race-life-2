@@ -403,10 +403,10 @@ stock ShowRaceListDialog(playerid)
 stock ShowPropertyListDialog(playerid)
 {
 	new 
-		stringToPrint[256] = "Property Name\tID", 
+		stringToPrint[512] = "Property Name\tID", 
 		query[128];
 
-	format(query, sizeof(query), "select id, name from properties where user_id = %d and type = 1 LIMIT 5", gPlayers[playerid][OrmID]);
+	format(query, sizeof(query), "select id, name from properties where user_id = %d and type = 1", gPlayers[playerid][OrmID]);
 
 	new 
 		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
@@ -1176,7 +1176,7 @@ stock ShowHighScoresOptionsDialog(playerid)
 stock ShowHighScoresPlayTimeDialog(playerid)
 {
 	new 
-		query[512] = "SELECT id, nickname, playtime FROM users WHERE playtime IS NOT 0 ORDER BY playtime DESC LIMIT 10";
+		query[512] = "SELECT id, nickname, playtime FROM users WHERE playtime IS NOT 0 ORDER BY playtime DESC LIMIT 15";
 
 	new 
 		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
@@ -1195,7 +1195,7 @@ stock ShowHighScoresPlayTimeDialog(playerid)
 
 	new 
 		i = 1, 
-		stringToPrint[1024] = "{FFD700}Top 10 players by Playtime:{FFFFFF}\n";
+		stringToPrint[1024] = "{FFD700}Top 15 players by Playtime:{FFFFFF}\n";
 
 	do
 	{
@@ -1386,6 +1386,61 @@ stock ShowHighScoresMissionsDialog(playerid)
 
 		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
 		value = DB_GetFieldIntByName(result, "value");
+		areaid = DB_GetFieldIntByName(result, "spec_id");
+
+		switch (areaid)
+		{
+			case AREA_LV:
+				{
+					area = "(Las Venturas)";
+				}
+			case AREA_SF:
+				{
+					area = "(San Fierro)";
+				}
+			case AREA_LS:
+				{
+					area = "(Los Santos)";
+				}
+			case AREA_ALL:
+				{
+					area = "(Whole map)";
+				}
+		}
+
+		if (value)
+		{
+			format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}%3d{FFFFFF} %16s\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, value, area, nickname);
+			i++;
+		}
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	query = "SELECT ROW_NUMBER() OVER (ORDER BY MAX(value) DESC) AS rank, u.nickname, spec_id, MAX(value) AS top_mission_count FROM high_scores AS h JOIN users AS u ON u.id = user_id WHERE type = 3 GROUP BY user_id ORDER BY top_mission_count DESC LIMIT 5;";
+
+	result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for taxi missions (2)!");
+		print(query);
+		return 0;
+	}
+
+	format(stringToPrint, sizeof(stringToPrint), "%s\n\n", stringToPrint);
+	i = 1;
+
+	do
+	{
+		new 
+			nickname[MAX_PLAYER_NAME], 
+			areaid, 
+			area[32], 
+			value;
+
+		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+		value = DB_GetFieldIntByName(result, "top_mission_count");
 		areaid = DB_GetFieldIntByName(result, "spec_id");
 
 		switch (areaid)
@@ -1851,7 +1906,7 @@ stock ShowDealMainDialog(playerid)
 		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d\t%d", 
 				stringToPrint, 
 				name, 
-				gPlayers[playerid][Drugs][id - 1], 
+				gPlayers[playerid][Drugs][id], 
 				floatround(price * gBlackMarketRatio) 
 			);
 	}

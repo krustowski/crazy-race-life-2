@@ -1326,8 +1326,8 @@ new gI18nMessages[][PlayerLocale][MAX_MESSAGE_LEN] =
 		"[ TAXI ] Musis ridit taxi auto!"
 	},
 	{
-		"[ TAXI ] Telling NPC to enter the vehicle...",
-		"[ TAXI ] NPC nastupuje do auta..."
+		"[ TAXI ] Telling the passanger to enter the vehicle...",
+		"[ TAXI ] Pasazer nastupuje do auta..."
 	},
 	{
 		"[ TAXI ] Good job! Commission earned: $%d",

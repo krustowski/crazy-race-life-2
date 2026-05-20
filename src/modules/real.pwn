@@ -8,12 +8,12 @@
 //  Real Estate stuff
 //
 
-#define MAX_PROPERTIES		256
+#define MAX_PROPERTIES			384
 #define MAX_PLAYER_PROPERTIES	7
-#define MAX_PROPERTY_SKINS	5
+#define MAX_PROPERTY_SKINS		5
 #define MAX_PROPERTY_PICKUPS	32
-#define SPAWN_PICKUP_COUNT	4
-#define INVALID_PROPERTY_ID	-1
+#define SPAWN_PICKUP_COUNT		4
+#define INVALID_PROPERTY_ID		-1
 
 #include "db/sql.pwn"
 #include "support/dialogs.pwn"

@@ -1374,7 +1374,7 @@ stock ShowHighScoresMissionsDialog(playerid)
 
 	new 
 		i = 1, 
-		stringToPrint[2048] = "{FFD700}Top 10 Taxi Mission players{FFFFFF}\n";
+		stringToPrint[3048] = "{FFD700}Top 10 Taxi Mission players{FFFFFF}\n";
 
 	do
 	{
@@ -1428,7 +1428,7 @@ stock ShowHighScoresMissionsDialog(playerid)
 		return 0;
 	}
 
-	format(stringToPrint, sizeof(stringToPrint), "%s\n\n", stringToPrint);
+	format(stringToPrint, sizeof(stringToPrint), "%s\n", stringToPrint);
 	i = 1;
 
 	do
@@ -1496,6 +1496,38 @@ stock ShowHighScoresMissionsDialog(playerid)
 
 		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
 		value = DB_GetFieldIntByName(result, "value");
+
+		if (value)
+		{
+			format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}%3d{FFFFFF}\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, value, nickname);
+			i++;
+		}
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	query = "SELECT ROW_NUMBER() OVER (ORDER BY MAX(value) DESC) AS rank, u.nickname, spec_id, MAX(value) AS top_mission_count FROM high_scores AS h JOIN users AS u ON u.id = user_id WHERE type = 4 GROUP BY user_id ORDER BY top_mission_count DESC LIMIT 5;";
+
+	result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for trucking missions (2)!");
+		print(query);
+		return 0;
+	}
+
+	format(stringToPrint, sizeof(stringToPrint), "%s\n", stringToPrint);
+	i = 1;
+
+	do
+	{
+		new 
+			nickname[MAX_PLAYER_NAME], 
+			value;
+
+		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+		value = DB_GetFieldIntByName(result, "top_mission_count");
 
 		if (value)
 		{

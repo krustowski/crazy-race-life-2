@@ -86,6 +86,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(vehicle, 7, cmdtext);	  //rcon + lvl 4
 	dcmd(weapon, 6, cmdtext); 	  //rcon + lvl 3
 	dcmd(weapons, 7, cmdtext); 	  //rcon + lvl 3
+	dcmd(zone, 4, cmdtext);
 
 	return InvalidCommand(playerid);
 }
@@ -1856,3 +1857,51 @@ dcmd_weapons(playerid, const params[])
 	return 1;
 }
 
+new
+	gGangZone[384];
+
+dcmd_zone(playerid, const params[])
+{
+#pragma unused params
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4)
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
+
+	new
+		query[] = "select c.primary_x, c.primary_y, t.color from property_coords AS c JOIN properties AS p ON p.id = c.property_id JOIN users AS u ON u.id = p.user_id JOIN teams AS t ON t.id = u.team where c.type = 8 AND p.user_id > 0";
+
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+	if (!result)
+	{
+		print(query);
+		return 1;
+	}
+
+	new
+		i = 0;
+
+	do 
+	{
+		new
+			Float: X = DB_GetFieldFloatByName(result, "primary_x"),
+			Float: Y = DB_GetFieldFloatByName(result, "primary_y"),
+			colorString[16],
+			color;
+
+		DB_GetFieldStringByName(result, "color", colorString, sizeof(colorString));
+		color = HexToInt(colorString);
+
+		gGangZone[i] = CreatePlayerGangZone(playerid, X - 100, Y - 100, X + 100, Y + 100);
+		PlayerGangZoneShow(playerid, gGangZone[i], color);
+
+		i++;
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	return 1;
+}

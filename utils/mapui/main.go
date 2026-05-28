@@ -287,6 +287,32 @@ func gameDataHandler(w http.ResponseWriter, r *http.Request) {
 
 	rows.Close()
 
+	rows, err = db.Query("SELECT c.race_id, r.name, c.x, c.y FROM race_coords AS c JOIN races AS r ON c.race_id = r.id")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for rows.Next() {
+		var p Property
+		if err := rows.Scan(&p.ID, &p.Name, &p.X, &p.Y); err != nil {
+			log.Println(err)
+			continue
+		}
+
+		if p.ID == 0 {
+			continue
+		}
+
+		p.ID += 1300
+		p.Name = fmt.Sprint("Race: ", p.Name)
+		p.Type = 5
+
+		props = append(props, p)
+	}
+
+	rows.Close()
+
 	// Tiki prizes
 	rows, err = db.Query("SELECT id, x, y FROM prize_coords WHERE type = 1")
 	if err != nil {

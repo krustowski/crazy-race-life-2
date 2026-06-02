@@ -104,6 +104,27 @@ forward GivePlayerWeaponEx(playerid, timerid, weaponid, ammo);
 forward SendPlayerSalary();
 forward UpdatePlayerPlayTime();
 forward UpdatePlayerScore();
+forward UpdateDrugMissionInfoText(playerid);
+
+#include "modules/drugz.pwn"
+
+public UpdateDrugMissionInfoText(playerid)
+{
+	new stringToPrint[256];
+
+	gDrugMission[playerid][TimeElapsed] += 1000;
+
+	format(stringToPrint, sizeof(stringToPrint), gI18nMessages[I18N_DRUG_MISS_INFO][ gPlayers[playerid][Locale] ], 
+		gDrugMission[playerid][Count], 
+		floatround(floatround(gDrugMission[playerid][TimeElapsed] / 1000) / 60), 
+		floatround(gDrugMission[playerid][TimeElapsed] / 1000) % 60
+	);
+
+	TextDrawSetString(gDrugMission[playerid][InfoText], stringToPrint);
+	TextDrawShowForPlayer(playerid, gDrugMission[playerid][InfoText]);
+
+	return 1;
+}
 
 public BatchSavePlayerData()
 {
@@ -245,6 +266,55 @@ stock LoadPlayerData(playerid)
 	}
 
 	return 0;
+}
+
+stock ToggleDrugMission(playerid)
+{
+	if (gDrugMission[playerid][Active])
+	{
+		gPlayers[playerid][InMinigame] = false;
+
+		gDrugMission[playerid][Active] = false;
+		gDrugMission[playerid][Count] = 0;
+		gDrugMission[playerid][TimeElapsed] = 0;
+
+		KillTimer(gDrugMission[playerid][TimerElapsed]);
+
+		//SendClientMessageLocalized(playerid, I18N_DRUG_MISS_ABORTED);
+
+		new
+			gameText[32];
+
+		GetLocalizedString(playerid, I18N_DRUG_MISS_ABORTED, gameText, sizeof(gameText));
+		GameTextForPlayer(playerid, gameText, 3000, 3);
+
+		return 1;
+	}
+
+	if (gPlayers[playerid][InMinigame])
+	{
+		return SendClientMessageLocalized(playerid, I18N_DRUG_MISS_INMINIGAME_CONFLICT);
+	}
+
+	if (gPlayers[playerid][TeamID] != TEAM_DEALERS)
+	{
+		return SendClientMessageLocalized(playerid, I18N_DRUG_MISS_UNMET_TEAM);
+	}
+
+	gDrugMission[playerid][Active] = true;
+	gPlayers[playerid][InMinigame] = true;
+
+	gDrugMission[playerid][TimerElapsed] = SetTimerEx("UpdateDrugMissionInfoText", 1000, true, "i", playerid);
+
+	//SendClientMessageLocalized(playerid, I18N_DRUG_MISS_STARTED);
+
+	new
+		gameText[32];
+
+	GetLocalizedString(playerid, I18N_DRUG_MISS_STARTED, gameText, sizeof(gameText));
+	GameTextForPlayer(playerid, gameText, 3000, 3);
+
+	return 1;
 }
 
 stock ExtractPropperties(const input[], properties[MAX_PLAYER_PROPERTIES])
@@ -451,7 +521,7 @@ public UpdatePlayerPlayTime()
 
 public UpdatePlayerScore()
 {
-	for (new i; i < GetMaxPlayers(); i++)
+	for (new i; i < MAX_PLAYERS; i++)
 	{
 		if (!IsPlayerConnected(i))
 		{
@@ -679,6 +749,11 @@ stock CheckDrugzPickup(playerid, pickupid)
 			stringToPrint[128];
 
 		gPlayers[playerid][Drugs][type - 1] += amount;
+
+		if (gDrugMission[playerid][Active])
+		{
+			gDrugMission[playerid][Count] += amount;
+		}
 
 		GetLocalizedString(playerid, I18N_DRUGZ_PICKUP_FMT, stringToPrint, sizeof(stringToPrint));
 		format(stringToPrint, sizeof(stringToPrint), stringToPrint, amount, gDrugz[type - 1][DrugName]);
@@ -1329,6 +1404,10 @@ stock ResetPlayerState(playerid)
 	gDeathmatch[playerid][IsRegistered] = false;
 	gDeathmatch[playerid][InGame] = false;
 	gDeathmatch[playerid][Score] = 0;
+
+	// Reset the drug mission
+	gDrugMission[playerid][Active] = false;
+	TextDrawHideForPlayer(playerid, gDrugMission[playerid][InfoText]);
 
 	// Reset trucking
 	gTrucking[playerid] = false;

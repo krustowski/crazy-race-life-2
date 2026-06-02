@@ -24,6 +24,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(dance, 5, cmdtext);	  //all
 	dcmd(deal, 4, cmdtext);	  	  //all
 	dcmd(deathmatch, 10, cmdtext);	  //all
+	dcmd(drug, 4, cmdtext); 	  //all
 	dcmd(drugz, 5, cmdtext); 	  //all
 	dcmd(dwarp, 5, cmdtext); 	  //all
 	dcmd(fix, 3, cmdtext); 		  //all
@@ -270,6 +271,12 @@ dcmd_deathmatch(playerid, const params[])
 {
 #pragma unused params
 	return ShowDeathmatchOptionsDialog(playerid);
+}
+
+dcmd_drug(playerid, const params[])
+{
+#pragma unused params
+	return ToggleDrugMission(playerid);
 }
 
 dcmd_drugz(playerid, const params[])

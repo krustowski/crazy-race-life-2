@@ -142,6 +142,12 @@ enum
 	I18N_DEAL_ACCPTED_TARGET,
 	I18N_DEAL_ACCPTED_DEALER,
 	I18N_DEAL_DECLINED,
+	// Drug Mission
+	I18N_DRUG_MISS_INFO,
+	I18N_DRUG_MISS_INMINIGAME_CONFLICT,
+	I18N_DRUG_MISS_UNMET_TEAM,
+	I18N_DRUG_MISS_STARTED,
+	I18N_DRUG_MISS_ABORTED,
 	// Black Market
 	I18N_BLACK_MARKET_RATIO_UPDATE,
 	I18N_BLACK_MARKET_ALREADY_PROCESSED,
@@ -387,6 +393,12 @@ new gI18nMessageColor[] =
 	COLOR_ORANGE,
 	COLOR_ORANGE,
 	COLOR_ORANGE,
+	COLOR_YELLOW,
+	// Drug Mission
+	COLOR_YELLOW,
+	COLOR_RED,
+	COLOR_YELLOW,
+	COLOR_YELLOW,
 	COLOR_YELLOW,
 	// Black Market
 	COLOR_ORANGE,
@@ -926,6 +938,29 @@ new gI18nMessages[][PlayerLocale][MAX_MESSAGE_LEN] =
 	{
 		"[ DEAL ] The offer was declined!",
 		"[ DEAL ] Nabidka byla hracem odmitnuta!"
+	},
+	//
+	//  Drug Mission
+	//
+	{
+		"~w~Count:_____~g~%d~n~~w~Time:______~b~%d~y~:~b~%02d",
+		"~w~Sebrano:___~g~%d~n~~w~Cas:_______~b~%d~y~:~b~%02d"
+	},
+	{
+		"[ DRUGZ ] Another minigame is active, abort/finish it to be able to start a drug mission!",
+		"[ DRUGZ ] Jina minihra je aktivni, ukonci ji, abys mohl zapocit drugovou misi!"
+	},
+	{
+		"[ DRUGZ ] You must be a member of the Dealerz team!",
+		"[ DRUGZ ] Musis byt clenem teamu Dealeru!"
+	},
+	{
+		"~w~Drug Mission ~g~Started",
+		"~w~Drogova Mise ~g~Zahajena"
+	},
+	{
+		"~w~Drog Mission ~r~Aborted",
+		"~w~Drogova Mise ~r~Zrusena"
 	},
 	//
 	//  Black Market

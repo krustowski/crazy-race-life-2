@@ -41,9 +41,9 @@ enum TaxiMission
 	TimerCheckVehicle
 }
 
-new gTaxiMission[MAX_PLAYERS][TaxiMission];
-
-new gTaxiEnterTimer[MAX_PLAYERS];
+new 
+	gTaxiMission[MAX_PLAYERS][TaxiMission],
+	gTaxiEnterTimer[MAX_PLAYERS];
 
 forward UpdateTaxiMissionInfoText(playerid);
 forward CheckTaxiNearNPC(playerid);

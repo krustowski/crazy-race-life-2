@@ -37,8 +37,9 @@ enum TowMission
 	bool: CheckpointDisabled
 }
 
-new gTowMission[MAX_PLAYERS][TowMission];
-new Text: gTowMissionText[MAX_PLAYERS];
+new 
+	gTowMission[MAX_PLAYERS][TowMission],
+	Text: gTowMissionText[MAX_PLAYERS];
 
 forward UpdateTowMissionText(playerid);
 forward CheckPlayerTowTrailerAttached(playerid);

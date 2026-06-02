@@ -78,7 +78,20 @@ enum DrugPickup
 	Point[Coords]
 }
 
+enum DrugMission
+{
+	bool: Active,
+
+	Count,
+	TimeElapsed,
+
+	TimerElapsed,
+
+	Text: InfoText
+}
+
 new 
+	gDrugMission[MAX_PLAYERS][DrugMission],
 	gDrugPickups[MAX_DRUG_PICKUPS][DrugPickup],
 	gDrugz[MAX_DRUG_TYPES][Drug];
 
@@ -141,7 +154,7 @@ stock InitDrugValues()
 		return;
 	}
 
-	new 
+	new
 		i = 1,
 		name[64], 
 		name_alt[64], 
@@ -240,4 +253,3 @@ stock InitDrugPickups()
 
 	print("Drug pickups initialized!");
 }
-

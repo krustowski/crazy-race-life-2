@@ -39,11 +39,16 @@ public AddTexts(playerid)
 		return 1;
 	}
 
+	gDrugMission[playerid][InfoText] = TextDrawCreate(460.0, 400.0, "");
 	gVehicleStatesText[playerid] = TextDrawCreate(256, 410, "");
 	gRaceInfoText[playerid] = TextDrawCreate(460.0, 400.0, "");
 	gMissionInfoText[playerid] = TextDrawCreate(460.0, 400.0, "");
 	gTowMissionText[playerid] = TextDrawCreate(460.0, 380.0, "");
 	gDeathmatchText[playerid] = TextDrawCreate(400.0, 400.0, "");
+
+	TextDrawLetterSize(gDrugMission[playerid][InfoText], 0.5, 1.5);
+	TextDrawFont(gDrugMission[playerid][InfoText], t_TEXT_DRAW_FONT: 3);
+	TextDrawSetOutline(gDrugMission[playerid][InfoText], 1);
 
 	TextDrawLetterSize(gVehicleStatesText[playerid], 0.5, 1.5);
 	TextDrawFont(Text: gVehicleStatesText[playerid], t_TEXT_DRAW_FONT: 3);

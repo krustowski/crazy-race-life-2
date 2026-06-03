@@ -7,8 +7,10 @@
 //  rampage.pwn
 //
 
-#define MAX_RAMPAGE_MISSION_COUNT   16
-#define MAX_RAMPAGE_NPC_COUNT       16
+#define MAX_RAMPAGE_MISSION_COUNT           16
+#define MAX_RAMPAGE_NPC_COUNT               16
+#define MAX_RAMPAGE_WEAPON_COUNT            16
+#define MAX_RAMPAGE_HEALTH_POINTS_COUNT     16
 
 enum RMType
 {
@@ -24,7 +26,8 @@ enum RMEditType
     RMET_PICKUP_COORDS,
     RMET_NPC_COORDS_PRIMARY,
     RMET_NPC_COORDS_SECONDARY,
-    RMET_WEAPON_COORDS
+    RMET_WEAPON_COORDS,
+    RMET_HEALTH_COORDS
 }
 
 enum RampageNPC
@@ -36,7 +39,8 @@ enum RampageNPC
     Ammo,
 
     bool: Spawned,
-    bool: Killed
+    bool: Killed,
+    bool: Set
 }
 
 enum RampageEditor
@@ -44,8 +48,14 @@ enum RampageEditor
     bool: Active,
     RMEditType: EditType,
 
-    NPCCount,
     MissionID,
+    MissionName[64],
+
+    NPCCount,
+    WeaponNo,
+    HealthNo,
+
+    RMType: Location,
 
     PickupCoords[Coords]
 }
@@ -53,7 +63,7 @@ enum RampageEditor
 enum RampageMission
 {
     bool: Active,
-    RMType: type
+    RMType: Type
 }
 
 enum RampagePickup
@@ -63,7 +73,25 @@ enum RampagePickup
     Text3D: Text3D
 }
 
+enum RampageWeapon
+{
+    WeaponID,
+    Ammo,
+    Position[Coords],
+
+    bool: Set
+}
+
+enum HealthPoint
+{
+    Position[Coords],
+
+    bool: Set
+}
+
 new
+    gRampageHealthPoints[MAX_RAMPAGE_MISSION_COUNT][MAX_RAMPAGE_HEALTH_POINTS_COUNT][HealthPoint],
+    gRampageWeapons[MAX_RAMPAGE_MISSION_COUNT][MAX_RAMPAGE_WEAPON_COUNT][RampageWeapon],
     gRampagePickups[MAX_RAMPAGE_MISSION_COUNT][RampagePickup],
     gRampageNPCs[MAX_RAMPAGE_MISSION_COUNT][MAX_RAMPAGE_NPC_COUNT][RampageNPC],
     gRampageEdit[MAX_PLAYERS][RampageEditor],
@@ -192,4 +220,129 @@ stock SetRampageNPC(playerid)
 	gTaxiMission[playerid][NPCid] = npcid;
 
 	return SetRampageNPCPos(npcid);
+}
+
+stock SaveRampageMission(playerid)
+{
+    new
+        missionid = gRampageEdit[playerid][MissionID],
+        query[512];
+
+    format(query, sizeof(query), "INSERT INTO rampages (name, location_type) VALUES ('%s', %d)",
+            gRampageEdit[playerid][MissionName],
+            _: gRampageEdit[playerid][Location]
+        );
+
+    new
+        DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+    if (!result)
+    {
+		print("Database error: cannot write rampage data!");
+		print(query);
+		return 0;
+	}
+    
+    DB_FreeResultSet(result);
+
+    // Pickup
+
+    format(query, sizeof(query), "INSERT INTO rampage_coords (rampage_id, type, primary_x, primary_y, primary_z) VALUES (%d, %d, %.2f, %.2f, %.2f)",
+            missionid,
+            1,
+            gRampageEdit[playerid][PickupCoords][CoordX],
+            gRampageEdit[playerid][PickupCoords][CoordY],
+            gRampageEdit[playerid][PickupCoords][CoordZ]
+        );
+
+    result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+    if (!result)
+    {
+		print("Database error: cannot write rampage pickup data!");
+		print(query);
+		return 0;
+	}
+    
+    DB_FreeResultSet(result);
+
+    for (new i = 0; i < MAX_RAMPAGE_MISSION_COUNT; i++)
+    {
+        // Save all health points
+        if (gRampageHealthPoints[missionid][i][Set])
+        {
+            format(query, sizeof(query), "INSERT INTO rampage_coords (rampage_id, type, primary_x, primary_y, primary_z) VALUES (%d, %d, %.2f, %.2f, %.2f)",
+                    missionid,
+                    5,
+                    gRampageHealthPoints[missionid][i][Position][CoordX],
+                    gRampageHealthPoints[missionid][i][Position][CoordY],
+                    gRampageHealthPoints[missionid][i][Position][CoordZ]
+                );
+
+            result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+            if (!result)
+            {
+                print("Database error: cannot write rampage health point data!");
+                print(query);
+                return 0;
+    	    }   
+
+            DB_FreeResultSet(result); 
+        }
+
+        if (gRampageWeapons[missionid][i][Set])
+        {
+            format(query, sizeof(query), "INSERT INTO rampage_coords (rampage_id, type, primary_x, primary_y, primary_z) VALUES (%d, %d, %.2f, %.2f, %.2f)",
+                    missionid,
+                    4,
+                    gRampageWeapons[missionid][i][Position][CoordX],
+                    gRampageWeapons[missionid][i][Position][CoordY],
+                    gRampageWeapons[missionid][i][Position][CoordZ]
+                );
+
+            result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+            if (!result)
+            {
+                print("Database error: cannot write rampage weapon data!");
+                print(query);
+                return 0;
+    	    }   
+
+            DB_FreeResultSet(result); 
+        }
+
+        if (gRampageNPCs[missionid][i][Set])
+        {
+            format(query, sizeof(query), "INSERT INTO rampage_coords (rampage_id, type, primary_x, primary_y, primary_z, secondary_x, secondary_y, secondary_z) VALUES (%d, %d, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f)",
+                    missionid,
+                    2,
+                    gRampageNPCs[missionid][i][Primary][CoordX],
+                    gRampageNPCs[missionid][i][Primary][CoordY],
+                    gRampageNPCs[missionid][i][Primary][CoordZ],
+                    gRampageNPCs[missionid][i][Secondary][CoordX],
+                    gRampageNPCs[missionid][i][Secondary][CoordY],
+                    gRampageNPCs[missionid][i][Secondary][CoordZ]
+                );
+
+            result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+            if (!result)
+            {
+                print("Database error: cannot write rampage weapon data!");
+                print(query);
+                return 0;
+    	    }   
+
+            DB_FreeResultSet(result); 
+        }
+    }
+
+    InitRampagePickups();
+
+    gPlayers[playerid][EditingMode] = false;
+    gRampageMission[playerid][Active] = false;
+
+    return 1;
 }

@@ -1145,6 +1145,101 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				return 1;
 			}
+		case DIALOG_RAMPAGE_EDITOR_MAIN:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				switch (listitem)
+				{
+					case 0:
+						{
+							return ShowRampageEditorNameDialog(playerid);
+						}
+					case 1: 
+						{
+							return ShowRampageEditorLocationTypeDialog(playerid);
+						}
+					case 2:
+						{
+							gRampageEdit[playerid][EditType] = RMET_PICKUP_COORDS;
+							return SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Press KEY_NO to record the rampage pickup coords!");
+						}
+					case 3:
+						{
+							gRampageEdit[playerid][EditType] = RMET_NPC_COORDS_PRIMARY;
+							return SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Press KEY_NO to record the primary rampage NPC coords!");
+						}
+					case 4:
+						{
+							gRampageEdit[playerid][EditType] = RMET_WEAPON_COORDS;
+							return SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Press KEY_NO to record the rampage weapon coords!");
+						}
+					case 5:
+						{
+							gRampageEdit[playerid][EditType] = RMET_HEALTH_COORDS;
+							return SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Press KEY_NO to record the health pickup coords!");
+						}
+					case 6:
+						{
+							return SaveRampageMission(playerid);
+						}
+				}
+
+				return 1;
+			}
+		case DIALOG_RAMPAGE_EDITOR_NAME:
+			{
+				if (!response || !strlen(inputtext))
+				{
+					return 1;
+				}
+
+				format(gRampageEdit[playerid][MissionName], 64, "%s", inputtext);
+
+				gRampageEdit[playerid][EditType] = RMET_NONE;
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Rampage mission name presaved/cached!");
+
+				return ShowRampageEditorMainDialog(playerid);
+			}
+		case DIALOG_RAMPAGE_EDITOR_WEAPON:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				new
+					missionid = gRampageEdit[playerid][MissionID],
+					weaponno = gRampageEdit[playerid][WeaponNo]++,
+					weaponid;
+
+				if (!strlen(inputtext) || !IsNumeric(inputtext))
+				{
+					weaponid = random(37) + 1;
+				}
+
+				gRampageWeapons[missionid][weaponno][WeaponID] = weaponid;
+
+				gRampageEdit[playerid][EditType] = RMET_NONE;
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Rampage weapon ID presaved/cached!");
+
+				return ShowRampageEditorMainDialog(playerid);
+			}
+		case DIALOG_RAMPAGE_EDITOR_LOCATION_TYPE:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				gRampageEdit[playerid][Location] = RMType: listitem;
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Rampage location presaved/cached!");
+
+				return ShowRampageEditorMainDialog(playerid);
+			}
 		case DIALOG_PROPERTY_EDITOR_MAIN:
 			{
 				if (!response)

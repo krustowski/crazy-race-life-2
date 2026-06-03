@@ -28,9 +28,9 @@ CREATE TABLE IF NOT EXISTS "rampage_coords" (
 	"primary_x"	REAL NOT NULL,
 	"primary_y"	REAL NOT NULL,
 	"primary_z"	REAL NOT NULL,	
-    "secondary_x"	REAL NOT NULL,
-	"secondary_y"	REAL NOT NULL,
-	"secondary_z"	REAL NOT NULL,
+    "secondary_x"	REAL,
+	"secondary_y"	REAL,
+	"secondary_z"	REAL,
 	PRIMARY KEY("id" AUTOINCREMENT),
 	FOREIGN KEY("rampage_id") REFERENCES "rampages"("id"),
 	FOREIGN KEY("type") REFERENCES "rampage_coord_types"("id")
@@ -44,6 +44,7 @@ INSERT INTO "rampage_coord_types" VALUES (1,'TYPE_COORD_PICKUP');
 INSERT INTO "rampage_coord_types" VALUES (2,'TYPE_COORD_NPC_SPAWN');
 INSERT INTO "rampage_coord_types" VALUES (3,'TYPE_COORD_NPC_MOVE');
 INSERT INTO "rampage_coord_types" VALUES (4,'TYPE_COORD_WEAPON_SPAWN');
+INSERT INTO "rampage_coord_types" VALUES (5,'TYPE_COORD_HEALTH_POINT');
 
 INSERT INTO "rampage_location_types" VALUES (0,'TYPE_LOCATION_NONE');
 INSERT INTO "rampage_location_types" VALUES (1,'TYPE_LOCATION_LV');

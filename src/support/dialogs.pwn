@@ -149,7 +149,10 @@ enum
 
 enum 
 {
-	DIALOG_RAMPAGE_EDITOR_MAIN = 0xC0
+	DIALOG_RAMPAGE_EDITOR_MAIN = 0xC0,
+	DIALOG_RAMPAGE_EDITOR_NAME,
+	DIALOG_RAMPAGE_EDITOR_WEAPON,
+	DIALOG_RAMPAGE_EDITOR_LOCATION_TYPE
 }
 
 #include "modules/real.pwn"
@@ -2023,9 +2026,50 @@ stock ShowDealConfirmationDialog(playerid)
 stock ShowRampageEditorMainDialog(playerid)
 {
 	new
-		stringToPrint[128] = "Rampage Name\nRampage Pickup Coords\nRampage NPC Coords\nSave Rampage";
+		stringToPrint[128] = "Rampage Name\nRampage Location Type\nRampage Pickup Coords\nRampage NPC Coords\nRampage Weapon\nHealth Pickup Coords\nSave Rampage";
 
+	gPlayers[playerid][EditingMode] = true;
 	gRampageEdit[playerid][Active] = true;
 
+	new
+        query[512] = "SELECT id FROM rampages ORDER BY id DESC LIMIT 1";
+
+	new
+        DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+	new
+        missionid = 1;
+
+	if (DB_GetRowCount(result))
+	{
+    	missionid = DB_GetFieldIntByName(result, "id") + 1;
+	}
+
+	gRampageEdit[playerid][MissionID] = missionid;
+
 	return ShowPlayerDialog(playerid, DIALOG_RAMPAGE_EDITOR_MAIN, DIALOG_STYLE_LIST, "Rampage Editor", stringToPrint, "Select", "Close");
+}
+
+stock ShowRampageEditorNameDialog(playerid)
+{
+	new
+		stringToPrint[128] = "Set a new rampage mission name below:";
+
+	return ShowPlayerDialog(playerid, DIALOG_RAMPAGE_EDITOR_NAME, DIALOG_STYLE_INPUT, "Rampage Editor: Name", stringToPrint, "Apply", "Close");
+}
+
+stock ShowRampageEditorWeaponDialog(playerid)
+{
+	new
+		stringToPrint[128] = "Type in the weapon ID (type). Leave blank to select the ID randomly:";
+
+	return ShowPlayerDialog(playerid, DIALOG_RAMPAGE_EDITOR_WEAPON, DIALOG_STYLE_INPUT, "Rampage Editor: Weapon ID", stringToPrint, "Apply", "Close");
+}
+
+stock ShowRampageEditorLocationTypeDialog(playerid)
+{
+	new
+		stringToPrint[128] = "None\nLas Venturas\nSan Fierro\nLos Santos";
+
+	return ShowPlayerDialog(playerid, DIALOG_RAMPAGE_EDITOR_LOCATION_TYPE, DIALOG_STYLE_LIST, "Rampage Editor: Location Type", stringToPrint, "Apply", "Close");
 }

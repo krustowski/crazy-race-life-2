@@ -1152,7 +1152,8 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 
 								gRampageEdit[playerid][EditType] = RMET_NONE;
 
-								return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Rampage pickup poistion recorded!");
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Rampage pickup poistion recorded!");
+								return ShowRampageEditorMainDialog(playerid);
 							}
 						case RMET_NPC_COORDS_PRIMARY:
 							{
@@ -1160,7 +1161,7 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 									Float: X,
 									Float: Y,
 									Float: Z,
-									npcid = gRampageEdit[playerid][NPCCount]++,
+									npcid = gRampageEdit[playerid][NPCCount],
 									missionid = gRampageEdit[playerid][MissionID];
 
 								GetPlayerPos(playerid, X, Y, Z);
@@ -1171,7 +1172,7 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 
 								gRampageEdit[playerid][EditType] = RMET_NPC_COORDS_SECONDARY;
 
-								return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Rampage NPC primary poistion recorded!");
+								return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Rampage NPC primary poistion recorded! Press KEY_NO again to record the secondary position");
 							}
 						case RMET_NPC_COORDS_SECONDARY:
 							{
@@ -1184,13 +1185,57 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 
 								GetPlayerPos(playerid, X, Y, Z);
 
+								gRampageNPCs[missionid][npcid][Set] = true;
 								gRampageNPCs[missionid][npcid][Secondary][CoordX] = X;
 								gRampageNPCs[missionid][npcid][Secondary][CoordY] = Y;
 								gRampageNPCs[missionid][npcid][Secondary][CoordZ] = Z;
 
-								gRampageEdit[playerid][EditType] = RMET_NPC_COORDS_SECONDARY;
+								gRampageEdit[playerid][EditType] = RMET_NONE;
 
-								return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Rampage NPC primary poistion recorded!");
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Rampage NPC secondary position recorded!");
+								return ShowRampageEditorMainDialog(playerid);
+							}
+						case RMET_WEAPON_COORDS:
+							{
+								new 
+									Float: X,
+									Float: Y,
+									Float: Z,
+									weaponid = gRampageEdit[playerid][WeaponNo],
+									missionid = gRampageEdit[playerid][MissionID];
+
+								GetPlayerPos(playerid, X, Y, Z);
+
+								gRampageWeapons[missionid][weaponid][Set] = true;
+								gRampageWeapons[missionid][weaponid][Position][CoordX] = X;
+								gRampageWeapons[missionid][weaponid][Position][CoordY] = Y;
+								gRampageWeapons[missionid][weaponid][Position][CoordZ] = Z;
+
+								gRampageEdit[playerid][EditType] = RMET_NONE;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Rampage weapon poistion recorded! Please define the weapon ID (optional)");
+								return ShowRampageEditorWeaponDialog(playerid);
+							}
+						case RMET_HEALTH_COORDS:
+							{
+								new 
+									Float: X,
+									Float: Y,
+									Float: Z,
+									healthid = gRampageEdit[playerid][HealthNo]++,
+									missionid = gRampageEdit[playerid][MissionID];
+
+								GetPlayerPos(playerid, X, Y, Z);
+
+								gRampageHealthPoints[missionid][healthid][Set] = true;
+								gRampageHealthPoints[missionid][healthid][Position][CoordX] = X;
+								gRampageHealthPoints[missionid][healthid][Position][CoordY] = Y;
+								gRampageHealthPoints[missionid][healthid][Position][CoordZ] = Z;
+
+								gRampageEdit[playerid][EditType] = RMET_NONE;
+
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Rampage health point poistion recorded!");
+								return ShowRampageEditorMainDialog(playerid);
 							}
 						default:
 							{

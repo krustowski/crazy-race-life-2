@@ -147,6 +147,11 @@ enum
 	DIALOG_PHONE_PM_TEXT,
 }
 
+enum 
+{
+	DIALOG_RAMPAGE_EDITOR_MAIN = 0xC0
+}
+
 #include "modules/real.pwn"
 #include "modules/race.pwn"
 
@@ -883,11 +888,12 @@ stock ShowGameEditorListDialog(playerid)
 {
 	new 
 		stringToPrint[256];
-	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s\n%s",
 			"Property Editor",
 			"Trucking Editor",
 			"Race Editor",
-			"Police Bribe Editor"
+			"Police Bribe Editor",
+			"Rampage Editor"
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_EDITOR_LIST, DIALOG_STYLE_LIST, "Game Editors", stringToPrint, "Select", "Cancel");
@@ -2012,3 +2018,14 @@ stock ShowDealConfirmationDialog(playerid)
 	return ShowPlayerDialog(playerid, DIALOG_DEAL_CONFIRMATION, DIALOG_STYLE_MSGBOX, "Deal Confirmation", stringToPrint, "Accept", "Decline");
 }
 
+#include "modules/rampage.pwn"
+
+stock ShowRampageEditorMainDialog(playerid)
+{
+	new
+		stringToPrint[128] = "Rampage Name\nRampage Pickup Coords\nRampage NPC Coords\nSave Rampage";
+
+	gRampageEdit[playerid][Active] = true;
+
+	return ShowPlayerDialog(playerid, DIALOG_RAMPAGE_EDITOR_MAIN, DIALOG_STYLE_LIST, "Rampage Editor", stringToPrint, "Select", "Close");
+}

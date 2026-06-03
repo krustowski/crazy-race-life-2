@@ -52,6 +52,7 @@ public OnGameModeInit()
 
 	InitDB();
 	InitPoliceBribePickups();
+	InitRampagePickups();
 	InitBankLocations();
 	InitDrugValues();
 	InitDrugPickups();

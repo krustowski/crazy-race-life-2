@@ -4,26 +4,27 @@
 #define _CRL2_PICKUPS
 
 // https://www.open.mp/docs/scripting/resources/pickuptypes
-#define PICKUP_TYPE_NONE			0
-#define PICKUP_TYPE_ALWAYS			1
+#define PICKUP_TYPE_NONE					0
+#define PICKUP_TYPE_ALWAYS					1
 #define PICKUP_TYPE_RESPAWN_30_SECONDS		2
 #define PICKUP_TYPE_RESPAWN_AFTER_DEATH		3
-#define PICKUP_TYPE_NO_RESPAWN			19 
+#define PICKUP_TYPE_NO_RESPAWN				19 
 
-#define MAX_PRIZES 				16
+#define MAX_PRIZES 					16
 
 #define PICKUP_BRIEFCASE			1210
-#define PICKUP_INFO				1239
+#define PICKUP_INFO					1239
 #define PICKUP_HEART				1240
-#define PICKUP_PILL				1241
+#define PICKUP_PILL					1241
 #define PICKUP_ARMOUR				1242
-#define PICKUP_STAR				1247
+#define PICKUP_STAR					1247
 #define PICKUP_SKULL				1254
 #define PICKUP_HOUSE_BLUE			1272
 #define PICKUP_HOUSE_GREEN			1273
 #define PICKUP_DOLLAR				1274
 #define PICKUP_SHIRT				1275
-#define PICKUP_TIKI				1276
+#define PICKUP_TIKI					1276
+#define PICKUP_RAMPAGE				1313
 #define PICKUP_ARROW				1318
 #define PICKUP_MOMEY_BAG			1550
 #define PICKUP_DRUG_WHITE			1575
@@ -32,12 +33,12 @@
 #define PICKUP_DRUG_GREEN			1578
 #define PICKUP_DRUG_BLUE			1579
 #define PICKUP_DRUG_RED				1580
-#define PICKUP_CARD				1581
+#define PICKUP_CARD					1581
 #define PICKUP_PUMPKIN				19320
 #define PICKUP_HOUSE_RED 			19522
 #define PICKUP_HOUSE_YELLOW			19524
 
-#define MAX_DEATH_MONEY_PICKUPS			128
+#define MAX_DEATH_MONEY_PICKUPS		128
 
 #include "modules/bank.pwn"
 #include "modules/team.pwn"
@@ -171,7 +172,7 @@ public InitPickups()
 	{
 		new 
 			id = 0, 
-		    	name[64],
+		    name[64],
 			Float: X,
 			Float: Y,
 			Float: Z;

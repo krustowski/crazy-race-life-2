@@ -1137,6 +1137,10 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							return ShowBribeEditorMainDialog(playerid);
 						}
+					case 4:
+						{
+							return ShowRampageEditorMainDialog(playerid);
+						}
 				}
 
 				return 1;

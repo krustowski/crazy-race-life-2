@@ -965,6 +965,7 @@ public SpawnPlayerDelayed(playerid)
 #include "modules/taxi.pwn"
 #include "modules/tow.pwn"
 #include "modules/bribe.pwn"
+#include "modules/rampage.pwn"
 
 stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 {
@@ -1130,6 +1131,72 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 				if (!gPlayers[playerid][EditingMode])
 				{
 					return 1;
+				}
+
+				if (gRampageEdit[playerid][Active])
+				{
+					switch (gRampageEdit[playerid][EditType])
+					{
+						case RMET_PICKUP_COORDS:
+							{
+								new 
+									Float: X,
+									Float: Y,
+									Float: Z;
+
+								GetPlayerPos(playerid, X, Y, Z);
+
+								gRampageEdit[playerid][PickupCoords][CoordX] = X;
+								gRampageEdit[playerid][PickupCoords][CoordY] = Y;
+								gRampageEdit[playerid][PickupCoords][CoordZ] = Z;
+
+								gRampageEdit[playerid][EditType] = RMET_NONE;
+
+								return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Rampage pickup poistion recorded!");
+							}
+						case RMET_NPC_COORDS_PRIMARY:
+							{
+								new 
+									Float: X,
+									Float: Y,
+									Float: Z,
+									npcid = gRampageEdit[playerid][NPCCount]++,
+									missionid = gRampageEdit[playerid][MissionID];
+
+								GetPlayerPos(playerid, X, Y, Z);
+
+								gRampageNPCs[missionid][npcid][Primary][CoordX] = X;
+								gRampageNPCs[missionid][npcid][Primary][CoordY] = Y;
+								gRampageNPCs[missionid][npcid][Primary][CoordZ] = Z;
+
+								gRampageEdit[playerid][EditType] = RMET_NPC_COORDS_SECONDARY;
+
+								return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Rampage NPC primary poistion recorded!");
+							}
+						case RMET_NPC_COORDS_SECONDARY:
+							{
+								new 
+									Float: X,
+									Float: Y,
+									Float: Z,
+									npcid = gRampageEdit[playerid][NPCCount]++,
+									missionid = gRampageEdit[playerid][MissionID];
+
+								GetPlayerPos(playerid, X, Y, Z);
+
+								gRampageNPCs[missionid][npcid][Secondary][CoordX] = X;
+								gRampageNPCs[missionid][npcid][Secondary][CoordY] = Y;
+								gRampageNPCs[missionid][npcid][Secondary][CoordZ] = Z;
+
+								gRampageEdit[playerid][EditType] = RMET_NPC_COORDS_SECONDARY;
+
+								return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Rampage NPC primary poistion recorded!");
+							}
+						default:
+							{
+								return 1;
+							}
+					}
 				}
 
 				if (gPlayerRaceEdit[playerid][ID])

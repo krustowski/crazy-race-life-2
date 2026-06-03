@@ -307,7 +307,7 @@ stock SpawnProperty(propertyId)
 	do 
 	{
 		new 
-			PropertyPoint: type = PropertyPoint: DB_GetFieldIntByName(result, "type"),
+			PropertyPoint: propPoint = PropertyPoint: DB_GetFieldIntByName(result, "type"),
 			Float: pX = DB_GetFieldFloatByName(result, "primary_x"),
 			Float: pY = DB_GetFieldFloatByName(result, "primary_y"),
 			Float: pZ = DB_GetFieldFloatByName(result, "primary_z"),
@@ -317,9 +317,9 @@ stock SpawnProperty(propertyId)
 			Float: sZ = DB_GetFieldFloatByName(result, "secondary_z"),
 			Float: sR = DB_GetFieldFloatByName(result, "secondary_rot");
 
-		gPropertyCoords[propertyId][i][PickupType] = PropertyPoint: type;
+		gPropertyCoords[propertyId][i][PickupType] = PropertyPoint: propPoint;
 
-		switch (type)
+		switch (propPoint)
 		{
 			case SPAWN_POINT:
 				{

@@ -672,6 +672,15 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		return 1;
 	}
 
+	// 
+	//  Rampage
+	//
+
+	if (CheckRampagePickup(playerid, pickupid))
+	{
+		return SetRampageMission(playerid);
+	}
+
 	//
 	//  Banking
 	//

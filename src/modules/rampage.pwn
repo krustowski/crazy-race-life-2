@@ -62,6 +62,7 @@ enum RampageEditor
 
 enum RampageMission
 {
+    ID,
     bool: Active,
     RMType: Type
 }
@@ -102,12 +103,14 @@ new
 //  NPCs are equipped with random weapons or with weapons defined in the database (picked in Rampage Editor).
 //
 
-stock bool: CheckRampagePickup(pickupid)
+stock bool: CheckRampagePickup(playerid, pickupid)
 {
     for (new i = 0; i < MAX_RAMPAGE_MISSION_COUNT; i++)
     {
-        if (gRampagePickups[i][ID] == pickupid)
+        if (gRampagePickups[i][PickupID] == pickupid)
         {
+            gRampageMission[playerid][ID] = gRampagePickups[i][MissionID];
+
             return true;
         }
     }
@@ -170,56 +173,178 @@ stock InitRampagePickups()
     return 1;
 }
 
-stock SetRampageMission(playerid, missionid)
-{}
-
-stock SetRampageNPCPos(npcid)
+stock SetRampageMission(playerid)
 {
+    if (gRampageMission[playerid][Active])
+    {
+        return 1;
+    }
+
+    new
+        missionid = gRampageMission[playerid][ID],
+        query[256];
+
+    // Create and spawn weapons
+    format(query, sizeof(query), "SELECT * FROM rampage_coords WHERE type = 4 AND rampage_id = %d", missionid);
+
+    new
+        DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+    if (!result)
+    {
+        print("Database error: unable to fetch rampage_coords for weapons!");
+        print(query);
+        return 0;
+    }
+
+    if (DB_GetRowCount(result))
+    {
+        do
+        {
+            new
+                weaponid = DB_GetFieldIntByName(result, "weapon_id"),
+                Float: X = DB_GetFieldFloatByName(result, "primary_x"),
+                Float: Y = DB_GetFieldFloatByName(result, "primary_y"),
+                Float: Z = DB_GetFieldFloatByName(result, "primary_z");
+
+            if (!weaponid)
+            {
+                weaponid = random(37) + 1;
+            }
+
+            // TODO: Assign to some pickup array to check against on pick up
+            EnsurePickupCreated(320 + weaponid, 1, X, Y, Z);
+            
+        }
+        while (DB_SelectNextRow(result));
+    }
+
+    DB_FreeResultSet(result);
+
+    // Create and spawn health points
+    format(query, sizeof(query), "SELECT * FROM rampage_coords WHERE type = 5 AND rampage_id = %d", missionid);
+
+    result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+    if (!result)
+    {
+        print("Database error: unable to fetch rampage_coords for health points!");
+        print(query);
+        return 0;
+    }
+
+    if (DB_GetRowCount(result))
+    {
+        do
+        {
+            new
+                Float: X = DB_GetFieldFloatByName(result, "primary_x"),
+                Float: Y = DB_GetFieldFloatByName(result, "primary_y"),
+                Float: Z = DB_GetFieldFloatByName(result, "primary_z");
+
+            // TODO: Assign to some pickup array to check against on pick up
+            EnsurePickupCreated(PICKUP_HEART, 1, X, Y, Z);
+            
+        }
+        while (DB_SelectNextRow(result));
+    }
+
+    DB_FreeResultSet(result);
+
+    // Create and spawn NPCs
+    format(query, sizeof(query), "SELECT * FROM rampage_coords WHERE type = 2 AND rampage_id = %d", missionid);
+
+    result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+    if (!result)
+    {
+        print("Database error: unable to fetch rampage_coords for NPCs!");
+        print(query);
+        return 0;
+    }
+
+    if (DB_GetRowCount(result))
+    {
+        new
+            i = 0;
+
+        do
+        {
+            new
+                Float: pX = DB_GetFieldFloatByName(result, "primary_x"),
+                Float: pY = DB_GetFieldFloatByName(result, "primary_y"),
+                Float: pZ = DB_GetFieldFloatByName(result, "primary_z"),             
+                Float: sX = DB_GetFieldFloatByName(result, "secondary_x"),
+                Float: sY = DB_GetFieldFloatByName(result, "secondary_y"),
+                Float: sZ = DB_GetFieldFloatByName(result, "secondary_z");
+
+            if (SetRampageNPC(playerid, missionid, i))
+            {
+                new
+                    npcid = gRampageNPCs[missionid][i][ID];
+
+                NPC_SetPos(npcid, pX, pY, pZ);
+                NPC_SetWeapon(npcid, WEAPON: (random(37) + 1));
+                NPC_SetSkin(npcid, random(300));
+
+                NPC_Move(npcid, sX, sY, sZ, NPC_MOVE_TYPE_JOG, NPC_MOVE_SPEED_JOG, 0.05);
+            }
+                        
+        }
+        while (DB_SelectNextRow(result));
+    }
+
+    DB_FreeResultSet(result);
+
+    gRampageMission[playerid][Active] = true;
+
     return 1;
 }
 
-stock SetRampageNPC(playerid)
+stock SetRampageNPC(playerid, missionid, npcarrayid)
 {
-	new
-        const NPC_COUNT = 128, 
-        npcs[NPC_COUNT];
-	NPC_GetAll(npcs, sizeof(npcs));
+    const NPC_COUNT = 128;
 
-	new preid = -1;
-	for (new i = 0; i < NPC_COUNT; i++)
-	{
-		if (!NPC_IsValid(npcs[i]))
+    new
+        npcs[NPC_COUNT];
+
+    NPC_GetAll(npcs, sizeof(npcs));
+
+    new preid = -1;
+    for (new i = 0; i < NPC_COUNT; i++)
+    {
+        if (!NPC_IsValid(npcs[i]))
 		{
 			preid = i;
 			break;
 		}
 	}
 
-	if (preid == -1)
-	{
-		//return SendClientMessageLocalized(playerid, I18N_TAXI_MISS_TOO_MANY_CUSTOMERS);
+    if (preid == -1)
+    {
+	    //return SendClientMessageLocalized(playerid, I18N_TAXI_MISS_TOO_MANY_CUSTOMERS);
         return 0;
-	}
+    }
 
-	new 
+    new 
         npc_name[MAX_PLAYER_NAME];
-	format(npc_name, sizeof(npc_name), "[NPC]rampage_npc%d", preid);
+    format(npc_name, sizeof(npc_name), "[NPC]rampage_npc%d", preid);
 
-	new 
+    new 
         npcid = NPC_Create(npc_name);
 
-	if (npcid == INVALID_NPC_ID)
-	{
-		print(npc_name);
-		//return SendClientMessageLocalized(playerid, I18N_TAXI_MISS_TOO_MANY_CUSTOMERS);
+    if (npcid == INVALID_NPC_ID)
+    {
+        print(npc_name);
+        //return SendClientMessageLocalized(playerid, I18N_TAXI_MISS_TOO_MANY_CUSTOMERS);
         return 0;
-	}
+    }
 
-	NPC_Spawn(npcid);
+    NPC_Spawn(npcid);
 
-	gTaxiMission[playerid][NPCid] = npcid;
+    gRampageNPCs[missionid][npcarrayid][ID] = npcid;
 
-	return SetRampageNPCPos(npcid);
+    return 1;
 }
 
 stock SaveRampageMission(playerid)

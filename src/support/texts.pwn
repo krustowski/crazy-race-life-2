@@ -39,6 +39,7 @@ public AddTexts(playerid)
 		return 1;
 	}
 
+	gRampageMission[playerid][InfoText] = TextDrawCreate(460.0, 400.0, "");
 	gDrugMission[playerid][InfoText] = TextDrawCreate(460.0, 400.0, "");
 	gVehicleStatesText[playerid] = TextDrawCreate(256, 410, "");
 	gRaceInfoText[playerid] = TextDrawCreate(460.0, 400.0, "");
@@ -46,6 +47,10 @@ public AddTexts(playerid)
 	gTowMissionText[playerid] = TextDrawCreate(460.0, 380.0, "");
 	gDeathmatchText[playerid] = TextDrawCreate(400.0, 400.0, "");
 
+	TextDrawLetterSize(gRampageMission[playerid][InfoText], 0.5, 1.5);
+	TextDrawFont(gRampageMission[playerid][InfoText], t_TEXT_DRAW_FONT: 3);
+	TextDrawSetOutline(gRampageMission[playerid][InfoText], 1);
+	
 	TextDrawLetterSize(gDrugMission[playerid][InfoText], 0.5, 1.5);
 	TextDrawFont(gDrugMission[playerid][InfoText], t_TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gDrugMission[playerid][InfoText], 1);

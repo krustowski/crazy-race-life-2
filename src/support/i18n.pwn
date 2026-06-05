@@ -122,6 +122,10 @@ enum
 	I18N_ATM_INVALID_AMOUNT,
 	I18N_ATM_DEPOSITED_FMT,
 	I18N_ATM_WITHDRAWAL_FMT,
+	// Rampages
+	I18N_RAMPAGE_MISS_INFO,
+	I18N_RAMPAGE_MISS_START,
+	I18N_RAMPAGE_MISS_ABORT,
 	// Private messages
 	I18N_PRIV_MSG_RECEIVED_FMT,
 	I18N_PRIV_MSG_SENT_FMT,
@@ -372,6 +376,10 @@ new gI18nMessageColor[] =
 	COLOR_LIGHTGREEN,
 	COLOR_LIGHTGREEN,
 	COLOR_RED,
+	COLOR_YELLOW,
+	COLOR_YELLOW,
+	// Rampage
+	COLOR_YELLOW,
 	COLOR_YELLOW,
 	COLOR_YELLOW,
 	// Private messages
@@ -862,6 +870,21 @@ new gI18nMessages[][PlayerLocale][MAX_MESSAGE_LEN] =
 	{
 		"[ ATM ] Cash withdrawal: $%d! Account balance: $%d!",
 		"[ ATM ] Vybrano z uctu: $%d! Aktualni zustatek: $%d!"
+	},
+	//
+	//  Rampage
+	//
+	{
+		"~w~Killed:_____~g~%d~n~~w~Time:______~b~%d~y~:~b~%02d",
+		"~w~Zabito:_____~g~%d~n~~w~Cas:_______~b~%d~y~:~b~%02d"
+	},
+	{
+		"~y~Rampage ~w~Mission ~g~Started~w~.",
+		"~y~Rampage ~w~Mise ~g~Zapocala."
+	},
+	{
+		"~y~Rampage ~w~Mission ~r~Ended~w~.",
+		"~y~Rampage ~w~Mise ~r~Skoncila."
 	},
 	//
 	//  Private messages

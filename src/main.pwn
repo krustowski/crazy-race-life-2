@@ -325,8 +325,134 @@ public OnPlayerSpawn(playerid)
 	return 1;
 }
 
+public OnNPCRespawn(npcid)
+{
+	for (new playerid = 0; playerid < MAX_PLAYERS; playerid++)
+	{
+		if (!gRampageMission[playerid][Active])
+		{
+			continue;
+		}
+
+		new missionid = gRampageMission[playerid][ID];
+
+		for (new i = 0; i < MAX_RAMPAGE_NPC_COUNT; i++)
+		{
+			if (gRampageNPCs[missionid][i][ID] != npcid)
+			{
+				continue;
+			}
+
+			new 
+				Float: tX, 
+				Float: tY, 
+				Float: tZ;
+
+			GetPlayerPos(playerid, tX, tY, tZ);
+
+			NPC_SetHealth(npcid, 50.0);
+			NPC_SetInvulnerable(npcid, false);
+			NPC_SetSkin(npcid, random(300));
+			NPC_SetWeapon(npcid, WEAPON: (random(13) + 22));
+			NPC_AimAtPlayer(npcid, playerid, true, 500, true, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, NPC_ENTITY_CHECK_PLAYER);
+			NPC_Shoot(npcid, WEAPON: NPC_GetWeapon(npcid), playerid, true, tX, tY, tZ, 0.0, 0.0, 0.0, true, NPC_ENTITY_CHECK_ALL);
+
+			return 1;
+		}
+	}
+
+	return 1;
+}
+
 public OnNPCDeath(npcid, killerid, WEAPON:reason)
 {
+	if (gRampageMission[killerid][Active])
+	{
+		new 
+			missionid = gRampageMission[killerid][ID];
+
+		for (new i = 0; i < MAX_RAMPAGE_NPC_COUNT; i++)
+		{
+			if (gRampageNPCs[missionid][i][ID] == npcid)
+			{
+				SetTimerEx("RecreateRampageNPC", 250, false, "iii", killerid, missionid, i);
+				break;
+			}
+		}
+
+		return 1;
+	}
+
+	if (NPC_IsValid(killerid) || IsPlayerNPC(killerid))
+	{
+		// Check if npcid belongs to any active rampage mission
+		for (new playerid = 0; playerid < MAX_PLAYERS; playerid++)
+		{
+			if (!gRampageMission[playerid][Active])
+			{
+				continue;
+			}
+
+			new 
+				missionid = gRampageMission[playerid][ID];
+
+			for (new i = 0; i < MAX_RAMPAGE_NPC_COUNT; i++)
+			{
+				if (gRampageNPCs[missionid][i][ID] == npcid)
+				{
+					SetTimerEx("RecreateRampageNPC", 250, false, "iii", playerid, missionid, i);
+					return 1;
+				}
+			}
+		}
+
+		NPC_Respawn(npcid);
+
+		if (npcid != killerid)
+		{
+			NPC_Respawn(killerid);
+		}
+		else
+		{
+			const NPC_COUNT = 128;
+
+			new
+				npcs[NPC_COUNT];
+
+			NPC_GetAll(npcs, sizeof(npcs));
+
+			for (new j = 0; j < NPC_COUNT; j++)
+			{
+				if (NPC_IsValid(npcs[j]) && NPC_GetWeapon(npcs[j]) > 0)
+				{
+					killerid = npcs[j];
+					break;
+				}
+			}
+		}
+
+		new
+            Float: tX,
+            Float: tY,
+            Float: tZ;
+
+		GetPlayerPos(killerid, tX, tY, tZ);
+
+		NPC_SetHealth(npcid, 50.0);
+		NPC_SetHealth(killerid, 50.0);
+
+		NPC_SetInvulnerable(npcid, false);
+		NPC_SetInvulnerable(killerid, false);
+
+		NPC_SetSkin(npcid, random(300));
+		NPC_SetSkin(killerid, random(300));
+
+		NPC_AimAtPlayer(npcid, killerid, true, 500, true, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, NPC_ENTITY_CHECK_PLAYER);
+		NPC_Shoot(npcid, WEAPON: NPC_GetWeapon(npcid), killerid, true, tX, tY, tZ, 0.0, 0.0, 0.0, true, NPC_ENTITY_CHECK_ALL);
+
+		return 1;
+	}
+
 	NPC_Destroy(npcid);
 
 	AbortPlayerTaxiMission(killerid);
@@ -347,6 +473,15 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 		gDeathmatch[killerid][Score]++;
 
 		return ResetPlayerDeathmatchState(playerid);
+	}
+
+	AbortRampageMission(playerid); 
+
+	if (gRampageMission[killerid][Active])
+	{
+		gRampageMission[killerid][KilledCount]++;
+	
+		return 1;
 	}
 
 	if (gCombatMission[playerid][Active])
@@ -678,7 +813,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 	if (CheckRampagePickup(playerid, pickupid))
 	{
-		return SetRampageMission(playerid);
+		return 1;
 	}
 
 	//

@@ -346,7 +346,13 @@ stock AbortRampageMission(playerid)
 
         for (new k = 0; k < MAX_RAMPAGE_WEAPON_COUNT; k++)
         {
+            if (gRampagePickups[i][k][PickupType] == RMPT_START)
+            {
+                continue;
+            }
+
             DestroyPickup(gRampagePickups[i][k][PickupID]);
+            gRampagePickups[i][k][PickupID] = INVALID_PICKUP;
         }
     }
 
@@ -368,6 +374,11 @@ stock AbortRampageMission(playerid)
 stock SetRampageMission(playerid)
 {
     if (gRampageMission[playerid][Active])
+    {
+        return 1;
+    }
+
+    if (gPlayers[playerid][InMinigame])
     {
         return 1;
     }

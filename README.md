@@ -38,6 +38,8 @@ Live demo at:
     + Custom races all across the map
     + Air, ground and naval
     + Stunts
++ Rampage Missions (experimental)
+	+ 5-minute long clashes with NPC on the street
 + Real Estate
     + Custom spawn point
     + Custom vehicle attached (including the modifitaions)

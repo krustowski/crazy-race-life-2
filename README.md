@@ -26,6 +26,10 @@ Live demo at:
     + 4-minute long matches, 45-second interval before a match for players to join
 + Localization
     + English + Czech (partly, WIP)
++ NPC drivers
+	+ 5x Taxi driver per big city (WIP)
+	+ 2+ Trucking drivers 
+	+ Race Drivers (WIP)
 + Personal cellphone
     + Accessed easily via the `KEY_YES` key (Y usually)
     + Send private messages directly to a player

@@ -106,6 +106,11 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return SendClientMessage(playerid, COLOR_RED, "[ DRUGZ ] Invalid option.");
 				}
 
+				if (listitem < 0 || listitem >= sizeof(gProperties)) 
+				{
+					return 1;
+				}
+
 				// Save to the temporary user's var.
 				gPlayers[playerid][SelectedDrugID] = DrugType: listitem;
 

@@ -817,8 +817,7 @@ stock ProcessDealOffer(playerid)
 		value = gPlayers[playerid][SelectedDrugValue],
 		price = amount * value,
 		DrugType: drugid = gPlayers[playerid][SelectedDrugID],
-		targetidraw = gPlayers[playerid][DealPlayerTargetID],
-		dealerid = gPlayers[playerid][OnlinePlayerList][targetidraw];
+		dealerid = gPlayers[playerid][DealPlayerTargetID];
 
 	if (!IsPlayerConnected(dealerid))
 	{

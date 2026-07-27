@@ -121,7 +121,6 @@ public OffRadarCheckpoint(playerid)
 	gRadarCaught[playerid] = 0;
 }
 
-
 stock HandleCarKill(playerid, killerid, WEAPON:reason)
 {
 	// Adjust the wanted level

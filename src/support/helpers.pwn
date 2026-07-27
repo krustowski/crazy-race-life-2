@@ -415,7 +415,7 @@ stock SanitizeString(const input[], output[], size)
 	new 
 		j = 0;
 
-	for (new i = 0; i < strlen(input) && j < size - 1; i++)
+	for (new i = 0; i < strlen(input) && j < size - 2; i++)
 	{
 		if (input[i] == '\'')
 		{ 

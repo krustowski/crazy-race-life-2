@@ -82,7 +82,7 @@ public OnRadarCheckpoint()
 
 		if (!gRadarEnabled)
 		{
-			return 1;
+			continue;
 		}
 
 		for (new j = 0; j < sizeof(gRadarPositions); j++)

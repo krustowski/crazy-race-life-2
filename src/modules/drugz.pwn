@@ -10,6 +10,7 @@
 #define MAX_DRUG_TYPES		10
 #define MAX_DRUG_PICKUPS	64
 #define MAX_MARKET_ITEMS	128
+#define MAX_DRUGGERY_POINTS	16
 
 #define MARKET_RATIO_MIN	0.01
 #define MARKET_RATIO_MAX	100.0
@@ -90,53 +91,20 @@ enum DrugMission
 	Text: InfoText
 }
 
+enum DruggeryPoint
+{
+	ID,
+	Pickup,
+	PointCoords[Coords]
+}
+
+new
+	gDruggeryPoints[MAX_DRUGGERY_POINTS][DruggeryPoint];
+
 new 
 	gDrugMission[MAX_PLAYERS][DrugMission],
 	gDrugPickups[MAX_DRUG_PICKUPS][DrugPickup],
 	gDrugz[MAX_DRUG_TYPES][Drug];
-
-forward UpdateBlackMarketRatio();
-
-public UpdateBlackMarketRatio()
-{
-	new
-		// Symmetric step: -0.20 to +0.20 of current ratio
-		Float: step = floatdiv(float(random(MARKET_STEP_PERCENT * 2 + 1) - MARKET_STEP_PERCENT), 100.0),
-		// Mean reversion: pull toward equilibrium proportional to distance
-		Float: reversion = floatmul(MARKET_REVERSION_RATE, MARKET_RATIO_EQULIBRIUM - gBlackMarketRatio);
-
-	// Update raw value of the market ratio
-	gBlackMarketRatio = gBlackMarketRatio + step + reversion;
-
-	// Hard clamps
-	if (gBlackMarketRatio < MARKET_RATIO_MIN)
-	{
-		gBlackMarketRatio = MARKET_RATIO_MIN;
-	}
-
-	if (gBlackMarketRatio > MARKET_RATIO_MAX)
-	{
-		gBlackMarketRatio = MARKET_RATIO_MAX;
-	}
-
-	// Ratio update message broadcasting
-	for (new i = 0; i < MAX_PLAYERS; i++)
-	{
-		if (!IsPlayerConnected(i))
-		{
-			continue;
-		}
-
-		new msg[64];
-		GetLocalizedString(i, I18N_BLACK_MARKET_RATIO_UPDATE, msg, sizeof(msg));
-
-		format(msg, sizeof(msg), msg,
-				gBlackMarketRatio
-			);
-
-		SendClientMessage(i, COLOR_ORANGE, msg);
-	}
-}
 
 stock InitDrugValues()
 {
@@ -252,4 +220,67 @@ stock InitDrugPickups()
 	DB_FreeResultSet(result);
 
 	print("Drug pickups initialized!");
+}
+
+stock InitDruggeryPoints()
+{
+	new
+		query[] = "SELECT id, x, y, z FROM druggery_points";
+
+	new
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+	if (!DB_GetRowCount(result))
+	{
+		DB_FreeResultSet(result);
+		return 1;
+	}
+
+	new
+		i = 0;
+
+	do
+	{
+		new
+			id = DB_GetFieldIntByName(result, "id"),
+			Float: X = DB_GetFieldFloatByName(result, "x"),
+			Float: Y = DB_GetFieldFloatByName(result, "y"),
+			Float: Z = DB_GetFieldFloatByName(result, "z");
+
+		gDruggeryPoints[i][ID] = id;
+		gDruggeryPoints[i][Pickup] = EnsurePickupCreated(PICKUP_SKULL, 1, X, Y, Z);
+
+		gDruggeryPoints[i][PointCoords][CoordX] = X;
+		gDruggeryPoints[i][PointCoords][CoordY] = Y;
+		gDruggeryPoints[i][PointCoords][CoordZ] = Z;
+
+		i++;
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	print("Druggery points initialized!");
+
+	return 1;
+}
+
+stock CheckDruggeryPointPickup(playerid, pickupid)
+{
+	for (new i = 0; i < MAX_DRUGGERY_POINTS; i++)
+	{
+		if (gDruggeryPoints[i][Pickup] != pickupid)
+		{
+			continue;
+		}
+
+		if (GetPlayerDialogID(playerid) != INVALID_DIALOG_ID)
+		{
+			return 0;
+		}
+
+		return ShowBlackMarketMainDialog(playerid);
+	}
+
+	return 0;
 }

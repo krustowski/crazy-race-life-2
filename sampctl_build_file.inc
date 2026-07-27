@@ -5,11 +5,11 @@
 #define _sampctl_build_file_included
 
 #define SAMPCTL_BUILD_FILE 1
-#define SAMPCTL_VERSION "unknown"
+#define SAMPCTL_VERSION "1.14.0"
 #define SAMPCTL_PLATFORM "linux"
 
-#define SAMPCTL_BUILD_COMMIT "23ac12b59b9c5a340fcee75915c2545c6765d194"
-#define SAMPCTL_BUILD_COMMIT_SHORT "23ac12b"
+#define SAMPCTL_BUILD_COMMIT "318b128e66242b641388b00a8bb0cb1d4f510f2f"
+#define SAMPCTL_BUILD_COMMIT_SHORT "318b128"
 #define SAMPCTL_BUILD_BRANCH "master"
 
 

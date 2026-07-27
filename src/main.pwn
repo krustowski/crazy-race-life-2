@@ -17,12 +17,9 @@
  *  Created: 	Jan 2025 (Extends legacy GameMode CRL (2008-2010))
  *  Credits: 	krusty, kompry, DRaGsTeR, amdulka, cranyy, tack
  *  Language: 	EN, CZ
- *  Version: 	0.10.z
+ *  Version: 	0.11.z
  *
  */
-
-
-#include <open.mp>
 
 #include "support/includes.pwn"
 
@@ -56,6 +53,7 @@ public OnGameModeInit()
 	InitBankLocations();
 	InitDrugValues();
 	InitDrugPickups();
+	InitDruggeryPoints();
 
 	InitTeams();
 
@@ -64,11 +62,15 @@ public OnGameModeInit()
 	InitHighScores();
 	InitTrucking();
 
+	//InitVehicleModels();
+
 	InitPickups();
 	InitObjects();
 	InitVehicles();
 	InitTexts();
 	InitTimers();
+
+	InitNPCs();
 
 	return 1;
 }
@@ -104,6 +106,7 @@ public OnPlayerConnect(playerid)
 	// Fetch player's name and print it out to outhers online.
 	GetPlayerName(playerid, playerNameRaw, sizeof(playerNameRaw));
 	SanitizeString(playerNameRaw, playerName, MAX_PLAYER_NAME);
+	//SetPlayerName(playerid, playerName);
 	gPlayers[playerid][Name] = playerName;
 
 	if (IsPlayerNPC(playerid) || NPC_IsValid(playerid))
@@ -124,7 +127,7 @@ public OnPlayerConnect(playerid)
 		SendClientMessage(i, COLOR_GREY, stringToPrint);
 	}
 
-	SendMessageToWebhook(playerid, "connected", -1);
+	SetTimerEx("SendMessageToWebhook", 250, false, "isi", playerid, "connected", -1);
 
 	// Send a welcome text to the connecting new player.
 	SendClientMessage(playerid, COLOR_INVISIBLE, "");
@@ -142,7 +145,7 @@ public OnPlayerConnect(playerid)
 	SendClientMessage(playerid, COLOR_GREY, stringToPrint);
 	format(stringToPrint, sizeof(stringToPrint), "%s%d.%d.%d (%s)",
 			"Version: {FFD700}",
-		       	CRAZY_RACE_LIFE_2_VERSION_MAJOR,
+		    CRAZY_RACE_LIFE_2_VERSION_MAJOR,
 			CRAZY_RACE_LIFE_2_VERSION_MINOR,
 			CRAZY_RACE_LIFE_2_VERSION_PATCH,
 			SAMPCTL_BUILD_COMMIT_SHORT
@@ -155,13 +158,15 @@ public OnPlayerConnect(playerid)
 		SendClientMessage(playerid, COLOR_RED, "[ CLIENT ] You don't seem to be using the openMP launcher, some game features may not be available for you. Please visit https://open.mp to get it.");
 	}
 
+	SpawnPlayer(playerid);
+
 	// Ask the user to login/register.
 	gPlayers[playerid][LoginAttempts] = 0;
 
 	if (IsPlayerConnected(playerid)) 
 	{
 		//ShowAuthDialog(playerid);
-		gPlayers[playerid][LoginTimer] = Timer: SetTimerEx("ShowAuthDialog", 2500, false, "i", playerid);
+		gPlayers[playerid][LoginTimer] = Timer: SetTimerEx("ShowAuthDialog", 500, false, "i", playerid);
 	}
 
 	return 1;
@@ -199,9 +204,9 @@ public OnPlayerDisconnect(playerid, reason)
 
 	gPlayers[playerid][IsLogged] = false;
 
-	SendDeathMessage(playerid, INVALID_PLAYER_ID, 201);
+	//SendDeathMessage(playerid, INVALID_PLAYER_ID, 201);
 
-	SendMessageToWebhook(playerid, "disconnected", reason);
+	SetTimerEx("SendMessageToWebhook", 250, false, "isi", playerid, "disconnected", reason);
 
 	new 
 		stringToPrint[128];
@@ -235,10 +240,10 @@ public OnPlayerRequestClass(playerid, classid)
 	SetPlayerCameraPos(playerid, 1871.3, 1933.6, 127.5);
 	SetPlayerCameraLookAt(playerid, 1966.1, 1936.1, 127.5);*/
 
-	if (!gPlayers[playerid][IsLogged])
+	/*if (!gPlayers[playerid][IsLogged])
 	{
 		return 0;
-	}
+	}*/
 
 	return 1;
 }
@@ -271,6 +276,7 @@ public OnPlayerSpawn(playerid)
 
 	if (!gPlayers[playerid][IsLogged])
 	{
+		TogglePlayerControllable(playerid, false);
 		return 1;
 	}
 
@@ -309,7 +315,7 @@ public OnPlayerSpawn(playerid)
 		gPlayers[playerid][InsideProperty] = false;
 	}
 
-	// Respawn at player(s house.
+	// Respawn at player's house.
 	if (gPlayers[playerid][SpawnPoint])
 	{
 		if (SpawnPlayerAtProperty(playerid))
@@ -318,9 +324,76 @@ public OnPlayerSpawn(playerid)
 		}
 	}
 
-	// Default location to spawrn a player (LV pyramid).
+	// Default location to spawrn a player (LV pyramid top).
 	//SetPlayerPos(playerid, 2323.73, 1283.18, 97.60);
 	SetPlayerPos(playerid, 2248.22, 1239.58, 10.82);
+
+	return 1;
+}
+
+public OnNPCCreate(npcid)
+{
+	// Timer to spawn the NPC after creation
+	SetTimerEx("Race_SpawnNPC", 100, false, "i", npcid);
+	SetTimerEx("Taxi_SpawnNPC", 200, false, "i", npcid);
+	SetTimerEx("Truck_SpawnNPC", 300, false, "i", npcid);
+
+	return 1;
+}
+
+public OnNPCSpawn(npcid)
+{
+	new 
+		raceIdx = GetRaceIndexByNPC(npcid),
+		taxiIdx = GetTaxiIndexByNPC(npcid),
+		truckIdx = GetTruckIndexByNPC(npcid);
+
+	if (raceIdx != -1 && gRaceVehicle[raceIdx] != INVALID_VEHICLE_ID)
+	{
+		NPC_SetSkin(npcid, RACE_NPC_SKIN);
+		NPC_PutInVehicle(npcid, gRaceVehicle[raceIdx], DRIVER_SEAT);
+		SetPlayerColor(npcid, RACE_NPC_MARKER_COLOR);
+
+		// Timer of 1 second before starting playback
+		SetTimerEx("Race_StartInitialPlayback", 1000, false, "i", npcid);
+	}
+
+	if (taxiIdx != -1 && gTaxiVehicle[taxiIdx] != INVALID_VEHICLE_ID)
+	{
+		NPC_SetSkin(npcid, TAXI_NPC_SKIN);
+		NPC_PutInVehicle(npcid, gTaxiVehicle[taxiIdx], DRIVER_SEAT);
+		SetPlayerColor(npcid, TAXI_NPC_MARKER_COLOR);
+
+		// Timer of 1 second before starting playback
+		SetTimerEx("Taxi_StartInitialPlayback", 1000, false, "i", npcid);
+
+		// #if TRAIN_DEBUG
+		// printf("[TRAIN NPC]: Driver of train %s spawned, putting in vehicle", TrainStationNames[trainIdx]);
+		// #endif
+	}
+
+	if (truckIdx != -1 && gTruckVehicle[truckIdx] != INVALID_VEHICLE_ID)
+	{
+		NPC_SetSkin(npcid, TRUCK_NPC_SKIN);
+		NPC_PutInVehicle(npcid, gTruckVehicle[truckIdx], DRIVER_SEAT);
+		SetPlayerColor(npcid, TRUCK_NPC_MARKER_COLOR);
+
+		// Timer of 1 second before starting playback
+		SetTimerEx("Truck_StartInitialPlayback", 1000, false, "i", npcid);
+
+		// #if TRAIN_DEBUG
+		// printf("[TRAIN NPC]: Driver of train %s spawned, putting in vehicle", TrainStationNames[trainIdx]);
+		// #endif
+	}
+
+	return 1;
+}
+
+public OnNPCPlaybackEnd(npcid, recordid)
+{
+	RaceNPC_StartNextPlayback(npcid);
+	TaxiNPC_StartNextPlayback(npcid);
+	TruckNPC_StartNextPlayback(npcid);
 
 	return 1;
 }
@@ -477,7 +550,7 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 
 	AbortRampageMission(playerid); 
 
-	if (gRampageMission[killerid][Active])
+	if (IsPlayerConnected(killerid) && gRampageMission[killerid][Active])
 	{
 		gRampageMission[killerid][KilledCount]++;
 	
@@ -493,7 +566,6 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 	AbortTruckingMission(playerid);
 	AbortTowMission(playerid);
 	AbortPlayerTaxiMission(playerid);
-	//AbortCombatMission(playerid, false);
 
 	new 
 		raceid = CheckPlayerRaceState(playerid);
@@ -604,7 +676,7 @@ public OnPlayerText(playerid, text[])
 			stringToPrint[256];
 
 		text[0] = ' ';
-		format(stringToPrint, sizeof(stringToPrint), "%s [Team Chat]:%s", gPlayers[playerid][Name], text);
+		format(stringToPrint, sizeof(stringToPrint), "%s [Team Chat]: %s", gPlayers[playerid][Name], text);
 
 		for (new i = 0; i < MAX_PLAYERS; i++)
 		{
@@ -807,6 +879,12 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		return 1;
 	}
 
+	// Druggery
+	if (CheckDruggeryPointPickup(playerid, pickupid))
+	{
+		return 1;
+	}
+
 	// 
 	//  Rampage
 	//
@@ -995,6 +1073,7 @@ public OnEnterExitModShop(playerid, enterexit, interiorid)
 public OnVehiclePaintjob(playerid, vehicleid, paintjobid)
 {
 	UpdatePropertyVehiclePaintjob(playerid, vehicleid, paintjobid);
+
 	return 1;
 }
 
@@ -1092,6 +1171,41 @@ public OnPlayerLeavePlayerGangZone(playerid, zoneid)
 
 	return 1;
 }
+
+/*public OnPlayerRequestDownload(playerid, DOWNLOAD_REQUEST: type, crc)
+{
+	if (!IsPlayerConnected(playerid)) 
+	{
+		return 0;
+	}
+
+	new 
+		fullURL[256], 
+		fileName[64], 
+		foundFileName = 0;
+
+	if (type == DOWNLOAD_REQUEST_TEXTURE_FILE)
+	{
+		foundFileName = FindTextureFileNameFromCRC(crc, fileName, sizeof(fileName));
+	}
+	else if (type == DOWNLOAD_REQUEST_MODEL_FILE)
+	{
+		foundFileName = FindModelFileNameFromCRC(crc, fileName, sizeof(fileName));
+	}
+
+	if (foundFileName)
+	{
+		format(fullURL, sizeof fullURL, "%s/%s", gModelsUrl, fileName);
+		RedirectDownload(playerid, fullURL);
+	}
+
+	return 0;
+}
+
+public OnPlayerFinishedDownloading(playerid, virtualworld)
+{
+	return 1;
+}*/
 
 /*
 

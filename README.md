@@ -43,7 +43,7 @@ Live demo at:
     + Air, ground and naval
     + Stunts
 + Rampage Missions (experimental)
-	+ 5-minute long clashes with NPC on the street
+	+ 5-minute long clashes with NPCs on the street
 + Real Estate
     + Custom spawn point
     + Custom vehicle attached (including the modifitaions)

@@ -843,8 +843,8 @@ stock ProcessDealOffer(playerid)
 	// Make the deal
 	GivePlayerMoney(playerid, -price);
 	GivePlayerMoney(dealerid, price);
-	gPlayers[playerid][Drugs][_: drugid] += floatround(amount);
-	gPlayers[dealerid][Drugs][_: drugid] -= floatround(amount);
+	gPlayers[playerid][Drugs][_: drugid - 1] += floatround(amount);
+	gPlayers[dealerid][Drugs][_: drugid - 1] -= floatround(amount);
 
 	SendClientMessageLocalized(playerid, I18N_DEAL_ACCPTED_TARGET);
 	SendClientMessageLocalized(dealerid, I18N_DEAL_ACCPTED_DEALER);

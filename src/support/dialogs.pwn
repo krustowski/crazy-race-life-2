@@ -1951,11 +1951,11 @@ stock ShowDealMainDialog(playerid)
 
 		DB_GetFieldStringByName(result, "name", name, sizeof(name));
 
-		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d\t%d", 
-				stringToPrint, 
-				name, 
-				gPlayers[playerid][Drugs][id], 
-				floatround(price * gBlackMarketRatio) 
+		format(stringToPrint, sizeof(stringToPrint), "%s\n%s\t%d\t%d",
+				stringToPrint,
+				name,
+				gPlayers[playerid][Drugs][id - 1],
+				floatround(price * gBlackMarketRatio)
 			);
 	}
 	while (DB_SelectNextRow(result));

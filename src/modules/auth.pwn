@@ -15,13 +15,14 @@ stock SetPlayerAccountLogin(playerid, const text[])
 	new 
 		hashedPwd[65], 
 		hashedPwdDb[65], 
-		saltDb[17], 
+		saltDb[17],
 		query[256];
 
 	// Fetch the sha256 hash and salt from DB
 	format(query, sizeof(query), "SELECT id, pwdhash, salt FROM users WHERE nickname = '%s'", gPlayers[playerid][Name]);
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
 		print("Database error: cannot fetch user data!");
@@ -53,6 +54,7 @@ stock SetPlayerAccountLogin(playerid, const text[])
 	// Draw mapicons for the user.
 	AddMapicons(playerid);
 
+	TogglePlayerControllable(playerid, true);
 	SpawnPlayer(playerid);
 
 	return 1;
@@ -92,7 +94,8 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 
 	SHA256_Hash(text, salt, hashedPwd, sizeof(hashedPwd));
 
-	new query[512];
+	new 
+		query[512];
 	format(query, sizeof(query), "INSERT INTO users (nickname, pwdhash, salt, cash, bank, adminlvl, wanted, team, class, health, armour, spawn, properties) VALUES ('%s', '%s', '%s', %d, %d, %d, %d, %d, %d, %.2f, %.2f, %d, '%s');", 
 			gPlayers[playerid][Name], 
 			hashedPwd, 
@@ -137,6 +140,8 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 	//gPlayers[playerid][PlayTimeTimer] = Timer: SetTimerEx("UpdatePlayerPlayTime", 5000, true, "i", playerid);
 
 	SetPlayerHealth(playerid, 100.0);
+
+	TogglePlayerControllable(playerid, true);
 	SpawnPlayer(playerid);
 
 	return 1; 
@@ -151,7 +156,8 @@ public ShowAuthDialog(playerid)
 
 	format(query, sizeof(query), "SELECT pwdhash, salt FROM users WHERE nickname = '%s'", gPlayers[playerid][Name]);
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 
 	if (DB_GetRowCount(result)) 
 	{
@@ -166,7 +172,7 @@ public ShowAuthDialog(playerid)
 	{
 		format(stringToPrint, sizeof(stringToPrint), "{FFD700}Register{FFFFFF}\n\nWelcome %s! Register your account by entering a password:", gPlayers[playerid][Name]);
 
-		ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registeration", stringToPrint, "Register", "Cancel");
+		ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registration", stringToPrint, "Register", "Cancel");
 	}
 
 	DB_FreeResultSet(result);

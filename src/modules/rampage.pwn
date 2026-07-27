@@ -339,23 +339,29 @@ stock AbortRampageMission(playerid)
         return 1;
     }
 
-    for (new i = 0; i < MAX_RAMPAGE_MISSION_COUNT; i++)
+    new
+        missionid = gRampageMission[playerid][ID];
+
+    for (new j = 0; j < MAX_RAMPAGE_NPC_COUNT; j++)
     {
-        for (new j = 0; j < MAX_RAMPAGE_NPC_COUNT; j++)
+        if (NPC_IsValid(gRampageNPCs[missionid][j][ID]))
         {
-            NPC_Destroy(gRampageNPCs[i][j][ID]);
+            NPC_Destroy(gRampageNPCs[missionid][j][ID]);
         }
 
-        for (new k = 0; k < MAX_RAMPAGE_WEAPON_COUNT; k++)
-        {
-            if (gRampagePickups[i][k][PickupType] == RMPT_START)
-            {
-                continue;
-            }
+        gRampageNPCs[missionid][j][ID] = 0;
+        gRampageNPCs[missionid][j][Set] = false;
+    }
 
-            DestroyPickup(gRampagePickups[i][k][PickupID]);
-            gRampagePickups[i][k][PickupID] = INVALID_PICKUP;
+    for (new k = 0; k < MAX_RAMPAGE_WEAPON_COUNT; k++)
+    {
+        if (gRampagePickups[missionid][k][PickupType] == RMPT_START)
+        {
+            continue;
         }
+
+        DestroyPickup(gRampagePickups[missionid][k][PickupID]);
+        gRampagePickups[missionid][k][PickupID] = INVALID_PICKUP;
     }
 
     KillTimer(gRampageMission[playerid][TimerElapsed]);

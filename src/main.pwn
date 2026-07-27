@@ -196,7 +196,11 @@ public OnPlayerDisconnect(playerid, reason)
 	AbortPlayerTaxiMission(playerid);
 	AbortCombatMission(playerid, false);
 	AbortRampageMission(playerid);
-	ToggleDrugMission(playerid);
+
+	if (gDrugMission[playerid][Active])
+	{
+		ToggleDrugMission(playerid);
+	}
 
 	// Save player's data and set such player to unauthorized.
 	if (reason == 1 || reason == 2)

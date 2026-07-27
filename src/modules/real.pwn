@@ -237,7 +237,7 @@ public SendRealEstateCommission()
 
 		do
 		{
-			new 
+			new
 				cost = DB_GetFieldIntByName(result, "cost");
 			commission += floatround(cost / 50) + random(cost / 100);
 		}

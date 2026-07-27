@@ -21,7 +21,7 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				if (!response) 
 				{
-					return Kick(playerid);
+					return DelayedKick(playerid);
 				}
 
 				if (SetPlayerAccountLogin(playerid, inputtext))
@@ -35,7 +35,7 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if (gPlayers[playerid][LoginAttempts] >= 3)
 				{
 					ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Login", "Failed to enter the password (3 times).", "Ok", "");
-					Kick(playerid);
+					DelayedKick(playerid);
 				}
 				else 
 				{
@@ -48,10 +48,10 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				if (!response) 
 				{
-					return Kick(playerid);
+					return DelayedKick(playerid);
 				}
 
-				if (strlen(inputtext) <= 5) 
+				if (strlen(inputtext) <= 5)
 				{
 					return ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Register", "Enter a password longer than 5 characters!", "Register", "Cancel");
 				}
@@ -1968,6 +1968,31 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				
 				gPlayers[playerid][AcceptedDeal] = true;
 				return ProcessDealOffer(playerid);
+			}
+		case DIALOG_NPC_RECORD_SUFFIX:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				if (!strlen(inputtext))
+				{
+					return 1;
+				}
+
+				new
+					fileName[64];
+				format(fileName, sizeof(fileName), "NPC_TRACK_%s_0", inputtext);
+				format(gPlayers[playerid][NPCRecordSuffix], 16, "%s", inputtext);
+
+				gPlayers[playerid][NPCRecording] = true;
+				gPlayers[playerid][NPCRecordNo] = 0;
+				gPlayers[playerid][EditingMode] = true;
+
+				StartRecordingPlayerData(playerid, PLAYER_RECORDING_TYPE_DRIVER, fileName);
+
+				return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] NPC Recording started! Press N to start another recording");
 			}
 
 		default: 

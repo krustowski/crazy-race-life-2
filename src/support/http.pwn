@@ -17,9 +17,11 @@ public WebhookResponse(index, response_code, data[])
 	}
 }
 
-static const WEBHOOK_URL[] = "samp-webhook.n0p.cz/hooks/samp-webhook-player";
+static const WEBHOOK_URL[] = "crl2.krusty.space/hooks/samp-webhook-player";
 
-stock SendMessageToWebhook(playerid, const message[], reasonid)
+forward SendMessageToWebhook(playerid, const message[], reasonid);
+
+public SendMessageToWebhook(playerid, const message[], reasonid)
 {
 	new reason[32];
 
@@ -48,10 +50,12 @@ stock SendMessageToWebhook(playerid, const message[], reasonid)
 	}
 
 	// Send the HTTP message to Webhook
-	new stringToSend[128];
+	new 
+		stringToSend[128];
 	format(stringToSend, sizeof(stringToSend), "payload={\"nickname\":\"%s\",\"state\":\"%s\",\"reason\":\"%s\"}", gPlayers[playerid][Name], message, reason);
 
-	new http = HTTP(playerid, HTTP_POST, WEBHOOK_URL, stringToSend, "WebhookResponse");
+	new 
+		http = HTTP(playerid, HTTP_POST, WEBHOOK_URL, stringToSend, "WebhookResponse");
 	if (!http)
 	{
 		printf("Failed to send HTTP request: HTTP returns %d, idx %d", http, playerid);

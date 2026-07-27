@@ -22,6 +22,15 @@ schema:
 migrate:
 	@./utils/goose -dir ./sql/migrations sqlite3 crl2_data.db up
 
+npc_taxi:
+	@LD_LIBRARY_PATH=${HOME}/.config/sampctl/pawn/openmultiplayer/compiler/v3.10.11 DYLD_LIBRARY_PATH=${HOME}/.config/sampctl/pawn/openmultiplayer/compiler/v3.10.11 \
+		${HOME}/.config/sampctl/pawn/openmultiplayer/compiler/v3.10.11/pawncc \
+		${PWD}/npcmodes/npc_taxi.pwn \
+		-o${PWD}/npcmodes/npc_taxi.amx \
+		-d3 \
+		-Z+ \
+		-i${PWD}/dependencies/omp-stdlib
+
 .PHONY: tests
 
 tests:

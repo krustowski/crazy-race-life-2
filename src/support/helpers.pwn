@@ -5,18 +5,18 @@
 
 #define RC_BANDIT   	441
 #define RC_BARON    	464
-#define RC_GOBLIN  	501
-#define RC_RAIDER  	465
-#define D_TRAM     	449
-#define RC_TANK    	564
+#define RC_GOBLIN  		501
+#define RC_RAIDER  		465
+#define D_TRAM     		449
+#define RC_TANK    		564
 #define RC_CAM      	594
 
 enum Coords
 {
 	Float: CoordX,
-       	Float: CoordY,
-       	Float: CoordZ,
-       	Float: CoordR
+    Float: CoordY,
+    Float: CoordZ,
+    Float: CoordR
 }
 
 new 
@@ -75,6 +75,28 @@ stock KickAll()
 			Kick(i);
 		}
 	}
+}
+
+// Kick(playerid) called directly drops any message/dialog shown right before it (per the
+// Kick() docs) and can race the player's own reconnect against this slot's cleanup. Delaying
+// it by a timer lets the last message reach the client and lets the disconnect settle first.
+forward DoDelayedKick(playerid);
+
+public DoDelayedKick(playerid)
+{
+	if (IsPlayerConnected(playerid))
+	{
+		Kick(playerid);
+	}
+
+	return 1;
+}
+
+stock DelayedKick(playerid, delay = 1000)
+{
+	SetTimerEx("DoDelayedKick", delay, false, "i", playerid);
+
+	return 1;
 }
 
 stock SystemMsg(playerid, const msg[])

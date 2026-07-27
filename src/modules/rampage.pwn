@@ -154,7 +154,9 @@ public RecreateRampageNPC(playerid, missionid, npcindex)
     NPC_Destroy(gRampageNPCs[missionid][npcindex][ID]);
 
     if (!SetRampageNPC(playerid, missionid, npcindex))
+    {
         return 1;
+    }
 
     new
         npcid = gRampageNPCs[missionid][npcindex][ID];
@@ -361,7 +363,7 @@ stock AbortRampageMission(playerid)
     gRampageMission[playerid][KilledCount] = 0;
 
     gPlayers[playerid][InMinigame] = false;
-    gRampageMission[playerid][Active] = false;
+    gRampageMission[playerid][Active] = false;    
 
     TextDrawHideForPlayer(playerid, gRampageMission[playerid][InfoText]);
 

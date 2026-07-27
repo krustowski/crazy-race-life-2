@@ -8,7 +8,7 @@
 //
 
 #define MAX_RACE_NAME		64
-#define MAX_RACE_CP		99
+#define MAX_RACE_CP			99
 #define MAX_RACE_COORD		3
 #define MAX_RACE_COUNT		64
 

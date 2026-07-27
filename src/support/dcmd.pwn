@@ -78,6 +78,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(kick, 4, cmdtext);           //rcon +
 	dcmd(lvl, 3, cmdtext);            //rcon + lvl 4
 	dcmd(nitro, 5, cmdtext);          //rcon + lvl 3
+	dcmd(npcrec, 6, cmdtext);          //rcon + lvl 4
 	dcmd(packet, 6, cmdtext);         //rcon +
 	dcmd(radio, 5, cmdtext);	  //rcon + lvl 4
 	dcmd(reset, 5, cmdtext);	  //rcon + lvl 4
@@ -1524,7 +1525,7 @@ dcmd_lvl(playerid, const params[])
 	gPlayers[targetId][AdminLevel] = targetLvl;
 	SavePlayerData(targetId);
 
-	new msg[64];
+	new msg[128];
 	GetLocalizedString(playerid, I18N_ADMIN_LVL_SET_FMT, msg, sizeof(msg));
 	format(msg, sizeof(msg), msg, adminName, playerName, targetId, targetLvl);
 	SendClientMessage(playerid, COLOR_GREY, msg);
@@ -1547,6 +1548,26 @@ dcmd_nitro(playerid, const params[])
 	new targetid = strval(params);
 
 	return SetPlayerVehicleNitro(playerid, targetid);
+}
+
+dcmd_npcrec(playerid, const params[])
+{
+#pragma unused params
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4) 
+	{
+		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+	}
+
+	if (gPlayers[playerid][EditingMode])
+	{
+		gPlayers[playerid][EditingMode] = false;
+		gPlayers[playerid][NPCRecording] = false;
+		StopRecordingPlayerData(playerid);
+
+		return SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] NPC Recording stopped!");
+	}
+
+	return ShowNPCRecordingDialog(playerid);
 }
 
 dcmd_packet(playerid, const params[])

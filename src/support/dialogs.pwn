@@ -117,7 +117,8 @@ enum
 	DIALOG_DEATHMATCH_OPTIONS,
 	DIALOG_TAXI_OPTIONS,
 	DIALOG_BRIBE_MAIN,
-	DIALOG_BRIBE_NOTE
+	DIALOG_BRIBE_NOTE,
+	DIALOG_NPC_RECORD_SUFFIX
 }
 
 enum
@@ -1139,7 +1140,7 @@ stock ShowCombatHelpDialog(playerid)
 stock ShowPropertyHelpDialog(playerid)
 {
 	new 
-		stringToPrint[2048] = "{FFD700}Properties{FFFFFF}\n\nA property is a special type of building that can be either bought (a personal property), or rented (a commercial one).\n\n{FFD700}Personal properties{FFFFFF}\n\nA personal property can be bought using a custom dialog window that is shown to player when enterying a green house pickup.\nThe cost of the personal property is set a bit high, but according to other costs/commissions in the game it is still affordabele.\nThe perosnal property has a common private interior with a palette of pickups (health, skins, drugz and the exit pickup).\nThe property can be sold too, but a 10% commission is taken by the real estate broker.\nA list of personal properties can be invoked using the {FFD700}/property{FFFFFF} command.\nThe personal property can be used as a spawn point and a custom vehicle can be attached to it as well.\n\n{FFD700}Commercial properties{FFFFFF}\n\nA commercial property is for rent only. It is usually a business located all across the map.\nWhen a player rents this type of property, a rent-lock is activated. This means that no player can rent it away from such player for 3 days.\nThe rented property generates a periodic commission, which is given to player in cash with a custom salary altogether.";
+		stringToPrint[2048] = "{FFD700}Properties{FFFFFF}\n\nA property is a special type of building that can be either bought (a personal property), or rented (a commercial one).\n\n{FFD700}Personal properties{FFFFFF}\n\nA personal property can be bought using a custom dialog window that is shown to player when enterying a green house pickup.\nThe cost of the personal property is set a bit high, but according to other costs/commissions in the game it is still affordabele.\nThe perosnal property has a common private interior with a palette of pickups (health, skins, drugz and the exit pickup).\nThe property can be sold too, but a 10%% commission is taken by the real estate broker.\nA list of personal properties can be invoked using the {FFD700}/property{FFFFFF} command.\nThe personal property can be used as a spawn point and a custom vehicle can be attached to it as well.\n\n{FFD700}Commercial properties{FFFFFF}\n\nA commercial property is for rent only. It is usually a business located all across the map.\nWhen a player rents this type of property, a rent-lock is activated. This means that no player can rent it away from such player for 3 days.\nThe rented property generates a periodic commission, which is given to player in cash with a custom salary altogether.";
 
 	return ShowPlayerDialog(playerid, DIALOG_PROPERTY_HELP, DIALOG_STYLE_MSGBOX, "Properties Info", stringToPrint, "Close", "");
 }
@@ -1199,6 +1200,7 @@ stock ShowHighScoresPlayTimeDialog(playerid)
 	if (!DB_GetRowCount(result))
 	{
 		print("ShowHighScoresPlayTimeDialog: nothing to load from the database");
+		DB_FreeResultSet(result);
 		return 1;
 	}
 
@@ -1253,7 +1255,7 @@ stock ShowHighScoresPropertiesDialog(playerid)
 	new
 		totalArea[4];
 
-	for (new i = 0; i < 4; i++)
+	for (new i = 0; i < sizeof(totalArea); i++)
 	{
 		new
 			query_total[128] = "SELECT COUNT(*) AS total FROM properties WHERE name LIKE '%s' AND type = 2";
@@ -1341,10 +1343,13 @@ stock ShowHighScoresDeathmatchDialog(playerid)
 	if (!DB_GetRowCount(result))
 	{
 		print("ShowHighScoresDeathmatchDialog: nothing to load from the database");
+		DB_FreeResultSet(result);
 		return 1;
 	}
 
-	new i = 1, stringToPrint[512] = "{FFD700}Top 5 Deathmatch winners:{FFFFFF}\n";
+	new
+		i = 1,
+		stringToPrint[512] = "{FFD700}Top 5 Deathmatch winners:{FFFFFF}\n";
 
 	do
 	{
@@ -1381,16 +1386,16 @@ stock ShowHighScoresMissionsDialog(playerid)
 		return 0;
 	}
 
-	new 
-		i = 1, 
+	new
+		i = 1,
 		stringToPrint[3048] = "{FFD700}Top 10 Taxi Mission players{FFFFFF}\n";
 
 	do
 	{
-		new 
-			nickname[MAX_PLAYER_NAME], 
-			areaid, 
-			area[32], 
+		new
+			nickname[MAX_PLAYER_NAME],
+			areaid,
+			area[32],
 			value;
 
 		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
@@ -1631,15 +1636,15 @@ stock ShowHighScoresCombatDialog(playerid)
 			case 1:
 				{
 					format(stringToPrint, sizeof(stringToPrint), "%s\n\n{FFD700}Combat Mission No. %2d{FFFFFF}\n\n", stringToPrint, missionid);
-					format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}1st: {00FF00}%2d{FFD700}\t\%s\n", stringToPrint, value, nickname);
+					format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}1st: {00FF00}%2d{FFD700}\t%s\n", stringToPrint, value, nickname);
 				}
 			case 2:
 				{
-					format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}2nd: {00FF00}%2d{FFD700}\t\%s\n", stringToPrint, value, nickname);
+					format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}2nd: {00FF00}%2d{FFD700}\t%s\n", stringToPrint, value, nickname);
 				}
 			case 3:
 				{
-					format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}3rd: {00FF00}%2d{FFD700}\t\%s\n", stringToPrint, value, nickname);
+					format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}3rd: {00FF00}%2d{FFD700}\t%s\n", stringToPrint, value, nickname);
 				}
 		}
 		i++;
@@ -1790,13 +1795,15 @@ stock ShowBlackMarketItemListDialog(playerid)
 		stringToPrint[1024],
 		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, 
 			"SELECT i.id, u.id AS uid, u.nickname, t.id AS tid, t.name, i.amount, i.value, p.price FROM (SELECT id, drug_type, settler_id, amount, value FROM black_market_items) i JOIN users u ON u.id = i.settler_id JOIN drug_types t ON t.id = i.drug_type JOIN drug_prices p ON p.id = i.drug_type");
-	if (!result) {
+	if (!result) 
+	{
 		print("Database error: cannot fetch black market items!");
 		return 1;
 	}
 
 	if (!DB_GetRowCount(result))
 	{
+		DB_FreeResultSet(result);
 		return SendClientMessage(playerid, COLOR_YELLOW, "[ MARKET ] No offers set on market!");
 	}
 
@@ -2072,4 +2079,9 @@ stock ShowRampageEditorLocationTypeDialog(playerid)
 		stringToPrint[128] = "None\nLas Venturas\nSan Fierro\nLos Santos";
 
 	return ShowPlayerDialog(playerid, DIALOG_RAMPAGE_EDITOR_LOCATION_TYPE, DIALOG_STYLE_LIST, "Rampage Editor: Location Type", stringToPrint, "Apply", "Close");
+}
+
+stock ShowNPCRecordingDialog(playerid)
+{
+	return ShowPlayerDialog(playerid, DIALOG_NPC_RECORD_SUFFIX, DIALOG_STYLE_INPUT, "NPC Recording Suffix", "Enter a suffix (xxx) for the recording file name (NPC_TRACK_xxx):\n\n", "Apply", "Cancel");
 }

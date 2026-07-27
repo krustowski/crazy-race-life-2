@@ -7,6 +7,10 @@
 //  includes.pwn
 //
 
+#define MAX_OBJECTS	2000
+#define MAX_PLAYERS 100
+
+#include <open.mp>
 
 //#include <a_mysql>
 #include <core>
@@ -21,7 +25,7 @@
 //
 
 #define DEBUG_ENABLED 	true
-#define SECOND_MS	1000
+#define SECOND_MS		1000
 
 #define SOUND_MUSIC10
 #define SOUND_OFF
@@ -82,6 +86,7 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 #include "modules/tutorial.pwn"
 #include "modules/bribe.pwn"
 #include "modules/tow.pwn"
+#include "modules/npcs.pwn"
 
 //
 //  Trucking subsystem.
@@ -105,6 +110,8 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 //
 //  Pickups, Objects, Vehicles, Texts, Mapicons...
 //
+
+//#include "support/models.pwn"
 
 #include "support/pickups.pwn"
 #include "support/objects.pwn"

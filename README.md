@@ -7,7 +7,7 @@ Live demo at:
 ```
 95.216.7.113:39876
 ```
-
+[![](https://widgets.gamemonitoring.net/servers/9019170/560x95.webp)](https://gamemonitoring.net/samp/servers/9019170)
 
 ## Features
 

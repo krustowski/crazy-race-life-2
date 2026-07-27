@@ -58,3 +58,4 @@ scriptfiles/
 */*/*.pem
 tmp/
 gnuplot.html
+npcmodes/

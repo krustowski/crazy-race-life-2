@@ -12,9 +12,7 @@
 new 
 	gAdminElevator;
 
-forward InitObjects();
-
-public InitObjects()
+stock InitObjects()
 {
 	//------------------------admin house
 	gAdminElevator = CreateObject(5837, 2303.207, 1174.944, 80.285, 0.0, 0.0, 142.812);

@@ -7,10 +7,10 @@
 //  combat.pwn
 //
 
-#define MAX_COMBAT_NPCS			25
-#define MAX_COMBAT_PICKUPS		20
-#define MAX_COMBAT_VEHICLES		5
-#define COMBAT_ACCURACY			0.15
+#define MAX_COMBAT_NPCS				25
+#define MAX_COMBAT_PICKUPS			20
+#define MAX_COMBAT_VEHICLES			5
+#define COMBAT_ACCURACY				0.15
 #define COMPAT_BRIEFCASE_DOLLARS	50000
 
 enum 

@@ -104,7 +104,7 @@ public InitPickups()
 	gHackerzInteriorEntrance = EnsurePickupCreated(1318, 1, 2866.62, -2125.24, 5.72);
 	gHackerzInteriorExit = EnsurePickupCreated(1318, 1, 2853.09, -2125.16, 0.19);
 	gHackerzMoneyBag = EnsurePickupCreated(1550, 1, 2838.59, -2141.25, 0.19);
-	gHackerBlackMarket = EnsurePickupCreated(PICKUP_SKULL, 1, 2836.32, -2137.32, 0.19);
+	//gHackerBlackMarket = EnsurePickupCreated(PICKUP_SKULL, 1, 2836.32, -2137.32, 0.19);
 
 	// ???
 	//picktunel = EnsurePickupCreated(1318, 1, 2263.41, -755.52, 38.04);
@@ -125,25 +125,25 @@ public InitPickups()
 	//  Drugz.
 	//
 
-	switch (random(2))
-	{
-		case 0:
-			{
-				// Dillimore
-				gDruggeryEntrance = EnsurePickupCreated(1318, 1, 645.68, -510.51, 16.33);
-				gDruggery = CreateObject(18056, 645.68, -510.51, 1500.00, 0.0, 0.0, 0.0, 0.0);
-				gDruggeryMarket = EnsurePickupCreated(PICKUP_SKULL, 1, 658.45, -507.50, 1500.00);
-				//gDruggeryExit = EnsurePickupCreated(1318, 1, 658.45, -507.50, 1500.00);
-			}
-		case 1:
-			{
-				// Montgomery
-				gDruggeryEntrance = EnsurePickupCreated(1318, 1, 1280.85, 304.07, 19.55);
-				gDruggery = CreateObject(18056, 1280.85, 304.07, 1500.00, 0.0, 0.0, 0.0, 0.0);
-				gDruggeryMarket = EnsurePickupCreated(PICKUP_SKULL, 1, 1293.66, 301.10, 1500.00);
-				//gDruggeryExit = EnsurePickupCreated(1318, 1, 1293.66, 301.10, 1500.00);
-			}
-	}
+	// switch (random(2))
+	// {
+	// 	case 0:
+	// 		{
+	// 			// Dillimore
+	// 			gDruggeryEntrance = EnsurePickupCreated(1318, 1, 645.68, -510.51, 16.33);
+	// 			gDruggery = CreateObject(18056, 645.68, -510.51, 1500.00, 0.0, 0.0, 0.0, 0.0);
+	// 			gDruggeryMarket = EnsurePickupCreated(PICKUP_SKULL, 1, 658.45, -507.50, 1500.00);
+	// 			//gDruggeryExit = EnsurePickupCreated(1318, 1, 658.45, -507.50, 1500.00);
+	// 		}
+	// 	case 1:
+	// 		{
+	// 			// Montgomery
+	// 			gDruggeryEntrance = EnsurePickupCreated(1318, 1, 1280.85, 304.07, 19.55);
+	// 			gDruggery = CreateObject(18056, 1280.85, 304.07, 1500.00, 0.0, 0.0, 0.0, 0.0);
+	// 			gDruggeryMarket = EnsurePickupCreated(PICKUP_SKULL, 1, 1293.66, 301.10, 1500.00);
+	// 			//gDruggeryExit = EnsurePickupCreated(1318, 1, 1293.66, 301.10, 1500.00);
+	// 		}
+	// }
 
 	//
 	//  Jobs/Teams.

@@ -7,7 +7,7 @@ new
 	// The very game clock's text
 	Text: gClockText,
 	// A minor hotfix not to change the world time on each tick
-	gPreviousHour;
+	gPreviousHour = -1;
 
 forward DrawClockText();
 
@@ -27,6 +27,11 @@ public DrawClockText()
 	// Redraw the clock text/string for all online players
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
+		if (!IsPlayerConnected(i))
+		{
+			continue;
+		}
+
 		TextDrawHideForPlayer(i, gClockText);
 		TextDrawSetString(gClockText, stringToPrint);
 		TextDrawShowForPlayer(i, gClockText);

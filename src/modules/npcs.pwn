@@ -18,7 +18,7 @@
 #define PETROL_VEHICLE_ID       584
 #define TRUCK_NPC_SKIN          7
 
-#define MAX_RACE_DRIVERS        1
+#define MAX_RACE_DRIVERS        2
 #define RACE_VEHICLE_ID         503
 #define RACE_NPC_SKIN           7
 
@@ -52,7 +52,8 @@ new
     bool: gTruckPlaybackStarted[MAX_TRUCK_DRIVERS];
 
 new const Float:gRaceSpawnData[][4] = {
-    {-2005.57, 320.18, 35.01, 199.93}
+    {-2005.57, 320.18, 35.01, 199.93},
+    {-2017.07, -2499.41, 32.53, 177.06}
 };
 
 new const Float:gTaxiSpawnData[][4] = {

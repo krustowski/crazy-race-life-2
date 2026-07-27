@@ -86,6 +86,10 @@ enum Player
 	NewRaceID,
 	RacesHSOffset,
 
+	bool: NPCRecording,
+	NPCRecordNo,
+	NPCRecordSuffix[16],
+
 	// To precompile and save the currently online player list mappings to the dialog-controlled listitem values.
 	OnlinePlayerList[MAX_PLAYERS],
 
@@ -105,8 +109,51 @@ forward SendPlayerSalary();
 forward UpdatePlayerPlayTime();
 forward UpdatePlayerScore();
 forward UpdateDrugMissionInfoText(playerid);
+forward UpdateBlackMarketRatio();
 
 #include "modules/drugz.pwn"
+
+public UpdateBlackMarketRatio()
+{
+	new
+		// Symmetric step: -0.20 to +0.20 of current ratio
+		Float: step = floatdiv(float(random(MARKET_STEP_PERCENT * 2 + 1) - MARKET_STEP_PERCENT), 100.0),
+		// Mean reversion: pull toward equilibrium proportional to distance
+		Float: reversion = floatmul(MARKET_REVERSION_RATE, MARKET_RATIO_EQULIBRIUM - gBlackMarketRatio);
+
+	// Update raw value of the market ratio
+	gBlackMarketRatio = gBlackMarketRatio + step + reversion;
+
+	// Hard clamps
+	if (gBlackMarketRatio < MARKET_RATIO_MIN)
+	{
+		gBlackMarketRatio = MARKET_RATIO_MIN;
+	}
+
+	if (gBlackMarketRatio > MARKET_RATIO_MAX)
+	{
+		gBlackMarketRatio = MARKET_RATIO_MAX;
+	}
+
+	// Ratio update message broadcasting
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i) || gPlayers[i][TeamID] != TEAM_DEALERS)
+		{
+			continue;
+		}
+
+		new 
+			msg[64];
+		GetLocalizedString(i, I18N_BLACK_MARKET_RATIO_UPDATE, msg, sizeof(msg));
+
+		format(msg, sizeof(msg), msg,
+				gBlackMarketRatio
+			);
+
+		SendClientMessage(i, COLOR_ORANGE, msg);
+	}
+}
 
 public UpdateDrugMissionInfoText(playerid)
 {
@@ -508,7 +555,7 @@ public UpdatePlayerPlayTime()
 {
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if (!IsPlayerConnected(i))
+		if (!IsPlayerConnected(i) || !gPlayers[i][IsLogged])
 		{
 			return 1;	
 		}
@@ -521,11 +568,11 @@ public UpdatePlayerPlayTime()
 
 public UpdatePlayerScore()
 {
-	for (new i; i < MAX_PLAYERS; i++)
+	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if (!IsPlayerConnected(i))
+		if (!IsPlayerConnected(i) || !gPlayers[i][IsLogged])
 		{
-			return 1;	
+			return 1;
 		}
 
 		SetPlayerScore(i, GetPlayerMoney(i));
@@ -1133,6 +1180,19 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 					return 1;
 				}
 
+				if (gPlayers[playerid][NPCRecording])
+				{
+					StopRecordingPlayerData(playerid);
+
+					new
+						recordName[64];
+					format(recordName, sizeof(recordName), "NPC_TRACK_%s_%d", gPlayers[playerid][NPCRecordSuffix], ++gPlayers[playerid][NPCRecordNo]);
+
+					StartRecordingPlayerData(playerid, PLAYER_RECORDING_TYPE_DRIVER, recordName);
+
+					return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Another NPC recording started!");
+				}
+
 				if (gRampageEdit[playerid][Active])
 				{
 					switch (gRampageEdit[playerid][EditType])
@@ -1552,6 +1612,9 @@ stock ResetPlayerState(playerid)
 
 	// Reset locale to English
 	gPlayers[playerid][Locale] = LOCALE_EN;
+
+	gPlayers[playerid][NPCRecording] = false;
+	gPlayers[playerid][NPCRecordNo] = 0;
 
 	return 1;
 }

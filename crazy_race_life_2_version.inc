@@ -3,5 +3,5 @@
 // To update the version number for a new release, run "sampctl release"
 
 #define CRAZY_RACE_LIFE_2_VERSION_MAJOR (0)
-#define CRAZY_RACE_LIFE_2_VERSION_MINOR (10)
-#define CRAZY_RACE_LIFE_2_VERSION_PATCH (8)
+#define CRAZY_RACE_LIFE_2_VERSION_MINOR (11)
+#define CRAZY_RACE_LIFE_2_VERSION_PATCH (0)

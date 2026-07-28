@@ -543,6 +543,13 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 {
 	SendDeathMessage(killerid, playerid, reason);
 
+	// Dying does not fire OnPlayerExitVehicle, so the player stays attached
+	// to their vehicle server-side.
+	if (IsPlayerInAnyVehicle(playerid))
+	{
+		RemovePlayerFromVehicle(playerid);
+	}
+
 	// Hide velocity meters.
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 

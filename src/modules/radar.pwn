@@ -3,13 +3,14 @@
 #endif
 #define _CRL2_RADAR
 
-new RADAR_FEE = 500;
+new const
+	RADAR_FEE = 500;
 
 enum E_POSITION
 {
 	Float:E_POSITION_X,
-     	Float:E_POSITION_Y,
-        Float:E_POSITION_Z
+    Float:E_POSITION_Y,
+    Float:E_POSITION_Z
 }
 
 // Global variables to track the player's position and state.
@@ -22,7 +23,7 @@ new
 //new Text:KPH[MAX_PLAYERS];
 //new Text:KPHR[MAX_PLAYERS];
 
-new Text:gVehicleStatesText[MAX_PLAYERS];
+new Text: gVehicleStatesText[MAX_PLAYERS];
 
 new Float: gRadarPositions[][4] =
 {
@@ -52,7 +53,14 @@ public OnRadarCheckpoint()
 			continue;
 		}
 
-		new stringToPrint[256], Float:radarValue, Float:radarDistance, Float:radarX, Float:radarY, Float:radarZ, Float:vehicleHelth;
+		new 
+			stringToPrint[256], 
+			Float: radarValue, 
+			Float: radarDistance, 
+			Float: radarX, 
+			Float: radarY, 
+			Float: radarZ, 
+			Float: vehicleHelth;
 
 		// Fetch the current player's position.
 		GetPlayerPos(i, radarX, radarY, radarZ);

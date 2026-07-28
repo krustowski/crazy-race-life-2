@@ -58,4 +58,7 @@ scriptfiles/
 */*/*.pem
 tmp/
 gnuplot.html
-npcmodes/
+npcmodes/*.pwn
+
+# Generated MkDocs site
+site/

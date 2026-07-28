@@ -1,0 +1,72 @@
+site_name: CrazyRaceLife2 (CRL2)
+site_description: Documentation for the CrazyRaceLife2 SA-MP/openMP gamemode
+docs_dir: docs
+dev_addr: 0.0.0.0:8000
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - toc.follow
+    - search.suggest
+    - content.code.copy
+
+markdown_extensions:
+  - tables
+  - toc:
+      permalink: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Architecture: architecture.md
+  - Database Schema: database.md
+  - Commands Reference: commands.md
+  - Localization: localization.md
+  - Modules:
+      - modules/index.md
+      - Anti-Cheat: modules/anticheat.md
+      - Authentication: modules/auth.md
+      - Banking: modules/bank.md
+      - Police Bribes: modules/bribe.md
+      - Combat Missions: modules/combat.md
+      - Deathmatch: modules/deathmatch.md
+      - Drugs: modules/drugz.md
+      - NPC Drivers: modules/npcs.md
+      - Player Core: modules/player.md
+      - Racing: modules/race.md
+      - Radar: modules/radar.md
+      - Rampage Missions: modules/rampage.md
+      - Real Estate: modules/real.md
+      - Taxi Missions: modules/taxi.md
+      - Teams: modules/team.md
+      - Tow Missions: modules/tow.md
+      - Trucking Missions: modules/trucking.md
+      - Tutorial: modules/tutorial.md
+  - Support Systems:
+      - World & Visuals: support/world-and-visuals.md
+      - Player UI & Interaction: support/player-ui.md
+      - Infrastructure: support/infrastructure.md
+  - Appendix:
+      - sampctl CLI: sampctl-docs.md

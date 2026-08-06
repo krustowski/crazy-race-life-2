@@ -58,6 +58,7 @@ enum Player
 	bool: InsideProperty,
 	bool: EditingMode,
 	bool: DialogShown,
+	bool: TeamMenuShown,
 	bool: Listening,
 	bool: InMinigame,
 	bool: SwitchedControllers,
@@ -518,7 +519,7 @@ public SendPlayerSalary()
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if (!IsPlayerConnected(i)) 
+		if (!IsPlayerConnected(i) || !gPlayers[i][IsLogged]) 
 		{
 			continue;
 		}
@@ -557,7 +558,7 @@ public UpdatePlayerPlayTime()
 	{
 		if (!IsPlayerConnected(i) || !gPlayers[i][IsLogged])
 		{
-			return 1;	
+			continue;	
 		}
 
 		gPlayers[i][PlayTime] += 5000;
@@ -572,7 +573,7 @@ public UpdatePlayerScore()
 	{
 		if (!IsPlayerConnected(i) || !gPlayers[i][IsLogged])
 		{
-			return 1;
+			continue;
 		}
 
 		SetPlayerScore(i, GetPlayerMoney(i));
@@ -1002,7 +1003,21 @@ stock bool: IsPlayerInTeam(playerid, PLAYER_TEAM: teamid)
 forward SpawnPlayerDelayed(playerid);
 public SpawnPlayerDelayed(playerid)
 {
+	// Death doesn't fire OnPlayerExitVehicle, so a player who died in a vehicle
+	// is still attached to it server-side. open.mp's own SpawnPlayer() docs warn
+	// it "kills the player if they are in a vehicle" (broken respawn) when called
+	// like that, and RemovePlayerFromVehicle() needs a tick to actually take
+	// effect, so detach first and only spawn once they're confirmed on foot.
+	if (IsPlayerInAnyVehicle(playerid))
+	{
+		RemovePlayerFromVehicle(playerid);
+		SetTimerEx("SpawnPlayerDelayed", 100, false, "i", playerid);
+		return 1;
+	}
+
 	SpawnPlayer(playerid);
+
+	return 1;
 }
 
 #include "modules/real.pwn"

@@ -543,13 +543,6 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 {
 	SendDeathMessage(killerid, playerid, reason);
 
-	// Dying does not fire OnPlayerExitVehicle, so the player stays attached
-	// to their vehicle server-side.
-	if (IsPlayerInAnyVehicle(playerid))
-	{
-		RemovePlayerFromVehicle(playerid);
-	}
-
 	// Hide velocity meters.
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
@@ -597,7 +590,7 @@ public OnPlayerDeath(playerid, killerid, WEAPON:reason)
 
 	SetPlayerHealth(playerid, 100.0);
 
-	SetTimerEx("SpawnPlayerDelayed", 250, false, "i", playerid);
+	SetTimerEx("SpawnPlayerDelayed", 500, false, "i", playerid);
 
 	return 1;
 }
@@ -892,15 +885,15 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		return 1;
 	}
 
-	// Druggery
-	if (CheckDruggeryPointPickup(playerid, pickupid))
+	if (CheckMedicalPickup(playerid, pickupid))
 	{
 		return 1;
 	}
 
-	// 
-	//  Rampage
-	//
+	if (CheckDruggeryPointPickup(playerid, pickupid))
+	{
+		return 1;
+	}
 
 	if (CheckRampagePickup(playerid, pickupid))
 	{
@@ -923,24 +916,21 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 			break;
 		}
 
-		/*if (gPlayers[playerid][DialogShown])
-		{
-			continue;
-		}*/
-
 		return ShowBankOptionsDialog(playerid);
 	}
 
 	//
-	//  Various jobs/teams pickups.
+	//  Various jobs/teams pickups
 	//
 
 	for (new i = 0; i < MAX_TEAMS; i++)
 	{
 		for (new j = 0; j < MAX_TEAM_PICKUPS; j++)
 		{
-			if (pickupid == _: gTeams[i][Pickups][j])
+			if (pickupid == _: gTeams[i][Pickups][j] && !gPlayers[playerid][TeamMenuShown])
 			{
+				gPlayers[playerid][TeamMenuShown] = true;
+
 				return ShowMenuForPlayer(Menu:gTeams[i][Menus][0], playerid);
 			}
 		}
@@ -961,7 +951,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	}
 
 	//
-	//  Real Estate pickups.
+	//  Real Estate pickups
 	//
 
 	if (CheckRealEstatePickup(playerid, pickupid))
@@ -970,7 +960,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	}
 
 	//
-	//  Drugz.
+	//  Drugz
 	//
 
 	if (CheckDrugzPickup(playerid, pickupid))
@@ -984,7 +974,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	}
 
 	//
-	//  Other pickups --- entries, baggies etc.
+	//  Other pickups --- entries, baggies etc
 	//
 
 	if (CheckGenericPickup(playerid, pickupid))
@@ -998,7 +988,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	}
 
 	//
-	//  Death pickups.
+	//  Death pickups
 	//
 
 	if (CheckDeathMoneyPickup(playerid, pickupid))
@@ -1011,9 +1001,11 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 
 public OnPlayerSelectedMenuRow(playerid, row)
 {
-	new 
-		Menu: currentMenu = GetPlayerMenu(playerid), 
+	new
+		Menu: currentMenu = GetPlayerMenu(playerid),
 		stringToPrint[256];
+
+	gPlayers[playerid][TeamMenuShown] = false;
 
 	if (row == 2)
 	{
@@ -1025,8 +1017,10 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		ResetPlayerWeapons(playerid);
 		gPlayers[playerid][TeamID] = TEAM_NONE;
 
-		SendClientMessage(playerid, COLOR_GREY, "[ TEAM ] You left the team!");
 		SetPlayerTeam(playerid, 0);
+		SetPlayerColor(playerid, COLOR_WHITE);
+
+		SendClientMessage(playerid, COLOR_GREY, "[ TEAM ] You left the team!");
 
 		return 1;
 	}
@@ -1060,6 +1054,8 @@ public OnPlayerSelectedMenuRow(playerid, row)
 
 public OnPlayerExitedMenu(playerid)
 {
+	gPlayers[playerid][TeamMenuShown] = false;
+
 	return 1;
 }
 

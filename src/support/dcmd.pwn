@@ -118,15 +118,17 @@ dcmd_afk(playerid, const params[])
 		return SendClientMessageLocalized(playerid, I18N_AFK_CMD_DEATHMATCH_BLOCK);
 	}
 
-	new stringToPrint[256], stringID;
+	new 
+		stringToPrint[256], 
+		stringID;
 
 	if (!gPlayers[playerid][AFK])
 	{
 		stringID = I18N_AFK_CMD_APPLIED;
 
-		new playerAFKName[MAX_PLAYER_NAME];
-		format(playerAFKName, sizeof(playerAFKName), "%s_AFK", gPlayers[playerid][Name]);
-		SetPlayerName(playerid, playerAFKName);
+		//new playerAFKName[MAX_PLAYER_NAME];
+		//format(playerAFKName, sizeof(playerAFKName), "%s_AFK", gPlayers[playerid][Name]);
+		//SetPlayerName(playerid, playerAFKName);
 
 		// Lock the player's animations.
 		TogglePlayerControllable(playerid, false);
@@ -137,7 +139,7 @@ dcmd_afk(playerid, const params[])
 	{
 		stringID = I18N_AFK_CMD_REVERTED;
 
-		SetPlayerName(playerid, gPlayers[playerid][Name]);
+		//SetPlayerName(playerid, gPlayers[playerid][Name]);
 
 		// Re-enable player's animations.
 		TogglePlayerControllable(playerid, true);
@@ -343,7 +345,8 @@ dcmd_fix(playerid, const params[])
 		return SendUsageMessage(playerid, "/fix [playerID]");
 	}
 
-	new targetid = strval(params);
+	new 
+		targetid = strval(params);
 
 	if (!IsPlayerConnected(targetid))
 	{
@@ -355,7 +358,8 @@ dcmd_fix(playerid, const params[])
 		return SendClientMessageLocalized(playerid, I18N_FIX_CMD_TARGET_NOT_IN_VEHICLE);
 	}
 
-	new Float: vehicleHealth;
+	new 
+		Float: vehicleHealth;
 	GetVehicleHealth(GetPlayerVehicleID(targetid), vehicleHealth);
 
 	if (vehicleHealth >= 1000.0)
@@ -363,7 +367,10 @@ dcmd_fix(playerid, const params[])
 		return SendClientMessageLocalized(playerid, I18N_FIX_CMD_NO_REPAIRING);
 	}
 
-	new Float: pX, Float: pY, Float: pZ;
+	new 
+		Float: pX, 
+		Float: pY, 
+		Float: pZ;
 	GetPlayerPos(playerid, pX, pY, pZ);
 
 	if (!IsPlayerInSphere(targetid, pX, pY, pZ, 10.0))
@@ -374,7 +381,9 @@ dcmd_fix(playerid, const params[])
 	SetVehicleHealth(GetPlayerVehicleID(targetid), 1000.0);
 	RepairVehicle(GetPlayerVehicleID(targetid));
 
-	new commission = 1500 + random(1000), stringToPrint[128];
+	new 
+		commission = 1500 + random(1000), 
+		stringToPrint[128];
 	GivePlayerMoney(playerid, commission);
 
 	GetLocalizedString(playerid, I18N_FIX_CMD_COMMISSION_FMT, stringToPrint, sizeof(stringToPrint));
@@ -496,8 +505,27 @@ dcmd_kill(playerid, const params[])
 		SendClientMessage(i, COLOR_BROWN, stringToPrint);
 	}
 
-	SetPlayerHealth(playerid, 0);
+	// RemovePlayerFromVehicle() needs a tick to actually take effect; killing
+	// the player in the same call still finds them "in a vehicle" and leaves
+	// the camera stuck until they manually press F. Give it a beat.
+	if (IsPlayerInAnyVehicle(playerid))
+	{
+		RemovePlayerFromVehicle(playerid);
+		SetTimerEx("KillPlayerDelayed", 100, false, "i", playerid);
+	}
+	else
+	{
+		SetPlayerHealth(playerid, 0);
+	}
 
+	return 1;
+}
+
+forward KillPlayerDelayed(playerid);
+
+public KillPlayerDelayed(playerid)
+{
+	SetPlayerHealth(playerid, 0);
 	return 1;
 }
 
@@ -1234,10 +1262,6 @@ dcmd_elevator(playerid, const params[])
 	{
 		MoveObject(gAdminElevator, 2303.207, 1174.944, 80.285, 3.0, 0.0, 0.0, 142.812);
 
-		new msg[64];
-		GetLocalizedString(playerid, I18N_AE_MOVE_UP, msg, sizeof(msg));
-		//format(msg, sizeof(msg), msg);
-
 		for (new i = 0; i < MAX_PLAYERS; i++)
 		{
 			if (!IsPlayerConnected(i))
@@ -1245,17 +1269,13 @@ dcmd_elevator(playerid, const params[])
 				continue;
 			}
 
-			SendClientMessage(i, COLOR_YELLOW, msg);
+			SendClientMessageLocalized(i, I18N_AE_MOVE_UP);
 		}
 	}
 	else if (!strcmp(params, "stop"))
 	{
 		StopObject(gAdminElevator);
 
-		new msg[64];
-		GetLocalizedString(playerid, I18N_AE_MOVE_STOP, msg, sizeof(msg));
-		//format(msg, sizeof(msg), msg);
-
 		for (new i = 0; i < MAX_PLAYERS; i++)
 		{
 			if (!IsPlayerConnected(i))
@@ -1263,17 +1283,13 @@ dcmd_elevator(playerid, const params[])
 				continue;
 			}
 
-			SendClientMessage(i, COLOR_YELLOW, msg);
+			SendClientMessageLocalized(i, I18N_AE_MOVE_STOP);
 		}
 	}
 	else if (!strcmp(params, "down"))
 	{
 		MoveObject(gAdminElevator, 2303.207, 1174.944, 11.260, 3.0, 0.0, 0.0, 0.0);
 
-		new msg[64];
-		GetLocalizedString(playerid, I18N_AE_MOVE_DOWN, msg, sizeof(msg));
-		//format(msg, sizeof(msg), msg);
-
 		for (new i = 0; i < MAX_PLAYERS; i++)
 		{
 			if (!IsPlayerConnected(i))
@@ -1281,7 +1297,7 @@ dcmd_elevator(playerid, const params[])
 				continue;
 			}
 
-			SendClientMessage(i, COLOR_YELLOW, msg);
+			SendClientMessageLocalized(i, I18N_AE_MOVE_DOWN);
 		}
 	}
 	else
@@ -1886,12 +1902,12 @@ dcmd_weapons(playerid, const params[])
 }
 
 new
-	gGangZone[384];
+	gGangZone[MAX_PROPERTIES] = {INVALID_GANG_ZONE, ...};
 
 dcmd_zone(playerid, const params[])
 {
 #pragma unused params
-	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4)
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
 	{
 		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
 	}
@@ -1899,12 +1915,18 @@ dcmd_zone(playerid, const params[])
 	new
 		query[] = "select c.primary_x, c.primary_y, t.color from property_coords AS c JOIN properties AS p ON p.id = c.property_id JOIN users AS u ON u.id = p.user_id JOIN teams AS t ON t.id = u.team where c.type = 8 AND p.user_id > 0";
 
-	new 
+	new
 		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 
 	if (!result)
 	{
 		print(query);
+		return 1;
+	}
+
+	if (!DB_GetRowCount(result))
+	{
+		DB_FreeResultSet(result);
 		return 1;
 	}
 
@@ -1922,8 +1944,22 @@ dcmd_zone(playerid, const params[])
 		DB_GetFieldStringByName(result, "color", colorString, sizeof(colorString));
 		color = HexToInt(colorString);
 
-		gGangZone[i] = CreatePlayerGangZone(playerid, X - 100, Y - 100, X + 100, Y + 100);
+		if (IsValidPlayerGangZone(playerid, gGangZone[i]))
+		{
+			PlayerGangZoneDestroy(playerid, gGangZone[i]);
+			gGangZone[i] = INVALID_GANG_ZONE;
+		}
+
+		new
+			const ZONE_OFFSET = 50;
+
+		gGangZone[i] = CreatePlayerGangZone(playerid, X - ZONE_OFFSET, Y - ZONE_OFFSET, X + ZONE_OFFSET, Y + ZONE_OFFSET);
 		PlayerGangZoneShow(playerid, gGangZone[i], color);
+
+		if (i + 1 == MAX_PROPERTIES)
+		{
+			break;
+		}
 
 		i++;
 	}

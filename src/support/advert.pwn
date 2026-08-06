@@ -5,6 +5,9 @@
 
 forward ShowAdvert();
 
+new
+	lastAdvertNo = -1;
+
 new advertList[][PlayerLocale][] =
 {
 	//
@@ -53,6 +56,22 @@ new advertList[][PlayerLocale][] =
 	{
 		"[ GAME ] Any substance or stuff can be saved at your propriety. Go buy one!",
 		"[ HRA ] Jakekoliv substance nebo propriety lze ulozit ve vlastni nemovitosti. Nevahej a kup si jednu!"
+	},
+	{
+		"[ TIP ] New around here? Type /tut to track your progress through the new player tutorial",
+		"[ TIP ] Jsi tu novy? Napis /tut a sleduj svuj postup v tutorialu pro nove hrace"
+	},
+	{
+		"[ TIP ] Press the Y key to open your cellphone menu - call a mechanic, a taxi, or check your bank balance",
+		"[ TIP ] Zmackni klavesu Y a otevri si menu mobilu - zavolej mechanika, taxikare nebo si zkontroluj zustatek v bance"
+	},
+	{
+		"[ INFO ] This server speaks your language! Switch between English and Czech anytime using /locale",
+		"[ INFO ] Tenhle server mluvi tvou reci! Kdykoliv muzes prepnout mezi anglictinou a cestinou prikazem /locale"
+	},
+	{
+		"[ GAME ] Keep an eye out for the orange Pumpkin pickups too - they're worth $1.5M!",
+		"[ HRA ] Davej pozor i na oranzove Pumpkin sosky - maji cenu 1.5M dolaru!"
 	},
 	//
 	//  Racing
@@ -104,6 +123,42 @@ new advertList[][PlayerLocale][] =
 		"[ TIP ] Nudi te spawn bod na vrcholku pyramidy v LV? Kup si svou nemovitost a nastav si spawn bod u ni prikazem /property!"
 	},
 	//
+	//  Teams
+	//
+	{
+		"[ TIP ] Want to talk to your team only? Start your message with ! to use Team Chat",
+		"[ TIP ] Chces mluvit jen se svym tymem? Zacni zpravu vykricnikem (!) a pouzijes Tymovy chat"
+	},
+	//
+	//  Missions
+	//
+	{
+		"[ TIP ] Prefer heavy loads? Try the Trucking missions using /truck!",
+		"[ TIP ] Mas radsi tezky naklad? Zkus kamionacke mise pomoci prikazu /truck!"
+	},
+	{
+		"[ TIP ] Spot an abandoned car lying around? Impound it with a Tow mission: /tow!",
+		"[ TIP ] Vsimnul sis nekde opusteneho auta? Odtahni ho pomoci Tow mise: prikaz /tow!"
+	},
+	//
+	//  Police & Wanted
+	//
+	{
+		"[ GAME ] Wanted level too high? Find a hidden Police Bribe pickup to make it disappear",
+		"[ HRA ] Mas moc vysoky wanted level? Najdi schovany Bribe pickup pro policii a zbav se ho"
+	},
+	{
+		"[ TIP ] Check who's currently wanted by the police with /wanted",
+		"[ TIP ] Zjisti, kdo je prave hledany policii, pomoci prikazu /wanted"
+	},
+	//
+	//  Trivia
+	//
+	{
+		"[ TRIVIA ] Did you know? CrazyRaceLife2 is a revival of the original CrazyRaceLife gamemode from 2008-2010!",
+		"[ TRIVIA ] Vedel jsi, ze? CrazyRaceLife2 je znovuzrozeni puvodniho gamemodu CrazyRaceLife z let 2008-2010!"
+	},
+	//
 	//  Endtip
 	//
 	{
@@ -114,7 +169,8 @@ new advertList[][PlayerLocale][] =
 
 public ShowAdvert()
 {
-	new advertId = random(sizeof(advertList));
+	new 
+		advertId = random(sizeof(advertList));
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -122,6 +178,14 @@ public ShowAdvert()
 		{
 			continue;
 		}
+
+		if (advertId == lastAdvertNo)
+		{
+			advertId++;
+			advertId %= sizeof(advertList);
+		}
+
+		lastAdvertNo = advertId;
 
 		SendClientMessage(i, COLOR_WHITE, advertList[advertId][ gPlayers[i][Locale] ]);
 	}

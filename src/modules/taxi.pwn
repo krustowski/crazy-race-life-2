@@ -8,6 +8,8 @@
 //  Taxi-related module
 //
 
+#define MAX_TAXI_NPCS	50
+
 enum
 {
 	AREA_LV,
@@ -205,11 +207,13 @@ stock CheckTaxiMissionCheckpoint(playerid)
 	DisablePlayerRaceCheckpoint(playerid);
 	SetVehicleVelocity(GetPlayerVehicleID(playerid), 0.0, 0.0, 0.0);
 
-	new commission = 5000 + (floatround(gTaxiMission[playerid][CommissionCoef] * (random(++gTaxiMission[playerid][DoneCount]) + 1) * 2500));
+	new
+		commission = 5000 + (floatround(gTaxiMission[playerid][CommissionCoef] * (random(++gTaxiMission[playerid][DoneCount]) + 1) * 2500));
 	GivePlayerMoney(playerid, commission);
 	gTaxiMission[playerid][Earned] += commission;
 
-	new stringToPrint[128];
+	new
+		stringToPrint[128];
 	format(stringToPrint, sizeof(stringToPrint), gI18nMessages[I18N_TAXI_MISS_COMMISSION][ gPlayers[playerid][Locale] ], commission);
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 
@@ -229,7 +233,13 @@ stock CheckTaxiMissionCheckpoint(playerid)
 
 stock SetTaxiMissionCheckpoint(playerid)
 {
-	new area[24], name[64], Float: X, Float: Y, Float: Z, query[256];
+	new
+		area[24],
+		name[64],
+		Float: X,
+		Float: Y,
+		Float: Z,
+		query[256];
 
 	switch (gTaxiMission[playerid][AreaID])
 	{
@@ -255,7 +265,8 @@ stock SetTaxiMissionCheckpoint(playerid)
 
 	for (;;)
 	{
-		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		new 
+			DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result) 
 		{
 			SendClientMessageLocalized(playerid, I18N_TAXI_MISS_DB_READ_ERROR);
@@ -280,7 +291,10 @@ stock SetTaxiMissionCheckpoint(playerid)
 		break;
 	}
 
-	new Float: pX, Float: pY, Float: pZ;
+	new
+		Float: pX, 
+		Float: pY, 
+		Float: pZ;
 	GetPlayerPos(playerid, pX, pY, pZ);
 
 	gTaxiMission[playerid][CommissionCoef] = (floatabs(pX - X) / 3000 + floatabs(pY - Y) / 3000) / 2;
@@ -300,7 +314,12 @@ stock SetTaxiMissionCheckpoint(playerid)
 
 stock SetTaxiMissionCustomerPos(playerid)
 {
-	new area[24], Float: X, Float: Y, Float: Z, query[256];
+	new
+		area[24],
+		Float: X,
+		Float: Y,
+		Float: Z,
+		query[256];
 	
 	switch (gTaxiMission[playerid][AreaID])
 	{
@@ -327,7 +346,8 @@ stock SetTaxiMissionCustomerPos(playerid)
 	// Set iteration limit to 250, so the last is used if not anything closer appears...
 	for (new i = 0; i < 250; i++)
 	{
-		new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		new 
+			DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 		if (!result) 
 		{
 			SendClientMessageLocalized(playerid, I18N_TAXI_MISS_DB_READ_ERROR);
@@ -367,11 +387,13 @@ stock SetTaxiMissionCustomer(playerid)
 		return SetTaxiMissionCustomerPos(playerid);
 	}
 
-	new npcs[25];
+	new 
+		npcs[MAX_TAXI_NPCS];
 	NPC_GetAll(npcs, sizeof(npcs));
 
-	new preid = -1;
-	for (new i = 0; i < 25; i++)
+	new
+		preid = -1;
+	for (new i = 0; i < MAX_TAXI_NPCS; i++)
 	{
 		if (!NPC_IsValid(npcs[i]))
 		{
@@ -382,18 +404,22 @@ stock SetTaxiMissionCustomer(playerid)
 
 	if (preid == -1)
 	{
-		return SendClientMessageLocalized(playerid, I18N_TAXI_MISS_TOO_MANY_CUSTOMERS);
+		SendClientMessageLocalized(playerid, I18N_TAXI_MISS_TOO_MANY_CUSTOMERS);
+		return 0;
 	}
 
-	new npc_name[MAX_PLAYER_NAME];
+	new
+		npc_name[MAX_PLAYER_NAME];
 	format(npc_name, sizeof(npc_name), "[NPC]taxi_cust%d", preid);
 
-	new npcid = NPC_Create(npc_name);
+	new
+		npcid = NPC_Create(npc_name);
 
 	if (npcid == INVALID_NPC_ID)
 	{
 		print(npc_name);
-		return SendClientMessageLocalized(playerid, I18N_TAXI_MISS_TOO_MANY_CUSTOMERS);
+		SendClientMessageLocalized(playerid, I18N_TAXI_MISS_TOO_MANY_CUSTOMERS);
+		return 0;
 	}
 
 	NPC_Spawn(npcid);
@@ -405,7 +431,8 @@ stock SetTaxiMissionCustomer(playerid)
 
 stock IsPlayerInTaxiCab(playerid)
 {
-	new modelid = GetVehicleModel(GetPlayerVehicleID(playerid));
+	new
+		modelid = GetVehicleModel(GetPlayerVehicleID(playerid));
 
 	if (modelid != 420 && modelid != 438)
 	{
@@ -432,11 +459,20 @@ stock SetPlayerTaxiMission(playerid, areaid)
 		return SendClientMessageLocalized(playerid, I18N_TAXI_MISS_WRONG_VEHICLE);
 	}
 
+	if (!IsPlayerInTeam(playerid, TEAM_TAXIMEN))
+	{
+		return SendClientMessageLocalized(playerid, I18N_TAXI_MISS_WRONG_TEAM);
+	}
+
 	gTaxiMission[playerid][AreaID] = areaid;
 	gTaxiMission[playerid][VehicleID] = GetPlayerVehicleID(playerid);
 
 	gTaxiMission[playerid][NPCid] = -1;
-	SetTaxiMissionCustomer(playerid);
+
+	if (!SetTaxiMissionCustomer(playerid))
+	{
+		return 1;
+	}
 
 	gPlayers[playerid][InMinigame] = true;
 
@@ -500,8 +536,8 @@ stock SaveTaxiMissionScore(playerid)
 		return 1;
 	}
 
-	new query[256];
-
+	new
+		query[256];
 	format(query, sizeof(query), "INSERT INTO high_scores (type, spec_id, value, user_id) VALUES (%d, '%d', %d, %d)",
 			3,
 			gTaxiMission[playerid][AreaID],
@@ -509,7 +545,8 @@ stock SaveTaxiMissionScore(playerid)
 			gPlayers[playerid][OrmID]
 	      );
 
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
 	{
 		print("Database error: cannot write high scores data!");

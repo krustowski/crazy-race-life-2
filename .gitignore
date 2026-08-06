@@ -62,3 +62,8 @@ npcmodes/*.pwn
 
 # Generated MkDocs site
 site/
+
+# mapcheck: generated from a real GTA:SA install, not distributable
+utils/mapcheck/cadb-gen/*.cadb
+utils/mapcheck/cadb-gen/cadb-gen
+utils/mapcheck

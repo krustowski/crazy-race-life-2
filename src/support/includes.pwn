@@ -7,8 +7,14 @@
 //  includes.pwn
 //
 
-#define MAX_OBJECTS	2000
-#define MAX_PLAYERS 100
+#define MAX_OBJECTS		2000
+#define MAX_PLAYERS 	100
+#define MAX_VEHICLES	2000
+
+#define STRONG_TAGS
+
+// Hotfix for the OOM errors
+#pragma dynamic 1000000
 
 #include <open.mp>
 

@@ -256,6 +256,7 @@ enum
 	I18N_COMBAT_MISS_ABORT,
 	I18N_COMBAT_MISS_FINISHED,
 	// Taxi
+	I18N_TAXI_MISS_WRONG_TEAM,
 	I18N_TAXI_MISS_WRONG_VEHICLE,
 	I18N_TAXI_MISS_NPC_ENTERING,
 	I18N_TAXI_MISS_COMMISSION,
@@ -512,6 +513,7 @@ new gI18nMessageColor[] =
 	COLOR_YELLOW,
 	COLOR_YELLOW,
 	// Taxi
+	COLOR_RED,
 	COLOR_RED,
 	COLOR_YELLOW,
 	COLOR_INVISIBLE,
@@ -1379,6 +1381,10 @@ new gI18nMessages[][PlayerLocale][MAX_MESSAGE_LEN] =
 	//
 	//  Taxi
 	//
+	{
+		"[ TAXI ] Not a Taximen team member!",
+		"[ TAXI ] Nejsi clenem tymu taxikaru!"
+	},
 	{
 		"[ TAXI ] Not a taxi cab!",
 		"[ TAXI ] Musis ridit taxi auto!"

@@ -177,34 +177,42 @@ stock ShowHighScoresRacesDialog(playerid, offset)
 			continue;
 		}
 
-		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFD700}Race No. %d{FFFFFF}\n\n1st\t{00FF00}%d:%02d{FFFFFF} min\t{FFD700}%s{FFFFFF}\t(model %d)\n", 
+		new
+			vehicleName[32];
+		GetVehicleNameByModel(gHighScores[i][VehicleModel][0], vehicleName);
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFD700}Race No. %d{FFFFFF}\n\n1st\t{00FF00}%d:%02d{FFFFFF} min\t{FFD700}%s{FFFFFF}\t(%s)\n", 
 				stringToPrint, 
 				i, 
 				(gHighScores[i][Time][0] / 1000) / 60,
 				(gHighScores[i][Time][0] / 1000) % 60,
 				gHighScores[i][Nickname1], 
-				gHighScores[i][VehicleModel][0]
+				vehicleName
 		      );
 
 		if (gHighScores[i][Time][1] != 0)
 		{
-			format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}2nd\t{00FF00}%d:%02d{FFFFFF} min\t{FFD700}%s{FFFFFF}\t(model %d)\n", 
+			GetVehicleNameByModel(gHighScores[i][VehicleModel][1], vehicleName);
+
+			format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}2nd\t{00FF00}%d:%02d{FFFFFF} min\t{FFD700}%s{FFFFFF}\t(%s)\n", 
 					stringToPrint,
 					(gHighScores[i][Time][1] / 1000) / 60,
 					(gHighScores[i][Time][1] / 1000) % 60,
 					gHighScores[i][Nickname2], 
-					gHighScores[i][VehicleModel][1]
+					vehicleName
 			      );
 		}
 
 		if (gHighScores[i][Time][2] != 0)
 		{
-			format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}3rd\t{00FF00}%d:%02d{FFFFFF} min\t{FFD700}%s{FFFFFF}\t(model %d)\n", 
+			GetVehicleNameByModel(gHighScores[i][VehicleModel][2], vehicleName);
+
+			format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}3rd\t{00FF00}%d:%02d{FFFFFF} min\t{FFD700}%s{FFFFFF}\t(%s)\n", 
 					stringToPrint,
 					(gHighScores[i][Time][2] / 1000) / 60,
 					(gHighScores[i][Time][2] / 1000) % 60,
 					gHighScores[i][Nickname3], 
-					gHighScores[i][VehicleModel][2]
+					vehicleName
 			      );
 		}
 	}

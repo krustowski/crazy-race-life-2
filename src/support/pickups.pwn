@@ -39,6 +39,7 @@
 #define PICKUP_HOUSE_YELLOW			19524
 
 #define MAX_DEATH_MONEY_PICKUPS		128
+#define MAX_MEDICAL_PICKUPS			16
 
 #include "modules/bank.pwn"
 #include "modules/team.pwn"
@@ -73,6 +74,9 @@ new
 	gPickupBankLSEnter,
 	gPickupBankLSExit;
 
+new
+	gMedicalPickups[MAX_MEDICAL_PICKUPS] = {INVALID_PICKUP, ...};
+
 enum PrizeType
 {
 	PRIZE_NONE,
@@ -98,6 +102,24 @@ forward InitPickups();
 public InitPickups()
 {
 	InitPrizes();
+
+	new
+		medicalPickupID = 0;
+
+	// Fort Carson
+	gMedicalPickups[medicalPickupID++] = EnsurePickupCreated(1240, 1, -322.96, 1055.46, 19.74);
+	// El Quebrados
+	gMedicalPickups[medicalPickupID++] = EnsurePickupCreated(1240, 1, -1514.84, 2524.60, 55.79);
+	// Los Santos (Downtown/Glen Park)
+	gMedicalPickups[medicalPickupID++] = EnsurePickupCreated(1240, 1, 2034.04, -1404.63, 17.25);
+	// Los Santos (All Saints General Hospital)
+	gMedicalPickups[medicalPickupID++] = EnsurePickupCreated(1240, 1, 1177.48, -1323.69, 14.07);
+	// San Fierro Medical Center
+	gMedicalPickups[medicalPickupID++] = EnsurePickupCreated(1240, 1, -2675.39, 633.00, 14.45);
+	// Angel Pine Medical Center
+	gMedicalPickups[medicalPickupID++] = EnsurePickupCreated(1240, 1, -2199.77, -2306.06, 30.62);
+	// Las Venturas Hospital
+	gMedicalPickups[medicalPickupID++] = EnsurePickupCreated(1240, 1, 1607.03, 1820.86, 10.82);
 
 	gAdminRoomHealth = EnsurePickupCreated(1240, 1, 2302.85, 1155.93, 85.94);
 
@@ -364,6 +386,24 @@ stock CreateDeathMoneyPickup(playerid)
 	return 1;
 }
 
+stock CheckMedicalPickup(playerid, pickupid)
+{
+	for (new i = 0; i < MAX_MEDICAL_PICKUPS; i++)
+	{
+		if (gMedicalPickups[i] != pickupid)
+		{
+			continue;
+		}
+
+		SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ HP ] Health 100.0!");
+		SetPlayerHealth(playerid, 100.0);
+
+		return 1;
+	}
+
+	return 0;
+}
+
 stock CheckDeathMoneyPickup(playerid, pickupid)
 {
 	for (new i = 0; i < MAX_DEATH_MONEY_PICKUPS; i++)
@@ -397,16 +437,16 @@ stock CheckBlackMarketPickup(playerid, pickupid)
 
 stock CheckGenericPickup(playerid, pickupid)
 {
-	if (pickupid == gDruggeryEntrance)
-	{
-		new 
-			Float: dX, 
-			Float: dY, 
-			Float: dZ;
+	// if (pickupid == gDruggeryEntrance)
+	// {
+	// 	new 
+	// 		Float: dX, 
+	// 		Float: dY, 
+	// 		Float: dZ;
 
-		GetObjectPos(gDruggery, dX, dY, dZ);
-		return SetPlayerPos(playerid, dX, dY, dZ);
-	}
+	// 	GetObjectPos(gDruggery, dX, dY, dZ);
+	// 	return SetPlayerPos(playerid, dX, dY, dZ);
+	// }
 
 	for (new i = 0; i < MAX_PRIZES; i++)
 	{
@@ -464,9 +504,10 @@ stock CheckGenericPickup(playerid, pickupid)
 
 	else if (pickupid == gHackerzMoneyBag)
 	{
-		GivePlayerMoney(playerid, 10000);
+		GivePlayerMoney(playerid, 100000);
 		DestroyPickup(gHackerzMoneyBag);
-		gHackerzMoneyBag = 0;
+		gHackerzMoneyBag = INVALID_PICKUP;
+
 		return 1;
 	}
 	else if (pickupid == gAdminDoorDown)

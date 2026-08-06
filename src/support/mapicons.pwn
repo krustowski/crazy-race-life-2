@@ -84,6 +84,15 @@ public AddMapicons(playerid)
 	//SetPlayerMapIcon(playerid, mapiconid++, 2323.73, 1283.18, 97.60, E_MAPICON_ID_ENEMY_ATTACK, 0, MAPICON_LOCAL);
 	SetPlayerMapIcon(playerid, mapiconid++, 2248.22, 1239.58, 10.82, E_MAPICON_ID_ENEMY_ATTACK, 0, MAPICON_LOCAL);
 
+	// Hospitals
+	SetPlayerMapIcon(playerid, mapiconid++, -322.96, 1055.46, 19.74, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL); // Fort Carson
+	SetPlayerMapIcon(playerid, mapiconid++, -1514.84, 2524.60, 55.79, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL); // El Quebrados
+	SetPlayerMapIcon(playerid, mapiconid++, 2034.04, -1404.63, 17.25, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL); // Los Santos (Downtown/Glen Park)
+	SetPlayerMapIcon(playerid, mapiconid++, 1177.48, -1323.69, 14.07, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL); // Los Santos (All Saints General Hospital)
+	SetPlayerMapIcon(playerid, mapiconid++, -2675.39, 633.00, 14.45, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL); // San Fierro Medical Center
+	SetPlayerMapIcon(playerid, mapiconid++, -2199.77, -2306.06, 30.62, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL); // Angel Pine Medical Center
+	SetPlayerMapIcon(playerid, mapiconid++, 1607.03, 1820.86, 10.82, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL);
+
 	// ATMs.
 	for (new i = 0; i < sizeof(gBankLocation); i++)
 	{

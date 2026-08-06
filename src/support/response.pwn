@@ -679,11 +679,11 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								return SendClientMessage(playerid, COLOR_RED, "[ ! ] Target ID is playing a minigame!");
 							}
 
-							GivePlayerWeapon(clickedplayerid, t_WEAPON: 26, 400);
-							GivePlayerWeapon(clickedplayerid, t_WEAPON: 28, 400);
-							GivePlayerWeapon(clickedplayerid, t_WEAPON: 31, 400);
-							GivePlayerWeapon(clickedplayerid, t_WEAPON: 43, 1);
-							GivePlayerWeapon(clickedplayerid, t_WEAPON: 46, 1);
+							GivePlayerWeapon(clickedplayerid, WEAPON: 26, 400);
+							GivePlayerWeapon(clickedplayerid, WEAPON: 28, 400);
+							GivePlayerWeapon(clickedplayerid, WEAPON: 31, 400);
+							GivePlayerWeapon(clickedplayerid, WEAPON: 43, 1);
+							GivePlayerWeapon(clickedplayerid, WEAPON: 46, 1);
 
 							SendClientMessage(clickedplayerid, COLOR_ORANGE, "[ WEAPON ] Received a weapons pack");
 							SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ ADMIN ] Weapons sent");
@@ -817,7 +817,7 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ ADMIN ] Weapon sent");
 
-				return GivePlayerWeapon(clickedplayerid, t_WEAPON: weaponid, 1000);
+				return GivePlayerWeapon(clickedplayerid, WEAPON: weaponid, 1000);
 			}
 		case DIALOG_PLAYER_FAKECHAT:
 			{

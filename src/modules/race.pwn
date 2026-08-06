@@ -135,7 +135,7 @@ stock SetPlayerRaceSingle(playerid, raceId, const Float:coords[][E_RACE_COORD], 
 		Float: x1, 
 		Float: y1, 
 		Float: z1, 
-		t_CP_TYPE: cpType;
+		CP_TYPE: cpType;
 
 	switch (raceType) 
 	{

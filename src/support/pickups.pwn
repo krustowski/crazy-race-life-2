@@ -60,9 +60,9 @@ new
 	gHackerBlackMarket;
 
 new 
-	gDruggery,
+	//gDruggery,
 	gDruggeryMarket,
-	gDruggeryEntrance,
+	//gDruggeryEntrance,
 #pragma unused gDruggeryExit
 	gDruggeryExit;
 
@@ -73,9 +73,6 @@ new
 	gPickupSFCentrumExit,
 	gPickupBankLSEnter,
 	gPickupBankLSExit;
-
-new
-	gMedicalPickups[MAX_MEDICAL_PICKUPS] = {INVALID_PICKUP, ...};
 
 enum PrizeType
 {
@@ -97,29 +94,42 @@ new gPrizes[MAX_PRIZES][Prize];
 //
 //
 
+new
+	gMedicalPickups[MAX_MEDICAL_PICKUPS] = {INVALID_PICKUP, ...},
+	gMedicalPickupCount = 0;
+
+stock CreateMedicalPickup(Float: X, Float: Y, Float: Z)
+{
+	if (gMedicalPickupCount == MAX_MEDICAL_PICKUPS)
+	{
+		return 0;
+	}
+
+	gMedicalPickups[gMedicalPickupCount++] = EnsurePickupCreated(PICKUP_HEART, PICKUP_TYPE_ALWAYS, X, Y, Z);
+
+	return 1;
+}
+
 forward InitPickups();
 
 public InitPickups()
 {
 	InitPrizes();
 
-	new
-		medicalPickupID = 0;
-
 	// Fort Carson
-	gMedicalPickups[medicalPickupID++] = EnsurePickupCreated(1240, 1, -322.96, 1055.46, 19.74);
+	CreateMedicalPickup(-322.96, 1055.46, 19.74);
 	// El Quebrados
-	gMedicalPickups[medicalPickupID++] = EnsurePickupCreated(1240, 1, -1514.84, 2524.60, 55.79);
+	CreateMedicalPickup(-1514.84, 2524.60, 55.79);
 	// Los Santos (Downtown/Glen Park)
-	gMedicalPickups[medicalPickupID++] = EnsurePickupCreated(1240, 1, 2034.04, -1404.63, 17.25);
+	CreateMedicalPickup(2034.04, -1404.63, 17.25);
 	// Los Santos (All Saints General Hospital)
-	gMedicalPickups[medicalPickupID++] = EnsurePickupCreated(1240, 1, 1177.48, -1323.69, 14.07);
+	CreateMedicalPickup(1177.48, -1323.69, 14.07);
 	// San Fierro Medical Center
-	gMedicalPickups[medicalPickupID++] = EnsurePickupCreated(1240, 1, -2675.39, 633.00, 14.45);
+	CreateMedicalPickup(-2675.39, 633.00, 14.45);
 	// Angel Pine Medical Center
-	gMedicalPickups[medicalPickupID++] = EnsurePickupCreated(1240, 1, -2199.77, -2306.06, 30.62);
+	CreateMedicalPickup(-2199.77, -2306.06, 30.62);
 	// Las Venturas Hospital
-	gMedicalPickups[medicalPickupID++] = EnsurePickupCreated(1240, 1, 1607.03, 1820.86, 10.82);
+	CreateMedicalPickup(1607.03, 1820.86, 10.82);
 
 	gAdminRoomHealth = EnsurePickupCreated(1240, 1, 2302.85, 1155.93, 85.94);
 

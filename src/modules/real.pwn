@@ -94,7 +94,7 @@ enum VehicleProps
 	Model,
 	Paintjob,
 	Colours[2],
-	Components[16]
+	CARMODTYPE: Components[16]
 }
 
 enum Property
@@ -428,7 +428,7 @@ stock SpawnProperty(propertyId)
 						for (new j = 0; j < 16; j++)
 						{
 							if (gProperties[propertyId][Vehicle][Components][j])
-								AddVehicleComponent(gProperties[propertyId][Vehicle][ID], gProperties[propertyId][Vehicle][Components][j]);
+								AddVehicleComponent(gProperties[propertyId][Vehicle][ID], _: gProperties[propertyId][Vehicle][Components][j]);
 						}
 
 						ChangeVehiclePaintjob(gProperties[propertyId][Vehicle][ID], gProperties[propertyId][Vehicle][Paintjob]);
@@ -668,11 +668,11 @@ stock SaveRealEstateData()
 			{
 				if (!strcmp(componentsString, ""))
 				{
-					format(componentsString, sizeof(componentsString), "%d", gProperties[i][Vehicle][Components][j]);
+					format(componentsString, sizeof(componentsString), "%d", _: gProperties[i][Vehicle][Components][j]);
 					continue;
 				}
 
-				format(componentsString, sizeof(componentsString), "%s,%d", componentsString, gProperties[i][Vehicle][Components][j]);
+				format(componentsString, sizeof(componentsString), "%s,%d", componentsString, _: gProperties[i][Vehicle][Components][j]);
 			}
 
 			format(query, sizeof(query), "INSERT INTO vehicles (id, model, color1, color2, components, paintjob) VALUES (%d, %d, %d, %d, \"%s\", %d) ON CONFLICT(id) DO UPDATE SET model = excluded.model, color1 = excluded.color1, color2 = excluded.color2, components = excluded.components, paintjob = excluded.paintjob",
@@ -833,11 +833,11 @@ stock LoadRealEstateData()
 
 		new 
 			componentsString[256], 
-			components[16];
+			CARMODTYPE: components[16];
 
 		DB_GetFieldString(result_vehicle, FIELD_VEHICLE_COMPONENTS, componentsString, sizeof(componentsString));
 
-		ExtractIntsFromString(componentsString, components);
+		ExtractIntsFromString(componentsString, _: components);
 		gProperties[i][Vehicle][Components] = components;
 
 		gProperties[i][Vehicle][Model] = DB_GetFieldInt(result_vehicle, FIELD_VEHICLE_MODEL);
@@ -1413,7 +1413,7 @@ stock UpdatePropertyVehicle(playerid)
 
 	for (new i = 0; i < 16; i++)
 	{
-		gProperties[arrayID][Vehicle][Components][i] = GetVehicleComponentInSlot(vehicleID, t_CARMODTYPE: i);
+		gProperties[arrayID][Vehicle][Components][i] = CARMODTYPE: GetVehicleComponentInSlot(vehicleID, CARMODTYPE: i);
 	}
 
 	SendClientMessageLocalized(playerid, I18N_REAL_VEHMOD_SAVED);
@@ -2001,7 +2001,7 @@ stock AttachVehicleToProperty(playerid, propertyid)
 
 		for (new j = 0; j < 16; j++)
 		{
-			gProperties[i][Vehicle][Components][j] = GetVehicleComponentInSlot(vehicleId, t_CARMODTYPE: j);
+			gProperties[i][Vehicle][Components][j] = CARMODTYPE: GetVehicleComponentInSlot(vehicleId, CARMODTYPE: j);
 		}
 
 		if (gProperties[i][Vehicle][ID])
@@ -2028,7 +2028,7 @@ stock AttachVehicleToProperty(playerid, propertyid)
 		{
 			if (gProperties[i][Vehicle][Components][j])
 			{
-				AddVehicleComponent(gProperties[i][Vehicle][ID], gProperties[i][Vehicle][Components][j]);
+				AddVehicleComponent(gProperties[i][Vehicle][ID], _: gProperties[i][Vehicle][Components][j]);
 			}
 		}
 

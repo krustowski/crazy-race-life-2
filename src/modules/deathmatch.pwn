@@ -14,7 +14,7 @@ enum Deathmatch
 {
 	bool: InGame,
 	bool: IsRegistered,
-      	Score
+    Score
 }
 
 enum DeathmatchTimers
@@ -46,12 +46,12 @@ new
 	gDeathmatchGangZone[MAX_PLAYERS];
 
 new Float: deathmatchPickups[6][3] = {
-        { -1380.62, -2346.69, 35.01 },
-        { -1334.16, -2352.38, 36.00 },
-        { -1307.00, -2308.74, 35.17 },
-        { -1314.60, -2255.89, 31.37 },
-        { -1361.84, -2235.61, 32.44 },
-        { -1412.34, -2243.93, 34.35 }
+    { -1380.62, -2346.69, 35.01 },
+    { -1334.16, -2352.38, 36.00 },
+    { -1307.00, -2308.74, 35.17 },
+    { -1314.60, -2255.89, 31.37 },
+    { -1361.84, -2235.61, 32.44 },
+    { -1412.34, -2243.93, 34.35 }
 };
 
 forward StartDeathmatch();
@@ -326,8 +326,8 @@ stock ResetPlayerDeathmatchState(playerid)
 	ResetPlayerWeapons(playerid);
 	SetPlayerPos(playerid, Float: -1365.1, Float: -2307.0, Float: 39.1);
 
-	GivePlayerWeapon(playerid, t_WEAPON: 30, 999);
-	GivePlayerWeapon(playerid, t_WEAPON: 34, 999);
+	GivePlayerWeapon(playerid, WEAPON: 30, 999);
+	GivePlayerWeapon(playerid, WEAPON: 34, 999);
 
 	return 1;
 }

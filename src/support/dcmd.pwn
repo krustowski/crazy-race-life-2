@@ -296,7 +296,7 @@ dcmd_dwarp(playerid, const params[])
 		return SendClientMessageLocalized(playerid, I18N_IN_PROPERTY_BLOCK);
 	}
 
-	new t_PLAYER_STATE: playerState = GetPlayerState(playerid), senderName[MAX_PLAYER_NAME], stringToPrint[256], vehicleId = GetPlayerVehicleID(playerid);
+	new PLAYER_STATE: playerState = GetPlayerState(playerid), senderName[MAX_PLAYER_NAME], stringToPrint[256], vehicleId = GetPlayerVehicleID(playerid);
 
 	SetPlayerInterior(playerid, 0);
 	GetPlayerName(playerid, senderName, sizeof(senderName));
@@ -766,7 +766,7 @@ dcmd_skydive(playerid, const params[])
 {
 #pragma unused params
 	// Give such user a parachute.
-	GivePlayerWeapon(playerid, t_WEAPON: 46, 1);
+	GivePlayerWeapon(playerid, WEAPON: 46, 1);
 
 	// Set their position high above the LV pyramide.
 	SetPlayerPos(playerid, 2247.61, 1260.14, 1313.40);
@@ -1863,7 +1863,7 @@ dcmd_weapon(playerid, const params[])
 		return SendClientMessageLocalized(playerid, I18N_DEATHMATCH_INGAME_BLOCK);
 	}
 
-	GivePlayerWeapon(targetId, t_WEAPON: targetWeapon, 1000);
+	GivePlayerWeapon(targetId, WEAPON: targetWeapon, 1000);
 
 	return 1;
 }
@@ -1892,11 +1892,11 @@ dcmd_weapons(playerid, const params[])
 		return SendClientMessageLocalized(playerid, I18N_DEATHMATCH_INGAME_BLOCK);
 	}
 
-	GivePlayerWeapon(targetId, t_WEAPON: 26, 400);
-	GivePlayerWeapon(targetId, t_WEAPON: 28, 400);
-	GivePlayerWeapon(targetId, t_WEAPON: 31, 400);
-	GivePlayerWeapon(targetId, t_WEAPON: 43, 1);
-	GivePlayerWeapon(targetId, t_WEAPON: 46, 1);
+	GivePlayerWeapon(targetId, WEAPON: 26, 400);
+	GivePlayerWeapon(targetId, WEAPON: 28, 400);
+	GivePlayerWeapon(targetId, WEAPON: 31, 400);
+	GivePlayerWeapon(targetId, WEAPON: 43, 1);
+	GivePlayerWeapon(targetId, WEAPON: 46, 1);
 
 	return 1;
 }

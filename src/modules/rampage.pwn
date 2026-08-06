@@ -582,6 +582,7 @@ stock SetRampageMission(playerid)
 
 stock SetRampageNPC(playerid, missionid, npcarrayid)
 {
+#pragma unused playerid
     const NPC_COUNT = 128;
 
     new

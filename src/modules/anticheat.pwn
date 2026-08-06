@@ -23,7 +23,7 @@ public AntiCheatWeapon()
 		new 	
 			weaponData[13][2];
 	
-		GetPlayerWeaponData(i, t_WEAPON_SLOT: 7, t_WEAPON: weaponData[7][0], weaponData[7][1]);
+		GetPlayerWeaponData(i, WEAPON_SLOT: 7, WEAPON: weaponData[7][0], weaponData[7][1]);
 
 		if (weaponData[7][0] == 38 || weaponData[7][0] == 37 || weaponData[7][0] == 36)
 		{	

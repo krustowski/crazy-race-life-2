@@ -136,7 +136,7 @@ stock HandleCarKill(playerid, killerid, WEAPON:reason)
 	SetPlayerWantedLevel(killerid, gPlayers[killerid][WantedLevel]);
 
 	new 
-		t_PLAYER_STATE:killerState = GetPlayerState(killerid),
+		PLAYER_STATE:killerState = GetPlayerState(killerid),
 		stringToPrint[128];
 
 	if (IsPlayerInAnyVehicle(killerid) && !IsPlayerInAnyVehicle(playerid) && killerState == PLAYER_STATE_DRIVER && reason != WEAPON_VEHICLE)

@@ -194,7 +194,7 @@ public GivePlayerWeaponEx(playerid, timerid, weaponid, ammo)
 {
 	KillTimer(_: gPlayers[playerid][OnDeathGunsTimer][timerid]);
 
-	GivePlayerWeapon(playerid, t_WEAPON: weaponid, ammo);
+	GivePlayerWeapon(playerid, WEAPON: weaponid, ammo);
 }
 
 stock LoadPlayerData(playerid)
@@ -677,7 +677,7 @@ stock MovePlayerToPlayer(playerid, targetid, bool: reversed)
 	}
 
 	new 
-		portedPlayerState = GetPlayerState(portedid), 
+		PLAYER_STATE: portedPlayerState = GetPlayerState(portedid), 
 		portedVehicleId = GetPlayerVehicleID(portedid);
 
 	SetPlayerInterior(portedid, interior);
@@ -710,7 +710,7 @@ stock SetPlayerVehicleNitro(playerid, targetid)
 	}
 
 	new 
-		t_PLAYER_STATE: targetPlayerState = GetPlayerState(targetid), 
+		PLAYER_STATE: targetPlayerState = GetPlayerState(targetid), 
 		targetVehicleId = GetPlayerVehicleID(targetid);
 
 	if (targetPlayerState != PLAYER_STATE_DRIVER)

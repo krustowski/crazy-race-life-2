@@ -22,13 +22,13 @@ public InitTexts()
 	gGameModeText = TextDrawCreate(20.0, 425.0, MINIMAP_TEXT);
 
 	TextDrawLetterSize(gGameModeText, 0.5, 1.5);
-	TextDrawFont(gGameModeText, t_TEXT_DRAW_FONT: 3);
+	TextDrawFont(gGameModeText, TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gGameModeText, 1);
 
 	gClockText = TextDrawCreate(547.0, 24.0, "loading");
 
 	TextDrawLetterSize(gClockText, 0.6, 1.8);
-	TextDrawFont(gClockText, t_TEXT_DRAW_FONT: 3);
+	TextDrawFont(gClockText, TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gClockText, 1);
 }
 
@@ -48,31 +48,31 @@ public AddTexts(playerid)
 	gDeathmatchText[playerid] = TextDrawCreate(400.0, 400.0, "");
 
 	TextDrawLetterSize(gRampageMission[playerid][InfoText], 0.5, 1.5);
-	TextDrawFont(gRampageMission[playerid][InfoText], t_TEXT_DRAW_FONT: 3);
+	TextDrawFont(gRampageMission[playerid][InfoText], TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gRampageMission[playerid][InfoText], 1);
 	
 	TextDrawLetterSize(gDrugMission[playerid][InfoText], 0.5, 1.5);
-	TextDrawFont(gDrugMission[playerid][InfoText], t_TEXT_DRAW_FONT: 3);
+	TextDrawFont(gDrugMission[playerid][InfoText], TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gDrugMission[playerid][InfoText], 1);
 
 	TextDrawLetterSize(gVehicleStatesText[playerid], 0.5, 1.5);
-	TextDrawFont(Text: gVehicleStatesText[playerid], t_TEXT_DRAW_FONT: 3);
+	TextDrawFont(Text: gVehicleStatesText[playerid], TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gVehicleStatesText[playerid], 1);
 
 	TextDrawLetterSize(gRaceInfoText[playerid], 0.5, 1.5);
-	TextDrawFont(gRaceInfoText[playerid], t_TEXT_DRAW_FONT: 3);
+	TextDrawFont(gRaceInfoText[playerid], TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gRaceInfoText[playerid], 1);
 
 	TextDrawLetterSize(gMissionInfoText[playerid], 0.5, 1.5);
-	TextDrawFont(gMissionInfoText[playerid], t_TEXT_DRAW_FONT: 3);
+	TextDrawFont(gMissionInfoText[playerid], TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gMissionInfoText[playerid], 1);
 
 	TextDrawLetterSize(gTowMissionText[playerid], 0.5, 1.5);
-	TextDrawFont(gTowMissionText[playerid], t_TEXT_DRAW_FONT: 3);
+	TextDrawFont(gTowMissionText[playerid], TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gTowMissionText[playerid], 1);
 
 	TextDrawLetterSize(gDeathmatchText[playerid], 0.5, 1.5);
-	TextDrawFont(gDeathmatchText[playerid], t_TEXT_DRAW_FONT: 3);
+	TextDrawFont(gDeathmatchText[playerid], TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gDeathmatchText[playerid], 1);
 
 	// Show the game clock.

@@ -40,7 +40,7 @@ public OnGameModeInit()
 	EnableStuntBonusForAll(true);  
 	EnableZoneNames(true);
 	ShowNameTags(true);
-	ShowPlayerMarkers(t_PLAYER_MARKERS_MODE: true); 
+	ShowPlayerMarkers(PLAYER_MARKERS_MODE: true); 
 	UsePlayerPedAnims();
 
 	//
@@ -539,9 +539,9 @@ public OnNPCDeath(npcid, killerid, WEAPON:reason)
 	return 1;
 }
 
-public OnPlayerDeath(playerid, killerid, WEAPON:reason)
+public OnPlayerDeath(playerid, killerid, WEAPON: reason)
 {
-	SendDeathMessage(killerid, playerid, reason);
+	SendDeathMessage(killerid, playerid, _: reason);
 
 	// Hide velocity meters.
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
@@ -613,7 +613,7 @@ public OnVehicleSpawn(vehicleid)
 		{
 			if (gProperties[i][Vehicle][Components][j])
 			{
-				AddVehicleComponent(gProperties[i][Vehicle][ID], gProperties[i][Vehicle][Components][j]);
+				AddVehicleComponent(gProperties[i][Vehicle][ID], _: gProperties[i][Vehicle][Components][j]);
 			}
 		}
 
@@ -660,14 +660,15 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 			continue;
 		}
 
-		new t_CARMODTYPE: componentType = GetVehicleComponentType(componentid);
+		new
+			CARMODTYPE: componentType = GetVehicleComponentType(componentid);
 
 		if (componentType == CARMODTYPE_NONE)
 		{
 			break;
 		}
 
-		gProperties[i][Vehicle][Components][componentType] = componentid;
+		gProperties[i][Vehicle][Components][_: componentType] = CARMODTYPE: componentid;
 		SendClientMessageLocalized(playerid, I18N_REAL_VEHICLE_MOD_SAVED);
 	}
 
@@ -682,7 +683,7 @@ public OnPlayerText(playerid, text[])
 			stringToPrint[256];
 
 		text[0] = ' ';
-		format(stringToPrint, sizeof(stringToPrint), "%s [Team Chat]: %s", gPlayers[playerid][Name], text);
+		format(stringToPrint, sizeof(stringToPrint), "%s [Team Chat]:%s", gPlayers[playerid][Name], text);
 
 		for (new i = 0; i < MAX_PLAYERS; i++)
 		{
@@ -698,7 +699,7 @@ public OnPlayerText(playerid, text[])
 	return 1;
 }
 
-public OnPlayerClickPlayer(playerid, clickedplayerid, CLICK_SOURCE:source)
+public OnPlayerClickPlayer(playerid, clickedplayerid, CLICK_SOURCE: source)
 {
 	if (gPlayers[playerid][AdminLevel] < 1)
 	{

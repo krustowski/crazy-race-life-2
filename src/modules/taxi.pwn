@@ -483,7 +483,7 @@ stock SetPlayerTaxiMission(playerid, areaid)
 
 	gTaxiMission[playerid][InfoText] = TextDrawCreate(460.0, 400.0, "");
 	TextDrawLetterSize(gTaxiMission[playerid][InfoText], 0.5, 1.5);
-	TextDrawFont(gTaxiMission[playerid][InfoText], t_TEXT_DRAW_FONT: 3);
+	TextDrawFont(gTaxiMission[playerid][InfoText], TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gTaxiMission[playerid][InfoText], 1);
 
 	GameTextForPlayer(playerid, gI18nMessages[I18N_TAXI_MISS_START][ gPlayers[playerid][Locale] ], 3000, 3); 

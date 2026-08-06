@@ -374,12 +374,12 @@ stock SetCombatMission(playerid, missionid)
 
 	gCombatMission[playerid][InfoText] = TextDrawCreate(460.0, 400.0, "");
 	TextDrawLetterSize(gCombatMission[playerid][InfoText], 0.5, 1.5);
-	TextDrawFont(gCombatMission[playerid][InfoText], t_TEXT_DRAW_FONT: 3);
+	TextDrawFont(gCombatMission[playerid][InfoText], TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gCombatMission[playerid][InfoText], 1);
 
 	ResetPlayerWeapons(playerid);
-	GivePlayerWeapon(playerid, t_WEAPON: 26, 200);
-	GivePlayerWeapon(playerid, t_WEAPON: 31, 500);
+	GivePlayerWeapon(playerid, WEAPON: 26, 200);
+	GivePlayerWeapon(playerid, WEAPON: 31, 500);
 
 	gCombatMission[playerid][TimerUpdate] = Timer: SetTimerEx("UpdateCombatMissionInfoText", 1000, true, "i", playerid);
 

@@ -128,6 +128,10 @@ stock Race_Init()
 
 		gRaces[id][UpdateRaceInfoTimer] = Timer: INVALID_TIMER;
 		gRaces[id][StartRaceTimer] = Timer: INVALID_TIMER;
+		gRaces[id][CountdownTimer] = Timer: INVALID_TIMER;
+
+		// Invalidate any cached precalculations
+		gRaces[id][IsPrepared] = false;
 
 		new
 			invalidPlayers[MAX_RACE_PLAYERS] = {INVALID_PLAYER_ID, ...};
@@ -192,20 +196,38 @@ stock Race_RegisterPlayer(playerid, raceid)
 		return SendClientMessageLocalized(playerid, I18N_RACE_ALREADY_JOINED);
 	}
 
-	if (Race_IsRaceActive(raceid))
-	{
-		// TODO: SendClientMessageLocalized: Already active
-		return 0;
-	}
-
 	if (raceid == 0 || raceid >= MAX_RACE_COUNT)
 	{
 		return SendClientMessageLocalized(playerid, I18N_RACE_NO_SUCH_RACE);
 	}
 
+	if (Race_IsRaceActive(raceid))
+	{
+		return SendClientMessageLocalized(playerid, I18N_RACE_ALREADY_RUNNING);
+	}
+
 	if (GetPlayerMoney(playerid) < gRaces[raceid][CostDollars])
 	{
 		return SendClientMessageLocalized(playerid, I18N_RACE_NO_MONEY);
+	}
+
+	// Find a free start-grid slot
+	new
+		slot = -1;
+
+	for (new i = 0; i < MAX_RACE_PLAYERS; i++)
+	{
+		if (gRaces[raceid][RegisteredPlayers][i] == INVALID_PLAYER_ID)
+		{
+			slot = i;
+			break;
+		}
+	}
+
+	if (slot == -1)
+	{
+		// TODO: localize this
+		return SendClientMessage(playerid, COLOR_RED, "[ RACE ] This race is already full!");
 	}
 
 	if (!gRaces[raceid][IsPrepared])
@@ -227,10 +249,10 @@ stock Race_RegisterPlayer(playerid, raceid)
 	gPlayerRace[playerid][CheckpointDoneCount] = 0;
 	gPlayerRace[playerid][LastCheckpointTimestamp] = 0;
 
-	gRaces[raceid][RegisteredPlayers][ gRaces[raceid][RegisteredCount] ] = playerid;
+	gRaces[raceid][RegisteredPlayers][slot] = playerid;
 	gRaces[raceid][RegisteredCount]++;
 
-	// Default position in race = registered position
+	// Default position in race = registered position (or just use slot???)
 	gPlayerRace[playerid][Position] = gRaces[raceid][RegisteredCount];
 
 	if (!gRaces[raceid][CountdownRemaining])
@@ -316,23 +338,7 @@ static Race_GetStartFacingAngle(raceid)
 
 	gRaces[raceid][AlphaAngle] = atan2(diffY, diffX);
 
-	// printf("[race debug] id=%d start=(%.2f,%.2f) cp0=(%.2f,%.2f) diffX=%.2f diffY=%.2f AlphaAngle=%.2f heading=%.2f",
-	// 		raceid, x1, y1, x2, y2, diffX, diffY, gRaces[raceid][AlphaAngle], Race_HeadingFromAngle(gRaces[raceid][AlphaAngle]));
-
 	return 1;
-}
-
-static Race_GetStartingCoordsIndex(registeredPos)
-{
-	new
-		// Line number starting from 0 (first), 1 (second), ...
-		lineNo = floatround( floatdiv(registeredPos, 3), floatround_ceil ) - 1,
-		// Position within the same line
-		linePos = (registeredPos - 1) % 3,
-		// The middle position of such line (array ID)
-		lineBasePos = (!lineNo) ? 0 : lineNo * 3;
-
-	return lineBasePos + linePos;
 }
 
 static Race_CalculateStartingCoords(raceid)
@@ -368,7 +374,9 @@ static Race_CalculateStartingCoords(raceid)
 		Float: gapCosB = floatmul( GAP, floatcos(betaAngle, degrees) ),
 		Float: gapSinB = floatmul( GAP, floatsin(betaAngle, degrees) );
 
-	for (new i = 2; i < MAX_RACE_PLAYERS; i++)
+	// i = the 1-based registration position; position 1 is the seeded start
+	// coordinate itself, so the loop fills positions 2..MAX_RACE_PLAYERS.
+	for (new i = 2; i <= MAX_RACE_PLAYERS; i++)
 	{
 		new
 			// Line number starting from 0 (first), 1 (second), ...
@@ -379,7 +387,7 @@ static Race_CalculateStartingCoords(raceid)
 			lineBasePos = (!lineNo) ? 0 : lineNo * 3;
 
 		new
-			arrayPos = Race_GetStartingCoordsIndex(i);
+			arrayPos = lineBasePos + linePos;
 
 		if (arrayPos >= MAX_RACE_PLAYERS)
 		{
@@ -388,22 +396,22 @@ static Race_CalculateStartingCoords(raceid)
 
 		switch (linePos)
 		{
-			// middle
+			// Middle
 			case 0:
 				{
 					if (lineNo > 0)
 					{
 						X[arrayPos] = floatsub(X[lineBasePos - 3], gapCosA);
-						Y[arrayPos] = floatsub(X[lineBasePos - 3], gapSinA);
+						Y[arrayPos] = floatsub(Y[lineBasePos - 3], gapSinA);
 					}
 				}
-			// right
+			// Right
 			case 1:
 				{
 					X[arrayPos] = floatsub(X[lineBasePos], gapCosB);
 					Y[arrayPos] = floatsub(Y[lineBasePos], gapSinB);
 				}
-			// left
+			// Left
 			case 2:
 				{
 					X[arrayPos] = floatadd(X[lineBasePos], gapCosB);
@@ -439,11 +447,24 @@ static Race_SetPlayerPos(playerid, raceid)
 	//        
 	//        ...
 	new
-		registeredPos = gRaces[raceid][RegisteredCount],
 		vehicleid = GetPlayerVehicleID(playerid);
 
 	new
-		arrayPos = Race_GetStartingCoordsIndex(registeredPos);
+		arrayPos = -1;
+
+	for (new i = 0; i < MAX_RACE_PLAYERS; i++)
+	{
+		if (gRaces[raceid][RegisteredPlayers][i] == playerid)
+		{
+			arrayPos = i;
+			break;
+		}
+	}
+
+	if (arrayPos == -1)
+	{
+		return 1;
+	}
 
 	TogglePlayerControllable(playerid, false);
 
@@ -723,7 +744,7 @@ stock Race_SetNextCheckpoint(playerid, raceid)
 			}
 	}
 
-	// End the race.
+	// End the race
 	if (raceCpPosition >= gRaces[raceid][CheckPointCount])
 	{
 		Race_AbortMinigame(playerid, true);
@@ -735,7 +756,7 @@ stock Race_SetNextCheckpoint(playerid, raceid)
 	y0 = gRaceCoords[raceid][raceCpPosition][CoordY];
 	z0 = gRaceCoords[raceid][raceCpPosition][CoordZ];
 
-	if (raceCpPosition + 1 <= gRaces[raceid][CheckPointCount])
+	if (raceCpPosition + 1 < gRaces[raceid][CheckPointCount])
 	{
 		x1 = gRaceCoords[raceid][raceCpPosition + 1][CoordX];
 		y1 = gRaceCoords[raceid][raceCpPosition + 1][CoordY];
@@ -767,7 +788,6 @@ stock Race_AbortMinigame(playerid, bool: success = false)
 	if (!gPlayerRace[playerid][IsRegistered])
 	{
 		return 1;
-		//return SendClientMessageLocalized(playerid, I18N_RACE_NO_RACE);
 	}
 
 	DisablePlayerRaceCheckpoint(playerid);
@@ -848,6 +868,10 @@ stock Race_AbortMinigame(playerid, bool: success = false)
 		KillTimer(_: gRaces[raceid][CountdownTimer]);
 		KillTimer(_: gRaces[raceid][StartRaceTimer]);
 		KillTimer(_: gRaces[raceid][UpdateRaceInfoTimer]);
+
+		gRaces[raceid][CountdownTimer] = Timer: INVALID_TIMER;
+		gRaces[raceid][StartRaceTimer] = Timer: INVALID_TIMER;
+		gRaces[raceid][UpdateRaceInfoTimer] = Timer: INVALID_TIMER;
 	}
 
 	return 1;

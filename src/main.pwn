@@ -17,7 +17,7 @@
  *  Created: 	Jan 2025 (Extends legacy GameMode CRL (2008-2010))
  *  Credits: 	krusty, kompry, DRaGsTeR, amdulka, cranyy, tack
  *  Language: 	EN, CZ
- *  Version: 	0.11.z
+ *  Version: 	0.12.z
  *
  */
 

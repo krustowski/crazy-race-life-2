@@ -187,6 +187,7 @@ enum
 	I18N_RACE_ABORTED_GAMETEXT,
 	I18N_RACE_INFO_TEXT_FMT,
 	I18N_RACE_DATABASE_ERROR,
+	I18N_RACE_ALREADY_RUNNING,
 	// Deathmatch
 	I18N_DEATHMATCH_STARTED,
 	I18N_DEATHMATCH_INGAME_BLOCK,
@@ -443,6 +444,7 @@ new gI18nMessageColor[] =
 	COLOR_LIGHTGREEN,
 	COLOR_RED,
 	COLOR_LIGHTGREEN,
+	COLOR_RED,
 	COLOR_RED,
 	// Deathmatch
 	COLOR_YELLOW,
@@ -1086,8 +1088,8 @@ new gI18nMessages[][PlayerLocale][MAX_MESSAGE_LEN] =
 		"[ ZAVOD ] Jiz mas spustenou jinou minihru, ukonci ji pro zahajeni zavodu!"
 	},
 	{
-		"[ RACE ] Joined the '%s' race (cost $%d). Use the first checkpoint to start the race!",
-		"[ ZAVOD ] Uspesne prihlasen do zavodu '%s' (prihlaska $%d). Projed prvnim checkpointem pro spusteni casomiry."
+		"[ RACE ] Joined the '%s' race (cost $%d). Watch the race start countdown!",
+		"[ ZAVOD ] Uspesne prihlasen do zavodu '%s' (prihlaska $%d). Sleduj odpocet do startu zavodu!"
 	},
 	{
 		"[ RACE ] Player %s just finished the '%s' race, and received a prize of $%d!",
@@ -1112,6 +1114,10 @@ new gI18nMessages[][PlayerLocale][MAX_MESSAGE_LEN] =
 	{
 		"[ RACE ] Database error!",
 		"[ ZAVOD ] Chyba databaze!"
+	},
+	{
+		"[ RACE ] This race is in process at the moment. Try registering in later",
+		"[ ZAVOD ] Tento zavod je prave v plnem proudu. Zkus se zaregistrovat pozdeji"
 	},
 	//
 	//  Deathmatch

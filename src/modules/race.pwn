@@ -31,6 +31,9 @@ enum Race
 	Start[Coords],
 	CheckPointCount,
 
+	Float: StartingCoordX[MAX_RACE_PLAYERS],
+	Float: StartingCoordY[MAX_RACE_PLAYERS],
+
 	bool: IsPrepared,
 
 	// Race start line position helpers
@@ -266,6 +269,8 @@ stock Race_PrepareRace(raceid)
 	// Perpendicular to the direction of travel, used to line racers up side by side
 	gRaces[raceid][BetaAngle] = floatadd(gRaces[raceid][AlphaAngle], 90.0);
 
+	Race_CalculateStartingCoords(raceid);
+
 	gRaces[raceid][IsPrepared] = true;
 
 	return 1;
@@ -314,24 +319,34 @@ stock Race_GetStartFacingAngle(raceid)
 	return 1;
 }
 
-stock Race_SetPlayerPos(playerid, raceid)
+static Race_GetStartingCoordsIndex(registeredPos)
 {
-	// Decide where a registered racer should be put before a race start line
-	//
-	// ----- start -----            line no.:
-	//   2     1     3              0
-	//
-	//   5-GAP-4     6              1
-	//        
-	//        ...
+	new
+		// Line number starting from 0 (first), 1 (second), ...
+		lineNo = floatround( floatdiv(registeredPos, 3), floatround_ceil ) - 1,
+		// Position within the same line
+		linePos = (registeredPos - 1) % 3,
+		// The middle position of such line (array ID)
+		lineBasePos = (!lineNo) ? 0 : lineNo * 3;
 
-	new registeredPos = gRaces[raceid][RegisteredCount];
+	return lineBasePos + linePos;
+}
+
+static Race_CalculateStartingCoords(raceid)
+{
+	if (raceid >= MAX_RACE_COUNT)
+	{
+		return 1;
+	}
 
 	// Beta angle used to calculate the relative gapped coords (perpendicular to the direction of travel)
-	new Float: betaAngle = floatadd(gRaces[raceid][AlphaAngle], 90.0);
+	new
+		Float: alphaAngle = gRaces[raceid][AlphaAngle],
+		Float: betaAngle = gRaces[raceid][BetaAngle];
 
 	// Gap between racers' vehicles
-	new const Float: GAP = 5.0;
+	new
+		const Float: GAP = 5.0;
 
 	// First line of vehicles perpendicular to the race direction (defined by the race start and the first CP)
 	// Racer no. 1: [x0,y0],
@@ -341,55 +356,88 @@ stock Race_SetPlayerPos(playerid, raceid)
 		Float: X[MAX_RACE_PLAYERS],
 		Float: Y[MAX_RACE_PLAYERS];
 
-	new
-		lineNo = floatround( floatdiv(registeredPos, 3), floatround_ceil ) - 1,
-		linePos = (registeredPos - 1) % 3,
-		lineBasePos = (!lineNo) ? 0 : (lineNo * 3) - 1;
-
-	if (lineNo + linePos >= MAX_RACE_PLAYERS)
-	{
-		return 0;
-	}
-
 	X[0] = gRaces[raceid][Start][CoordX];
 	Y[0] = gRaces[raceid][Start][CoordY];
 
-	switch (linePos)
+	new
+		Float: gapCosA = floatmul( GAP, floatcos(alphaAngle, degrees) ),
+		Float: gapSinA = floatmul( GAP, floatsin(alphaAngle, degrees) ),
+		Float: gapCosB = floatmul( GAP, floatcos(betaAngle, degrees) ),
+		Float: gapSinB = floatmul( GAP, floatsin(betaAngle, degrees) );
+
+	for (new i = 2; i < MAX_RACE_PLAYERS; i++)
 	{
-		// middle
-		case 0:
-			{
-				// TODO: recalculate if lineNo > 0
-			}
-		// left
-		case 1:
-			{
-				X[lineNo + linePos] = floatsub(X[lineBasePos], floatmul( GAP, floatcos(betaAngle, degrees) ));
-				Y[lineNo + linePos] = floatsub(Y[lineBasePos], floatmul( GAP, floatsin(betaAngle, degrees) ));
-			}
-		// right
-		case 2:
-			{
-				X[lineNo + linePos] = floatadd(X[lineBasePos], floatmul( GAP, floatcos(betaAngle, degrees) ));
-				Y[lineNo + linePos] = floatadd(Y[lineBasePos], floatmul( GAP, floatsin(betaAngle, degrees) ));
-			}
+		new
+			// Line number starting from 0 (first), 1 (second), ...
+			lineNo = floatround( floatdiv(i, 3), floatround_ceil ) - 1,
+			// Position within the same line
+			linePos = (i - 1) % 3,
+			// The middle position of such line (array ID)
+			lineBasePos = (!lineNo) ? 0 : lineNo * 3;
+
+		new
+			arrayPos = Race_GetStartingCoordsIndex(i);
+
+		if (arrayPos >= MAX_RACE_PLAYERS)
+		{
+			break;
+		}
+
+		switch (linePos)
+		{
+			// middle
+			case 0:
+				{
+					if (lineNo > 0)
+					{
+						X[arrayPos] = floatsub(X[lineBasePos - 3], gapCosA);
+						Y[arrayPos] = floatsub(X[lineBasePos - 3], gapSinA);
+					}
+				}
+			// right
+			case 1:
+				{
+					X[arrayPos] = floatsub(X[lineBasePos], gapCosB);
+					Y[arrayPos] = floatsub(Y[lineBasePos], gapSinB);
+				}
+			// left
+			case 2:
+				{
+					X[arrayPos] = floatadd(X[lineBasePos], gapCosB);
+					Y[arrayPos] = floatadd(Y[lineBasePos], gapSinB);
+				}
+		}
 	}
 
+	gRaces[raceid][StartingCoordX] = X;
+	gRaces[raceid][StartingCoordY] = Y;
+
+	return 1;
+}
+
+stock Race_SetPlayerPos(playerid, raceid)
+{
+	// Decide where a registered racer should be put before a race start line
+	//
+	// ----- start -----            lineNo.:
+	//   3     1     2              0
+	//
+	//   6-GAP-4     5              1
+	//        
+	//        ...
 	new
+		registeredPos = gRaces[raceid][RegisteredCount],
 		vehicleid = GetPlayerVehicleID(playerid);
 
-	// Freeze the driver first -- they're already PLAYER_STATE_DRIVER at this point
-	// (required to register), so their client still owns the vehicle's physics sync.
-	// Repositioning before this can race against that client's own updates, and any
-	// speed/spin it was carrying survives the teleport otherwise.
+	new
+		arrayPos = Race_GetStartingCoordsIndex(registeredPos);
+
 	TogglePlayerControllable(playerid, false);
 
 	SetVehicleZAngle(vehicleid, Race_HeadingFromAngle(gRaces[raceid][AlphaAngle]));
-	SetVehiclePos(vehicleid, X[lineNo + linePos], Y[lineNo + linePos], gRaces[raceid][Start][CoordZ] + 2.00);
+	SetVehiclePos(vehicleid, gRaces[raceid][StartingCoordX][arrayPos], gRaces[raceid][StartingCoordY][arrayPos], gRaces[raceid][Start][CoordZ] + 2.00);
 	SetVehicleVelocity(vehicleid, 0.0, 0.0, 0.0);
 	SetVehicleAngularVelocity(vehicleid, 0.0, 0.0, 0.0);
-
-	//SetPlayerPosFindZ(playerid, X[lineNo + linePos], Y[lineNo + linePos], 1000.0);
 
 	return 1;
 }
@@ -628,10 +676,10 @@ stock Race_SetNextCheckpoint(playerid, raceid)
 	}
 
 	// End the race.
-	if (raceCpPosition > gRaces[raceid][CheckPointCount])
+	if (raceCpPosition >= gRaces[raceid][CheckPointCount])
 	{
 		Race_AbortMinigame(playerid, true);
-		//ResetPlayerRaceState(playerid, raceId, true);
+
 		return 1;
 	}
 
@@ -666,18 +714,18 @@ stock Race_SetNextCheckpoint(playerid, raceid)
 	return 1;
 }
 
-stock Race_AbortMinigame(playerid, success = false)
+stock Race_AbortMinigame(playerid, bool: success = false)
 {
 	if (!gPlayerRace[playerid][IsRegistered])
 	{
-		return SendClientMessageLocalized(playerid, I18N_RACE_NO_RACE);
+		return 1;
+		//return SendClientMessageLocalized(playerid, I18N_RACE_NO_RACE);
 	}
 
 	DisablePlayerRaceCheckpoint(playerid);
+	TogglePlayerControllable(playerid, true);
 
 	TextDrawHideForPlayer(playerid, gRaceInfoText[playerid]);
-	//KillTimer(_: gPlayerRaceTimer[playerid]);
-	//gPlayerRaceTimer[playerid] = Timer: 0;
 
 	gPlayers[playerid][InMinigame] = false;
 	gPlayerRace[playerid][IsRegistered] = false;
@@ -691,6 +739,7 @@ stock Race_AbortMinigame(playerid, success = false)
 		if (gRaces[raceid][RegisteredPlayers][i] == playerid)
 		{
 			gRaces[raceid][RegisteredPlayers][i] = INVALID_PLAYER_ID;
+			gRaces[raceid][RegisteredCount]--;
 			break;
 		}
 	}
@@ -742,6 +791,14 @@ stock Race_AbortMinigame(playerid, success = false)
 
 	gPlayerRace[playerid][CheckpointDoneCount] = 0;
 
+	// End the race completely if no one is left registered in
+	if (!gRaces[raceid][RegisteredCount])
+	{
+		gRaces[raceid][IsActive] = false;
+		KillTimer(_: gRaces[raceid][StartRaceTimer]);
+		KillTimer(_: gRaces[raceid][UpdateRaceInfoTimer]);
+	}
+
 	return 1;
 }
 
@@ -779,50 +836,6 @@ stock Race_SaveNewScore(raceid, playerid, time, vehicleModel)
 	return 1;
 }
 
-// This number should be aither 0, or 1 at max! This means the player must be in just one race at the time!
-// stock CheckPlayerRaceState(playerid)
-// {
-// 	for (new i = 0; i < MAX_RACE_COUNT; i++)
-// 	{
-// 		if (gPlayerRace[playerid][i])
-// 		{
-// 			// The player is racing at the moment!
-// 			return i;
-// 		}
-// 	}
-
-// 	// The player does not seem to be in any race now.
-// 	return 0;
-// }
-
-// stock SetPlayerRaceStartPos(playerid)
-// {
-// 	new 
-// 		raceId = CheckPlayerRaceState(playerid);
-
-// 	if (!raceId)
-// 	{
-// 		SendClientMessageLocalized(playerid, I18N_RACE_WARP_NO_RACE);
-// 		return 0;
-// 	}
-
-// 	if (gPlayerRace[playerid][raceId] > 1)
-// 	{
-// 		SendClientMessageLocalized(playerid, I18N_RACE_WARP_AFTER_START);
-// 		return 0;
-// 	}
-
-// 	if (!IsPlayerInAnyVehicle(playerid) && GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
-// 	{
-// 		SendClientMessageLocalized(playerid, I18N_RACE_WARP_NO_VEHIC_DRIVER);
-// 		return 0;
-// 	}
-
-// 	SetVehiclePos(GetPlayerVehicleID(playerid), Float:gRaces[raceId][Start][E_RACE_COORD_X], Float:gRaces[raceId][Start][E_RACE_COORD_Y], Float:gRaces[raceId][Start][E_RACE_COORD_Z] + 2.00);
-
-// 	return 1;
-// }
-
 //
 //
 //
@@ -848,7 +861,7 @@ stock InitHighScores()
 
 	new 
 		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) 
+	if (!result)
 	{
 		print("Database error: cannot fetch high scores data!");
 		return 0;

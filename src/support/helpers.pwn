@@ -430,3 +430,18 @@ stock SanitizeString(const input[], output[], size)
     
 	output[j] = '\0';
 }
+
+new
+	bool: gCountDownStarted = false;
+
+forward CountDownHelper(remaining);
+public CountDownHelper(remaining)
+{
+	if (!remaining || !gCountDownStarted)
+	{
+		return 0;
+	}
+
+	GameTextForAll("~n~~n~~n~~n~~n~~n~%d", 1000, 4, remaining);
+	return SetTimerEx("CountDownHelper", 1000, false, "i", --remaining);
+}

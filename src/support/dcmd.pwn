@@ -667,13 +667,13 @@ dcmd_property(playerid, const params[])
 dcmd_race(playerid, const params[])
 {
 #pragma unused params
-
-	new raceid = CheckPlayerRaceState(playerid);
-
-	if (!raceid)
+	if (!gPlayerRace[playerid][IsRegistered])
 	{
 		return ShowRaceListDialog(playerid);
 	}
+
+	new
+		raceid = gPlayerRace[playerid][RaceID];
 
 	return ShowRaceOptionsDialog(playerid, raceid);
 }
@@ -1141,8 +1141,6 @@ dcmd_combat(playerid, const params[])
 	return ShowCombatListDialog(playerid);
 }
 
-new gCountDownStarted = false;
-
 dcmd_countdown(playerid, const params[])
 {
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 2) 
@@ -1167,19 +1165,6 @@ dcmd_countdown(playerid, const params[])
 	CountDownHelper(remaining);
 
 	return 1;
-}
-
-forward CountDownHelper(remaining);
-
-public CountDownHelper(remaining)
-{
-	if (!remaining || !gCountDownStarted)
-	{
-		return 0;
-	}
-
-	GameTextForAll("~n~~n~~n~~n~~n~~n~%d", 1000, 4, remaining);
-	return SetTimerEx("CountDownHelper", 1000, false, "i", --remaining);
 }
 
 dcmd_crime(playerid, const params[])

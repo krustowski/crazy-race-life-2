@@ -15,7 +15,7 @@ InitDrugValues/Pickups()     → modules/drugz.pwn
 InitDruggeryPoints()         → modules/drugz.pwn
 InitTeams()                  → modules/team.pwn
 InitRealEstateProperties()   → modules/real.pwn
-InitRaces() / InitHighScores → modules/race.pwn
+Race_Init() / InitHighScores → modules/race.pwn
 InitTrucking()                → modules/trucking.pwn
 InitPickups/Objects/Vehicles/Texts/Timers() → support/*.pwn
 InitNPCs()                    → modules/npcs.pwn

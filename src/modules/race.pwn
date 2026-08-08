@@ -42,12 +42,14 @@ enum Race
 
 	// Indication for a started race
 	bool: IsActive,
+	CountdownRemaining,
 
 	TimeStarted,
 	RegisteredCount,
 	RegisteredPlayers[MAX_RACE_PLAYERS],
 
 	Timer: StartRaceTimer,
+	Timer: CountdownTimer,
 	Timer: UpdateRaceInfoTimer,
 
 	RACE_EDIT_TYPE: EditType,
@@ -231,10 +233,11 @@ stock Race_RegisterPlayer(playerid, raceid)
 	// Default position in race = registered position
 	gPlayerRace[playerid][Position] = gRaces[raceid][RegisteredCount];
 
-	if (!IsValidTimer(_: gRaces[raceid][StartRaceTimer]))
+	if (!gRaces[raceid][CountdownRemaining])
 	{
+		gRaces[raceid][CountdownRemaining] = RACE_COUNTDOWN_SECONDS;
+		gRaces[raceid][CountdownTimer] = Timer: SetTimerEx("Race_CountdownHelper", 1000, false, "i", raceid);
 		gRaces[raceid][StartRaceTimer] = Timer: SetTimerEx("Race_StartRace", RACE_COUNTDOWN_SECONDS * 1000, false, "i", raceid);
-		// TODO: show countdown
 	}
 
 	new
@@ -254,7 +257,7 @@ stock Race_RegisterPlayer(playerid, raceid)
 	return 1;
 }
 
-stock Race_PrepareRace(raceid)
+static Race_PrepareRace(raceid)
 {
 	if (raceid >= MAX_RACE_COUNT)
 	{
@@ -281,7 +284,7 @@ stock Race_PrepareRace(raceid)
 // counter-clockwise: 0 = north, 90 = west, 180 = south, 270 = east -- so the
 // conversion is angle - 90, not 90 - angle (that would be a mirror image,
 // correct only for due-north/due-south directions).
-stock Float: Race_HeadingFromAngle(Float: angle)
+static Float: Race_HeadingFromAngle(Float: angle)
 {
 	new
 		Float: heading = floatsub(angle, 90.0);
@@ -294,7 +297,7 @@ stock Float: Race_HeadingFromAngle(Float: angle)
 	return heading;
 }
 
-stock Race_GetStartFacingAngle(raceid)
+static Race_GetStartFacingAngle(raceid)
 {
 	if (raceid >= MAX_RACE_COUNT)
 	{
@@ -415,8 +418,18 @@ static Race_CalculateStartingCoords(raceid)
 	return 1;
 }
 
-stock Race_SetPlayerPos(playerid, raceid)
+static Race_SetPlayerPos(playerid, raceid)
 {
+	if (raceid >= MAX_RACE_COUNT)
+	{
+		return 1;
+	}
+
+	if (!gPlayerRace[playerid][IsRegistered])
+	{
+		return 1;
+	}
+
 	// Decide where a registered racer should be put before a race start line
 	//
 	// ----- start -----            lineNo.:
@@ -438,6 +451,41 @@ stock Race_SetPlayerPos(playerid, raceid)
 	SetVehiclePos(vehicleid, gRaces[raceid][StartingCoordX][arrayPos], gRaces[raceid][StartingCoordY][arrayPos], gRaces[raceid][Start][CoordZ] + 2.00);
 	SetVehicleVelocity(vehicleid, 0.0, 0.0, 0.0);
 	SetVehicleAngularVelocity(vehicleid, 0.0, 0.0, 0.0);
+
+	return 1;
+}
+
+forward Race_CountdownHelper(raceid);
+public Race_CountdownHelper(raceid)
+{
+	if (raceid >= MAX_RACE_COUNT)
+	{
+		return 1;
+	}
+
+	new
+		remaining = --gRaces[raceid][CountdownRemaining];
+
+	if (!remaining || !gRaces[raceid][RegisteredCount])
+	{
+		return 1;
+	}
+
+	for (new i = 0; i < MAX_RACE_PLAYERS; i++)
+	{
+		new
+			playerid = gRaces[raceid][RegisteredPlayers][i];
+
+		if (playerid == INVALID_PLAYER_ID)
+		{
+			continue;
+		}
+
+		GameTextForPlayer(playerid, "~n~~n~~n~~n~~n~~n~%d", 1000, 4, remaining);
+	}
+
+	gRaces[raceid][CountdownRemaining] = remaining;
+	gRaces[raceid][CountdownTimer] = Timer: SetTimerEx("Race_CountdownHelper", 1000, false, "i", raceid);
 
 	return 1;
 }
@@ -795,6 +843,9 @@ stock Race_AbortMinigame(playerid, bool: success = false)
 	if (!gRaces[raceid][RegisteredCount])
 	{
 		gRaces[raceid][IsActive] = false;
+		gRaces[raceid][CountdownRemaining] = 0;
+
+		KillTimer(_: gRaces[raceid][CountdownTimer]);
 		KillTimer(_: gRaces[raceid][StartRaceTimer]);
 		KillTimer(_: gRaces[raceid][UpdateRaceInfoTimer]);
 	}

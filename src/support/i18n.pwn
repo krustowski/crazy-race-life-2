@@ -1106,8 +1106,8 @@ new gI18nMessages[][PlayerLocale][MAX_MESSAGE_LEN] =
 		"~w~Zavod ~r~Zrusen"
 	},
 	{
-		"~w~Race:__________~g~%3d~n~~w~Checkpoint:_~r~%2d~y~/~r~%2d~n~~w~Time:______~b~%4d~y~:~b~%2d",
-		"~w~Zavod:_________~g~%3d~n~~w~Checkpoint:_~r~%2d~y~/~r~%2d~n~~w~Cas:_______~b~%4d~y~:~b~%2d"
+		"~w~Race:__________~g~%3d~n~~w~Checkpoint:_~r~%2d~y~/~r~%2d~n~~w~Position:_~g~%d~y~/~r~%2d~n~~w~Time:______~b~%4d~y~:~b~%2d",
+		"~w~Zavod:_________~g~%3d~n~~w~Checkpoint:_~r~%2d~y~/~r~%2d~n~~w~Pozice:___~g~%d~y~/~r~%2d~n~~w~Cas:_______~b~%4d~y~:~b~%2d"
 	},
 	{
 		"[ RACE ] Database error!",

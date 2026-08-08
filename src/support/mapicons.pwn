@@ -102,15 +102,16 @@ public AddMapicons(playerid)
 	// Race start points.
 	for (new i = 1; i < MAX_RACE_COUNT; i++)
 	{
-		if (!strcmp(gRaces[i][Name], ""))
+		//if (!strcmp(gRaces[i][Name], ""))
+		if (!gRaces[i][Type])
 		{
 			continue;
 		}
 
 		new 
-			Float: pX = gRaces[i][Start][E_RACE_COORD_X],
-			Float: pY = gRaces[i][Start][E_RACE_COORD_Y],
-			Float: pZ = gRaces[i][Start][E_RACE_COORD_Z];
+			Float: pX = gRaces[i][Start][CoordX],
+			Float: pY = gRaces[i][Start][CoordY],
+			Float: pZ = gRaces[i][Start][CoordZ];
 
 		SetPlayerMapIcon(playerid, mapiconid++, pX, pY, pZ, E_MAPICON_ID_RACE_TOURNAMENT, 0, MAPICON_LOCAL);
 	}

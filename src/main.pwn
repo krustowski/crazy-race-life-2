@@ -58,7 +58,7 @@ public OnGameModeInit()
 	InitTeams();
 
 	InitRealEstateProperties();
-	InitRaces();
+	Race_Init();
 	InitHighScores();
 	InitTrucking();
 
@@ -187,9 +187,11 @@ public OnPlayerDisconnect(playerid, reason)
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
 	KillTimer(_: gPlayers[playerid][LoginTimer]);
-	KillTimer(_: gPlayerRaceTimer[playerid]);
+	//KillTimer(_: gPlayerRace[playerid]);
 	KillTimer(_: gPlayerMissions[playerid][TimerElapsed]);
 	KillTimer(_: gPlayerMissions[playerid][TimerAttachedCheck]);
+
+	Race_AbortMinigame(playerid);
 
 	AbortTruckingMission(playerid);
 	AbortTowMission(playerid);
@@ -573,13 +575,7 @@ public OnPlayerDeath(playerid, killerid, WEAPON: reason)
 	AbortTowMission(playerid);
 	AbortPlayerTaxiMission(playerid);
 
-	new 
-		raceid = CheckPlayerRaceState(playerid);
-
-	if (raceid)
-	{
-		ResetPlayerRaceState(playerid, raceid, false);
-	}
+	Race_AbortMinigame(playerid);
 
 	CreateDeathMoneyPickup(playerid);
 
@@ -830,7 +826,7 @@ public OnPlayerLeaveCheckpoint(playerid)
 
 public OnPlayerEnterRaceCheckpoint(playerid)
 {
-	if (CheckRaceCheckpoint(playerid))
+	if (Race_CheckCheckpoint(playerid))
 	{
 		return 1;
 	}

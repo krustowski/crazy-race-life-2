@@ -1322,6 +1322,8 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 				{
 					switch (gPlayerRaceEdit[playerid][EditType])
 					{
+						case RACE_EDITOR_NONE:
+							{}
 						case RACE_EDITOR_START_COORDS:
 							{
 								new 
@@ -1331,9 +1333,9 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 
 								GetPlayerPos(playerid, X, Y, Z);
 
-								gPlayerRaceEdit[playerid][Start][E_RACE_COORD_X] = X;
-								gPlayerRaceEdit[playerid][Start][E_RACE_COORD_Y] = Y;
-								gPlayerRaceEdit[playerid][Start][E_RACE_COORD_Z] = Z;
+								gPlayerRaceEdit[playerid][Start][CoordX] = X;
+								gPlayerRaceEdit[playerid][Start][CoordY] = Y;
+								gPlayerRaceEdit[playerid][Start][CoordZ] = Z;
 
 								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Start coords recorded!");
 								return ShowRaceEditorOptionsDialog(playerid, gPlayerRaceEdit[playerid][ID]);
@@ -1351,9 +1353,9 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 									coord_no = gPlayerRaceEdit[playerid][EditTrackCoordNo],
 									stringToPrint[128];
 
-								gPlayerRaceEditTrackCoords[playerid][coord_no][E_RACE_COORD_X] = X;
-								gPlayerRaceEditTrackCoords[playerid][coord_no][E_RACE_COORD_Y] = Y;
-								gPlayerRaceEditTrackCoords[playerid][coord_no][E_RACE_COORD_Z] = Z;
+								gPlayerRaceEditTrackCoords[playerid][coord_no][CoordX] = X;
+								gPlayerRaceEditTrackCoords[playerid][coord_no][CoordY] = Y;
+								gPlayerRaceEditTrackCoords[playerid][coord_no][CoordZ] = Z;
 
 								gPlayerRaceEdit[playerid][EditTrackCoordNo]++;
 
@@ -1609,14 +1611,9 @@ stock ResetPlayerState(playerid)
 	TextDrawHideForPlayer(playerid, gTowMissionText[playerid]);
 
 	// Reset racing
-	gPlayerRaceTimer[playerid] = Timer: 0;
-	gPlayerRaceTime[playerid] = 0;
+	gPlayerRace[playerid][IsRegistered] = false;
+	gPlayerRace[playerid][TimeElapsed] = 0;
 	TextDrawHideForPlayer(playerid, gRaceInfoText[playerid]);
-
-	for (new i = 0; i < MAX_RACE_COUNT; i++)
-	{
-		gPlayerRace[playerid][i] = 0;
-	}
 
 	// Combat mission
 	gCombatMission[playerid][Active] = false;

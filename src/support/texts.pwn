@@ -42,7 +42,7 @@ public AddTexts(playerid)
 	gRampageMission[playerid][InfoText] = TextDrawCreate(460.0, 400.0, "");
 	gDrugMission[playerid][InfoText] = TextDrawCreate(460.0, 400.0, "");
 	gVehicleStatesText[playerid] = TextDrawCreate(256, 410, "");
-	gRaceInfoText[playerid] = TextDrawCreate(460.0, 400.0, "");
+	gRaceInfoText[playerid] = TextDrawCreate(460.0, 380.0, "");
 	gMissionInfoText[playerid] = TextDrawCreate(460.0, 400.0, "");
 	gTowMissionText[playerid] = TextDrawCreate(460.0, 380.0, "");
 	gDeathmatchText[playerid] = TextDrawCreate(400.0, 400.0, "");

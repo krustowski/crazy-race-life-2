@@ -456,20 +456,17 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				SetPlayerRaceState(playerid, listitem + 1);
+				Race_RegisterPlayer(playerid, listitem + 1);
 
-				if (!gPlayerRace[playerid][listitem + 1])
+				if (!gPlayerRace[playerid][IsRegistered])
 				{
 					return 1;
 				}
 
-				/*if (!CheckPlayerRaceState(playerid))
-				  return 1;*/
-
-				if (SetPlayerRaceStartPos(playerid))
-				{
-					return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ RACE ] Warp near the race start used successfully");
-				}
+				// if (SetPlayerRaceStartPos(playerid))
+				// {
+				// 	return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ RACE ] Warp near the race start used successfully");
+				// }
 
 				return 1;
 			}
@@ -484,7 +481,7 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					case 0:
 						{
-							ResetPlayerRaceState(playerid, 0, false);
+							Race_AbortMinigame(playerid);
 						}
 				}
 
@@ -1336,6 +1333,11 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							gPlayers[playerid][EditingMode] = true;
 							gPlayers[playerid][NewRaceID] = newraceid;
 
+							// Flush any leftover state from a previously-edited race first --
+							// EditTrackCoordNo in particular, otherwise this race's track
+							// points get appended after the last race's and its checkpoint 1
+							// ends up being one of that other race's leftover coordinates.
+							gPlayerRaceEdit[playerid] = gNullRace;
 							gPlayerRaceEdit[playerid][ID] = newraceid;
 
 							return ShowRaceEditorOptionsDialog(playerid, gPlayers[playerid][NewRaceID]);

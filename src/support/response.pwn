@@ -61,7 +61,9 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 
-				return 1;
+				SystemMsg(playerid, "[ AUTH ] Registration failed, please try again or reconnect.");
+
+				return ShowAuthDialog(playerid);
 			}
 		case DIALOG_PROPERTY_BUY:
 			{

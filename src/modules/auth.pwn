@@ -63,13 +63,13 @@ stock SetPlayerAccountLogin(playerid, const text[])
 stock SetPlayerAccountRegistration(playerid, const text[])
 {
 	new
-		query_test[64];
+		query_test[256];
 
 	format(query_test, sizeof(query_test), "SELECT pwdhash, salt FROM users WHERE nickname = '%s'", gPlayers[playerid][Name]);
 
-	new 
+	new
 		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query_test);
-	if (!result) 
+	if (!result)
 	{
 		print("Database error: cannot fetch user data!");
 		return 0;
@@ -77,6 +77,7 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 
 	if (DB_GetRowCount(result))
 	{
+		DB_FreeResultSet(result);
 		return 0;
 	}
 
@@ -115,6 +116,7 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 	result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result) 
 	{
+		print(query);
 		print("Database error: cannot write (register) user data!");
 		return 0;
 	}
@@ -156,10 +158,17 @@ public ShowAuthDialog(playerid)
 
 	format(query, sizeof(query), "SELECT pwdhash, salt FROM users WHERE nickname = '%s'", gPlayers[playerid][Name]);
 
-	new 
+	new
 		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot fetch user data (auth dialog)!");
 
-	if (DB_GetRowCount(result)) 
+		SystemMsg(playerid, "[ AUTH ] Login is temporarily unavailable, please reconnect later.");
+		return DelayedKick(playerid);
+	}
+
+	if (DB_GetRowCount(result))
 	{
 		format(stringToPrint, sizeof(stringToPrint), "{FFD700}Login{FFFFFF}\n\nPlayer (%s) has already registered their account. Log-in using your password:", gPlayers[playerid][Name]);
 

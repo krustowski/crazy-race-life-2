@@ -111,6 +111,11 @@ stock Race_Init()
 		new
 			id = DB_GetFieldIntByName(result, "id");
 
+		if (!id)
+		{
+			continue;
+		}
+
 		if (id >= MAX_RACE_COUNT)
 		{
 			break;
@@ -122,6 +127,7 @@ stock Race_Init()
 		gRaces[id][Name] = raceName;
 
 		gRaces[id][ID] = id;
+		
 		gRaces[id][Type] = DB_GetFieldIntByName(result, "type");
 		gRaces[id][CostDollars] = DB_GetFieldIntByName(result, "cost_dollars");
 		gRaces[id][PrizeDollars] = DB_GetFieldIntByName(result, "prize_dollars");

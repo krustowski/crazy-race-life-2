@@ -597,8 +597,8 @@ stock OnPlayerPrivMsg(playerid, receiverid, text[])
 	}
 
 	new 
-		stringForReceiver[256], 
-		stringForSender[256]; 
+		stringForReceiver[512], 
+		stringForSender[512]; 
 
 	GetLocalizedString(receiverid, I18N_PRIV_MSG_RECEIVED_FMT, stringForReceiver, sizeof(stringForReceiver));
 	format(stringForReceiver, sizeof(stringForReceiver), stringForReceiver, 

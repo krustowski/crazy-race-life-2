@@ -609,7 +609,7 @@ dcmd_phone(playerid, const params[])
 
 dcmd_pm(playerid, const params[])
 {
-	new token1[32], token2[32];
+	new token1[32], token2[128];
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || count != 2 || !IsNumeric(token1))
@@ -789,7 +789,7 @@ dcmd_taxi(playerid, const params[])
 
 dcmd_text(playerid, const params[])
 {
-	new token1[32], token2[32];
+	new token1[32], token2[128];
 	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
 	if (!strlen(params) || count != 2)
@@ -804,7 +804,7 @@ dcmd_text(playerid, const params[])
 		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
 	}
 
-	new playerName[MAX_PLAYER_NAME], stringToPrint[256], targetName[MAX_PLAYER_NAME];
+	new playerName[MAX_PLAYER_NAME], stringToPrint[512], targetName[MAX_PLAYER_NAME];
 
 	GetPlayerName(playerid, playerName, sizeof(playerName));
 	GetPlayerName(targetId, targetName, sizeof(targetName));

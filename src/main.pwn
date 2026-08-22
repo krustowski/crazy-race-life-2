@@ -581,7 +581,7 @@ public OnPlayerDeath(playerid, killerid, WEAPON: reason)
 
 	if (killerid != INVALID_PLAYER_ID && IsPlayerConnected(killerid) && killerid != playerid) 
 	{
-		HandleCarKill(playerid, killerid, reason);
+		//HandleCarKill(playerid, killerid, reason);
 	}
 
 	SetPlayerHealth(playerid, 100.0);

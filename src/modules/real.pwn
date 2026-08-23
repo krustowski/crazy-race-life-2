@@ -467,7 +467,7 @@ stock SpawnProperty(propertyId)
 
 									if (strcmp(playerName, ""))
 									{
-										gPropertyCoords[propertyId][i][Text] = Create3DTextLabel("%s owns this property", COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false, playerName);
+										gPropertyCoords[propertyId][i][Text] = Create3DTextLabel("%s\n\n%s owns this property", COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false, gProperties[propertyId][Label], playerName);
 									}
 								}
 							}
@@ -487,7 +487,8 @@ stock SpawnProperty(propertyId)
 										text[128];
 									GetOwnerName(gProperties[propertyId][UserID], playerName);
 
-									format(text, sizeof(text), "property is rented by %s",
+									format(text, sizeof(text), "%s\n\nproperty is rented by %s",
+											gProperties[propertyId][Label],
 											playerName
 									      );
 

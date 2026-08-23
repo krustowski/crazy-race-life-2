@@ -45,7 +45,7 @@ public AntiCheatWeapon()
 				SendClientMessage(j, COLOR_RED, stringToPrint);
 			}
 
-			if (!IsPlayerAdmin(i) || gPlayers[i][AdminLevel] < 1)
+			if (!IsPlayerAdmin(i) && gPlayers[i][AdminLevel] < 1)
 			{
 				Kick(i);
 			}
@@ -87,7 +87,7 @@ public AntiJetPack()
 			SendClientMessage(j, COLOR_RED, stringToPrint);
 		}
 
-		if (!IsPlayerAdmin(i) || gPlayers[i][AdminLevel] < 1)
+		if (!IsPlayerAdmin(i) && gPlayers[i][AdminLevel] < 1)
 		{
 			PlayerPlaySound(i, 1056, 0, 0, 0);
 			Kick(i);

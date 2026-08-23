@@ -36,7 +36,7 @@ stock InitTimers()
 	gTimers[TIMER_ON_RADAR_CHECKPOINT] = SetTimer("OnRadarCheckpoint", 300, true);
 
 	gTimers[TIMER_AUTOSAVE_DATA] = SetTimer("AutosaveData", 3 * 60 * SECOND_MS, true);
-	gTimers[TIMER_UPDATE_PLAYER_PLAYTIME] = SetTimer("UpdatePlayerPlayTime", 10 * SECOND_MS, true);
+	gTimers[TIMER_UPDATE_PLAYER_PLAYTIME] = SetTimer("UpdatePlayerPlayTime", 5 * SECOND_MS, true);
 	gTimers[TIMER_UPDATE_PLAYER_SCORE] = SetTimer("UpdatePlayerScore", 2 * SECOND_MS, true);
 
 	gTimers[TIMER_UPDATE_BLACK_MARKET_RATIO] = SetTimer("UpdateBlackMarketRatio", 3 * 60 * SECOND_MS, true);

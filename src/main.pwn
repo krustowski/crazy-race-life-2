@@ -158,6 +158,13 @@ public OnPlayerConnect(playerid)
 		SendClientMessage(playerid, COLOR_RED, "[ CLIENT ] You don't seem to be using the openMP launcher, some game features may not be available for you. Please visit https://open.mp to get it.");
 	}
 
+	PreloadAnimLib(playerid, "CARRY");
+	PreloadAnimLib(playerid, "SHOP");
+	PreloadAnimLib(playerid, "DEALER");
+	PreloadAnimLib(playerid, "FOOD");
+	PreloadAnimLib(playerid, "PED");
+	PreloadAnimLib(playerid, "BAR");
+
 	SpawnPlayer(playerid);
 
 	// Ask the user to login/register.
@@ -816,6 +823,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 public OnPlayerEnterCheckpoint(playerid)
 {
+	if (Pizza_CheckCheckpoint(playerid))
+	{
+		return 1;
+	}
+
 	return 1;
 }
 
@@ -917,7 +929,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	}
 
 	//
-	//  Various jobs/teams pickups
+	//  Various jobs/teams pickups (TODO: refctor)
 	//
 
 	for (new i = 0; i < MAX_TEAMS; i++)
@@ -943,6 +955,15 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	}
 
 	if (CheckDeathmatchPickups(playerid, pickupid))
+	{
+		return 1;
+	}
+
+	//
+	//  Death pickups
+	//
+
+	if (CheckDeathMoneyPickup(playerid, pickupid))
 	{
 		return 1;
 	}
@@ -980,15 +1001,6 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	}
 
 	if (CheckPoliceBribePickup(playerid, pickupid))
-	{
-		return 1;
-	}
-
-	//
-	//  Death pickups
-	//
-
-	if (CheckDeathMoneyPickup(playerid, pickupid))
 	{
 		return 1;
 	}
@@ -1042,6 +1054,17 @@ public OnPlayerSelectedMenuRow(playerid, row)
 
 			format(stringToPrint, sizeof(stringToPrint), "[ TEAM ] Player %s joined the %s team!", gPlayers[playerid][Name], gTeams[i][TeamName]);
 			SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+
+			for (new k = 0; k < MAX_PLAYERS; k++)
+			{
+				if (!IsPlayerConnected(k) || !gPlayers[k][IsLogged])
+				{
+					continue;
+				}
+
+				RedrawRealZones(k);
+			}
+
 			break;
 		}
 	}

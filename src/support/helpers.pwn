@@ -445,3 +445,8 @@ public CountDownHelper(remaining)
 	GameTextForAll("~n~~n~~n~~n~~n~~n~%d", 1000, 4, remaining);
 	return SetTimerEx("CountDownHelper", 1000, false, "i", --remaining);
 }
+
+stock PreloadAnimLib(playerid, const animlib[])
+{
+	ApplyAnimation(playerid, animlib, "null", 0.0, false, false, false, false, 0, FORCE_SYNC: 0);
+}

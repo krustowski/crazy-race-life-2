@@ -1027,6 +1027,7 @@ public SpawnPlayerDelayed(playerid)
 #include "modules/tow.pwn"
 #include "modules/bribe.pwn"
 #include "modules/rampage.pwn"
+#include "modules/pizza.pwn"
 
 stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 {
@@ -1124,6 +1125,16 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 				if (gTowMission[playerid][Active])
 				{
 					return OperateTowTruck(playerid);
+				}
+
+				if (IsPlayerInTeam(playerid, TEAM_PIZZAGUYS))
+				{
+					if (gPizzaMission[playerid][Active])
+					{
+						return Pizza_ResetMinigame(playerid);
+					}
+
+					return Pizza_StartMinigame(playerid);
 				}
 
 				if (IsPlayerInTeam(playerid, TEAM_MECHANICS))

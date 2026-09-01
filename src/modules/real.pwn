@@ -282,6 +282,69 @@ public SendRealEstateCommission()
 	return 1;
 }*/
 
+new
+	gGangZone[MAX_PROPERTIES] = {INVALID_GANG_ZONE, ...};
+
+stock RedrawRealZones(playerid)
+{
+	new
+		query[] = "select c.primary_x, c.primary_y, t.color from property_coords AS c JOIN properties AS p ON p.id = c.property_id JOIN users AS u ON u.id = p.user_id JOIN teams AS t ON t.id = u.team where c.type = 8 AND p.user_id > 0";
+
+	new
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+	if (!result)
+	{
+		print(query);
+		return 1;
+	}
+
+	if (!DB_GetRowCount(result))
+	{
+		DB_FreeResultSet(result);
+		return 1;
+	}
+
+	new
+		i = 0;
+
+	do 
+	{
+		new
+			Float: X = DB_GetFieldFloatByName(result, "primary_x"),
+			Float: Y = DB_GetFieldFloatByName(result, "primary_y"),
+			colorString[16],
+			color;
+
+		DB_GetFieldStringByName(result, "color", colorString, sizeof(colorString));
+		color = HexToInt(colorString);
+
+		if (IsValidPlayerGangZone(playerid, gGangZone[i]))
+		{
+			PlayerGangZoneDestroy(playerid, gGangZone[i]);
+			gGangZone[i] = INVALID_GANG_ZONE;
+		}
+
+		new
+			const ZONE_OFFSET = 50;
+
+		gGangZone[i] = CreatePlayerGangZone(playerid, X - ZONE_OFFSET, Y - ZONE_OFFSET, X + ZONE_OFFSET, Y + ZONE_OFFSET);
+		PlayerGangZoneShow(playerid, gGangZone[i], color);
+
+		if (i + 1 == MAX_PROPERTIES)
+		{
+			break;
+		}
+
+		i++;
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	return 1;
+}
+
 stock SpawnProperty(propertyId)
 {
 	new 
@@ -538,6 +601,16 @@ stock SpawnProperty(propertyId)
 	while (DB_SelectNextRow(result));
 
 	DB_FreeResultSet(result);
+
+	for (new j = 0; j < MAX_PLAYERS; j++)
+	{
+		if (!IsPlayerConnected(j) || !gPlayers[j][IsLogged])
+		{
+			continue;
+		}
+
+		RedrawRealZones(j);
+	}
 
 	return 1;
 }

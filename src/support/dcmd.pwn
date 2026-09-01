@@ -88,7 +88,6 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(vehicle, 7, cmdtext);	  //rcon + lvl 4
 	dcmd(weapon, 6, cmdtext); 	  //rcon + lvl 3
 	dcmd(weapons, 7, cmdtext); 	  //rcon + lvl 3
-	dcmd(zone, 4, cmdtext);
 
 	return InvalidCommand(playerid);
 }
@@ -1128,7 +1127,7 @@ dcmd_clear(playerid, const params[])
 dcmd_combat(playerid, const params[])
 {
 #pragma unused params
-	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3) 
+	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 1) 
 	{
 		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
 	}
@@ -1882,75 +1881,6 @@ dcmd_weapons(playerid, const params[])
 	GivePlayerWeapon(targetId, WEAPON: 31, 400);
 	GivePlayerWeapon(targetId, WEAPON: 43, 1);
 	GivePlayerWeapon(targetId, WEAPON: 46, 1);
-
-	return 1;
-}
-
-new
-	gGangZone[MAX_PROPERTIES] = {INVALID_GANG_ZONE, ...};
-
-dcmd_zone(playerid, const params[])
-{
-#pragma unused params
-	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 3)
-	{
-		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
-	}
-
-	new
-		query[] = "select c.primary_x, c.primary_y, t.color from property_coords AS c JOIN properties AS p ON p.id = c.property_id JOIN users AS u ON u.id = p.user_id JOIN teams AS t ON t.id = u.team where c.type = 8 AND p.user_id > 0";
-
-	new
-		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-
-	if (!result)
-	{
-		print(query);
-		return 1;
-	}
-
-	if (!DB_GetRowCount(result))
-	{
-		DB_FreeResultSet(result);
-		return 1;
-	}
-
-	new
-		i = 0;
-
-	do 
-	{
-		new
-			Float: X = DB_GetFieldFloatByName(result, "primary_x"),
-			Float: Y = DB_GetFieldFloatByName(result, "primary_y"),
-			colorString[16],
-			color;
-
-		DB_GetFieldStringByName(result, "color", colorString, sizeof(colorString));
-		color = HexToInt(colorString);
-
-		if (IsValidPlayerGangZone(playerid, gGangZone[i]))
-		{
-			PlayerGangZoneDestroy(playerid, gGangZone[i]);
-			gGangZone[i] = INVALID_GANG_ZONE;
-		}
-
-		new
-			const ZONE_OFFSET = 50;
-
-		gGangZone[i] = CreatePlayerGangZone(playerid, X - ZONE_OFFSET, Y - ZONE_OFFSET, X + ZONE_OFFSET, Y + ZONE_OFFSET);
-		PlayerGangZoneShow(playerid, gGangZone[i], color);
-
-		if (i + 1 == MAX_PROPERTIES)
-		{
-			break;
-		}
-
-		i++;
-	}
-	while (DB_SelectNextRow(result));
-
-	DB_FreeResultSet(result);
 
 	return 1;
 }

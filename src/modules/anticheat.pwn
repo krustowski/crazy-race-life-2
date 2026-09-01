@@ -40,14 +40,15 @@ public AntiCheatWeapon()
 					continue;
 				}
 
-				GetLocalizedString(j, I18N_WEAPON_CHEAT_VIOLATION_FMT, stringToPrint, sizeof(stringToPrint));
-				format(stringToPrint, sizeof(stringToPrint), stringToPrint, playerName);
-				SendClientMessage(j, COLOR_RED, stringToPrint);
-			}
-
-			if (!IsPlayerAdmin(i) && gPlayers[i][AdminLevel] < 1)
-			{
-				Kick(i);
+				if (!IsPlayerAdmin(i) && gPlayers[i][AdminLevel] < 1)
+				{
+					GetLocalizedString(j, I18N_WEAPON_CHEAT_VIOLATION_FMT, stringToPrint, sizeof(stringToPrint));
+					format(stringToPrint, sizeof(stringToPrint), stringToPrint, playerName);
+					SendClientMessage(j, COLOR_RED, stringToPrint);
+				
+					PlayerPlaySound(i, 1056, 0, 0, 0);
+					Kick(i);
+				}
 			}
 		}
 	}
@@ -82,15 +83,15 @@ public AntiJetPack()
 				continue;
 			}
 
-			GetLocalizedString(j, I18N_JETPACK_VIOLATION_FMT, stringToPrint, sizeof(stringToPrint));
-			format(stringToPrint, sizeof(stringToPrint), stringToPrint, playerName);
-			SendClientMessage(j, COLOR_RED, stringToPrint);
-		}
+			if (!IsPlayerAdmin(i) && gPlayers[i][AdminLevel] < 1)
+			{
+				GetLocalizedString(j, I18N_JETPACK_VIOLATION_FMT, stringToPrint, sizeof(stringToPrint));
+				format(stringToPrint, sizeof(stringToPrint), stringToPrint, playerName);
+				SendClientMessage(j, COLOR_RED, stringToPrint);
 
-		if (!IsPlayerAdmin(i) && gPlayers[i][AdminLevel] < 1)
-		{
-			PlayerPlaySound(i, 1056, 0, 0, 0);
-			Kick(i);
+				PlayerPlaySound(i, 1056, 0, 0, 0);
+				Kick(i);
+			}
 		}
 	}
 

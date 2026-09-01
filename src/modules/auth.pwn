@@ -51,6 +51,8 @@ stock SetPlayerAccountLogin(playerid, const text[])
 	LoadPlayerData(playerid);
 	LoadPlayerProperties(playerid);
 
+	RedrawRealZones(playerid);
+
 	// Draw mapicons for the user.
 	AddMapicons(playerid);
 
@@ -139,7 +141,10 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 	gPlayers[playerid][IsLogged] = true;
 	LoadPlayerData(playerid);
 
-	//gPlayers[playerid][PlayTimeTimer] = Timer: SetTimerEx("UpdatePlayerPlayTime", 5000, true, "i", playerid);
+	RedrawRealZones(playerid);
+
+	// Draw mapicons for the user.
+	AddMapicons(playerid);
 
 	SetPlayerHealth(playerid, 100.0);
 

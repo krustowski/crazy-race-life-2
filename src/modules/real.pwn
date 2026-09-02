@@ -345,6 +345,21 @@ stock RedrawRealZones(playerid)
 	return 1;
 }
 
+stock RedrawRealZonesForAll()
+{
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i) || !gPlayers[i][IsLogged])
+		{
+			continue;
+		}
+
+		RedrawRealZones(i);
+	}
+
+	return 1;
+}
+
 stock SpawnProperty(propertyId)
 {
 	new 
@@ -602,15 +617,7 @@ stock SpawnProperty(propertyId)
 
 	DB_FreeResultSet(result);
 
-	for (new j = 0; j < MAX_PLAYERS; j++)
-	{
-		if (!IsPlayerConnected(j) || !gPlayers[j][IsLogged])
-		{
-			continue;
-		}
-
-		RedrawRealZones(j);
-	}
+	RedrawRealZonesForAll();
 
 	return 1;
 }
@@ -1231,7 +1238,7 @@ stock BuyPlayerProperty(playerid, propertyID)
 
 	arrayID = GetPropertyArrayIDfromID(propertyID);
 
-	// Check if there is a free slot for such player.
+	// Check if there is a free slot for such player
 	for (new i = 0; i < MAX_PLAYER_PROPERTIES; i++)
 	{
 		if (!gPlayers[playerid][Properties][i])
@@ -1242,7 +1249,7 @@ stock BuyPlayerProperty(playerid, propertyID)
 	}
 
 	//
-	//  Validations.
+	//  Validations
 	//
 
 	if (arrayID == INVALID_PROPERTY_ID || !propertyID)
@@ -1266,7 +1273,7 @@ stock BuyPlayerProperty(playerid, propertyID)
 	}
 
 	//
-	//  Ok, proceed with the transaction.
+	//  Ok, proceed with the transaction
 	//
 
 	gProperties[arrayID][UserID] = gPlayers[playerid][OrmID];
@@ -1290,7 +1297,7 @@ stock BuyPlayerProperty(playerid, propertyID)
 
 			if (strcmp(playerName, ""))
 			{
-				gPropertyCoords[arrayID][i][Text] = Create3DTextLabel("%s owns this property", COLOR_ORANGE, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ], 15.0, -1, false, playerName);
+				gPropertyCoords[arrayID][i][Text] = Create3DTextLabel("%s\n\n%s owns this property", COLOR_ORANGE, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ], 15.0, -1, false, gProperties[arrayID][Label], playerName);
 			}
 		}
 

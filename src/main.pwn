@@ -682,17 +682,18 @@ public OnPlayerText(playerid, text[])
 {
 	if (strlen(text) > 1 && text[0] == '!' && gPlayers[playerid][TeamID])
 	{
-		new 
+		new
+			color = gTeams[ _: gPlayers[playerid][TeamID] - 1 ][Color],
 			stringToPrint[256];
 
 		text[0] = ' ';
-		format(stringToPrint, sizeof(stringToPrint), "%s (ID: %d) [Team Chat]:%s", gPlayers[playerid][Name], playerid, text);
+		format(stringToPrint, sizeof(stringToPrint), "{%06x}%s: {FFFFFF}(ID: %d): {%06x}[Team Chat]:{FFFFFF}%s", color >>> 8, gPlayers[playerid][Name], playerid, color >>> 8, text);
 
 		for (new i = 0; i < MAX_PLAYERS; i++)
 		{
 			if (IsPlayerConnected(i) && gPlayers[i][TeamID] == gPlayers[playerid][TeamID])
 			{
-				SendClientMessage(i, gTeams[ _: gPlayers[i][TeamID] - 1 ][Color], stringToPrint);
+				SendClientMessage(i, color, stringToPrint);
 			}
 		}
 
@@ -702,7 +703,7 @@ public OnPlayerText(playerid, text[])
 	new
 		stringToPrint[256];
 
-	format(stringToPrint, sizeof(stringToPrint), "(ID: %d) %s", playerid, text);
+	format(stringToPrint, sizeof(stringToPrint), "(ID: %d): %s", playerid, text);
 	SendPlayerMessageToAll(playerid, stringToPrint);
 
 	return 0;

@@ -1640,3 +1640,34 @@ stock ResetPlayerState(playerid)
 
 	return 1;
 }
+
+stock SetPlayerTeamEx(playerid, teamid)
+{	
+	for (new i = 0; i < MAX_TEAM_WEAPONS; i++)
+	{
+		KillTimer(_: gPlayers[playerid][OnDeathGunsTimer][i]);
+
+		if (gTeams[teamid][Weapons][i] && gTeams[teamid][Ammo][i])
+		{
+			gPlayers[playerid][OnDeathGunsTimer][i] = Timer: SetTimerEx("GivePlayerWeaponEx", 2000, false, "i,i,i,i", playerid, i, gTeams[teamid][Weapons][i], gTeams[teamid][Ammo][i]);
+		}
+	}
+
+	SetPlayerColor(playerid, gTeams[teamid][Color]);
+	SetPlayerSkin(playerid, gTeams[teamid][Skins][0]);
+	SetPlayerTeam(playerid, gTeams[teamid][ID]);
+
+	gPlayers[playerid][TeamID] = PLAYER_TEAM: gTeams[teamid][ID];
+
+	new
+		stringToPrint[128];
+
+	format(stringToPrint, sizeof(stringToPrint), "[ TEAM ] Player %s joined the %s team!", gPlayers[playerid][Name], gTeams[teamid][TeamName]);
+	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+
+	SavePlayerData(playerid);
+
+	RedrawRealZonesForAll();
+
+	return 1;
+}

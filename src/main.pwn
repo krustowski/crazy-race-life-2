@@ -686,7 +686,7 @@ public OnPlayerText(playerid, text[])
 			stringToPrint[256];
 
 		text[0] = ' ';
-		format(stringToPrint, sizeof(stringToPrint), "%s [Team Chat]:%s", gPlayers[playerid][Name], text);
+		format(stringToPrint, sizeof(stringToPrint), "%s (ID: %d) [Team Chat]:%s", gPlayers[playerid][Name], playerid, text);
 
 		for (new i = 0; i < MAX_PLAYERS; i++)
 		{
@@ -699,7 +699,13 @@ public OnPlayerText(playerid, text[])
 		return 0;
 	}
 
-	return 1;
+	new
+		stringToPrint[256];
+
+	format(stringToPrint, sizeof(stringToPrint), "(ID: %d) %s", playerid, text);
+	SendPlayerMessageToAll(playerid, stringToPrint);
+
+	return 0;
 }
 
 public OnPlayerClickPlayer(playerid, clickedplayerid, CLICK_SOURCE: source)
@@ -1011,9 +1017,8 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 public OnPlayerSelectedMenuRow(playerid, row)
 {
 	new
-		Menu: currentMenu = GetPlayerMenu(playerid),
-		stringToPrint[256];
-
+		Menu: currentMenu = GetPlayerMenu(playerid);
+		
 	gPlayers[playerid][TeamMenuShown] = false;
 
 	if (row == 2)
@@ -1038,33 +1043,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 	{
 		if (currentMenu == gTeams[i][Menus][0])
 		{
-			for (new j = 0; j < MAX_TEAM_WEAPONS; j++)
-			{
-				if (gTeams[i][Weapons][j])
-				{
-					GivePlayerWeapon(playerid, WEAPON: gTeams[i][Weapons][j], gTeams[i][Ammo][j]);
-				}
-			}
-
-			SetPlayerColor(playerid, gTeams[i][Color]);
-			SetPlayerSkin(playerid, gTeams[i][Skins][0]);
-			SetPlayerTeam(playerid, gTeams[i][ID]);
-
-			gPlayers[playerid][TeamID] = PLAYER_TEAM: gTeams[i][ID];
-
-			format(stringToPrint, sizeof(stringToPrint), "[ TEAM ] Player %s joined the %s team!", gPlayers[playerid][Name], gTeams[i][TeamName]);
-			SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
-
-			for (new k = 0; k < MAX_PLAYERS; k++)
-			{
-				if (!IsPlayerConnected(k) || !gPlayers[k][IsLogged])
-				{
-					continue;
-				}
-
-				RedrawRealZones(k);
-			}
-
+			SetPlayerTeamEx(playerid, i);
 			break;
 		}
 	}

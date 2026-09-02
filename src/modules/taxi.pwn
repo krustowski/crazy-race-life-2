@@ -82,7 +82,7 @@ public EnterVehicleTimer(npcid)
 
 	NPC_EnterVehicle(npcid, vehicleid, 3, NPC_MOVE_TYPE: 1);
 
-       	gTaxiMission[driverid][TimerCheckNPCInVehicle] = SetTimerEx("CheckNPCInVehicle", 2000, true, "i", driverid);
+	gTaxiMission[driverid][TimerCheckNPCInVehicle] = SetTimerEx("CheckNPCInVehicle", 2000, true, "i", driverid);
 
 	return 1;
 }

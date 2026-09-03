@@ -1680,7 +1680,7 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				return ShowHighScoresRacesDialog(playerid, gPlayers[playerid][RacesHSOffset]);
 			}
-		case DIALOG_TAXI_OPTIONS:
+		case DIALOG_TAXI_START_OPTIONS:
 			{
 				if (!response)
 				{
@@ -1688,6 +1688,25 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 
 				return SetPlayerTaxiMission(playerid, listitem);
+			}
+		case DIALOG_TAXI_OPTIONS:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				switch (listitem)
+				{
+					case 0:
+						{
+							return DrawTaxiNextDestionation(playerid);
+						}
+					case 1:
+						{
+							return AbortPlayerTaxiMission(playerid);
+						}
+				}
 			}
 		case DIALOG_HIGH_SCORES_OPTIONS:
 			{

@@ -783,7 +783,7 @@ dcmd_taxi(playerid, const params[])
 		return SetPlayerTaxiMission(playerid, 0);
 	}
 
-	return ShowTaxiMissionOptionsDialog(playerid);
+	return ShowTaxiMissionStartOptionsDialog(playerid);
 }
 
 dcmd_text(playerid, const params[])

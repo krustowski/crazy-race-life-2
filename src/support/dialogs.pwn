@@ -115,7 +115,6 @@ enum
 	DIALOG_TUTORIAL_MAIN,
 	DIALOG_TUTORIAL_STATS,
 	DIALOG_DEATHMATCH_OPTIONS,
-	DIALOG_TAXI_OPTIONS,
 	DIALOG_BRIBE_MAIN,
 	DIALOG_BRIBE_NOTE,
 	DIALOG_NPC_RECORD_SUFFIX
@@ -154,6 +153,12 @@ enum
 	DIALOG_RAMPAGE_EDITOR_NAME,
 	DIALOG_RAMPAGE_EDITOR_WEAPON,
 	DIALOG_RAMPAGE_EDITOR_LOCATION_TYPE
+}
+
+enum
+{
+	DIALOG_TAXI_START_OPTIONS = 0xD0,
+	DIALOG_TAXI_OPTIONS
 }
 
 #include "modules/real.pwn"
@@ -1161,7 +1166,7 @@ stock ShowRaceHelpDialog(playerid)
 	return ShowPlayerDialog(playerid, DIALOG_RACE_HELP, DIALOG_STYLE_MSGBOX, "Racing Info", stringToPrint, "Close", "");
 }
 
-stock ShowTaxiMissionOptionsDialog(playerid)
+stock ShowTaxiMissionStartOptionsDialog(playerid)
 {
 	new 
 		stringToPrint[256];
@@ -1172,7 +1177,19 @@ stock ShowTaxiMissionOptionsDialog(playerid)
 			"Whole Map"
 		);
 
-	return ShowPlayerDialog(playerid, DIALOG_TAXI_OPTIONS, DIALOG_STYLE_LIST, "Taxi Mission", stringToPrint, "Select", "Close");
+	return ShowPlayerDialog(playerid, DIALOG_TAXI_START_OPTIONS, DIALOG_STYLE_LIST, "Taxi Mission", stringToPrint, "Select", "Close");
+}
+
+stock ShowTaxiMissionOptionsDialog(playerid)
+{
+	new
+		stringToPrint[256];
+	format(stringToPrint, sizeof(stringToPrint), "%s%s",
+			"Show next destination\n",
+			"Exit minigame"
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_TAXI_OPTIONS, DIALOG_STYLE_LIST, "Taxi Mission Options", stringToPrint, "Select", "Close");
 }
 
 stock ShowHighScoresOptionsDialog(playerid)

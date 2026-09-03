@@ -27,6 +27,8 @@ enum TaxiMission
 
 	Float: CommissionCoef,
 
+	NextDestinationName[64],
+
 	TimeElapsed,
 	Earned,
 	DoneCount,
@@ -89,6 +91,8 @@ public EnterVehicleTimer(npcid)
 
 public ExitVehicleTimer(playerid)
 {
+	strcopy(gTaxiMission[playerid][NextDestinationName], "");
+
 	TogglePlayerControllable(playerid, true);
 	SetTaxiMissionCustomerPos(playerid);
 
@@ -302,12 +306,22 @@ stock SetTaxiMissionCheckpoint(playerid)
 	gTaxiMission[playerid][Checkpoint][CoordX] = X;
 	gTaxiMission[playerid][Checkpoint][CoordY] = Y;
 	gTaxiMission[playerid][Checkpoint][CoordZ] = Z;
+	
+	strcopy(gTaxiMission[playerid][NextDestinationName], name);
 
-	new gameString[128];
-	format(gameString, sizeof(gameString), gI18nMessages[I18N_TAXI_MISS_NEXT_DESTINATION][ gPlayers[playerid][Locale] ], name);
+	DrawTaxiNextDestionation(playerid);
 
-	GameTextForPlayer(playerid, gameString, 4000, 3); 
 	SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, X, Y, Z, X, Y, Z, 15.0);
+
+	return 1;
+}
+
+stock DrawTaxiNextDestionation(playerid)
+{
+	new
+		gameString[128];
+	format(gameString, sizeof(gameString), gI18nMessages[I18N_TAXI_MISS_NEXT_DESTINATION][ gPlayers[playerid][Locale] ], gTaxiMission[playerid][NextDestinationName]);
+	GameTextForPlayer(playerid, gameString, 4000, 3);
 
 	return 1;
 }
@@ -520,6 +534,8 @@ stock AbortPlayerTaxiMission(playerid)
 	gTaxiMission[playerid][DoneCount] = 0;
 	gTaxiMission[playerid][Earned] = 0;
 	gTaxiMission[playerid][TimeElapsed] = 0;
+	
+	strcopy(gTaxiMission[playerid][NextDestinationName], "");
 
 	DisablePlayerRaceCheckpoint(playerid);
 	TextDrawHideForPlayer(playerid, gTaxiMission[playerid][InfoText]);

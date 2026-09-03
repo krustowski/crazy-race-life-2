@@ -1114,12 +1114,12 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 
 				if (gTaxiMission[playerid][Active])
 				{
-					return AbortPlayerTaxiMission(playerid);
+					return ShowTaxiMissionOptionsDialog(playerid);
 				}
 
 				if (IsPlayerInTaxiCab(playerid))
 				{
-					return ShowTaxiMissionOptionsDialog(playerid);
+					return ShowTaxiMissionStartOptionsDialog(playerid);
 				}
 
 				if (gTowMission[playerid][Active])

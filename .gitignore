@@ -36,6 +36,7 @@ plugins/
 announce
 samp03svr
 samp-npc
+omp-server
 
 # logs
 logs/

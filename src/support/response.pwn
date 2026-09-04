@@ -1728,7 +1728,7 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 					case 2:
 						{
-							return ShowHighScoresMissionsDialog(playerid);
+							return ShowHighScoresMissionListDialog(playerid);
 						}
 					case 3:
 						{
@@ -1743,6 +1743,59 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							return ShowHighScoresPropertiesDialog(playerid);
 						}
 				}
+			}
+		case DIALOG_HIGH_SCORES_MISSION_LIST:
+			{
+				if (!response)
+				{
+					return ShowHighScoresOptionsDialog(playerid);
+				}
+
+				switch (listitem)
+				{
+					case 0:
+						{
+							return ShowHighScoresCombatDialog(playerid);
+						}
+					case 1:
+						{
+							return 1;//ShowHighScoresMissionDrugDialog(playerid);
+						}
+					case 2:
+						{
+							return 1;//ShowHighScoresRampageDialog(playerid);
+						}
+					case 3:
+						{
+							return ShowHighScoresMissionTaxiDialog(playerid);
+						}
+					case 4:
+						{
+							return ShowHighScoresMissionTowDialog(playerid);
+						}
+					case 5:
+						{
+							return ShowHighScoresMissionTruckDialog(playerid);
+						}
+				}
+
+				return 1;
+			}
+		case DIALOG_HIGH_SCORES_MISSION_DRUG:
+			{
+				return ShowHighScoresMissionListDialog(playerid);
+			}
+		case DIALOG_HIGH_SCORES_MISSION_TAXI:
+			{
+				return ShowHighScoresMissionListDialog(playerid);
+			}
+		case DIALOG_HIGH_SCORES_MISSION_TOW:
+			{
+				return ShowHighScoresMissionListDialog(playerid);
+			}
+		case DIALOG_HIGH_SCORES_MISSION_TRUCK:
+			{
+				return ShowHighScoresMissionListDialog(playerid);
 			}
 		case DIALOG_COMBAT_LIST:
 			{

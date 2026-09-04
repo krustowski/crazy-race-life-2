@@ -506,7 +506,7 @@ dcmd_kill(playerid, const params[])
 
 	// RemovePlayerFromVehicle() needs a tick to actually take effect; killing
 	// the player in the same call still finds them "in a vehicle" and leaves
-	// the camera stuck until they manually press F. Give it a beat.
+	// the camera stuck until they manually press F.
 	if (IsPlayerInAnyVehicle(playerid))
 	{
 		RemovePlayerFromVehicle(playerid);
@@ -550,13 +550,19 @@ dcmd_locale(playerid, const params[])
 dcmd_locate(playerid, const params[])
 {
 #pragma unused params
-	new stringToPrint[256], interiorNo = GetPlayerInterior(playerid), Float:X, Float:Y, Float:Z, Float:Angle;
+	new
+		stringToPrint[256], 
+		interiorNo = GetPlayerInterior(playerid), 
+		Float: X, 
+		Float: Y, 
+		Float: Z, 
+		Float: angle;
 
 	GetPlayerPos(playerid, X, Y, Z);
-	GetPlayerFacingAngle(playerid, Angle);
+	GetPlayerFacingAngle(playerid, angle);
 
 	GetLocalizedString(playerid, I18N_LOCATE_COORDS_FMT, stringToPrint, sizeof(stringToPrint));
-	format(stringToPrint, sizeof(stringToPrint), stringToPrint, interiorNo, X, Y, Z, Angle);
+	format(stringToPrint, sizeof(stringToPrint), stringToPrint, interiorNo, X, Y, Z, angle);
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 
 	return 1;

@@ -63,7 +63,12 @@ enum
 	DIALOG_HIGH_SCORES_PLAYTIME,
 	DIALOG_HIGH_SCORES_PROPERTIES,
 	DIALOG_HIGH_SCORES_DEATHMATCH,
-	DIALOG_HIGH_SCORES_MISSIONS,
+	DIALOG_HIGH_SCORES_MISSION_LIST,
+	DIALOG_HIGH_SCORES_MISSION_DRUG,
+	DIALOG_HIGH_SCORES_RAMPAGE,
+	DIALOG_HIGH_SCORES_MISSION_TAXI,
+	DIALOG_HIGH_SCORES_MISSION_TOW,
+	DIALOG_HIGH_SCORES_MISSION_TRUCK,
 	DIALOG_HIGH_SCORES_RACES,
 	DIALOG_HIGH_SCORES_COMBAT
 }
@@ -1211,7 +1216,7 @@ stock ShowHighScoresOptionsDialog(playerid)
 stock ShowHighScoresPlayTimeDialog(playerid)
 {
 	new 
-		query[512] = "SELECT id, nickname, playtime FROM users WHERE playtime IS NOT 0 ORDER BY playtime DESC LIMIT 15";
+		query[512] = "SELECT id, nickname, playtime FROM users WHERE playtime IS NOT 0 ORDER BY playtime DESC LIMIT 20";
 
 	new 
 		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
@@ -1231,7 +1236,7 @@ stock ShowHighScoresPlayTimeDialog(playerid)
 
 	new 
 		i = 1, 
-		stringToPrint[1024] = "{FFD700}Top 15 players by Playtime:{FFFFFF}\n";
+		stringToPrint[2048] = "{FFD700}Top 20 players by Playtime:{FFFFFF}\n";
 
 	do
 	{
@@ -1395,9 +1400,25 @@ stock ShowHighScoresDeathmatchDialog(playerid)
 	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_DEATHMATCH, DIALOG_STYLE_MSGBOX, "High Scores: Deathmatch", stringToPrint, "Close", "");
 }
 
+stock ShowHighScoresMissionListDialog(playerid)
+{
+	new
+		stringToPrint[256];
+	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%s%s", 
+			"Combat\n",
+			"Drug\n",
+			"Rampage\n",
+			"Taxi\n",
+			"Tow\n",
+			"Truck"
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_MISSION_LIST, DIALOG_STYLE_LIST, "High Scores: Missions", stringToPrint, "Select", "Back");
+}
+
 #include "modules/taxi.pwn"
 
-stock ShowHighScoresMissionsDialog(playerid)
+stock ShowHighScoresMissionTaxiDialog(playerid)
 {
 	new 
 		query[512] = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 10 AND s.type = 3 ORDER BY s.value DESC, s.rank";
@@ -1413,7 +1434,7 @@ stock ShowHighScoresMissionsDialog(playerid)
 
 	new
 		i = 1,
-		stringToPrint[3048] = "{FFD700}Top 10 Taxi Mission players{FFFFFF}\n";
+		stringToPrint[2048] = "{FFD700}Top 10 Taxi missions and players{FFFFFF}\n";
 
 	do
 	{
@@ -1457,7 +1478,7 @@ stock ShowHighScoresMissionsDialog(playerid)
 
 	DB_FreeResultSet(result);
 
-	query = "SELECT ROW_NUMBER() OVER (ORDER BY MAX(value) DESC) AS rank, u.nickname, spec_id, MAX(value) AS top_mission_count FROM high_scores AS h JOIN users AS u ON u.id = user_id WHERE type = 3 GROUP BY user_id ORDER BY top_mission_count DESC LIMIT 5;";
+	query = "SELECT ROW_NUMBER() OVER (ORDER BY MAX(value) DESC) AS rank, u.nickname, spec_id, MAX(value) AS top_mission_count FROM high_scores AS h JOIN users AS u ON u.id = user_id WHERE type = 3 GROUP BY user_id ORDER BY top_mission_count DESC LIMIT 10;";
 
 	result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
@@ -1512,11 +1533,17 @@ stock ShowHighScoresMissionsDialog(playerid)
 
 	DB_FreeResultSet(result);
 
-	// Trucking
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_MISSION_TAXI, DIALOG_STYLE_MSGBOX, "High Scores: Taxi Missions", stringToPrint, "Back", "");
+}
 
-	query = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 4 ORDER BY s.value DESC, s.rank";
+stock ShowHighScoresMissionTruckDialog(playerid)
+{
+	new
+		stringToPrint[2048],
+		query[] = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 10 AND s.type = 4 ORDER BY s.value DESC, s.rank";
 
-	result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
 	{
 		print("Database error: cannot read high_scores data for trucking missions!");
@@ -1524,8 +1551,9 @@ stock ShowHighScoresMissionsDialog(playerid)
 		return 0;
 	}
 
-	i = 1;
-	format(stringToPrint, sizeof(stringToPrint), "%s\n\n\n{FFD700}Top 5 Trucking Mission players{FFFFFF}\n", stringToPrint);
+	new
+		i = 1;
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Top 10 Trucking missions and players{FFFFFF}\n");
 
 	do
 	{
@@ -1546,7 +1574,7 @@ stock ShowHighScoresMissionsDialog(playerid)
 
 	DB_FreeResultSet(result);
 
-	query = "SELECT ROW_NUMBER() OVER (ORDER BY MAX(value) DESC) AS rank, u.nickname, spec_id, MAX(value) AS top_mission_count FROM high_scores AS h JOIN users AS u ON u.id = user_id WHERE type = 4 GROUP BY user_id ORDER BY top_mission_count DESC LIMIT 5;";
+	query = "SELECT ROW_NUMBER() OVER (ORDER BY MAX(value) DESC) AS rank, u.nickname, spec_id, MAX(value) AS top_mission_count FROM high_scores AS h JOIN users AS u ON u.id = user_id WHERE type = 4 GROUP BY user_id ORDER BY top_mission_count DESC LIMIT 10;";
 
 	result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
@@ -1578,11 +1606,17 @@ stock ShowHighScoresMissionsDialog(playerid)
 
 	DB_FreeResultSet(result);
 
-	// Towing
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_MISSION_TRUCK, DIALOG_STYLE_MSGBOX, "High Scores: Truck Mission", stringToPrint, "Back", "");
+}
 
-	query = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 6 ORDER BY s.spec_id DESC, s.rank";
+stock ShowHighScoresMissionTowDialog(playerid)
+{
+	new
+		stringToPrint[2048],
+		query[] = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 10 AND s.type = 6 ORDER BY s.spec_id DESC, s.rank";
 
-	result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	new
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
 	{
 		print("Database error: cannot read high_scores data for tow missions!");
@@ -1590,8 +1624,9 @@ stock ShowHighScoresMissionsDialog(playerid)
 		return 0;
 	}
 
-	i = 1;
-	format(stringToPrint, sizeof(stringToPrint), "%s\n\n\n{FFD700}Top 5 Tow Mission players{FFFFFF}\n", stringToPrint);
+	new
+		i = 1;
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Top 10 Tow missions and players{FFFFFF}\n");
 
 	do
 	{
@@ -1614,7 +1649,41 @@ stock ShowHighScoresMissionsDialog(playerid)
 
 	DB_FreeResultSet(result);
 
-	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_MISSIONS, DIALOG_STYLE_MSGBOX, "High Scores: Missions", stringToPrint, "Close", "");
+	query = "SELECT ROW_NUMBER() OVER (ORDER BY MAX(value) DESC) AS rank, u.nickname, spec_id, MAX(value) AS vehicle_count FROM high_scores AS h JOIN users AS u ON u.id = user_id WHERE type = 6 GROUP BY user_id ORDER BY spec_id DESC LIMIT 10;";
+
+	result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for tow missions (2)!");
+		print(query);
+		return 0;
+	}
+
+	format(stringToPrint, sizeof(stringToPrint), "%s\n", stringToPrint);
+	i = 1;
+
+	do
+	{
+		new 
+			nickname[MAX_PLAYER_NAME], 
+			done, 
+			models;
+
+		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+		models = DB_GetFieldIntByName(result, "spec_id");
+		done = DB_GetFieldIntByName(result, "vehicle_count");
+
+		if (done)
+		{
+			format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}%3d{FFFFFF} ({00FF00}%d{FFFFFF} models)\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, done, models, nickname);
+			i++;
+		}
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_MISSION_TOW, DIALOG_STYLE_MSGBOX, "High Scores: Missions", stringToPrint, "Back", "");
 }
 
 stock ShowHighScoresCombatDialog(playerid)
@@ -1678,7 +1747,7 @@ stock ShowHighScoresCombatDialog(playerid)
 
 	DB_FreeResultSet(result);
 
-	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_COMBAT, DIALOG_STYLE_MSGBOX, "High Scores: Missions", stringToPrint, "Close", "");
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_COMBAT, DIALOG_STYLE_MSGBOX, "High Scores: Missions", stringToPrint, "Back", "");
 }
 
 stock ShowCombatListDialog(playerid)

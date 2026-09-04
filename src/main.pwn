@@ -511,7 +511,7 @@ public OnNPCDeath(npcid, killerid, WEAPON:reason)
 
 			for (new j = 0; j < NPC_COUNT; j++)
 			{
-				if (NPC_IsValid(npcs[j]) && NPC_GetWeapon(npcs[j]) > 0)
+				if (NPC_IsValid(npcs[j]) && NPC_GetWeapon(npcs[j]) > WEAPON: 0)
 				{
 					killerid = npcs[j];
 					break;

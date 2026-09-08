@@ -11,6 +11,8 @@
 #define MAX_PLAYERS 	100
 #define MAX_VEHICLES	2000
 
+#define MAX_DRUG_TYPES	10
+
 #define STRONG_TAGS
 
 // Hotfix for the OOM errors
@@ -83,7 +85,6 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 //
 
 #include "modules/player.pwn"
-#include "modules/drugz.pwn"
 #include "modules/team.pwn"
 #include "modules/auth.pwn"
 #include "modules/real.pwn"

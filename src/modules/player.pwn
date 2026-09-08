@@ -13,7 +13,6 @@
 #include "db/sql.pwn"
 #include "modules/team.pwn"
 #include "modules/tutorial.pwn"
-#include "modules/drugz.pwn"
 #include "support/helpers.pwn"
 
 //
@@ -109,7 +108,6 @@ forward GivePlayerWeaponEx(playerid, timerid, weaponid, ammo);
 forward SendPlayerSalary();
 forward UpdatePlayerPlayTime();
 forward UpdatePlayerScore();
-forward UpdateDrugMissionInfoText(playerid);
 forward UpdateBlackMarketRatio();
 
 #include "modules/drugz.pwn"
@@ -154,24 +152,6 @@ public UpdateBlackMarketRatio()
 
 		SendClientMessage(i, COLOR_ORANGE, msg);
 	}
-}
-
-public UpdateDrugMissionInfoText(playerid)
-{
-	new stringToPrint[256];
-
-	gDrugMission[playerid][TimeElapsed] += 1000;
-
-	format(stringToPrint, sizeof(stringToPrint), gI18nMessages[I18N_DRUG_MISS_INFO][ gPlayers[playerid][Locale] ], 
-		gDrugMission[playerid][Count], 
-		floatround(floatround(gDrugMission[playerid][TimeElapsed] / 1000) / 60), 
-		floatround(gDrugMission[playerid][TimeElapsed] / 1000) % 60
-	);
-
-	TextDrawSetString(gDrugMission[playerid][InfoText], stringToPrint);
-	TextDrawShowForPlayer(playerid, gDrugMission[playerid][InfoText]);
-
-	return 1;
 }
 
 public BatchSavePlayerData()
@@ -314,55 +294,6 @@ stock LoadPlayerData(playerid)
 	}
 
 	return 0;
-}
-
-stock ToggleDrugMission(playerid)
-{
-	if (gDrugMission[playerid][Active])
-	{
-		gPlayers[playerid][InMinigame] = false;
-
-		gDrugMission[playerid][Active] = false;
-		gDrugMission[playerid][Count] = 0;
-		gDrugMission[playerid][TimeElapsed] = 0;
-
-		KillTimer(gDrugMission[playerid][TimerElapsed]);
-
-		//SendClientMessageLocalized(playerid, I18N_DRUG_MISS_ABORTED);
-
-		new
-			gameText[32];
-
-		GetLocalizedString(playerid, I18N_DRUG_MISS_ABORTED, gameText, sizeof(gameText));
-		GameTextForPlayer(playerid, gameText, 3000, 3);
-
-		return 1;
-	}
-
-	if (gPlayers[playerid][InMinigame])
-	{
-		return SendClientMessageLocalized(playerid, I18N_DRUG_MISS_INMINIGAME_CONFLICT);
-	}
-
-	if (gPlayers[playerid][TeamID] != TEAM_DEALERS)
-	{
-		return SendClientMessageLocalized(playerid, I18N_DRUG_MISS_UNMET_TEAM);
-	}
-
-	gDrugMission[playerid][Active] = true;
-	gPlayers[playerid][InMinigame] = true;
-
-	gDrugMission[playerid][TimerElapsed] = SetTimerEx("UpdateDrugMissionInfoText", 1000, true, "i", playerid);
-
-	//SendClientMessageLocalized(playerid, I18N_DRUG_MISS_STARTED);
-
-	new
-		gameText[32];
-
-	GetLocalizedString(playerid, I18N_DRUG_MISS_STARTED, gameText, sizeof(gameText));
-	GameTextForPlayer(playerid, gameText, 3000, 3);
-
-	return 1;
 }
 
 stock ExtractPropperties(const input[], properties[MAX_PLAYER_PROPERTIES])
@@ -780,35 +711,6 @@ stock WithdrawMoneyFromBankAccount(playerid, amount)
 	SendClientMessage(playerid, COLOR_YELLOW, stringToPrint);
 
 	return 1;
-}
-
-stock CheckDrugzPickup(playerid, pickupid)
-{
-	for (new i = 0; i < MAX_DRUG_PICKUPS; i++)
-	{
-		if (pickupid != gDrugPickups[i][Pickup])
-		{
-			continue;
-		}
-
-		new 
-			amount = random(10), 
-			type = _: gDrugPickups[i][Type], 
-			stringToPrint[128];
-
-		gPlayers[playerid][Drugs][type - 1] += amount;
-
-		if (gDrugMission[playerid][Active])
-		{
-			gDrugMission[playerid][Count] += amount;
-		}
-
-		GetLocalizedString(playerid, I18N_DRUGZ_PICKUP_FMT, stringToPrint, sizeof(stringToPrint));
-		format(stringToPrint, sizeof(stringToPrint), stringToPrint, amount, gDrugz[type - 1][DrugName]);
-		return SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
-	}
-
-	return 0;
 }
 
 stock ProcessDealOffer(playerid)

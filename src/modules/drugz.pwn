@@ -5,9 +5,9 @@
 
 //
 //  drugz.pwn
+//  Drug types, the black market and the Drug Mission.
 //
 
-#define MAX_DRUG_TYPES		10
 #define MAX_DRUG_PICKUPS	64
 #define MAX_MARKET_ITEMS	128
 #define MAX_DRUGGERY_POINTS	16
@@ -283,4 +283,153 @@ stock CheckDruggeryPointPickup(playerid, pickupid)
 	}
 
 	return 0;
+}
+//
+//  Drug Mission.
+//
+
+forward UpdateDrugMissionInfoText(playerid);
+
+public UpdateDrugMissionInfoText(playerid)
+{
+	new stringToPrint[256];
+
+	gDrugMission[playerid][TimeElapsed] += 1000;
+
+	format(stringToPrint, sizeof(stringToPrint), gI18nMessages[I18N_DRUG_MISS_INFO][ gPlayers[playerid][Locale] ], 
+		gDrugMission[playerid][Count], 
+		floatround(floatround(gDrugMission[playerid][TimeElapsed] / 1000) / 60), 
+		floatround(gDrugMission[playerid][TimeElapsed] / 1000) % 60
+	);
+
+	TextDrawSetString(gDrugMission[playerid][InfoText], stringToPrint);
+	TextDrawShowForPlayer(playerid, gDrugMission[playerid][InfoText]);
+
+	return 1;
+}
+
+stock CheckDrugzPickup(playerid, pickupid)
+{
+	for (new i = 0; i < MAX_DRUG_PICKUPS; i++)
+	{
+		if (pickupid != gDrugPickups[i][Pickup])
+		{
+			continue;
+		}
+
+		new 
+			amount = random(10), 
+			type = _: gDrugPickups[i][Type], 
+			stringToPrint[128];
+
+		gPlayers[playerid][Drugs][type - 1] += amount;
+
+		if (gDrugMission[playerid][Active])
+		{
+			gDrugMission[playerid][Count] += amount;
+		}
+
+		GetLocalizedString(playerid, I18N_DRUGZ_PICKUP_FMT, stringToPrint, sizeof(stringToPrint));
+		format(stringToPrint, sizeof(stringToPrint), stringToPrint, amount, gDrugz[type - 1][DrugName]);
+		return SendClientMessage(playerid, COLOR_ORANGE, stringToPrint);
+	}
+
+	return 0;
+}
+
+stock SaveDrugMissionScore(playerid)
+{
+	if (!gDrugMission[playerid][Count])
+	{
+		return 1;
+	}
+
+	new
+		query[256];
+	format(query, sizeof(query), "INSERT INTO high_scores (type, spec_id, value, user_id, time) VALUES (%d, '%d', %d, %d, %d)",
+			8,
+			1,
+			gDrugMission[playerid][Count],
+			gPlayers[playerid][OrmID],
+			gDrugMission[playerid][TimeElapsed]
+	      );
+
+	new
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot write high scores data!");
+		print(query);
+		return 0;
+	}
+
+	DB_FreeResultSet(result);
+
+	return 1;
+}
+
+stock AbortPlayerDrugMission(playerid)
+{
+	if (!gDrugMission[playerid][Active])
+	{
+		return 1;
+	}
+
+	KillTimer(gDrugMission[playerid][TimerElapsed]);
+
+	SaveDrugMissionScore(playerid);
+
+	gPlayers[playerid][InMinigame] = false;
+
+	gDrugMission[playerid][Active] = false;
+	gDrugMission[playerid][Count] = 0;
+	gDrugMission[playerid][TimeElapsed] = 0;
+
+	TextDrawHideForPlayer(playerid, gDrugMission[playerid][InfoText]);
+
+	//SendClientMessageLocalized(playerid, I18N_DRUG_MISS_ABORTED);
+
+	new
+		gameText[32];
+
+	GetLocalizedString(playerid, I18N_DRUG_MISS_ABORTED, gameText, sizeof(gameText));
+	GameTextForPlayer(playerid, gameText, 3000, 3);
+
+	return 1;
+}
+
+stock ToggleDrugMission(playerid)
+{
+	if (gDrugMission[playerid][Active])
+	{
+		return AbortPlayerDrugMission(playerid);
+	}
+
+	if (gPlayers[playerid][InMinigame])
+	{
+		return SendClientMessageLocalized(playerid, I18N_DRUG_MISS_INMINIGAME_CONFLICT);
+	}
+
+	if (gPlayers[playerid][TeamID] != TEAM_DEALERS)
+	{
+		return SendClientMessageLocalized(playerid, I18N_DRUG_MISS_UNMET_TEAM);
+	}
+
+	gDrugMission[playerid][Active] = true;
+	gPlayers[playerid][InMinigame] = true;
+
+	gDrugMission[playerid][Count] = 0;
+	gDrugMission[playerid][TimeElapsed] = 0;
+
+	gDrugMission[playerid][TimerElapsed] = SetTimerEx("UpdateDrugMissionInfoText", 1000, true, "i", playerid);
+
+	//SendClientMessageLocalized(playerid, I18N_DRUG_MISS_STARTED);
+
+	new
+		gameText[32];
+
+	GetLocalizedString(playerid, I18N_DRUG_MISS_STARTED, gameText, sizeof(gameText));
+	GameTextForPlayer(playerid, gameText, 3000, 3);
+
+	return 1;
 }

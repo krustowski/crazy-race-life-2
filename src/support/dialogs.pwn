@@ -306,7 +306,7 @@ stock ShowCommonCommandsDialog(playerid)
 		stringToPrint[2048];
 
 	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Common Commands{FFFFFF}\n\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
-    			"/acc\t\t\tgame account info dump\n",
+    		"/acc\t\t\tgame account info dump\n",
 			"/admins\t\t\tlists admins online\n",
 			"/afk\t\t\t(un)sets the Away-From-Keyboard state\n",
 			"/animoff\t\tclears all animations\n",
@@ -1686,10 +1686,178 @@ stock ShowHighScoresMissionTowDialog(playerid)
 	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_MISSION_TOW, DIALOG_STYLE_MSGBOX, "High Scores: Missions", stringToPrint, "Back", "");
 }
 
+stock ShowHighScoresRampageDialog(playerid)
+{
+	new
+		stringToPrint[4096],
+		query[512] = "SELECT s.value, s.spec_id, u.nickname, s.time, r.name AS rampage_name FROM ( SELECT type, value, spec_id, time, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id LEFT JOIN rampages r ON r.id = s.spec_id WHERE s.rank <= 10 AND s.type = 7 ORDER BY s.spec_id DESC, s.rank";
+
+	new
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for rampages!");
+		print(query);
+		return 0;
+	}
+
+	new
+		i = 1;
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Top 10 rampages and players{FFFFFF}\n");
+
+	do
+	{
+		new 
+			nickname[MAX_PLAYER_NAME], 
+			rampageName[64],
+			killed, 
+			time;
+
+		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+		DB_GetFieldStringByName(result, "rampage_name", rampageName, sizeof(rampageName));
+		killed = DB_GetFieldIntByName(result, "value");
+		time = 300000 - DB_GetFieldIntByName(result, "time");
+
+		if (!killed)
+		{
+			continue;
+		}
+			
+		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}%3d{FFFFFF}\t%2d:%02d ({FFD700}%s{FFFFFF})\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, killed, time / 1000 / 60, time / 1000 % 60, rampageName, nickname);
+		i++;
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	query = "SELECT ROW_NUMBER() OVER (ORDER BY MAX(value) DESC) AS rank, u.nickname, time, spec_id, r.name AS rampage_name, MAX(value) AS killed FROM high_scores AS h JOIN users AS u ON u.id = user_id LEFT JOIN rampages AS r ON r.id = h.spec_id WHERE type = 7 GROUP BY user_id ORDER BY spec_id DESC LIMIT 10;";
+
+	result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for rampages (2)!");
+		print(query);
+		return 0;
+	}
+
+	format(stringToPrint, sizeof(stringToPrint), "%s\n", stringToPrint);
+	i = 1;
+
+	do
+	{
+		new 
+			nickname[MAX_PLAYER_NAME], 
+			rampageName[64],
+			killed, 
+			time;
+
+		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+		DB_GetFieldStringByName(result, "rampage_name", rampageName, sizeof(rampageName));
+		killed = DB_GetFieldIntByName(result, "killed");
+		time = 300000 - DB_GetFieldIntByName(result, "time");
+
+		if (!killed)
+		{
+			continue;
+		}
+		
+		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}%3d{FFFFFF}\t%2d:%02d ({FFD700}%s{FFFFFF})\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, killed, time / 1000 / 60, time / 1000 % 60, rampageName, nickname);
+		i++;
+
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_RAMPAGE, DIALOG_STYLE_MSGBOX, "High Scores: Rampages", stringToPrint, "Back", "");
+}
+
+stock ShowHighScoresMissionDrugDialog(playerid)
+{
+	new
+		stringToPrint[2048],
+		query[512] = "SELECT s.value, s.spec_id, u.nickname, s.time FROM ( SELECT type, value, spec_id, user_id, time, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 10 AND s.type = 8 ORDER BY s.value DESC, s.rank";
+
+	new
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for drug missions!");
+		print(query);
+		return 0;
+	}
+
+	new
+		i = 1;
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Top 10 Drug missions and players{FFFFFF}\n");
+
+	do
+	{
+		new 
+			nickname[MAX_PLAYER_NAME], 
+			amount,
+			time;
+
+		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+		amount = DB_GetFieldIntByName(result, "value");
+		time = DB_GetFieldIntByName(result, "time");
+
+		if (!amount)
+		{
+			continue;
+		}
+			
+		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}%3d{FFFFFF}\t %2d:%02d\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, amount, time / 1000 / 60, time / 1000 % 60, nickname);
+		i++;
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	query = "SELECT ROW_NUMBER() OVER (ORDER BY MAX(value) DESC) AS rank, u.nickname, time, spec_id, MAX(value) AS amount FROM high_scores AS h JOIN users AS u ON u.id = user_id WHERE type = 8 GROUP BY user_id ORDER BY MAX(value) DESC LIMIT 10;";
+
+	result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for drug missions (2)!");
+		print(query);
+		return 0;
+	}
+
+	format(stringToPrint, sizeof(stringToPrint), "%s\n", stringToPrint);
+	i = 1;
+
+	do
+	{
+		new 
+			nickname[MAX_PLAYER_NAME], 
+			amount,
+			time;
+
+		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+		amount = DB_GetFieldIntByName(result, "amount");
+		time = DB_GetFieldIntByName(result, "time");
+
+		if (!amount)
+		{
+			continue;
+		}
+			
+		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}%3d{FFFFFF}\t %2d:%02d\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, amount, time / 1000 / 60, time / 1000 % 60, nickname);
+		i++;
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_MISSION_DRUG, DIALOG_STYLE_MSGBOX, "High Scores: Drug Missions", stringToPrint, "Back", "");
+}
+
 stock ShowHighScoresCombatDialog(playerid)
 {
 	new 
-		query[512] = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 5 AND s.type = 5 ORDER BY s.value DESC, s.rank", stringToPrint[1024];
+		query[512] = "SELECT s.value, s.spec_id, u.nickname FROM ( SELECT type, value, spec_id, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id WHERE s.rank <= 10 AND s.type = 5 ORDER BY s.value DESC, s.rank", 
+		stringToPrint[1024];
 
 	new 
 		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
@@ -1703,6 +1871,9 @@ stock ShowHighScoresCombatDialog(playerid)
 	new 
 		i = 1, 
 		s = 0;
+
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Top 10 Combat missions and players{FFFFFF}\n");
+
 	do
 	{
 		new 
@@ -1725,29 +1896,55 @@ stock ShowHighScoresCombatDialog(playerid)
 		}
 		s = missionid;
 
-		switch (i)
+		if (!value)
 		{
-			case 1:
-				{
-					format(stringToPrint, sizeof(stringToPrint), "%s\n\n{FFD700}Combat Mission No. %2d{FFFFFF}\n\n", stringToPrint, missionid);
-					format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}1st: {00FF00}%2d{FFD700}\t%s\n", stringToPrint, value, nickname);
-				}
-			case 2:
-				{
-					format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}2nd: {00FF00}%2d{FFD700}\t%s\n", stringToPrint, value, nickname);
-				}
-			case 3:
-				{
-					format(stringToPrint, sizeof(stringToPrint), "%s{FFFFFF}3rd: {00FF00}%2d{FFD700}\t%s\n", stringToPrint, value, nickname);
-				}
+			continue;
 		}
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}%3d{FFFFFF} briefcases (mission no. %d)\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, value, missionid, nickname);
 		i++;
 	}
 	while (DB_SelectNextRow(result));
 
 	DB_FreeResultSet(result);
 
-	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_COMBAT, DIALOG_STYLE_MSGBOX, "High Scores: Missions", stringToPrint, "Back", "");
+	query = "SELECT ROW_NUMBER() OVER (ORDER BY MAX(value) DESC) AS rank, u.nickname, spec_id, MAX(value) AS done FROM high_scores AS h JOIN users AS u ON u.id = user_id WHERE type = 5 GROUP BY user_id ORDER BY spec_id DESC LIMIT 10;";
+
+	result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for combat missions (2)!");
+		print(query);
+		return 0;
+	}
+
+	format(stringToPrint, sizeof(stringToPrint), "%s\n", stringToPrint);
+	i = 1;
+
+	do
+	{
+		new 
+			nickname[MAX_PLAYER_NAME], 
+			done, 
+			missionid;
+
+		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+		missionid = DB_GetFieldIntByName(result, "spec_id");
+		done = DB_GetFieldIntByName(result, "done");
+
+		if (!done)
+		{
+			continue;
+		}
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}%3d{FFFFFF} briefcases (mission no. %d)\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, done, missionid, nickname);
+		i++;
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_COMBAT, DIALOG_STYLE_MSGBOX, "High Scores: Combat Mission", stringToPrint, "Back", "");
 }
 
 stock ShowCombatListDialog(playerid)

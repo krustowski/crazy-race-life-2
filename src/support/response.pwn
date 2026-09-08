@@ -1759,11 +1759,11 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 					case 1:
 						{
-							return 1;//ShowHighScoresMissionDrugDialog(playerid);
+							return ShowHighScoresMissionDrugDialog(playerid);
 						}
 					case 2:
 						{
-							return 1;//ShowHighScoresRampageDialog(playerid);
+							return ShowHighScoresRampageDialog(playerid);
 						}
 					case 3:
 						{
@@ -1782,6 +1782,14 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				return 1;
 			}
 		case DIALOG_HIGH_SCORES_MISSION_DRUG:
+			{
+				return ShowHighScoresMissionListDialog(playerid);
+			}			
+		case DIALOG_HIGH_SCORES_COMBAT:
+			{
+				return ShowHighScoresMissionListDialog(playerid);
+			}		
+		case DIALOG_HIGH_SCORES_RAMPAGE:
 			{
 				return ShowHighScoresMissionListDialog(playerid);
 			}

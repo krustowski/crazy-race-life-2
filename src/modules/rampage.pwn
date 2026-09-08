@@ -153,6 +153,11 @@ public RecreateRampageNPC(playerid, missionid, npcindex)
 {
     NPC_Destroy(gRampageNPCs[missionid][npcindex][ID]);
 
+    if (!gRampageMission[playerid][Active])
+    {
+        return 1;
+    }
+
     if (!SetRampageNPC(playerid, missionid, npcindex))
     {
         return 1;
@@ -339,6 +344,11 @@ stock AbortRampageMission(playerid)
         return 1;
     }
 
+    if (gRampageMission[playerid][KilledCount])
+    {
+        SaveRampageMissionScore(playerid);
+    }
+    
     new
         missionid = gRampageMission[playerid][ID];
 
@@ -625,6 +635,37 @@ stock SetRampageNPC(playerid, missionid, npcarrayid)
     gRampageNPCs[missionid][npcarrayid][ID] = npcid;
 
     return 1;
+}
+
+stock SaveRampageMissionScore(playerid)
+{
+	if (!gRampageMission[playerid][KilledCount])
+	{
+		return 1;
+	}
+
+	new
+		query[256];
+	format(query, sizeof(query), "INSERT INTO high_scores (type, spec_id, value, user_id, time) VALUES (%d, '%d', %d, %d, %d)",
+			7,
+			gRampageMission[playerid][ID],
+			gRampageMission[playerid][KilledCount],
+			gPlayers[playerid][OrmID],
+            gRampageMission[playerid][TimeElapsed]
+	      );
+
+	new
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot write high scores data for rampage");
+		print(query);
+		return 0;
+	}
+
+	DB_FreeResultSet(result);
+
+	return 1;
 }
 
 stock SaveRampageMission(playerid)

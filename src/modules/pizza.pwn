@@ -3,6 +3,9 @@
 #endif
 #define _CRL2_PIZZA
 
+// A pizza customer spawns within this radius of the courier.
+#define PIZZA_CUSTOMER_MAX_DIST	175.0
+
 //
 //  pizza.pwn
 //
@@ -197,37 +200,57 @@ stock Pizza_SetCustomerPos(playerid)
         Float: X,
         Float: Y,
         Float: Z,
-        query[256];
+        Float: pX,
+        Float: pY,
+        Float: pZ,
+        query[640];
 
-    format(query, sizeof(query), "SELECT c.primary_x, c.primary_y, c.primary_z FROM property_coords AS c JOIN properties AS p ON c.property_id = p.id WHERE c.type = 8 AND p.name LIKE 'LS:%%' ORDER BY random() LIMIT 1");
+    GetPlayerPos(playerid, pX, pY, pZ);
 
-    // Set iteration limit to 250, so the last is used if not anything closer appears...
-    for (new i = 0; i < 250; i++)
+    // Let the database find a customer point that is already close enough
+    format(query, sizeof(query), "SELECT c.primary_x, c.primary_y, c.primary_z FROM property_coords AS c JOIN properties AS p ON c.property_id = p.id WHERE c.type = 8 AND p.name LIKE 'LS:%%' AND ((c.primary_x - %.3f) * (c.primary_x - %.3f) + (c.primary_y - %.3f) * (c.primary_y - %.3f) + (c.primary_z - %.3f) * (c.primary_z - %.3f)) <= %.1f ORDER BY random() LIMIT 1",
+            pX, pX, pY, pY, pZ, pZ, PIZZA_CUSTOMER_MAX_DIST * PIZZA_CUSTOMER_MAX_DIST);
+
+    new 
+        DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+    if (!result) 
     {
-        new 
-            DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-        if (!result) 
-        {
-		    //SendClientMessageLocalized(playerid, I18N_TAXI_MISS_DB_READ_ERROR);
+        print("Database error: cannot get random row from property_coords!");
+        print(query);
 
-            print("Database error: cannot get random row from property_coords!");
-            print(query);
-            return 0;
-        }
+        return 0;
+    }
 
-        X = DB_GetFieldFloatByName(result, "primary_x");
-        Y = DB_GetFieldFloatByName(result, "primary_y");
-        Z = DB_GetFieldFloatByName(result, "primary_z");
-
+    // Nobody nearby: any LS point will do, which is where the old loop ended up
+    // once it exhausted its attempts
+    if (!DB_GetRowCount(result))
+    {
         DB_FreeResultSet(result);
 
-        if (!IsPlayerInSphere(playerid, X, Y, Z, 175.0))
-        {
-            continue;
-        }
+        format(query, sizeof(query), "SELECT c.primary_x, c.primary_y, c.primary_z FROM property_coords AS c JOIN properties AS p ON c.property_id = p.id WHERE c.type = 8 AND p.name LIKE 'LS:%%' ORDER BY random() LIMIT 1");
 
-        break;
+        result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+        if (!result || !DB_GetRowCount(result))
+        {
+            print("Database error: no pizza customer point available!");
+            print(query);
+
+            if (result)
+            {
+                DB_FreeResultSet(result);
+            }
+
+            return 0;
+        }
     }
+
+    X = DB_GetFieldFloatByName(result, "primary_x");
+    Y = DB_GetFieldFloatByName(result, "primary_y");
+    Z = DB_GetFieldFloatByName(result, "primary_z");
+
+    DB_FreeResultSet(result);
     
     gPizzaMission[playerid][DeliveryPos][CoordX] = X;
     gPizzaMission[playerid][DeliveryPos][CoordY] = Y;

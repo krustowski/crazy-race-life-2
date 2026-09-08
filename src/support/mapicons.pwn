@@ -147,62 +147,11 @@ public AddMapicons(playerid)
 
 	// Real Estate
 	//
-	// Fetch the whole ownership list in one query. IsPlayerOwner() runs a
-	// synchronous query, so calling it per property meant MAX_PROPERTIES (512)
-	// blocking queries on every login -- crashdetect reported AddMapicons as a
-	// hang for exactly that reason.
-
-	new
-		ownedIds[MAX_PROPERTIES],
-		ownedCount = 0,
-		ownedQuery[128];
-
-	format(ownedQuery, sizeof(ownedQuery), "SELECT id FROM properties WHERE user_id = %d AND occupied = 1", gPlayers[playerid][OrmID]);
-
-	new
-		DBResult: ownedResult = DB_ExecuteQuery(gDbConnectionHandle, ownedQuery);
-
-	if (!ownedResult)
-	{
-		print("Database error: cannot list owned properties for map icons!");
-		print(ownedQuery);
-	}
-	else
-	{
-		if (DB_GetRowCount(ownedResult))
-		{
-			do
-			{
-				if (ownedCount >= MAX_PROPERTIES)
-				{
-					break;
-				}
-
-				ownedIds[ownedCount++] = DB_GetFieldIntByName(ownedResult, "id");
-			}
-			while (DB_SelectNextRow(ownedResult));
-		}
-
-		DB_FreeResultSet(ownedResult);
-	}
-
+	// IsPlayerOwnerOfArrayID is a plain memory comparison, so checking every
+	// property slot here is free. 
 	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
-		new
-			bool: isOwned = false;
-
-		for (new k = 0; k < ownedCount; k++)
-		{
-			if (ownedIds[k] != gProperties[i][ID])
-			{
-				continue;
-			}
-
-			isOwned = true;
-			break;
-		}
-
-		if (!isOwned)
+		if (!IsPlayerOwnerOfArrayID(playerid, i))
 		{
 			continue;
 		}

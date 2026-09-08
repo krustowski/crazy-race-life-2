@@ -52,7 +52,7 @@ Owns the `gClockText` TextDraw handle (declared here; actually created by `InitT
 
 | Function | Description |
 |---|---|
-| `public ShowAdvert()` (`src/support/advert.pwn:170`) | Sends one random localized advertisement/tip message to every connected player. |
+| `public ShowAdvert()` (`src/support/advert.pwn:166`) | Sends one random localized advertisement/tip message to every connected player. |
 
 ## Used By
 

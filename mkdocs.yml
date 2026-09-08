@@ -55,10 +55,12 @@ nav:
       - Drugs: modules/drugz.md
       - NPC Drivers: modules/npcs.md
       - Player Core: modules/player.md
+      - Prizes: modules/prizes.md
       - Racing: modules/race.md
       - Radar: modules/radar.md
       - Rampage Missions: modules/rampage.md
       - Real Estate: modules/real.md
+      - Pizza Delivery: modules/pizza.md
       - Taxi Missions: modules/taxi.md
       - Teams: modules/team.md
       - Tow Missions: modules/tow.md

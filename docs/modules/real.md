@@ -26,6 +26,33 @@ The **Property Editor** (admin-only, reached via `/edit` → "Property Editor") 
 ![Custom interior black market](../assets/img/crl2_real_custom_interior_black_market.png)
 ![Commercial property exterior](../assets/img/crl2_real_estate_exterior_commercial.png)
 
+## Ownership checks
+
+`IsPlayerOwner(playerid, propertyId)` answers "does this player own/occupy this property". It used to run
+
+```sql
+SELECT occupied FROM properties WHERE user_id = ? AND occupied = 1 AND id = ?
+```
+
+on **every call** — and several callers invoke it from inside a `MAX_PROPERTIES` (512) loop, so opening a property dialog or spawning could issue hundreds of blocking queries. crashdetect reported those as hung callbacks in `OnPlayerSpawn` and `AddMapicons`.
+
+It is now a memory comparison against `gProperties[][UserID]` and `[Occupied]`, which mirror exactly the two columns that query read:
+
+| path | keeps the mirror in step |
+|---|---|
+| `LoadRealEstateData` | loads both from `properties.user_id` / `occupied` at init |
+| `SaveRealEstateData` | writes both back |
+| `BuyPlayerProperty` / `SellPlayerProperty` / `RentProperty` | update both |
+
+There is exactly one `UPDATE properties` statement in the codebase (in `RentProperty`) and it maintains both fields, so the mirror cannot silently fall behind.
+
+!!! note "Don't use `gPlayers[][Properties]` for this"
+    The per-player `Properties[]` array looks like the obvious cache but is **not** equivalent: `LoadPlayerProperties` fills it with `AND type = PROPERTY_TYPE_PERSONAL` only, and `RentProperty` never adds to it. Swapping `IsPlayerOwner` onto that array would silently break commercial properties and renting.
+
+`IsPlayerOwnerOfArrayID(playerid, arrayid)` is the O(1) form. Most callers already hold the array index — they read `gProperties[i][ID]` to build the argument — so passing `i` directly avoids a `GetPropertyArrayIDfromID` rescan of all 512 slots. Nine call sites use it; the four that genuinely only have a property id still go through `IsPlayerOwner`.
+
+**One behavioural consequence:** ownership now comes from memory, so editing the `properties` table directly while the server is running is no longer visible to these checks until a restart. The rest of the module already read `gProperties[]` for everything else, so live edits were mostly being ignored anyway.
+
 ## Key Functions
 
 | Function | Description |
@@ -33,20 +60,21 @@ The **Property Editor** (admin-only, reached via `/edit` → "Property Editor") 
 | `public InitRealEstateProperties()` (`src/modules/real.pwn:184`) | Startup hook: loads all properties from DB then spawns every property's pickups/vehicle. |
 | `public SendRealEstateCommission()` (`src/modules/real.pwn:203`) | Periodic timer paying online tenants a share of their commercial properties' cost. |
 | `stock SpawnProperty(propertyId)` (`src/modules/real.pwn:363`) | (Re)creates all pickups, 3D text labels and the attached vehicle for one property. |
-| `stock LoadRealEstateData()` (`src/modules/real.pwn:855`) | Loads every property row plus its vehicle, saved skins and drug stash from the database. |
-| `stock SaveRealEstateData()` (`src/modules/real.pwn:726`) | Upserts every property, its vehicle and its drug stash back to the database. |
+| `stock LoadRealEstateData()` (`src/modules/real.pwn:858`) | Loads every property row plus its vehicle, saved skins and drug stash from the database. |
+| `stock SaveRealEstateData()` (`src/modules/real.pwn:729`) | Upserts every property, its vehicle and its drug stash back to the database. |
 | `stock LoadPlayerProperties(playerid)` (`src/modules/real.pwn:651`) | On login, populates `gPlayers[playerid][Properties]` with the player's owned personal properties. |
-| `stock IsPlayerOwner(playerid, propertyId)` (`src/modules/real.pwn:698`) | Live DB query checking whether a player currently owns/occupies a given property. |
-| `stock BuyPlayerProperty(playerid, propertyID)` (`src/modules/real.pwn:1254`) | Buys a free personal property into an open player slot. |
-| `stock RentProperty(playerid, propertyID)` (`src/modules/real.pwn:1171`) | Rents a commercial property, applying the 3-day re-rent lock. |
-| `stock SellPlayerProperty(playerid, propertyID)` (`src/modules/real.pwn:1344`) | Sells a personal property back for 90% of its cost. |
-| `stock SpawnPropertyInterior(playerid, arrayID)` / `DestroyPropertyInterior(playerid)` (`src/modules/real.pwn:1090`, `:1009`) | Creates/tears down the generic generated-room interior. |
-| `stock SpawnPlayerAtProperty(playerid)` (`src/modules/real.pwn:1109`) | Moves a player to their configured property spawn point; thin wrapper over the lookup below. |
-| `stock GetPlayerPropertySpawnPos(playerid, &Float:x, &Float:y, &Float:z)` (`src/modules/real.pwn:1125`) | Resolves that spawn point's coordinates **without** moving anyone, so `ApplyPlayerSpawnInfo` can hand them to the client before it spawns. |
-| `stock AttachVehicleToProperty(playerid, propertyid)` / `RespawnPropertyVehicle` (`src/modules/real.pwn:2043`, `:1917`) | Assigns/respawns the vehicle parked at a property's vehicle point. |
-| `stock EditProperty(playerid)` (`src/modules/real.pwn:1530`) | Admin editor: saves a new or edited property record and its coordinates. |
-| `stock CheckRealEstatePickup(playerid, pickupid)` (`src/modules/real.pwn:1759`) | Central pickup dispatcher covering every `PropertyPoint` type (offer, entrance, exit, health, black market, shirt, drugz, info). |
-| `stock SavePropertySkin` / `SelectPropertySkin` / `DeletePropertySkin` (`src/modules/real.pwn:2166`, `:2225`, `:2253`) | Manage up to 5 outfits saved per personal property. Wearing one (`SelectPropertySkin`) goes through `SetPlayerSkinEx`, so the choice is **permanent** — it survives respawns and is persisted to `users.class`. |
+| `stock IsPlayerOwner(playerid, propertyId)` (`src/modules/real.pwn:707`) | Whether a player currently owns/occupies a property, by id. A memory lookup — see [Ownership checks](#ownership-checks). |
+| `stock IsPlayerOwnerOfArrayID(playerid, arrayid)` (`src/modules/real.pwn:714`) | The same check in O(1), for callers that already hold the `gProperties[]` index. |
+| `stock BuyPlayerProperty(playerid, propertyID)` (`src/modules/real.pwn:1257`) | Buys a free personal property into an open player slot. |
+| `stock RentProperty(playerid, propertyID)` (`src/modules/real.pwn:1174`) | Rents a commercial property, applying the 3-day re-rent lock. |
+| `stock SellPlayerProperty(playerid, propertyID)` (`src/modules/real.pwn:1347`) | Sells a personal property back for 90% of its cost. |
+| `stock SpawnPropertyInterior(playerid, arrayID)` / `DestroyPropertyInterior(playerid)` (`src/modules/real.pwn:1027`, `:1093`) | Creates/tears down the generic generated-room interior. |
+| `stock SpawnPlayerAtProperty(playerid)` (`src/modules/real.pwn:1112`) | Moves a player to their configured property spawn point; thin wrapper over the lookup below. |
+| `stock GetPlayerPropertySpawnPos(playerid, &Float:x, &Float:y, &Float:z)` (`src/modules/real.pwn:1128`) | Resolves that spawn point's coordinates **without** moving anyone, so `ApplyPlayerSpawnInfo` can hand them to the client before it spawns. |
+| `stock AttachVehicleToProperty(playerid, propertyid)` / `RespawnPropertyVehicle` (`src/modules/real.pwn:2046`, `:2022`) | Assigns/respawns the vehicle parked at a property's vehicle point. |
+| `stock EditProperty(playerid)` (`src/modules/real.pwn:1533`) | Admin editor: saves a new or edited property record and its coordinates. |
+| `stock CheckRealEstatePickup(playerid, pickupid)` (`src/modules/real.pwn:1762`) | Central pickup dispatcher covering every `PropertyPoint` type (offer, entrance, exit, health, black market, shirt, drugz, info). |
+| `stock SavePropertySkin` / `SelectPropertySkin` / `DeletePropertySkin` (`src/modules/real.pwn:2169`, `:2228`, `:2253`) | Manage up to 5 outfits saved per personal property. Wearing one (`SelectPropertySkin`) goes through `SetPlayerSkinEx`, so the choice is **permanent** — it survives respawns and is persisted to `users.class`. |
 
 ## Commands
 
@@ -59,11 +87,7 @@ Reads/writes `gPlayers[playerid][OrmID]`, `Properties[MAX_PLAYER_PROPERTIES]`, `
 ## Notes
 
 - Each property carries its **own drug stash** (`Drugs[MAX_DRUG_TYPES]`, table `drugz` with `owner_type = 2`) independent of the player's personal inventory — properties double as stash houses in the drug economy, not just static real estate.
-- `IsPlayerOwner` issues a **live SQL query on every call** rather than checking cached state, and it is invoked on nearly every pickup interaction — a clear hot-path performance smell. Two of the worst offenders have been dealt with, both of which crashdetect had been reporting as hung callbacks:
-    - `GetPlayerPropertySpawnPos` now compares `gProperties[i][ID]` against the player's spawn point **before** asking the database, cutting a spawn from up to `MAX_PROPERTIES` (512) blocking queries down to at most one. Only one property can be the spawn point, so the reordering is behaviour-preserving.
-    - `AddMapicons` (`support/mapicons.pwn`) fetches the whole ownership list in one query instead of calling `IsPlayerOwner` per property slot.
-
-    The remaining call sites still query per call; caching ownership on `gPlayers[]` would remove the pattern entirely.
+- See [Ownership checks](#ownership-checks) for why `IsPlayerOwner` no longer touches the database, and the one behavioural consequence of that.
 - In `EditProperty()`, the inserts for spawn/entrance/offer/money/shirt/vehicle coordinates are all guarded by `!existingRecord` — meaning **editing an already-existing property through this dialog flow never persists updated coordinates**, only top-level fields (name/cost/type/occupied/custom_interior) get saved via the `ON CONFLICT` upsert.
 - `SpawnPlayerEntrancePickups` is entirely commented out, and `SellPlayerProperty` contains large commented-out remnants referencing an older `Pickups[PICKUP_TYPE_*]` layout that no longer matches the current `PropertyPoint`-indexed `gPropertyCoords` structure.
 - Property-attached vehicles are locked for everyone (`SetVehicleParamsEx(..., true, ...)`) twice in a row in `SpawnProperty` (once before, once after applying components) — redundant but harmless.

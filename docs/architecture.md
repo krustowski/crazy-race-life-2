@@ -18,7 +18,7 @@ InitTeams()                  → modules/team.pwn
 InitRealEstateProperties()   → modules/real.pwn
 Race_Init() / InitHighScores → modules/race.pwn
 InitTrucking()                → modules/trucking.pwn
-InitPickups/Objects/Vehicles/Texts/Timers() → support/*.pwn
+InitPickups/Objects/Vehicles/Texts/Timers() → support/*.pwn  (InitPickups also calls InitPrizes, modules/prizes.pwn)
 InitNPCs()                    → modules/npcs.pwn
 ```
 
@@ -41,7 +41,7 @@ Two pawncc rules shape this graph, and both bite silently:
 6. The player-data core, `modules/player.pwn`, then everything that reads/writes `gPlayers[]`: `team`, `auth`, `real`, `taxi`, `combat`, `tutorial`, `bribe`, `tow`, `npcs`. `modules/drugz.pwn` is included from *inside* `player.pwn`, after `gPlayers[]` is declared, because its Drug Mission code reads that array.
 7. `modules/trucking.pwn`.
 8. `support/helpers.pwn`, `modules/radar.pwn`.
-9. `modules/bank.pwn`.
+9. `modules/bank.pwn`, `modules/prizes.pwn` — the latter must precede `support/response.pwn`, which drives its editor dialog.
 10. World-building support: `pickups`, `objects`, `vehicles`, `texts`, `mapicons`, `dialogs`, `response`, `timers`.
 11. `support/dcmd.pwn` last, since command handlers call into every module above.
 
@@ -69,5 +69,6 @@ User-facing strings are not hardcoded per-callsite; they're looked up through `s
 
 - **No OOP, no hooks.** Everything is global functions and global arrays. `forward`/`public` pairs are used for functions invoked by name from timers (`SetTimerEx("Foo", ...)`) or the server itself; plain `stock` for everything else.
 - **`#if defined _CRL2_TEST_BUILD`** gates code that shouldn't run under the test harness (e.g. skipping the real SQLite connection in `src/db/sql.pwn`) — check for this define before assuming a code path always runs.
+- **Every database call blocks the server.** open.mp's `Databases` component is synchronous on the main thread — there is no async variant in the API this gamemode uses — so a query issued inside a loop stalls every player for its duration. crashdetect reports these as "Long callback execution detected"; treat that warning as a query-count problem first. Prefer filtering in SQL, grouping with window functions, or checking cached state (see [Real Estate — Ownership checks](modules/real.md#ownership-checks)) over re-running a query per item.
 - **Coordinates and points are data, not code.** Race checkpoints, property locations, trucking points, and bribe/drug pickups are rows in SQLite (`sql/migrations/`), loaded at `OnGameModeInit` time — adding a new race or property is a migration + data change, not a code change.
 - **Admin gating is inline.** There's no role table; every gated command checks `IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] >= N` directly in `dcmd.pwn`.

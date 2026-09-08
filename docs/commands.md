@@ -34,7 +34,7 @@ These are declared under the `//--------------[ COMMON COMMANDS ]-------------|`
 | `/phone` | Opens the phone options dialog and plays a phone-holding animation/attached prop. | — |
 | `/pm` | Sends a private message to another connected player. | `[playerID] [text]` |
 | `/port` | Opens the teleport/warp-locations dialog. Blocked inside a property or an active minigame. | — |
-| `/prizes` | Shows info about the Tiki and Pumpkin map prizes. | — |
+| `/prizes` | Shows info about the Tiki and Pumpkin map prizes ([`modules/prizes.md`](modules/prizes.md)). Admins show/hide individual prizes through `/edit` → Prize Editor. | — |
 | `/property` | Opens the real estate dialog hub ([`modules/real.md`](modules/real.md)). | — (dialog-driven) |
 | `/race` | Opens the race list, or the race options dialog if already registered for one ([`modules/race.md`](modules/race.md)). | — (dialog-driven) |
 | `/rules` | Shows the server rules dialog. | — |
@@ -96,7 +96,7 @@ Declared under the `//--------------[ ADMIN COMMANDS ]-------------|` banner at 
 | Command | Description |
 |---|---|
 | `/ban` | Bans a target player (SA-MP native `Ban()`, IP-based), broadcasting a message first. |
-| `/edit` | Opens the game editors hub dialog (property/race/trucking point editors). |
+| `/edit` | Opens the game editors hub dialog (property, trucking, race, police bribe, rampage and prize editors). |
 | `/fakechat` | Broadcasts a fake public chat line attributed to a target player. |
 | `/lvl` | Sets a target player's admin level (`0`-`5`); the caller's own level must exceed the target's current level. |
 | `/npcrec` | Opens the NPC route recording dialog, or stops an active recording session ([`modules/npcs.md`](modules/npcs.md)). |

@@ -21,12 +21,14 @@ Each page below documents one gameplay feature from `src/modules/`. For the shar
 | [Drugs](drugz.md) | `drugz.pwn` | Drug catalog, pickups, and druggery point data. |
 | [Real Estate](real.md) | `real.pwn` | Property ownership, spawn points, attached vehicles, safehouses. |
 | [Police Bribes](bribe.md) | `bribe.pwn` | Wanted-level-reducing bribe pickups. |
+| [Prizes](prizes.md) | `prizes.pwn` | Hidden Tiki/Pumpkin treasure pickups, plus the admin show/hide editor. |
 
 ## Missions
 
 | Module | Source | Summary |
 |---|---|---|
 | [Racing](race.md) | `race.pwn` | Race registration, checkpoints, timers, high scores. |
+| [Pizza Delivery](pizza.md) | `pizza.pwn` | Animation-driven pizza handover minigame for Pizzaboyz. **Unfinished** — pays nothing yet. |
 | [Taxi Missions](taxi.md) | `taxi.pwn` | Ad-hoc NPC taxi rides with randomized customers/destinations. |
 | [Tow Missions](tow.md) | `tow.pwn` | Vehicle impound service. |
 | [Trucking Missions](trucking.md) | `trucking.pwn` | Delivery points with weighted commissions/bonuses. |

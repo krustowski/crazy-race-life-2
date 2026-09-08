@@ -14,7 +14,7 @@ Almost the entire file is a single function, `InitObjects()`, consisting of seve
 
 ## Pickups (`src/support/pickups.pwn`, ~484 lines)
 
-Defines the pickup model-id constants (`PICKUP_BRIEFCASE`, `PICKUP_HOUSE_GREEN`, `PICKUP_DRUG_*`, etc.) and the SA-MP/open.mp pickup-type constants (`PICKUP_TYPE_ALWAYS`, `PICKUP_TYPE_RESPAWN_30_SECONDS`, ...) used across the codebase. `InitPickups()` spawns the fixed set of world pickups that don't belong to a specific gameplay module: the admin room health pack, the Hackerz interior entrance/exit/money-bag pickups, one ATM pickup per entry in `gBankLocation` (from `modules/bank.pwn`), a per-team join pickup plus join/leave menu built from a `team_coords`/`teams` join query, a handful of legacy hardcoded property doors, and the SF Centrum / Bank LS teleport pickup pairs. `InitPrizes()` separately loads the tiki/pumpkin "hidden prize" pickups from the `prize_coords` table (`WHERE hidden = 0`) into `gPrizes[MAX_PRIZES]`; `UpdatePrize` marks a prize row `hidden = 1` in the database and pays out $10M (tiki) or $1.5M (pumpkin). `CreateDeathMoneyPickup`/`CheckDeathMoneyPickup` implement a small ring buffer (`gDeathMoneyPickups[MAX_DEATH_MONEY_PICKUPS]`, 128 slots) of "money bag" pickups dropped at a player's death position holding their cash, redeemable by whoever picks them up first. `CheckBlackMarketPickup` and `CheckGenericPickup` are dispatch helpers called from `main.pwn`'s `OnPlayerPickUpPickup` to route a touched `pickupid` to the right handler (black market dialog, SF Centrum/Bank LS teleports, Hackerz interior, admin room heal/doors).
+Defines the pickup model-id constants (`PICKUP_BRIEFCASE`, `PICKUP_HOUSE_GREEN`, `PICKUP_DRUG_*`, etc.) and the SA-MP/open.mp pickup-type constants (`PICKUP_TYPE_ALWAYS`, `PICKUP_TYPE_RESPAWN_30_SECONDS`, ...) used across the codebase. `InitPickups()` spawns the fixed set of world pickups that don't belong to a specific gameplay module: the admin room health pack, the Hackerz interior entrance/exit/money-bag pickups, one ATM pickup per entry in `gBankLocation` (from `modules/bank.pwn`), a per-team join pickup plus join/leave menu built from a `team_coords`/`teams` join query, a handful of legacy hardcoded property doors, and the SF Centrum / Bank LS teleport pickup pairs. The tiki/pumpkin "hidden prize" pickups have moved out to their own module — `InitPickups()` still calls `InitPrizes()` and `CheckGenericPickup()` still calls `CheckPrizePickup()`, but the data, the database writes and the admin editor all live in [`modules/prizes.pwn`](../modules/prizes.md) now. `CreateDeathMoneyPickup`/`CheckDeathMoneyPickup` implement a small ring buffer (`gDeathMoneyPickups[MAX_DEATH_MONEY_PICKUPS]`, 128 slots) of "money bag" pickups dropped at a player's death position holding their cash, redeemable by whoever picks them up first. `CheckBlackMarketPickup` and `CheckGenericPickup` are dispatch helpers called from `main.pwn`'s `OnPlayerPickUpPickup` to route a touched `pickupid` to the right handler (black market dialog, SF Centrum/Bank LS teleports, Hackerz interior, admin room heal/doors).
 
 The actual `CreatePickup` retry logic lives in `EnsurePickupCreated` (`src/support/helpers.pwn:226`), not in this file — pickups.pwn and every gameplay module that spawns a pickup call into that shared helper.
 
@@ -24,13 +24,11 @@ The actual `CreatePickup` retry logic lives in `EnsurePickupCreated` (`src/suppo
 
 | Function | Description |
 |---|---|
-| `public InitPickups()` (`src/support/pickups.pwn:115`) | Spawns admin/Hackerz/bank/team/legacy-property pickups and builds per-team join menus from the database. |
-| `stock InitPrizes()` (`src/support/pickups.pwn:273`) | Loads non-hidden tiki/pumpkin prize pickups from `prize_coords` into `gPrizes`. |
-| `stock UpdatePrize(playerid, prizeid)` (`src/support/pickups.pwn:326`) | Marks a prize collected in the database and pays out the tiki/pumpkin reward. |
-| `stock CreateDeathMoneyPickup(playerid)` (`src/support/pickups.pwn:371`) | Drops the dying player's cash as a pickup at their position and resets their money. |
-| `stock CheckDeathMoneyPickup(playerid, pickupid)` (`src/support/pickups.pwn:417`) | Redeems a death-money pickup for whichever player touches it. |
-| `stock CheckBlackMarketPickup(playerid, pickupid)` (`src/support/pickups.pwn:438`) | Opens the black market dialog if the touched pickup is the druggery market spot. |
-| `stock CheckGenericPickup(playerid, pickupid)` (`src/support/pickups.pwn:448`) | Dispatches all other fixed world pickups (druggery entrance, prizes, SF Centrum/Bank LS teleports, admin room/doors, Hackerz). |
+| `public InitPickups()` (`src/support/pickups.pwn:98`) | Spawns admin/Hackerz/bank/team/legacy-property pickups and builds per-team join menus from the database. |
+| `stock CreateDeathMoneyPickup(playerid)` (`src/support/pickups.pwn:266`) | Drops the dying player's cash as a pickup at their position and resets their money. |
+| `stock CheckDeathMoneyPickup(playerid, pickupid)` (`src/support/pickups.pwn:312`) | Redeems a death-money pickup for whichever player touches it. |
+| `stock CheckBlackMarketPickup(playerid, pickupid)` (`src/support/pickups.pwn:333`) | Opens the black market dialog if the touched pickup is the druggery market spot. |
+| `stock CheckGenericPickup(playerid, pickupid)` (`src/support/pickups.pwn:343`) | Dispatches all other fixed world pickups (druggery entrance, SF Centrum/Bank LS teleports, admin room/doors, Hackerz), and hands prize pickups to `CheckPrizePickup`. |
 
 ## Vehicles (`src/support/vehicles.pwn`, ~475 lines)
 
@@ -64,7 +62,7 @@ Defines the `E_MAPICON_ID_*` enum, a large set of constants mirroring the client
 
     Every call therefore goes through `SetPlayerMapIconSafe`, which refuses out-of-range ids, and `AddMapicons` logs a `[mapicons]` line naming how many icons were dropped. Note that the icons dropped are simply the last ones assigned (currently trucking stations) — if a different category matters more, reorder the assignments in `AddMapicons`.
 
-Ownership is resolved with a single `SELECT id FROM properties WHERE user_id = ? AND occupied = 1` and matched in memory. It previously called `IsPlayerOwner()` — a synchronous query — once per property slot, i.e. up to `MAX_PROPERTIES` (512) blocking queries per login, which crashdetect reported as a hang in `AddMapicons`.
+Ownership is resolved with `IsPlayerOwnerOfArrayID()`, a plain memory comparison, so testing all `MAX_PROPERTIES` (512) slots costs nothing. That call used to run a synchronous query per slot — 512 blocking queries per login, which crashdetect reported as a hang in `AddMapicons`. See [Real Estate — Ownership checks](../modules/real.md#ownership-checks).
 
 **Key functions:**
 

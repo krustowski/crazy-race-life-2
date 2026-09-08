@@ -18,7 +18,7 @@ The team-selection **pickups and per-team join/leave menus** are actually built 
 | `stock HexToInt(const string[])` (`src/modules/team.pwn:116`) | Parses a hex colour string into an integer. |
 | `stock ExtractSkinsFromString(const input[], ints[5])` (`src/modules/team.pwn:136`) | Splits a comma-separated skin-ID string into an array. |
 | `stock ExtractWeaponsAmmuFromString(const input[], ints[MAX_TEAM_WEAPONS])` (`src/modules/team.pwn:157`) | Splits a comma-separated weapon/ammo string into an array. |
-| `stock CheckTaxiDriversOnline()` / `CheckCarMechanicsOnline()` / `CheckPizzaguysOnline()` (`src/modules/team.pwn:188`, `:183`, `:188`) | Unimplemented stubs — always return 0. |
+| `stock CheckTaxiDriversOnline()` / `CheckCarMechanicsOnline()` / `CheckPizzaguysOnline()` (`src/modules/team.pwn:178`, `:183`, `:188`) | Unimplemented stubs — always return 0. |
 
 ## Commands
 

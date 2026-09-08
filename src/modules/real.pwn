@@ -2242,7 +2242,8 @@ stock SelectPropertySkin(playerid, skinid)
 		return SendClientMessageLocalized(playerid, I18N_REAL_SKIN_FREE_SLOT);
 	}
 
-	SetPlayerSkin(playerid, gProperties[arrayid][Skins][skinid]);
+	SetPlayerSkinEx(playerid, gProperties[arrayid][Skins][skinid]);
+
 	return SendClientMessageLocalized(playerid, I18N_REAL_SKIN_SET);
 }
 

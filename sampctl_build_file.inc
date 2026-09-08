@@ -8,8 +8,8 @@
 #define SAMPCTL_VERSION "1.14.1"
 #define SAMPCTL_PLATFORM "linux"
 
-#define SAMPCTL_BUILD_COMMIT "be16f59e5b3ec2f953a90ad8b437b9ae995aacfa"
-#define SAMPCTL_BUILD_COMMIT_SHORT "be16f59"
+#define SAMPCTL_BUILD_COMMIT "ab9d2b26bc6d3e6148ef5d9eaab7d0dcecd7c8c7"
+#define SAMPCTL_BUILD_COMMIT_SHORT "ab9d2b2"
 #define SAMPCTL_BUILD_BRANCH "master"
 
 

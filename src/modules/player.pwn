@@ -9,6 +9,20 @@
 
 #define MAX_PLAYER_PROPERTIES 7
 
+#define SPAWN_DEFAULT_X		2248.22
+#define SPAWN_DEFAULT_Y		1239.58
+#define SPAWN_DEFAULT_Z		10.82
+
+// A dead player cannot be taken out of a vehicle, so the detach-and-retry below
+// would never finish on its own.
+#define SPAWN_DETACH_RETRIES	5
+
+// The client's "Wasted" sequence runs for well over a second. Spawning into the
+// middle of it leaves client and server disagreeing about whether the player is
+// alive, and the client resyncs (a "Loading..." screen) or re-reports the
+// death it was still playing out, killing the player a second time.
+#define RESPAWN_DELAY_MS	5000
+
 #include "support/i18n.pwn"
 #include "db/sql.pwn"
 #include "modules/team.pwn"
@@ -98,6 +112,9 @@ enum Player
 
 new 
 	gPlayers[MAX_PLAYERS][Player];
+
+new
+	gSpawnDetachTries[MAX_PLAYERS];
 
 //
 //
@@ -903,8 +920,48 @@ stock bool: IsPlayerInTeam(playerid, PLAYER_TEAM: teamid)
 }
 
 forward SpawnPlayerDelayed(playerid);
+// Tells the client where it is going BEFORE it spawns. Setting the spawn info 
+// up front means the client spawns at the destination and there is no teleport
+// to race.
+stock ApplyPlayerSpawnInfo(playerid)
+{
+	new
+		Float: spawnX = SPAWN_DEFAULT_X,
+		Float: spawnY = SPAWN_DEFAULT_Y,
+		Float: spawnZ = SPAWN_DEFAULT_Z;
+
+	if (gPlayers[playerid][SpawnPoint])
+	{
+		GetPlayerPropertySpawnPos(playerid, spawnX, spawnY, spawnZ);
+	}
+
+	return SetSpawnInfo(playerid, GetPlayerTeam(playerid), gPlayers[playerid][Skin], spawnX, spawnY, spawnZ, 0.0);
+}
+
+stock SetPlayerSkinEx(playerid, skinid)
+{
+	gPlayers[playerid][Skin] = skinid;
+
+	SetPlayerSkin(playerid, skinid);
+	ApplyPlayerSpawnInfo(playerid);
+
+	return 1;
+}
+
 public SpawnPlayerDelayed(playerid)
 {
+	if (!IsPlayerConnected(playerid))
+	{
+		gSpawnDetachTries[playerid] = 0;
+		return 1;
+	}
+
+	if (IsPlayerAlive(playerid))
+	{
+		gSpawnDetachTries[playerid] = 0;
+		return 1;
+	}
+
 	// Death doesn't fire OnPlayerExitVehicle, so a player who died in a vehicle
 	// is still attached to it server-side. open.mp's own SpawnPlayer() docs warn
 	// it "kills the player if they are in a vehicle" (broken respawn) when called
@@ -912,10 +969,35 @@ public SpawnPlayerDelayed(playerid)
 	// effect, so detach first and only spawn once they're confirmed on foot.
 	if (IsPlayerInAnyVehicle(playerid))
 	{
-		RemovePlayerFromVehicle(playerid);
-		SetTimerEx("SpawnPlayerDelayed", 100, false, "i", playerid);
-		return 1;
+		if (gSpawnDetachTries[playerid] < SPAWN_DETACH_RETRIES)
+		{
+			gSpawnDetachTries[playerid]++;
+
+			RemovePlayerFromVehicle(playerid);
+			SetTimerEx("SpawnPlayerDelayed", 250, false, "i", playerid);
+
+			return 1;
+		}
+
+		// Out of retries, and per the note above SpawnPlayer() would kill a
+		// player who is still in a vehicle -- queueing yet another respawn.
+		// SetPlayerPos takes them out of it synchronously, so spawn from there.
+		new
+			Float: playerX,
+			Float: playerY,
+			Float: playerZ;
+
+		GetPlayerPos(playerid, playerX, playerY, playerZ);
+		SetPlayerPos(playerid, playerX, playerY, playerZ);
 	}
+
+	gSpawnDetachTries[playerid] = 0;
+
+	ApplyPlayerSpawnInfo(playerid);
+
+#if DEBUG_SPAWN
+	printf("[spawn] DOSPAWN   pid=%d state=%d invehicle=%d", playerid, _: GetPlayerState(playerid), IsPlayerInAnyVehicle(playerid));
+#endif
 
 	SpawnPlayer(playerid);
 
@@ -1019,7 +1101,7 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 					return ShowTaxiMissionOptionsDialog(playerid);
 				}
 
-				if (IsPlayerInTaxiCab(playerid))
+				if (IsPlayerInTeam(playerid, TEAM_TAXIMEN) && IsPlayerInTaxiCab(playerid))
 				{
 					return ShowTaxiMissionStartOptionsDialog(playerid);
 				}
@@ -1556,10 +1638,12 @@ stock SetPlayerTeamEx(playerid, teamid)
 	}
 
 	SetPlayerColor(playerid, gTeams[teamid][Color]);
-	SetPlayerSkin(playerid, gTeams[teamid][Skins][0]);
 	SetPlayerTeam(playerid, gTeams[teamid][ID]);
 
 	gPlayers[playerid][TeamID] = PLAYER_TEAM: gTeams[teamid][ID];
+
+	// After the team is assigned, so the spawn info refresh inside picks it up.
+	SetPlayerSkinEx(playerid, gTeams[teamid][Skins][0]);
 
 	new
 		stringToPrint[128];

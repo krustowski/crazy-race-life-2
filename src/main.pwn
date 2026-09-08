@@ -43,6 +43,12 @@ public OnGameModeInit()
 	ShowPlayerMarkers(PLAYER_MARKERS_MODE: true); 
 	UsePlayerPedAnims();
 
+	// SA-MP requires at least one registered class. Without one the client has
+	// no spawn data to work from: the class-selection handshake never resolves
+	// and it cycles the "Loading..." screen, and SpawnPlayer() falls back to
+	// (0.0, 0.0, 0.0) -- Blueberry Acres.
+	AddPlayerClass(0, SPAWN_DEFAULT_X, SPAWN_DEFAULT_Y, SPAWN_DEFAULT_Z, 0.0);
+
 	//
 	// Create pickups, static objects and static vehicles + DrawTexts.
 	//
@@ -165,6 +171,9 @@ public OnPlayerConnect(playerid)
 	PreloadAnimLib(playerid, "PED");
 	PreloadAnimLib(playerid, "BAR");
 
+	// Without this the client spawns at (0.0, 0.0, 3.1): it never went through
+	// class selection, so it has no spawn info to work from.
+	ApplyPlayerSpawnInfo(playerid);
 	SpawnPlayer(playerid);
 
 	// Ask the user to login/register.
@@ -189,6 +198,11 @@ public OnPlayerDisconnect(playerid, reason)
 	StopAudioStreamForPlayer(playerid);
 	gPlayers[playerid][Listening] = false;
 	gPlayers[playerid][AFK] = false;
+
+	// Drop any /kill or respawn still waiting on a timer, so it cannot fire
+	// against whoever takes this slot next.
+	gKillDetachTries[playerid] = 0;
+	gSpawnDetachTries[playerid] = 0;
 
 	// Hide the vehicle velocity game text.
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
@@ -246,6 +260,9 @@ public OnPlayerDisconnect(playerid, reason)
 
 public OnPlayerRequestClass(playerid, classid)
 {
+#if DEBUG_SPAWN
+	printf("[spawn] REQCLASS  pid=%d class=%d state=%d logged=%d", playerid, classid, _: GetPlayerState(playerid), gPlayers[playerid][IsLogged]);
+#endif
 #pragma unused classid
 	//SetPlayerPos(playerid, 2323.73, 1283.18, 97.60);
 	/*SetPlayerPos(playerid, 1966.1, 1936.1, 127.5);
@@ -257,6 +274,16 @@ public OnPlayerRequestClass(playerid, classid)
 		return 0;
 	}*/
 
+	if (gPlayers[playerid][IsLogged])
+	{
+		// Refresh first: skin, team and spawn point can all have changed since
+		// login (joining a team, /skin, moving house), and this is the only
+		// spawn on the respawn path, so stale info would show as the old skin
+		// or the old position on every death.
+		ApplyPlayerSpawnInfo(playerid);
+		SpawnPlayer(playerid);
+	}
+
 	return 1;
 }
 
@@ -267,14 +294,28 @@ public OnPlayerRequestSpawn(playerid)
 		return 0;
 	}
 
-	printf("Player %d requested spawn!", playerid);
-	SpawnPlayer(playerid);
+#if DEBUG_SPAWN
+	printf("[spawn] REQSPAWN  pid=%d state=%d", playerid, _: GetPlayerState(playerid));
+#endif
 
+	// Returning 1 is what lets the spawn go ahead: calling SpawnPlayer() here
+	// as well spawns them a second time, and that spawn makes the client ask
+	// again, which is the repeating "Loading..." screen problem pathway.
 	return 1;
 }
 
 public OnPlayerSpawn(playerid)
 {
+#if DEBUG_SPAWN
+	new
+		Float: dbgX,
+		Float: dbgY,
+		Float: dbgZ;
+
+	GetPlayerPos(playerid, dbgX, dbgY, dbgZ);
+	printf("[spawn] SPAWN     pid=%d state=%d pos=%.1f,%.1f,%.1f npc=%d logged=%d", playerid, _: GetPlayerState(playerid), dbgX, dbgY, dbgZ, IsPlayerNPC(playerid), gPlayers[playerid][IsLogged]);
+#endif
+
 	if (IsPlayerNPC(playerid) || NPC_IsValid(playerid))
 	{
 		NPC_SetSkin(playerid, 89);
@@ -291,6 +332,10 @@ public OnPlayerSpawn(playerid)
 		TogglePlayerControllable(playerid, false);
 		return 1;
 	}
+
+	// Restore health here rather than in OnPlayerDeath: at this point the client
+	// has finished dying and agrees the player is alive again.
+	SetPlayerHealth(playerid, 100.0);
 
 	SetPlayerSkin(playerid, gPlayers[playerid][Skin]);
 
@@ -338,7 +383,7 @@ public OnPlayerSpawn(playerid)
 
 	// Default location to spawrn a player (LV pyramid top).
 	//SetPlayerPos(playerid, 2323.73, 1283.18, 97.60);
-	SetPlayerPos(playerid, 2248.22, 1239.58, 10.82);
+	SetPlayerPos(playerid, SPAWN_DEFAULT_X, SPAWN_DEFAULT_Y, SPAWN_DEFAULT_Z);
 
 	return 1;
 }
@@ -547,6 +592,10 @@ public OnNPCDeath(npcid, killerid, WEAPON:reason)
 
 public OnPlayerDeath(playerid, killerid, WEAPON: reason)
 {
+#if DEBUG_SPAWN
+	printf("[spawn] DEATH     pid=%d killer=%d reason=%d state=%d", playerid, killerid, _: reason, _: GetPlayerState(playerid));
+#endif
+
 	SendDeathMessage(killerid, playerid, _: reason);
 
 	// Hide velocity meters.
@@ -588,9 +637,11 @@ public OnPlayerDeath(playerid, killerid, WEAPON: reason)
 		//HandleCarKill(playerid, killerid, reason);
 	}
 
-	SetPlayerHealth(playerid, 100.0);
-
-	SetTimerEx("SpawnPlayerDelayed", 500, false, "i", playerid);
+	// Health is deliberately NOT restored here. Setting it while the client is
+	// still playing its death sequence makes the two sides disagree about
+	// whether the player is alive; OnPlayerSpawn restores it once they actually
+	// are.
+	SetTimerEx("SpawnPlayerDelayed", RESPAWN_DELAY_MS, false, "i", playerid);
 
 	return 1;
 }

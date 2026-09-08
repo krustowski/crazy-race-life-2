@@ -485,9 +485,24 @@ dcmd_hide(playerid, const params[])
 	return 1;
 }
 
+new
+	gKillDetachTries[MAX_PLAYERS];
+
 dcmd_kill(playerid, const params[])
 {
 #pragma unused params
+	// A player who is already dead, still in class selection or not logged in
+	// cannot die again.
+	if (!gPlayers[playerid][IsLogged] || !IsPlayerAlive(playerid))
+	{
+		return SendClientMessageLocalized(playerid, I18N_KILL_CMD_UNAVAILABLE);
+	}
+
+	if (gKillDetachTries[playerid])
+	{
+		return SendClientMessageLocalized(playerid, I18N_KILL_CMD_UNAVAILABLE);
+	}
+
 	new playerName[MAX_PLAYER_NAME], stringToPrint[256];
 
 	GetPlayerName(playerid, playerName, sizeof(playerName));
@@ -509,13 +524,15 @@ dcmd_kill(playerid, const params[])
 	// the camera stuck until they manually press F.
 	if (IsPlayerInAnyVehicle(playerid))
 	{
+		gKillDetachTries[playerid] = SPAWN_DETACH_RETRIES;
+
 		RemovePlayerFromVehicle(playerid);
-		SetTimerEx("KillPlayerDelayed", 100, false, "i", playerid);
+		SetTimerEx("KillPlayerDelayed", 250, false, "i", playerid);
+
+		return 1;
 	}
-	else
-	{
-		SetPlayerHealth(playerid, 0);
-	}
+
+	SetPlayerHealth(playerid, 0.0);
 
 	return 1;
 }
@@ -524,7 +541,34 @@ forward KillPlayerDelayed(playerid);
 
 public KillPlayerDelayed(playerid)
 {
-	SetPlayerHealth(playerid, 0);
+	if (!gKillDetachTries[playerid])
+	{
+		return 1;
+	}
+
+	if (!IsPlayerConnected(playerid) || !gPlayers[playerid][IsLogged] || !IsPlayerAlive(playerid))
+	{
+		gKillDetachTries[playerid] = 0;
+		return 1;
+	}
+
+	gKillDetachTries[playerid]--;
+
+	// Still attached: retry, but only a bounded number of times. Killing them
+	// inside the vehicle is the stuck-camera case this delay exists to avoid,
+	// so that is the last resort rather than the first move.
+	if (IsPlayerInAnyVehicle(playerid) && gKillDetachTries[playerid] > 0)
+	{
+		RemovePlayerFromVehicle(playerid);
+		SetTimerEx("KillPlayerDelayed", 250, false, "i", playerid);
+
+		return 1;
+	}
+
+	gKillDetachTries[playerid] = 0;
+
+	SetPlayerHealth(playerid, 0.0);
+
 	return 1;
 }
 
@@ -1746,8 +1790,7 @@ dcmd_skin(playerid, const params[])
 		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
 	}
 
-	gPlayers[targetId][Skin] = targetSkin;
-	SetPlayerSkin(targetId, targetSkin);
+	SetPlayerSkinEx(targetId, targetSkin);
 
 	return 1;
 }

@@ -57,6 +57,10 @@ stock SetPlayerAccountLogin(playerid, const text[])
 	AddMapicons(playerid);
 
 	TogglePlayerControllable(playerid, true);
+
+	// Skin, team and spawn property are known by now, so hand the client its
+	// real spawn position rather than teleporting it after the fact.
+	ApplyPlayerSpawnInfo(playerid);
 	SpawnPlayer(playerid);
 
 	return 1;
@@ -149,6 +153,10 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 	SetPlayerHealth(playerid, 100.0);
 
 	TogglePlayerControllable(playerid, true);
+
+	// Skin, team and spawn property are known by now, so hand the client its
+	// real spawn position rather than teleporting it after the fact.
+	ApplyPlayerSpawnInfo(playerid);
 	SpawnPlayer(playerid);
 
 	return 1; 

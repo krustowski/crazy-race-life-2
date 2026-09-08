@@ -94,6 +94,7 @@ enum
 	I18N_LOCATE_COORDS_FMT,
 	I18N_ANIMATION_VEHICLE_BLOCK,
 	I18N_KILL_CMD_FMT,
+	I18N_KILL_CMD_UNAVAILABLE,
 	I18N_TEAM_RELATED_CMD_ADMINZ,
 	I18N_HIDE_CMD_APPLIED,
 	I18N_HIDE_CMD_REVERTED,
@@ -352,6 +353,7 @@ new gI18nMessageColor[] =
 	COLOR_LIGHTGREEN,
 	COLOR_RED,
 	COLOR_RED2,
+	COLOR_RED,
 	COLOR_RED,
 	COLOR_LIGHTGREEN,
 	COLOR_LIGHTGREEN,
@@ -762,6 +764,10 @@ new gI18nMessages[][PlayerLocale][MAX_MESSAGE_LEN] =
 	{
 		"[ i ] Player %s has just committed a suicide! [ /kill ]",
 		"[ i ] Hrac %s prave spachal sebevrazdu!  [ /kill ]!"
+	},
+	{
+		"[ ! ] You can only use /kill while alive and spawned!",
+		"[ ! ] Prikaz /kill lze pouzit pouze pokud jsi nazivu a ve hre!"
 	},
 	{
 		"[ CMD ] Adminz-only team-related command!",

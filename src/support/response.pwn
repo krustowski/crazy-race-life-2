@@ -755,8 +755,7 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ ADMIN ] Skin ID changed");
 
-				gPlayers[clickedplayerid][Skin] = skinid;
-				return SetPlayerSkin(clickedplayerid, skinid);
+				return SetPlayerSkinEx(clickedplayerid, skinid);
 			}
 		case DIALOG_PLAYER_DRUNK_LEVEL_SET:
 			{

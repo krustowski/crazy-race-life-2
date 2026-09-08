@@ -172,20 +172,20 @@ public ShowAdvert()
 	new 
 		advertId = random(sizeof(advertList));
 
+	if (advertId == lastAdvertNo)
+	{
+		advertId++;
+		advertId %= sizeof(advertList);
+	}
+
+	lastAdvertNo = advertId;
+
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if (!IsPlayerConnected(i))
 		{
 			continue;
 		}
-
-		if (advertId == lastAdvertNo)
-		{
-			advertId++;
-			advertId %= sizeof(advertList);
-		}
-
-		lastAdvertNo = advertId;
 
 		SendClientMessage(i, COLOR_WHITE, advertList[advertId][ gPlayers[i][Locale] ]);
 	}

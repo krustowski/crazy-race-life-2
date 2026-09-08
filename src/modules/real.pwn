@@ -1108,14 +1108,31 @@ stock DestroyPropertyInterior(playerid)
 
 stock SpawnPlayerAtProperty(playerid)
 {
+	new
+		Float: spawnX,
+		Float: spawnY,
+		Float: spawnZ;
+
+	if (!GetPlayerPropertySpawnPos(playerid, spawnX, spawnY, spawnZ))
+	{
+		return 0;
+	}
+
+	return SetPlayerPos(playerid, spawnX, spawnY, spawnZ);
+}
+
+// Where the player's spawn-point property would put them, without moving them.
+stock GetPlayerPropertySpawnPos(playerid, &Float: spawnX, &Float: spawnY, &Float: spawnZ)
+{
 	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
-		if (!IsPlayerOwner(playerid, gProperties[i][ID]))
+		// Make a quick in-memory data check instead of queriyng the database.
+		if (gProperties[i][ID] != gPlayers[playerid][SpawnPoint])
 		{
 			continue;
 		}
 
-		if (gProperties[i][ID] != gPlayers[playerid][SpawnPoint])
+		if (!IsPlayerOwner(playerid, gProperties[i][ID]))
 		{
 			continue;
 		}
@@ -1127,7 +1144,11 @@ stock SpawnPlayerAtProperty(playerid)
 				continue;
 			}
 
-			return SetPlayerPos(playerid, gPropertyCoords[i][j][Primary][CoordX], gPropertyCoords[i][j][Primary][CoordY], gPropertyCoords[i][j][Primary][CoordZ]);
+			spawnX = gPropertyCoords[i][j][Primary][CoordX];
+			spawnY = gPropertyCoords[i][j][Primary][CoordY];
+			spawnZ = gPropertyCoords[i][j][Primary][CoordZ];
+
+			return 1;
 		}
 	}
 

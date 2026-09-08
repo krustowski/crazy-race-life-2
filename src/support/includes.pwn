@@ -33,6 +33,11 @@
 //
 
 #define DEBUG_ENABLED 	true
+
+// Temporary: traces the spawn/death handshake to the server log so a repeating
+// "Loading..." screen can be attributed to a callback.
+#define DEBUG_SPAWN		true
+
 #define SECOND_MS		1000
 
 #define SOUND_MUSIC10

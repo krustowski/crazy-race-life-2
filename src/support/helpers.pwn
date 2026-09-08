@@ -25,6 +25,17 @@ new
 forward AutosaveData();
 forward StartServerReset();
 
+// PLAYER_STATE_WASTED (dead), PLAYER_STATE_SPAWNED (class selection) and
+// PLAYER_STATE_NONE (not in the world) all still answer IsPlayerConnected(),
+// so anything that kills or respawns a player has to check the state instead.
+stock IsPlayerAlive(playerid)
+{
+	new
+		PLAYER_STATE: playerState = GetPlayerState(playerid);
+
+	return (playerState == PLAYER_STATE_ONFOOT || playerState == PLAYER_STATE_DRIVER || playerState == PLAYER_STATE_PASSENGER);
+}
+
 public AutosaveData()
 {
 	BatchSavePlayerData();

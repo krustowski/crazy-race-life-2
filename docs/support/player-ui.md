@@ -12,79 +12,84 @@ Every function follows the same shape: build a formatted string — often by que
 
 | Function | Description |
 |---|---|
-| `stock ShowHighScoresRacesDialog(playerid, offset)` (`src/support/dialogs.pwn:162`) | Paginated (10/page) top-3-per-race high score list. |
-| `stock ShowAdminCommandsDialog(playerid)` (`src/support/dialogs.pwn:215`) | Admin command reference, revealing more sections as `AdminLevel` increases (1-4). |
-| `stock ShowCommonCommandsDialog(playerid)` (`src/support/dialogs.pwn:285`) | Full player-facing `/command` cheatsheet. |
-| `stock ShowAdminsOnlineDialog(playerid)` (`src/support/dialogs.pwn:342`) | Lists connected admins (`AdminLevel > 0` or RCON) and their level. |
-| `stock ShowPlayerPocketDrugzDialog(playerid)` (`src/support/dialogs.pwn:377`) | Tabular view of the player's carried substance amounts. |
-| `stock ShowRaceListDialog(playerid)` (`src/support/dialogs.pwn:394`) | Lists all named races with entry cost/prize, to join one. |
-| `stock ShowPropertyListDialog(playerid)` (`src/support/dialogs.pwn:412`) | Lists the player's owned personal properties (DB query, `type = 1`). |
-| `stock ShowBankOptionsDialog(playerid)` (`src/support/dialogs.pwn:458`) | Deposit / Withdraw / Balance menu. |
-| `stock ShowBankDepositDialog(playerid)` (`src/support/dialogs.pwn:463`) | Input prompt for a deposit amount. |
-| `stock ShowBankWithdrawDialog(playerid)` (`src/support/dialogs.pwn:468`) | Input prompt for a withdrawal amount. |
-| `stock ShowPortListDialog(playerid)` (`src/support/dialogs.pwn:473`) | Menu of fixed teleport destinations (LV escalators, SF WangCars, LS Airport, parkour parks). |
-| `stock ShowTruckingPointListDialog(playerid)` (`src/support/dialogs.pwn:492`) | Lists named trucking points for the trucking editor. |
-| `stock ShowRaceEditorListDialog(playerid)` (`src/support/dialogs.pwn:514`) | Lists all named races for the race editor. |
-| `stock ShowRaceOptionsDialog(playerid, raceid)` (`src/support/dialogs.pwn:536`) | In-race menu (currently only "Exit race"). |
-| `stock ShowGetPlayerListDialog(playerid)` (`src/support/dialogs.pwn:545`) | Admin player picker backing `/get` (teleport target to admin). |
-| `stock ShowGotoPlayerListDialog(playerid)` (`src/support/dialogs.pwn:574`) | Admin player picker backing `/goto` (teleport admin to target). |
-| `stock ShowPlayerClickedDialog(playerid, clickedplayerid)` (`src/support/dialogs.pwn:603`) | Per-clicked-player admin action menu, options unlocked progressively by `AdminLevel` (1-4). |
-| `stock ShowPlayerSkinIDSetDialog(playerid)` (`src/support/dialogs.pwn:668`) | Input prompt to set the clicked player's skin id. |
-| `stock ShowPlayerDrunkLevelSetDialog(playerid)` (`src/support/dialogs.pwn:681`) | Input prompt to set the clicked player's drunk level. |
-| `stock ShowPlayerAdminLevelSetDialog(playerid)` (`src/support/dialogs.pwn:694`) | Input prompt to set the clicked player's admin level. |
-| `stock ShowPlayerGiveWeaponDialog(playerid)` (`src/support/dialogs.pwn:707`) | Input prompt to give the clicked player a specific weapon. |
-| `stock ShowPlayerFakechatDialog(playerid)` (`src/support/dialogs.pwn:720`) | Input prompt to send fake chat text as the clicked player. |
-| `stock ShowDeathmatchOptionsDialog(playerid)` (`src/support/dialogs.pwn:735`) | Register / leave the deathmatch minigame. |
-| `stock ShowPhoneOptionsDialog(playerid)` (`src/support/dialogs.pwn:756`) | In-game phone menu (balance, vehicle lock, PM, call taxi/mechanic/pizza). |
-| `stock ShowPhonePMPlayerListDialog(playerid)` (`src/support/dialogs.pwn:773`) | Player picker for sending a phone PM. |
-| `stock ShowPhonePMTextDialog(playerid, clickedplayerid)` (`src/support/dialogs.pwn:799`) | Input prompt for the PM text body. |
-| `stock ShowPlayerAccountDialog(playerid)` (`src/support/dialogs.pwn:824`) | Read-only account summary (cash, team, skin, admin/wanted level, playtime, client version). |
-| `stock ShowServerHelpListDialog(playerid)` (`src/support/dialogs.pwn:861`) | Top-level help topic menu. |
-| `stock ShowServerRulesDialog(playerid)` (`src/support/dialogs.pwn:882`) | Static server rules text. |
-| `stock ShowGameEditorListDialog(playerid)` (`src/support/dialogs.pwn:891`) | Admin menu linking to the property/trucking/race/bribe/rampage editors. |
-| `stock ShowBribeEditorMainDialog(playerid)` (`src/support/dialogs.pwn:906`) | Add / delete police bribe pickup menu. |
-| `stock ShowBribeEditorNoteDialog(playerid)` (`src/support/dialogs.pwn:915`) | Input prompt for a new bribe pickup's note text. |
-| `stock ShowPropertyEditorMainDialog(playerid)` (`src/support/dialogs.pwn:924`) | Draft new / list personal / list commercial property menu. |
-| `stock ShowPropertyEditorNewIDDialog(playerid)` (`src/support/dialogs.pwn:937`) | Input prompt for a new property's numeric id. |
-| `stock ShowRaceEditorMainDialog(playerid)` (`src/support/dialogs.pwn:942`) | Draft new race / list existing races menu. |
-| `stock ShowRaceEditorOptionsDialog(playerid, raceid)` (`src/support/dialogs.pwn:954`) | Per-race editor menu (name/cost/prize/start coords/record track/save). |
-| `stock ShowRaceEditorNameChangeDialog(playerid)` (`src/support/dialogs.pwn:974`) | Input prompt for a race's new name. |
-| `stock ShowRaceEditorCostChangeDialog(playerid)` (`src/support/dialogs.pwn:979`) | Input prompt for a race's entry cost. |
-| `stock ShowRaceEditorPrizeChangeDialog(playerid)` (`src/support/dialogs.pwn:984`) | Input prompt for a race's prize. |
-| `stock ShowTruckingEditorMainDialog(playerid)` (`src/support/dialogs.pwn:989`) | New point / list points menu. |
-| `stock ShowTruckingEditorOptionsDialog(playerid)` (`src/support/dialogs.pwn:1002`) | Per-point editor menu (name/type/checkpoint/pickup/truck/trailer coords/save). |
-| `stock ShowTruckingEditorNameDialog(playerid)` (`src/support/dialogs.pwn:1027`) | Input prompt for a trucking point's name. |
-| `stock ShowTruckingEditorTypeDialog(playerid)` (`src/support/dialogs.pwn:1039`) | Petrol Station vs. Generic Freight Point picker. |
-| `stock ShowPrizesInfoDialog(playerid)` (`src/support/dialogs.pwn:1057`) | Static info text about tiki/pumpkin prizes. |
-| `stock ShowCreditsDialog(playerid)` (`src/support/dialogs.pwn:1069`) | Gamemode credits and version string. |
-| `stock ShowWantedListDialog(playerid)` (`src/support/dialogs.pwn:1087`) | Lists online players with a nonzero wanted level. |
+| `stock ShowHighScoresRacesDialog(playerid, offset)` (`src/support/dialogs.pwn:172`) | Paginated (10/page) top-3-per-race high score list. |
+| `stock ShowAdminCommandsDialog(playerid)` (`src/support/dialogs.pwn:233`) | Admin command reference, revealing more sections as `AdminLevel` increases (1-4). |
+| `stock ShowCommonCommandsDialog(playerid)` (`src/support/dialogs.pwn:303`) | Full player-facing `/command` cheatsheet. |
+| `stock ShowAdminsOnlineDialog(playerid)` (`src/support/dialogs.pwn:360`) | Lists connected admins (`AdminLevel > 0` or RCON) and their level. |
+| `stock ShowPlayerPocketDrugzDialog(playerid)` (`src/support/dialogs.pwn:395`) | Tabular view of the player's carried substance amounts. |
+| `stock ShowRaceListDialog(playerid)` (`src/support/dialogs.pwn:412`) | Lists all named races with entry cost/prize, to join one. |
+| `stock ShowPropertyListDialog(playerid)` (`src/support/dialogs.pwn:430`) | Lists the player's owned personal properties (DB query, `type = 1`). |
+| `stock ShowBankOptionsDialog(playerid)` (`src/support/dialogs.pwn:476`) | Deposit / Withdraw / Balance menu. |
+| `stock ShowBankDepositDialog(playerid)` (`src/support/dialogs.pwn:481`) | Input prompt for a deposit amount. |
+| `stock ShowBankWithdrawDialog(playerid)` (`src/support/dialogs.pwn:486`) | Input prompt for a withdrawal amount. |
+| `stock ShowPortListDialog(playerid)` (`src/support/dialogs.pwn:491`) | Menu of fixed teleport destinations (LV escalators, SF WangCars, LS Airport, parkour parks). |
+| `stock ShowTruckingPointListDialog(playerid)` (`src/support/dialogs.pwn:510`) | Lists named trucking points for the trucking editor. |
+| `stock ShowRaceEditorListDialog(playerid)` (`src/support/dialogs.pwn:532`) | Lists all named races for the race editor. |
+| `stock ShowRaceOptionsDialog(playerid, raceid)` (`src/support/dialogs.pwn:554`) | In-race menu (currently only "Exit race"). |
+| `stock ShowGetPlayerListDialog(playerid)` (`src/support/dialogs.pwn:563`) | Admin player picker backing `/get` (teleport target to admin). |
+| `stock ShowGotoPlayerListDialog(playerid)` (`src/support/dialogs.pwn:592`) | Admin player picker backing `/goto` (teleport admin to target). |
+| `stock ShowPlayerClickedDialog(playerid, clickedplayerid)` (`src/support/dialogs.pwn:621`) | Per-clicked-player admin action menu, options unlocked progressively by `AdminLevel` (1-4). |
+| `stock ShowPlayerSkinIDSetDialog(playerid)` (`src/support/dialogs.pwn:686`) | Input prompt to set the clicked player's skin id. |
+| `stock ShowPlayerDrunkLevelSetDialog(playerid)` (`src/support/dialogs.pwn:699`) | Input prompt to set the clicked player's drunk level. |
+| `stock ShowPlayerAdminLevelSetDialog(playerid)` (`src/support/dialogs.pwn:712`) | Input prompt to set the clicked player's admin level. |
+| `stock ShowPlayerGiveWeaponDialog(playerid)` (`src/support/dialogs.pwn:725`) | Input prompt to give the clicked player a specific weapon. |
+| `stock ShowPlayerFakechatDialog(playerid)` (`src/support/dialogs.pwn:738`) | Input prompt to send fake chat text as the clicked player. |
+| `stock ShowDeathmatchOptionsDialog(playerid)` (`src/support/dialogs.pwn:753`) | Register / leave the deathmatch minigame. |
+| `stock ShowPhoneOptionsDialog(playerid)` (`src/support/dialogs.pwn:774`) | In-game phone menu (balance, vehicle lock, PM, call taxi/mechanic/pizza). |
+| `stock ShowPhonePMPlayerListDialog(playerid)` (`src/support/dialogs.pwn:791`) | Player picker for sending a phone PM. |
+| `stock ShowPhonePMTextDialog(playerid, clickedplayerid)` (`src/support/dialogs.pwn:817`) | Input prompt for the PM text body. |
+| `stock ShowPlayerAccountDialog(playerid)` (`src/support/dialogs.pwn:842`) | Read-only account summary (cash, team, skin, admin/wanted level, playtime, client version). |
+| `stock ShowServerHelpListDialog(playerid)` (`src/support/dialogs.pwn:879`) | Top-level help topic menu. |
+| `stock ShowServerRulesDialog(playerid)` (`src/support/dialogs.pwn:900`) | Static server rules text. |
+| `stock ShowGameEditorListDialog(playerid)` (`src/support/dialogs.pwn:909`) | Admin menu linking to the property/trucking/race/bribe/rampage editors. |
+| `stock ShowBribeEditorMainDialog(playerid)` (`src/support/dialogs.pwn:924`) | Add / delete police bribe pickup menu. |
+| `stock ShowBribeEditorNoteDialog(playerid)` (`src/support/dialogs.pwn:933`) | Input prompt for a new bribe pickup's note text. |
+| `stock ShowPropertyEditorMainDialog(playerid)` (`src/support/dialogs.pwn:942`) | Draft new / list personal / list commercial property menu. |
+| `stock ShowPropertyEditorNewIDDialog(playerid)` (`src/support/dialogs.pwn:955`) | Input prompt for a new property's numeric id. |
+| `stock ShowRaceEditorMainDialog(playerid)` (`src/support/dialogs.pwn:960`) | Draft new race / list existing races menu. |
+| `stock ShowRaceEditorOptionsDialog(playerid, raceid)` (`src/support/dialogs.pwn:972`) | Per-race editor menu (name/cost/prize/start coords/record track/save). |
+| `stock ShowRaceEditorNameChangeDialog(playerid)` (`src/support/dialogs.pwn:992`) | Input prompt for a race's new name. |
+| `stock ShowRaceEditorCostChangeDialog(playerid)` (`src/support/dialogs.pwn:997`) | Input prompt for a race's entry cost. |
+| `stock ShowRaceEditorPrizeChangeDialog(playerid)` (`src/support/dialogs.pwn:1002`) | Input prompt for a race's prize. |
+| `stock ShowTruckingEditorMainDialog(playerid)` (`src/support/dialogs.pwn:1007`) | New point / list points menu. |
+| `stock ShowTruckingEditorOptionsDialog(playerid)` (`src/support/dialogs.pwn:1020`) | Per-point editor menu (name/type/checkpoint/pickup/truck/trailer coords/save). |
+| `stock ShowTruckingEditorNameDialog(playerid)` (`src/support/dialogs.pwn:1045`) | Input prompt for a trucking point's name. |
+| `stock ShowTruckingEditorTypeDialog(playerid)` (`src/support/dialogs.pwn:1057`) | Petrol Station vs. Generic Freight Point picker. |
+| `stock ShowPrizesInfoDialog(playerid)` (`src/support/dialogs.pwn:1075`) | Static info text about tiki/pumpkin prizes. |
+| `stock ShowCreditsDialog(playerid)` (`src/support/dialogs.pwn:1087`) | Gamemode credits and version string. |
+| `stock ShowWantedListDialog(playerid)` (`src/support/dialogs.pwn:1105`) | Lists online players with a nonzero wanted level. |
 | `stock ShowTaxiHelpDialog` / `ShowTowHelpDialog` / `ShowTruckingHelpDialog` / `ShowCombatHelpDialog` / `ShowPropertyHelpDialog` / `ShowRaceHelpDialog(playerid)` (`src/support/dialogs.pwn:1108-1153`) | Six near-identical static help-text dialogs, one per mission/feature (mechanics, commission calculation, etc.). |
-| `stock ShowTaxiMissionOptionsDialog(playerid)` (`src/support/dialogs.pwn:1156`) | Area picker (LV/SF/LS/Whole map) for starting a taxi mission. |
-| `stock ShowHighScoresOptionsDialog(playerid)` (`src/support/dialogs.pwn:1170`) | Top-level high-scores category menu. |
-| `stock ShowHighScoresPlayTimeDialog(playerid)` (`src/support/dialogs.pwn:1186`) | Top 15 players by playtime. |
-| `stock ShowHighScoresPropertiesDialog(playerid)` (`src/support/dialogs.pwn:1237`) | Top 3 property owners per map area, via a window-function query. |
-| `stock ShowHighScoresDeathmatchDialog(playerid)` (`src/support/dialogs.pwn:1329`) | Top 5 deathmatch scores (`high_scores` type 2). |
-| `stock ShowHighScoresMissionsDialog(playerid)` (`src/support/dialogs.pwn:1375`) | Combined taxi/trucking/tow mission leaderboards (`high_scores` types 3/4/6). |
-| `stock ShowHighScoresCombatDialog(playerid)` (`src/support/dialogs.pwn:1595`) | Per-combat-mission top-3 briefcase counts (`high_scores` type 5). |
-| `stock ShowCombatListDialog(playerid)` (`src/support/dialogs.pwn:1659`) | Lists combat missions from the `combat_mission` table. |
-| `stock ShowTutorialMainDialog(playerid)` (`src/support/dialogs.pwn:1698`) | Activate tutorial / view stats / next task menu. |
-| `stock ShowTutorialStatsDialog(playerid)` (`src/support/dialogs.pwn:1715`) | Dumps the player's tutorial-progress stats. |
-| `stock ShowPlayerLocaleListDialog(playerid)` (`src/support/dialogs.pwn:1755`) | Lists available languages from `locale_types`. |
-| `stock ShowBlackMarketItemListDialog(playerid)` (`src/support/dialogs.pwn:1792`) | Lists current black market offers (joined query across items/users/drug types/prices). |
-| `stock ShowBlackMarketMainDialog(playerid)` (`src/support/dialogs.pwn:1862`) | List items / place new offer menu. |
-| `stock ShowBlackMarketNewDialog(playerid)` (`src/support/dialogs.pwn:1870`) | Tabular picker of the player's own drug types/amounts/prices to list for sale. |
-| `stock ShowBlackMarketAmountDialog(playerid)` (`src/support/dialogs.pwn:1911`) | Input prompt for a new market offer's amount. |
-| `stock ShowBlackMarketValueDialog(playerid)` (`src/support/dialogs.pwn:1919`) | Input prompt for a new market offer's per-unit price. |
-| `stock ShowDealMainDialog(playerid)` (`src/support/dialogs.pwn:1927`) | Tabular picker of drug types to offer directly to another player. |
-| `stock ShowDealAmountDialog(playerid)` (`src/support/dialogs.pwn:1968`) | Input prompt for a direct deal's amount. |
-| `stock ShowDealValueDialog(playerid)` (`src/support/dialogs.pwn:1976`) | Input prompt for a direct deal's per-unit value. |
-| `stock ShowDealPlayerListDialog(playerid)` (`src/support/dialogs.pwn:1984`) | Player picker for a direct deal's target. |
-| `stock ShowDealConfirmationDialog(playerid)` (`src/support/dialogs.pwn:2013`) | Accept/decline confirmation shown to the deal's target. |
-| `stock ShowRampageEditorMainDialog(playerid)` (`src/support/dialogs.pwn:2033`) | Rampage mission editor top menu; also precomputes the next mission id from `rampages`. |
-| `stock ShowRampageEditorNameDialog(playerid)` (`src/support/dialogs.pwn:2060`) | Input prompt for a rampage mission's name. |
-| `stock ShowRampageEditorWeaponDialog(playerid)` (`src/support/dialogs.pwn:2068`) | Input prompt for a rampage weapon id (blank = random). |
-| `stock ShowRampageEditorLocationTypeDialog(playerid)` (`src/support/dialogs.pwn:2076`) | None/LV/SF/LS location-type picker. |
-| `stock ShowNPCRecordingDialog(playerid)` (`src/support/dialogs.pwn:2084`) | Input prompt for an NPC route-recording file suffix. |
+| `stock ShowTaxiMissionOptionsDialog(playerid)` (`src/support/dialogs.pwn:1188`) | Area picker (LV/SF/LS/Whole map) for starting a taxi mission. |
+| `stock ShowHighScoresOptionsDialog(playerid)` (`src/support/dialogs.pwn:1200`) | Top-level high-scores category menu. |
+| `stock ShowHighScoresPlayTimeDialog(playerid)` (`src/support/dialogs.pwn:1216`) | Top 15 players by playtime. |
+| `stock ShowHighScoresPropertiesDialog(playerid)` (`src/support/dialogs.pwn:1267`) | Top 3 property owners per map area, via a window-function query. |
+| `stock ShowHighScoresDeathmatchDialog(playerid)` (`src/support/dialogs.pwn:1359`) | Top 5 deathmatch scores (`high_scores` type 2). |
+| `stock ShowHighScoresMissionListDialog(playerid)` (`src/support/dialogs.pwn:1403`) | Menu routing to the per-mission leaderboards below. |
+| `stock ShowHighScoresMissionTaxiDialog(playerid)` (`src/support/dialogs.pwn:1421`) | Taxi mission leaderboard (`high_scores` type 3). |
+| `stock ShowHighScoresMissionTruckDialog(playerid)` (`src/support/dialogs.pwn:1539`) | Trucking leaderboard (type 4). |
+| `stock ShowHighScoresMissionTowDialog(playerid)` (`src/support/dialogs.pwn:1612`) | Tow leaderboard (type 6). |
+| `stock ShowHighScoresRampageDialog(playerid)` (`src/support/dialogs.pwn:1689`) | Rampage leaderboard (type 7); joins `rampages` on `spec_id` so each row shows the rampage's name instead of its id. |
+| `stock ShowHighScoresMissionDrugDialog(playerid)` (`src/support/dialogs.pwn:1775`) | Drug Mission leaderboard (type 8). |
+| `stock ShowHighScoresCombatDialog(playerid)` (`src/support/dialogs.pwn:1856`) | Per-combat-mission briefcase counts (type 5). |
+| `stock ShowCombatListDialog(playerid)` (`src/support/dialogs.pwn:1950`) | Lists combat missions from the `combat_mission` table. |
+| `stock ShowTutorialMainDialog(playerid)` (`src/support/dialogs.pwn:1989`) | Activate tutorial / view stats / next task menu. |
+| `stock ShowTutorialStatsDialog(playerid)` (`src/support/dialogs.pwn:2006`) | Dumps the player's tutorial-progress stats. |
+| `stock ShowPlayerLocaleListDialog(playerid)` (`src/support/dialogs.pwn:2046`) | Lists available languages from `locale_types`. |
+| `stock ShowBlackMarketItemListDialog(playerid)` (`src/support/dialogs.pwn:2083`) | Lists current black market offers (joined query across items/users/drug types/prices). |
+| `stock ShowBlackMarketMainDialog(playerid)` (`src/support/dialogs.pwn:2153`) | List items / place new offer menu. |
+| `stock ShowBlackMarketNewDialog(playerid)` (`src/support/dialogs.pwn:2161`) | Tabular picker of the player's own drug types/amounts/prices to list for sale. |
+| `stock ShowBlackMarketAmountDialog(playerid)` (`src/support/dialogs.pwn:2202`) | Input prompt for a new market offer's amount. |
+| `stock ShowBlackMarketValueDialog(playerid)` (`src/support/dialogs.pwn:2210`) | Input prompt for a new market offer's per-unit price. |
+| `stock ShowDealMainDialog(playerid)` (`src/support/dialogs.pwn:2218`) | Tabular picker of drug types to offer directly to another player. |
+| `stock ShowDealAmountDialog(playerid)` (`src/support/dialogs.pwn:2259`) | Input prompt for a direct deal's amount. |
+| `stock ShowDealValueDialog(playerid)` (`src/support/dialogs.pwn:2267`) | Input prompt for a direct deal's per-unit value. |
+| `stock ShowDealPlayerListDialog(playerid)` (`src/support/dialogs.pwn:2275`) | Player picker for a direct deal's target. |
+| `stock ShowDealConfirmationDialog(playerid)` (`src/support/dialogs.pwn:2304`) | Accept/decline confirmation shown to the deal's target. |
+| `stock ShowRampageEditorMainDialog(playerid)` (`src/support/dialogs.pwn:2324`) | Rampage mission editor top menu; also precomputes the next mission id from `rampages`. |
+| `stock ShowRampageEditorNameDialog(playerid)` (`src/support/dialogs.pwn:2351`) | Input prompt for a rampage mission's name. |
+| `stock ShowRampageEditorWeaponDialog(playerid)` (`src/support/dialogs.pwn:2359`) | Input prompt for a rampage weapon id (blank = random). |
+| `stock ShowRampageEditorLocationTypeDialog(playerid)` (`src/support/dialogs.pwn:2367`) | None/LV/SF/LS location-type picker. |
+| `stock ShowNPCRecordingDialog(playerid)` (`src/support/dialogs.pwn:2375`) | Input prompt for an NPC route-recording file suffix. |
 
 ## Dialog Responses (`src/support/response.pwn`, ~2012 lines)
 
@@ -127,15 +132,15 @@ A general-purpose collection of `stock` utilities pulled in by nearly every modu
 
 | Function | Description |
 |---|---|
-| `public AutosaveData()` (`src/support/helpers.pwn:28`) | Periodic timer callback: saves all player data and real estate state. |
-| `public StartServerReset()` (`src/support/helpers.pwn:34`) | Issues an RCON `gmx` to restart the game mode. |
-| `stock DelayedKick(playerid, delay = 1000)` (`src/support/helpers.pwn:95`) | Schedules `Kick(playerid)` via a timer so pending messages/dialogs reach the client first. |
-| `stock IsNumeric(const input[])` (`src/support/helpers.pwn:112`) | Checks whether a string is all digits (used to validate dialog input). |
-| `stock IsPlayerInSphere(playerid, Float:x, Float:y, Float:z, Float:radius)` (`src/support/helpers.pwn:130`) | Radius check against a player's current position. |
-| `stock EnsurePickupCreated(model, type, Float:X, Float:Y, Float:Z)` (`src/support/helpers.pwn:226`) | Retries `CreatePickup` up to 50 times and returns the resulting pickup id. |
-| `stock IsVehicleRcTram(vehicleid)` (`src/support/helpers.pwn:253`) | True if the vehicle's model is a tram or one of the RC vehicle models. |
-| `stock SplitIntoTwo(const input[], token1[], token2[], tokenSize, const delimiter[2] = " ")` (`src/support/helpers.pwn:273`) | Splits a command parameter string into two tokens on a delimiter. |
-| `stock SanitizeString(const input[], output[], size)` (`src/support/helpers.pwn:413`) | Escapes single quotes for embedding a string in a SQL literal. |
+| `public AutosaveData()` (`src/support/helpers.pwn:39`) | Periodic timer callback: saves all player data and real estate state. |
+| `public StartServerReset()` (`src/support/helpers.pwn:45`) | Issues an RCON `gmx` to restart the game mode. |
+| `stock DelayedKick(playerid, delay = 1000)` (`src/support/helpers.pwn:106`) | Schedules `Kick(playerid)` via a timer so pending messages/dialogs reach the client first. |
+| `stock IsNumeric(const input[])` (`src/support/helpers.pwn:123`) | Checks whether a string is all digits (used to validate dialog input). |
+| `stock IsPlayerInSphere(playerid, Float:x, Float:y, Float:z, Float:radius)` (`src/support/helpers.pwn:141`) | Radius check against a player's current position. |
+| `stock EnsurePickupCreated(model, type, Float:X, Float:Y, Float:Z)` (`src/support/helpers.pwn:237`) | Retries `CreatePickup` up to 50 times and returns the resulting pickup id. |
+| `stock IsVehicleRcTram(vehicleid)` (`src/support/helpers.pwn:264`) | True if the vehicle's model is a tram or one of the RC vehicle models. |
+| `stock SplitIntoTwo(const input[], token1[], token2[], tokenSize, const delimiter[2] = " ")` (`src/support/helpers.pwn:284`) | Splits a command parameter string into two tokens on a delimiter. |
+| `stock SanitizeString(const input[], output[], size)` (`src/support/helpers.pwn:424`) | Escapes single quotes for embedding a string in a SQL literal. |
 
 ## Parkour (`src/support/parkour.pwn`, ~97 lines)
 

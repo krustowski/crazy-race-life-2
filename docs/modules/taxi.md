@@ -21,15 +21,15 @@ Reaching that checkpoint (`CheckTaxiMissionCheckpoint`, invoked from the main pi
 | Function | Description |
 |---|---|
 | `public EnterVehicleTimer(npcid)` (`src/modules/taxi.pwn:56`) | Scripts the waiting customer NPC into the player's stopped taxi. |
-| `public CheckTaxiVehicle(playerid)` (`src/modules/taxi.pwn:96`) | 1.5s watchdog: aborts the checkpoint/marks the vehicle if the player isn't in their taxi. |
-| `public CheckTaxiNearNPC(playerid)` (`src/modules/taxi.pwn:119`) | 2s watchdog: triggers NPC pickup once the taxi is stationary near the customer. |
-| `public CheckNPCInVehicle(playerid)` (`src/modules/taxi.pwn:156`) | Confirms the NPC boarded before generating the drop-off checkpoint. |
-| `stock CheckTaxiMissionCheckpoint(playerid)` (`src/modules/taxi.pwn:198`) | Checkpoint-reached handler: pays commission and starts the next leg. |
-| `stock SetTaxiMissionCheckpoint(playerid)` / `SetTaxiMissionCustomerPos(playerid)` (`src/modules/taxi.pwn:230`, `:301`) | Roll a random destination / customer spawn point for the current area. |
-| `stock SetTaxiMissionCustomer(playerid)` (`src/modules/taxi.pwn:363`) | Creates the customer NPC on first use, or repositions the existing one. |
-| `stock SetPlayerTaxiMission(playerid, areaid)` (`src/modules/taxi.pwn:418`) | Starts/aborts a taxi mission for the given area. |
-| `stock AbortPlayerTaxiMission(playerid)` (`src/modules/taxi.pwn:458`) | Cleans up timers/NPC/textdraw and saves the run's score. |
-| `stock SaveTaxiMissionScore(playerid)` (`src/modules/taxi.pwn:496`) | Writes the completed-fare count to `high_scores`. |
+| `public CheckTaxiVehicle(playerid)` (`src/modules/taxi.pwn:102`) | 1.5s watchdog: aborts the checkpoint/marks the vehicle if the player isn't in their taxi. |
+| `public CheckTaxiNearNPC(playerid)` (`src/modules/taxi.pwn:125`) | 2s watchdog: triggers NPC pickup once the taxi is stationary near the customer. |
+| `public CheckNPCInVehicle(playerid)` (`src/modules/taxi.pwn:162`) | Confirms the NPC boarded before generating the drop-off checkpoint. |
+| `stock CheckTaxiMissionCheckpoint(playerid)` (`src/modules/taxi.pwn:204`) | Checkpoint-reached handler: pays commission and starts the next leg. |
+| `stock SetTaxiMissionCheckpoint(playerid)` / `SetTaxiMissionCustomerPos(playerid)` (`src/modules/taxi.pwn:329`, `:301`) | Roll a random destination / customer spawn point for the current area. |
+| `stock SetTaxiMissionCustomer(playerid)` (`src/modules/taxi.pwn:397`) | Creates the customer NPC on first use, or repositions the existing one. |
+| `stock SetPlayerTaxiMission(playerid, areaid)` (`src/modules/taxi.pwn:459`) | Starts/aborts a taxi mission for the given area. |
+| `stock AbortPlayerTaxiMission(playerid)` (`src/modules/taxi.pwn:508`) | Cleans up timers/NPC/textdraw and saves the run's score. |
+| `stock SaveTaxiMissionScore(playerid)` (`src/modules/taxi.pwn:548`) | Writes the completed-fare count to `high_scores`. |
 
 ## Commands
 

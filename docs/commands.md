@@ -18,7 +18,7 @@ These are declared under the `//--------------[ COMMON COMMANDS ]-------------|`
 | `/dance` | Plays a dance animation (`1`-`4` as an argument). Blocked while in a vehicle. | — |
 | `/deal` | **Dealerz team only.** Opens the dealer offer dialog. | — (dialog-driven) |
 | `/deathmatch` | Opens the deathmatch options dialog ([`modules/deathmatch.md`](modules/deathmatch.md)). | — (dialog-driven) |
-| `/drug` | Toggles the drug mission on/off for the player ([`modules/drugz.md`](modules/drugz.md)). | — |
+| `/drug` | **Dealers only.** Toggles the Drug Mission on/off; ending one writes a `high_scores` row of type 8 ([`modules/drugz.md`](modules/drugz.md)). | — |
 | `/drugz` | Shows the player's pocket drug inventory dialog. | — |
 | `/dwarp` | Teleports the player (or their vehicle, if driving) to a shared warp point near the racing area; blocked while inside a property. Broadcast to all players. | — |
 | `/fix` | **Mechanics team only.** Repairs the caller's own vehicle for free, or a nearby target's vehicle for a cash commission (target must be within 10 units and below full health). | `[playerID]` (optional) |
@@ -26,7 +26,7 @@ These are declared under the `//--------------[ COMMON COMMANDS ]-------------|`
 | `/givecash` | Transfers cash from the caller to another connected player. | `[playerID] [amount]` |
 | `/help` | Opens the server help dialog. | — |
 | `/hide` | **Adminz team only.** Toggles the player's visibility on the map/radar (alpha-channel trick on their blip color). | — |
-| `/kill` | Commits suicide; announced to all players. | — |
+| `/kill` | Commits suicide; announced to all players. Refused (with a localized message) if the player is already dead, still in class selection, not logged in, or has a kill already pending. | — |
 | `/lay` | Plays a laying-down animation. Blocked while in a vehicle. | — |
 | `/locale` | Opens the language-selection dialog. See [Localization](localization.md). | — |
 | `/locate` | Prints the caller's current coordinates, facing angle, and interior ID. | — |

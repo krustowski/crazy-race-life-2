@@ -19,8 +19,8 @@ There are no commands here — the flow is purely dialog + timer driven.
 | Function | Description |
 |---|---|
 | `stock SetPlayerAccountLogin(playerid, const text[])` (`src/modules/auth.pwn:13`) | Verifies a submitted password against the stored SHA-256 hash/salt for the player's nickname; on success marks the player logged in and spawns them. |
-| `stock SetPlayerAccountRegistration(playerid, const text[])` (`src/modules/auth.pwn:63`) | Creates a new `users` row with default stats for a not-yet-registered nickname, logs the player in, and spawns them. |
-| `public ShowAuthDialog(playerid)` (`src/modules/auth.pwn:152`) | Looks up whether the player's nickname is already registered and shows either the login or registration password dialog. |
+| `stock SetPlayerAccountRegistration(playerid, const text[])` (`src/modules/auth.pwn:69`) | Creates a new `users` row with default stats for a not-yet-registered nickname, logs the player in, and spawns them. |
+| `public ShowAuthDialog(playerid)` (`src/modules/auth.pwn:167`) | Looks up whether the player's nickname is already registered and shows either the login or registration password dialog. |
 
 ## Commands
 

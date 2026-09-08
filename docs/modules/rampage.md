@@ -18,12 +18,12 @@ The **Rampage Editor** is reached only through the admin `/edit` command (`GameE
 |---|---|
 | `public UpdateRampageMissionInfoText(playerid)` (`src/modules/rampage.pwn:127`) | 1s countdown timer; updates the mission HUD textdraw and auto-aborts when time runs out. |
 | `public RecreateRampageNPC(playerid, missionid, npcindex)` (`src/modules/rampage.pwn:152`) | Respawns a killed mission NPC in place and re-aims all surviving NPCs. |
-| `stock CheckRampagePickup(playerid, pickupid)` (`src/modules/rampage.pwn:231`) | Pickup callback entry point: starts a mission, heals, or grants a weapon depending on pickup type. |
-| `stock InitRampagePickups()` (`src/modules/rampage.pwn:279`) | Loads `rampages`/`rampage_coords` (type 1) and spawns/refreshes every mission's start pickup. |
-| `stock AbortRampageMission(playerid)` (`src/modules/rampage.pwn:335`) | Destroys the mission's NPCs and pickups, clears state, respawns the player. |
-| `stock SetRampageMission(playerid)` (`src/modules/rampage.pwn:382`) | Loads weapon/health/NPC coordinates for the chosen mission and spawns them; starts the 5-minute timer. |
-| `stock SetRampageNPC(playerid, missionid, npcarrayid)` (`src/modules/rampage.pwn:583`) | Allocates an NPC bot slot and spawns it (used both live and by the editor preview). |
-| `stock SaveRampageMission(playerid)` (`src/modules/rampage.pwn:629`) | Persists an editor session (pickup, health, weapon and NPC coordinates) to the database. |
+| `stock CheckRampagePickup(playerid, pickupid)` (`src/modules/rampage.pwn:236`) | Pickup callback entry point: starts a mission, heals, or grants a weapon depending on pickup type. |
+| `stock InitRampagePickups()` (`src/modules/rampage.pwn:284`) | Loads `rampages`/`rampage_coords` (type 1) and spawns/refreshes every mission's start pickup. |
+| `stock AbortRampageMission(playerid)` (`src/modules/rampage.pwn:340`) | Destroys the mission's NPCs and pickups, clears state, respawns the player. |
+| `stock SetRampageMission(playerid)` (`src/modules/rampage.pwn:392`) | Loads weapon/health/NPC coordinates for the chosen mission and spawns them; starts the 5-minute timer. |
+| `stock SetRampageNPC(playerid, missionid, npcarrayid)` (`src/modules/rampage.pwn:593`) | Allocates an NPC bot slot and spawns it (used both live and by the editor preview). |
+| `stock SaveRampageMission(playerid)` (`src/modules/rampage.pwn:671`) | Persists an editor session (pickup, health, weapon and NPC coordinates) to the database. |
 
 ## Commands
 

@@ -40,7 +40,7 @@ This site documents the gamemode's internals for developers who want to extend, 
 
 ## Screenshots
 
-![Racing](../assets/img/crl2_racing_start.jpg)
+![Racing](assets/img/crl2_racing_start.jpg)
 *Racing checkpoint right after joining a race.*
 
 ![Real Estate exterior](assets/img/crl2_real_estate_exterior.png)

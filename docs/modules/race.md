@@ -40,23 +40,23 @@ Two angle conventions coexist and `Race_HeadingFromAngle()` is the single conver
 | Function | Description |
 |---|---|
 | `stock Race_Init()` (`src/modules/race.pwn:86`) | Loads `races` rows into `gRaces[]` keyed by DB id, creates start pickups + 3D labels, resets timers/registration and invalidates cached prep. |
-| `stock Race_RegisterPlayer(playerid, raceid)` (`src/modules/race.pwn:178`) | Validates and registers a player: entry fee, free-slot scan, lazy prep, countdown arming, grid placement. |
+| `stock Race_RegisterPlayer(playerid, raceid)` (`src/modules/race.pwn:182`) | Validates and registers a player: entry fee, free-slot scan, lazy prep, countdown arming, grid placement. |
 | `static Race_PrepareRace(raceid)` (`src/modules/race.pwn:288`) | One-time (until invalidated) derivation of a race's checkpoints, angles, and starting grid. |
 | `static Race_HeadingFromAngle(angle)` (`src/modules/race.pwn:315`) | Converts a math angle from `atan2` into a GTA Z-angle (heading = angle − 90°, normalized). |
 | `static Race_GetStartFacingAngle(raceid)` (`src/modules/race.pwn:328`) | Computes `AlphaAngle` from the start point toward checkpoint 0 via `atan2`. |
 | `static Race_CalculateStartingCoords(raceid)` (`src/modules/race.pwn:353`) | Precalculates all `MAX_RACE_PLAYERS` grid coordinates into `StartingCoordX/Y[]`. |
 | `static Race_SetPlayerPos(playerid, raceid)` (`src/modules/race.pwn:438`) | Freezes the driver, warps their vehicle to their grid slot, sets the start heading, zeroes velocity. |
-| `public Race_CountdownHelper(raceid)` (`src/modules/race.pwn:492`) | Self-re-arming 1s timer flashing the countdown game text to all registered racers. |
-| `public Race_StartRace(raceid)` (`src/modules/race.pwn:527`) | Marks the race active, unfreezes racers, arms the first checkpoints and the HUD update timer. |
-| `public Race_UpdateRaceInfoText(raceid)` (`src/modules/race.pwn:560`) | Per-second HUD redraw: checkpoints done, position, elapsed time. |
-| `stock Race_CalculatePosition(raceid, playerid)` (`src/modules/race.pwn:600`) | Recomputes a racer's live ranking (checkpoints done, then earliest timestamp). |
-| `stock Race_CheckCheckpoint(playerid)` (`src/modules/race.pwn:650`) | Entry point from `OnPlayerEnterRaceCheckpoint`; advances progress and re-arms the next checkpoint. |
-| `stock Race_LoadRaceCheckpoints(raceid)` (`src/modules/race.pwn:672`) | Loads `race_coords` (ordered by `seq_no`) into `gRaceCoords[]`, sets `CheckPointCount`. |
-| `stock Race_SetNextCheckpoint(playerid, raceid)` (`src/modules/race.pwn:720`) | Arms the next (or FINISH-typed last) race checkpoint; ends the race when progress passes the final one. |
-| `stock Race_AbortMinigame(playerid, bool: success)` (`src/modules/race.pwn:800`) | Ends the race for one player — payout/broadcast/high score on success — frees their slot, deactivates the race when empty. |
-| `stock Race_SaveNewScore(raceid, playerid, time, vehicleModel)` (`src/modules/race.pwn:895`) | Inserts a `high_scores` row and refreshes `gHighScores` via `InitHighScores()`. |
-| `stock InitHighScores()` (`src/modules/race.pwn:945`) | Loads the top-3 times per race (`high_scores` ⋈ `users`) into `gHighScores[]`. |
-| `stock SaveRaceData(playerid)` (`src/modules/race.pwn:1006`) | Race editor: bulk-inserts the drafted race's `races` + `race_coords` rows, then reloads via `Race_Init()`. |
+| `public Race_CountdownHelper(raceid)` (`src/modules/race.pwn:486`) | Self-re-arming 1s timer flashing the countdown game text to all registered racers. |
+| `public Race_StartRace(raceid)` (`src/modules/race.pwn:521`) | Marks the race active, unfreezes racers, arms the first checkpoints and the HUD update timer. |
+| `public Race_UpdateRaceInfoText(raceid)` (`src/modules/race.pwn:554`) | Per-second HUD redraw: checkpoints done, position, elapsed time. |
+| `stock Race_CalculatePosition(raceid, playerid)` (`src/modules/race.pwn:594`) | Recomputes a racer's live ranking (checkpoints done, then earliest timestamp). |
+| `stock Race_CheckCheckpoint(playerid)` (`src/modules/race.pwn:644`) | Entry point from `OnPlayerEnterRaceCheckpoint`; advances progress and re-arms the next checkpoint. |
+| `stock Race_LoadRaceCheckpoints(raceid)` (`src/modules/race.pwn:666`) | Loads `race_coords` (ordered by `seq_no`) into `gRaceCoords[]`, sets `CheckPointCount`. |
+| `stock Race_SetNextCheckpoint(playerid, raceid)` (`src/modules/race.pwn:714`) | Arms the next (or FINISH-typed last) race checkpoint; ends the race when progress passes the final one. |
+| `stock Race_AbortMinigame(playerid, bool: success)` (`src/modules/race.pwn:792`) | Ends the race for one player — payout/broadcast/high score on success — frees their slot, deactivates the race when empty. |
+| `stock Race_SaveNewScore(raceid, playerid, time, vehicleModel)` (`src/modules/race.pwn:886`) | Inserts a `high_scores` row and refreshes `gHighScores` via `InitHighScores()`. |
+| `stock InitHighScores()` (`src/modules/race.pwn:936`) | Loads the top-3 times per race (`high_scores` ⋈ `users`) into `gHighScores[]`. |
+| `stock SaveRaceData(playerid)` (`src/modules/race.pwn:997`) | Race editor: bulk-inserts the drafted race's `races` + `race_coords` rows, then reloads via `Race_Init()`. |
 
 ## Commands
 

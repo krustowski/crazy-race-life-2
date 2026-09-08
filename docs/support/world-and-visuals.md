@@ -24,13 +24,13 @@ The actual `CreatePickup` retry logic lives in `EnsurePickupCreated` (`src/suppo
 
 | Function | Description |
 |---|---|
-| `public InitPickups()` (`src/support/pickups.pwn:98`) | Spawns admin/Hackerz/bank/team/legacy-property pickups and builds per-team join menus from the database. |
-| `stock InitPrizes()` (`src/support/pickups.pwn:241`) | Loads non-hidden tiki/pumpkin prize pickups from `prize_coords` into `gPrizes`. |
-| `stock UpdatePrize(playerid, prizeid)` (`src/support/pickups.pwn:294`) | Marks a prize collected in the database and pays out the tiki/pumpkin reward. |
-| `stock CreateDeathMoneyPickup(playerid)` (`src/support/pickups.pwn:339`) | Drops the dying player's cash as a pickup at their position and resets their money. |
-| `stock CheckDeathMoneyPickup(playerid, pickupid)` (`src/support/pickups.pwn:367`) | Redeems a death-money pickup for whichever player touches it. |
-| `stock CheckBlackMarketPickup(playerid, pickupid)` (`src/support/pickups.pwn:388`) | Opens the black market dialog if the touched pickup is the druggery market spot. |
-| `stock CheckGenericPickup(playerid, pickupid)` (`src/support/pickups.pwn:398`) | Dispatches all other fixed world pickups (druggery entrance, prizes, SF Centrum/Bank LS teleports, admin room/doors, Hackerz). |
+| `public InitPickups()` (`src/support/pickups.pwn:115`) | Spawns admin/Hackerz/bank/team/legacy-property pickups and builds per-team join menus from the database. |
+| `stock InitPrizes()` (`src/support/pickups.pwn:273`) | Loads non-hidden tiki/pumpkin prize pickups from `prize_coords` into `gPrizes`. |
+| `stock UpdatePrize(playerid, prizeid)` (`src/support/pickups.pwn:326`) | Marks a prize collected in the database and pays out the tiki/pumpkin reward. |
+| `stock CreateDeathMoneyPickup(playerid)` (`src/support/pickups.pwn:371`) | Drops the dying player's cash as a pickup at their position and resets their money. |
+| `stock CheckDeathMoneyPickup(playerid, pickupid)` (`src/support/pickups.pwn:417`) | Redeems a death-money pickup for whichever player touches it. |
+| `stock CheckBlackMarketPickup(playerid, pickupid)` (`src/support/pickups.pwn:438`) | Opens the black market dialog if the touched pickup is the druggery market spot. |
+| `stock CheckGenericPickup(playerid, pickupid)` (`src/support/pickups.pwn:448`) | Dispatches all other fixed world pickups (druggery entrance, prizes, SF Centrum/Bank LS teleports, admin room/doors, Hackerz). |
 
 ## Vehicles (`src/support/vehicles.pwn`, ~475 lines)
 
@@ -59,11 +59,19 @@ The actual `CreatePickup` retry logic lives in `EnsurePickupCreated` (`src/suppo
 
 Defines the `E_MAPICON_ID_*` enum, a large set of constants mirroring the client's built-in GTA map icon IDs (ammu-nation, police, hospital, save house, and around 60 others). `AddMapicons(playerid)` is the single function in the file, called once per player after a successful login (from `modules/auth.pwn`). It lays down every client-side map icon the player should see: one per ATM (`gBankLocation`), one per named race start point (`gRaces`), a handful of hardcoded "property for sale" markers, the tow mission dock, a save-house icon for each real-estate property the player owns, one team-join icon per row in `team_coords`/`teams` (icon chosen per `PLAYER_TEAM` via a `switch`), and one icon per trucking petrol station (`trucking_coords WHERE type = 2`). Icon indices are assigned locally via an incrementing `mapiconid` counter and all use `MAPICON_LOCAL` scope.
 
+!!! warning "There are only 100 icon slots"
+    SA-MP supports exactly 100 map icons per player (ids 0–99); calls beyond that are out of range and corrupt the client's icon table, which crashes it. The total here is **player-dependent** — one save-house icon per owned property on top of ~96 fixed ones — so it silently crossed the limit for players with enough real estate while staying under it for everyone else.
+
+    Every call therefore goes through `SetPlayerMapIconSafe`, which refuses out-of-range ids, and `AddMapicons` logs a `[mapicons]` line naming how many icons were dropped. Note that the icons dropped are simply the last ones assigned (currently trucking stations) — if a different category matters more, reorder the assignments in `AddMapicons`.
+
+Ownership is resolved with a single `SELECT id FROM properties WHERE user_id = ? AND occupied = 1` and matched in memory. It previously called `IsPlayerOwner()` — a synchronous query — once per property slot, i.e. up to `MAX_PROPERTIES` (512) blocking queries per login, which crashdetect reported as a hang in `AddMapicons`.
+
 **Key functions:**
 
 | Function | Description |
 |---|---|
-| `public AddMapicons(playerid)` (`src/support/mapicons.pwn:78`) | Draws every client-side map icon for a just-authenticated player (ATMs, races, housing, teams, trucking). |
+| `public AddMapicons(playerid)` (`src/support/mapicons.pwn:90`) | Draws every client-side map icon for a just-authenticated player (ATMs, races, housing, teams, trucking). |
+| `stock SetPlayerMapIconSafe(...)` (`src/support/mapicons.pwn:80`) | Bounds-checked wrapper around `SetPlayerMapIcon`; drops any icon whose id would reach `MAX_PLAYER_MAP_ICONS` (100). |
 
 ## Models (`src/support/models.pwn`, ~27 lines)
 

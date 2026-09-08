@@ -906,7 +906,7 @@ dcmd_unlock(playerid, const params[])
 		{
 			new vehicleid = gProperties[i][Vehicle][ID];
 
-			if (vehicleid && IsPlayerOwner(playerid, gProperties[i][ID]))
+			if (vehicleid && IsPlayerOwnerOfArrayID(playerid, i))
 			{
 				new Float: X, Float: Y, Float: Z;
 				GetVehiclePos(vehicleid, X, Y, Z);

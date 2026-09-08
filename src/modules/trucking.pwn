@@ -3,6 +3,9 @@
 #endif
 #define _CRL2_TRUCKING
 
+// A new trucking checkpoint must be at least this far from the player.
+#define TRUCKING_POINT_MIN_DIST	50.0
+
 //
 //  trucking.pwn
 //
@@ -222,51 +225,64 @@ public CheckPlayerTrailerAttached(playerid)
 
 stock SetPlayerTruckingMission(playerid, MissionType: missionType)
 {
-	const 
-		MAX_ITERATIONS = 50;
-
 	new 
-		query[256];
-	format(query, sizeof(query), "select p.name, c.x, c.y, c.z from trucking_points as p join trucking_coords as c on c.trucking_id = p.id where c.type = 1 and p.type = %d order by random() limit 1", _: missionType);
+		query[640];
 
 	new 
 		Float: x0, 
 		Float: y0, 
 		Float: z0, 
+		Float: pX,
+		Float: pY,
+		Float: pZ,
 		name[64];
 
-	for (new i = 0; i < MAX_ITERATIONS; i++)
-	{
-		new 
-			DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result)
-		{
-			print("Database error: cannot fetch random trucking point!");
-			print(query);
-			return 0;
-		}
+	GetPlayerPos(playerid, pX, pY, pZ);
 
-		if (!DB_GetRowCount(result))
+	// Prevent generating the same checkpoint twice for the current position by
+	// excluding nearby points in the query
+	format(query, sizeof(query), "select p.name, c.x, c.y, c.z from trucking_points as p join trucking_coords as c on c.trucking_id = p.id where c.type = 1 and p.type = %d and ((c.x - %.3f) * (c.x - %.3f) + (c.y - %.3f) * (c.y - %.3f) + (c.z - %.3f) * (c.z - %.3f)) >= %.1f order by random() limit 1",
+			_: missionType, pX, pX, pY, pY, pZ, pZ, TRUCKING_POINT_MIN_DIST * TRUCKING_POINT_MIN_DIST);
+
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+	if (!result)
+	{
+		print("Database error: cannot fetch random trucking point!");
+		print(query);
+		return 0;
+	}
+
+	// Everything for this mission type is close by: take any of them
+	if (!DB_GetRowCount(result))
+	{
+		DB_FreeResultSet(result);
+
+		format(query, sizeof(query), "select p.name, c.x, c.y, c.z from trucking_points as p join trucking_coords as c on c.trucking_id = p.id where c.type = 1 and p.type = %d order by random() limit 1", _: missionType);
+
+		result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+		if (!result || !DB_GetRowCount(result))
 		{
 			print("Database warning: no rows for given query!");
 			print(query);
-			DB_FreeResultSet(result);
+
+			if (result)
+			{
+				DB_FreeResultSet(result);
+			}
+
 			return 0;
 		}
-
-		x0 = DB_GetFieldFloatByName(result, "x");
-		y0 = DB_GetFieldFloatByName(result, "y");
-		z0 = DB_GetFieldFloatByName(result, "z");
-		DB_GetFieldStringByName(result, "name", name, sizeof(name));
-
-		DB_FreeResultSet(result);
-
-		// Prevent generating the same checkpoint twice for current position
-		if (!IsPlayerInSphere(playerid, x0, y0, z0, 50.0))
-		{
-			break;
-		}
 	}
+
+	x0 = DB_GetFieldFloatByName(result, "x");
+	y0 = DB_GetFieldFloatByName(result, "y");
+	z0 = DB_GetFieldFloatByName(result, "z");
+	DB_GetFieldStringByName(result, "name", name, sizeof(name));
+
+	DB_FreeResultSet(result);
 
 	new 
 		Float: X, 

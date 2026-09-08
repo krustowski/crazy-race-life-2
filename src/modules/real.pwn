@@ -697,30 +697,22 @@ stock LoadPlayerProperties(playerid)
 
 stock IsPlayerOwner(playerid, propertyId)
 {
-	new 
-		query[256];
+	return IsPlayerOwnerOfArrayID(playerid, GetPropertyArrayIDfromID(propertyId));
+}
 
-	format(query, sizeof(query), "SELECT occupied FROM properties WHERE user_id = %d AND occupied = 1 AND id = %d", 
-			gPlayers[playerid][OrmID], 
-			propertyId
-	      );
-
-	new 
-		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) 
+stock IsPlayerOwnerOfArrayID(playerid, arrayid)
+{
+	if (arrayid < 0 || arrayid >= sizeof(gProperties))
 	{
-		printf("Database error: cannot verify property ownership (ID: %d)!", propertyId);
 		return false;
 	}
 
-	if (DB_GetRowCount(result))
+	if (!gProperties[arrayid][Occupied])
 	{
-		DB_FreeResultSet(result);
-		return true;
+		return false;
 	}
 
-	DB_FreeResultSet(result);
-	return false;
+	return (gProperties[arrayid][UserID] == gPlayers[playerid][OrmID]);
 }
 
 stock SaveRealEstateData()
@@ -1132,7 +1124,7 @@ stock GetPlayerPropertySpawnPos(playerid, &Float: spawnX, &Float: spawnY, &Float
 			continue;
 		}
 
-		if (!IsPlayerOwner(playerid, gProperties[i][ID]))
+		if (!IsPlayerOwnerOfArrayID(playerid, i))
 		{
 			continue;
 		}
@@ -1833,7 +1825,7 @@ stock CheckRealEstatePickup(playerid, pickupid)
 					}
 				case ENTRANCE_POINT:
 					{
-						if (!IsPlayerOwner(playerid, gProperties[i][ID]))
+						if (!IsPlayerOwnerOfArrayID(playerid, i))
 						{
 							return SendClientMessageLocalized(playerid, I18N_REAL_PRIVATE_PROPERTY_ENTRANCE_BLOCK);
 						}
@@ -1875,7 +1867,7 @@ stock CheckRealEstatePickup(playerid, pickupid)
 										return ShowPlayerDialog(playerid, DIALOG_PROPERTY_BUY, DIALOG_STYLE_INPUT, "Real Estate", stringToPrint, "Buy", "Cancel");
 									}
 
-									if (!IsPlayerOwner(playerid, gProperties[i][ID]))
+									if (!IsPlayerOwnerOfArrayID(playerid, i))
 									{
 										return SendClientMessageLocalized(playerid, I18N_REAL_PROPERTY_ALREADY_SOLD);
 									}
@@ -1905,7 +1897,7 @@ stock CheckRealEstatePickup(playerid, pickupid)
 										return ShowPlayerDialog(playerid, DIALOG_PROPERTY_RENT, DIALOG_STYLE_INPUT, "Real Estate (Commercial)", stringToPrint, "Rent", "Cancel");
 									}
 
-									if (IsPlayerOwner(playerid, gProperties[i][ID]))
+									if (IsPlayerOwnerOfArrayID(playerid, i))
 									{
 										return SendClientMessageLocalized(playerid, I18N_REAL_ALREADY_RENTED_BY_PLAYER);
 									}
@@ -2170,7 +2162,7 @@ stock SavePropertySkin(playerid)
 		return SendClientMessageLocalized(playerid, I18N_REAL_PLAYER_NOT_INSIDE);
 	}
 
-	if (!IsPlayerOwner(playerid, gProperties[ gPlayerInteriors[playerid][PropertyArrayID] ][ID]))
+	if (!IsPlayerOwnerOfArrayID(playerid, gPlayerInteriors[playerid][PropertyArrayID]))
 	{
 		return SendClientMessageLocalized(playerid, I18N_REAL_NOT_OWNED_BY_PLAYER);
 	}
@@ -2232,7 +2224,7 @@ stock SelectPropertySkin(playerid, skinid)
 	new 
 		arrayid = gPlayerInteriors[playerid][PropertyArrayID];
 
-	if (!IsPlayerOwner(playerid, gProperties[arrayid][ID]))
+	if (!IsPlayerOwnerOfArrayID(playerid, arrayid))
 	{
 		return SendClientMessageLocalized(playerid, I18N_REAL_NOT_OWNED_BY_PLAYER);
 	}
@@ -2257,7 +2249,7 @@ stock DeletePropertySkin(playerid, skinid)
 	new 
 		arrayid = gPlayerInteriors[playerid][PropertyArrayID];
 
-	if (!IsPlayerOwner(playerid, gProperties[arrayid][ID]))
+	if (!IsPlayerOwnerOfArrayID(playerid, arrayid))
 	{
 		return SendClientMessageLocalized(playerid, I18N_REAL_NOT_OWNED_BY_PLAYER);
 	}

@@ -75,28 +75,40 @@ enum
 
 forward AddMapicons(playerid);
 
+#define MAX_PLAYER_MAP_ICONS	100
+
+stock SetPlayerMapIconSafe(playerid, iconid, Float: x, Float: y, Float: z, markerType, colour, MAPICON: style = MAPICON_LOCAL)
+{
+	if (iconid < 0 || iconid >= MAX_PLAYER_MAP_ICONS)
+	{
+		return 0;
+	}
+
+	return SetPlayerMapIcon(playerid, iconid, x, y, z, markerType, colour, style);
+}
+
 public AddMapicons(playerid)
 {
 	new 
 		mapiconid = 0;
 
 	// The very global spawn point in LV.
-	//SetPlayerMapIcon(playerid, mapiconid++, 2323.73, 1283.18, 97.60, E_MAPICON_ID_ENEMY_ATTACK, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, mapiconid++, 2248.22, 1239.58, 10.82, E_MAPICON_ID_ENEMY_ATTACK, 0, MAPICON_LOCAL);
+	//SetPlayerMapIconSafe(playerid, mapiconid++, 2323.73, 1283.18, 97.60, E_MAPICON_ID_ENEMY_ATTACK, 0, MAPICON_LOCAL);
+	SetPlayerMapIconSafe(playerid, mapiconid++, 2248.22, 1239.58, 10.82, E_MAPICON_ID_ENEMY_ATTACK, 0, MAPICON_LOCAL);
 
 	// Hospitals
-	SetPlayerMapIcon(playerid, mapiconid++, -322.96, 1055.46, 19.74, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL); // Fort Carson
-	SetPlayerMapIcon(playerid, mapiconid++, -1514.84, 2524.60, 55.79, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL); // El Quebrados
-	SetPlayerMapIcon(playerid, mapiconid++, 2034.04, -1404.63, 17.25, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL); // Los Santos (Downtown/Glen Park)
-	SetPlayerMapIcon(playerid, mapiconid++, 1177.48, -1323.69, 14.07, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL); // Los Santos (All Saints General Hospital)
-	SetPlayerMapIcon(playerid, mapiconid++, -2675.39, 633.00, 14.45, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL); // San Fierro Medical Center
-	SetPlayerMapIcon(playerid, mapiconid++, -2199.77, -2306.06, 30.62, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL); // Angel Pine Medical Center
-	SetPlayerMapIcon(playerid, mapiconid++, 1607.03, 1820.86, 10.82, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL);
+	SetPlayerMapIconSafe(playerid, mapiconid++, -322.96, 1055.46, 19.74, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL); // Fort Carson
+	SetPlayerMapIconSafe(playerid, mapiconid++, -1514.84, 2524.60, 55.79, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL); // El Quebrados
+	SetPlayerMapIconSafe(playerid, mapiconid++, 2034.04, -1404.63, 17.25, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL); // Los Santos (Downtown/Glen Park)
+	SetPlayerMapIconSafe(playerid, mapiconid++, 1177.48, -1323.69, 14.07, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL); // Los Santos (All Saints General Hospital)
+	SetPlayerMapIconSafe(playerid, mapiconid++, -2675.39, 633.00, 14.45, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL); // San Fierro Medical Center
+	SetPlayerMapIconSafe(playerid, mapiconid++, -2199.77, -2306.06, 30.62, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL); // Angel Pine Medical Center
+	SetPlayerMapIconSafe(playerid, mapiconid++, 1607.03, 1820.86, 10.82, E_MAPICON_ID_HOSPITAL, 0, MAPICON_LOCAL);
 
 	// ATMs.
 	for (new i = 0; i < sizeof(gBankLocation); i++)
 	{
-		SetPlayerMapIcon(playerid, mapiconid++, Float:gBankLocation[i][0], Float:gBankLocation[i][1], Float:gBankLocation[i][2], E_MAPICON_ID_ROBBERY, 0, MAPICON_LOCAL);
+		SetPlayerMapIconSafe(playerid, mapiconid++, Float:gBankLocation[i][0], Float:gBankLocation[i][1], Float:gBankLocation[i][2], E_MAPICON_ID_ROBBERY, 0, MAPICON_LOCAL);
 	}
 
 	// Race start points.
@@ -113,31 +125,84 @@ public AddMapicons(playerid)
 			Float: pY = gRaces[i][Start][CoordY],
 			Float: pZ = gRaces[i][Start][CoordZ];
 
-		SetPlayerMapIcon(playerid, mapiconid++, pX, pY, pZ, E_MAPICON_ID_RACE_TOURNAMENT, 0, MAPICON_LOCAL);
+		SetPlayerMapIconSafe(playerid, mapiconid++, pX, pY, pZ, E_MAPICON_ID_RACE_TOURNAMENT, 0, MAPICON_LOCAL);
 	}
 
 	// Las Barrancas Housing
-	SetPlayerMapIcon(playerid, mapiconid++, -846.13, 1567.15, 24.63, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+	//SetPlayerMapIconSafe(playerid, mapiconid++, -846.13, 1567.15, 24.63, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
 
 	// Octane Springs Housing
-	SetPlayerMapIcon(playerid, mapiconid++, 776.62, 1986.97, 5.33, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+	//SetPlayerMapIconSafe(playerid, mapiconid++, 776.62, 1986.97, 5.33, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
 
-	SetPlayerMapIcon(playerid, mapiconid++, -2686.03, 205.63, 3.96, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, mapiconid++, -1497.76, 2671.87, 55.25, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, mapiconid++, 756.10, 332.78, 19.99, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, mapiconid++, 730.69, -538.99, 16.33, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, mapiconid++, -2803.74, -127.57, 6.84, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, mapiconid++, 248.99, -294.65, 1.34, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, mapiconid++, -210.51, 2751.34, 62.20, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+	//SetPlayerMapIconSafe(playerid, mapiconid++, -2686.03, 205.63, 3.96, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+	//SetPlayerMapIconSafe(playerid, mapiconid++, -1497.76, 2671.87, 55.25, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+	//SetPlayerMapIconSafe(playerid, mapiconid++, 756.10, 332.78, 19.99, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+	//SetPlayerMapIconSafe(playerid, mapiconid++, 730.69, -538.99, 16.33, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+	//SetPlayerMapIconSafe(playerid, mapiconid++, -2803.74, -127.57, 6.84, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+	//SetPlayerMapIconSafe(playerid, mapiconid++, 248.99, -294.65, 1.34, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
+	//SetPlayerMapIconSafe(playerid, mapiconid++, -210.51, 2751.34, 62.20, E_MAPICON_ID_PROP_FOR_SALE, 0, MAPICON_LOCAL);
 
 	// Tow mission point (modules/tow.pwn)
-	SetPlayerMapIcon(playerid, mapiconid++, DOCK_SF_X, DOCK_SF_Y, DOCK_SF_Z, E_MAPICON_ID_CAR_IMPOUND, 0, MAPICON_LOCAL);
+	SetPlayerMapIconSafe(playerid, mapiconid++, DOCK_SF_X, DOCK_SF_Y, DOCK_SF_Z, E_MAPICON_ID_CAR_IMPOUND, 0, MAPICON_LOCAL);
 
 	// Real Estate
+	//
+	// Fetch the whole ownership list in one query. IsPlayerOwner() runs a
+	// synchronous query, so calling it per property meant MAX_PROPERTIES (512)
+	// blocking queries on every login -- crashdetect reported AddMapicons as a
+	// hang for exactly that reason.
+
+	new
+		ownedIds[MAX_PROPERTIES],
+		ownedCount = 0,
+		ownedQuery[128];
+
+	format(ownedQuery, sizeof(ownedQuery), "SELECT id FROM properties WHERE user_id = %d AND occupied = 1", gPlayers[playerid][OrmID]);
+
+	new
+		DBResult: ownedResult = DB_ExecuteQuery(gDbConnectionHandle, ownedQuery);
+
+	if (!ownedResult)
+	{
+		print("Database error: cannot list owned properties for map icons!");
+		print(ownedQuery);
+	}
+	else
+	{
+		if (DB_GetRowCount(ownedResult))
+		{
+			do
+			{
+				if (ownedCount >= MAX_PROPERTIES)
+				{
+					break;
+				}
+
+				ownedIds[ownedCount++] = DB_GetFieldIntByName(ownedResult, "id");
+			}
+			while (DB_SelectNextRow(ownedResult));
+		}
+
+		DB_FreeResultSet(ownedResult);
+	}
 
 	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
-		if (!IsPlayerOwner(playerid, gProperties[i][ID]))
+		new
+			bool: isOwned = false;
+
+		for (new k = 0; k < ownedCount; k++)
+		{
+			if (ownedIds[k] != gProperties[i][ID])
+			{
+				continue;
+			}
+
+			isOwned = true;
+			break;
+		}
+
+		if (!isOwned)
 		{
 			continue;
 		}
@@ -166,7 +231,7 @@ public AddMapicons(playerid)
 			continue;
 		}
 
-		SetPlayerMapIcon(playerid, mapiconid++, pX, pY, pZ, E_MAPICON_ID_SAVE_HOUSE, 0, MAPICON_LOCAL);
+		SetPlayerMapIconSafe(playerid, mapiconid++, pX, pY, pZ, E_MAPICON_ID_SAVE_HOUSE, 0, MAPICON_LOCAL);
 	}
 
 	// Jobs.
@@ -203,23 +268,23 @@ public AddMapicons(playerid)
 		{
 			case TEAM_MECHANICS:
 				{
-					SetPlayerMapIcon(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_PAY_N_SPRAY, 0, MAPICON_LOCAL);
+					SetPlayerMapIconSafe(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_PAY_N_SPRAY, 0, MAPICON_LOCAL);
 				}
 			case TEAM_POLICE:
 				{
-					SetPlayerMapIcon(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_POLICE, 0, MAPICON_LOCAL);
+					SetPlayerMapIconSafe(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_POLICE, 0, MAPICON_LOCAL);
 				}
 			case TEAM_TAXIMEN:
 				{
-					SetPlayerMapIcon(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_CAR_IMPOUND, 0, MAPICON_LOCAL);
+					SetPlayerMapIconSafe(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_CAR_IMPOUND, 0, MAPICON_LOCAL);
 				}
 			case TEAM_PIZZAGUYS:
 				{
-					SetPlayerMapIcon(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_PIZZA, 0, MAPICON_LOCAL);
+					SetPlayerMapIconSafe(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_PIZZA, 0, MAPICON_LOCAL);
 				}
 			case TEAM_DEALERS:
 				{
-					SetPlayerMapIcon(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_MADD_DOGG, 0, MAPICON_LOCAL);
+					SetPlayerMapIconSafe(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_MADD_DOGG, 0, MAPICON_LOCAL);
 				}
 		}
 	}
@@ -251,11 +316,16 @@ public AddMapicons(playerid)
 		Y = DB_GetFieldFloatByName(result, "y");
 		Z = DB_GetFieldFloatByName(result, "z");
 
-		SetPlayerMapIcon(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
+		SetPlayerMapIconSafe(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
 	}
 	while (DB_SelectNextRow(result));
 
 	DB_FreeResultSet(result);
+
+	if (mapiconid > MAX_PLAYER_MAP_ICONS)
+	{
+		printf("[mapicons] player %d needs %d icons but only %d slots exist; %d dropped", playerid, mapiconid, MAX_PLAYER_MAP_ICONS, mapiconid - MAX_PLAYER_MAP_ICONS);
+	}
 
 	/*SetPlayerMapIcon(playerid, 40, 970.7, 2155.0, 10.8, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);
 	  SetPlayerMapIcon(playerid, 41, 2287.1, 2426.7, 10.8, E_MAPICON_ID_POLICE, 0, MAPICON_LOCAL);

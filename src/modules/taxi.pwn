@@ -10,6 +10,11 @@
 
 #define MAX_TAXI_NPCS	50
 
+// A destination must be at least this far from the player, and a customer must
+// spawn within this much of them. 
+#define TAXI_DESTINATION_MIN_DIST	75.0
+#define TAXI_CUSTOMER_MAX_DIST		175.0
+
 enum
 {
 	AREA_LV,
@@ -243,7 +248,7 @@ stock SetTaxiMissionCheckpoint(playerid)
 		Float: X,
 		Float: Y,
 		Float: Z,
-		query[256];
+		query[640];
 
 	switch (gTaxiMission[playerid][AreaID])
 	{
@@ -265,41 +270,62 @@ stock SetTaxiMissionCheckpoint(playerid)
 			}
 	}
 
-	format(query, sizeof(query), "SELECT c.primary_x, c.primary_y, c.primary_z, p.name FROM property_coords as c JOIN properties as p ON c.property_id = p.id WHERE c.type = 8 %s ORDER BY random() LIMIT 1", area);
+	new
+		Float: pX,
+		Float: pY,
+		Float: pZ;
 
-	for (;;)
+	GetPlayerPos(playerid, pX, pY, pZ);
+
+	// Ask the database for a point that is already far enough away, rather than
+	// re-rolling a random one until it happens to be
+	format(query, sizeof(query), "SELECT c.primary_x, c.primary_y, c.primary_z, p.name FROM property_coords AS c JOIN properties AS p ON c.property_id = p.id WHERE c.type = 8 %s AND ((c.primary_x - %.3f) * (c.primary_x - %.3f) + (c.primary_y - %.3f) * (c.primary_y - %.3f) + (c.primary_z - %.3f) * (c.primary_z - %.3f)) >= %.1f ORDER BY random() LIMIT 1",
+			area, pX, pX, pY, pY, pZ, pZ, TAXI_DESTINATION_MIN_DIST * TAXI_DESTINATION_MIN_DIST);
+
+	new
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+	if (!result)
 	{
-		new 
-			DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result) 
+		SendClientMessageLocalized(playerid, I18N_TAXI_MISS_DB_READ_ERROR);
+
+		print("Database error: cannot get random row from property_coords!");
+		print(query);
+
+		return 0;
+	}
+
+	// Nothing far enough in this area: take any point rather than giving up
+	if (!DB_GetRowCount(result))
+	{
+		DB_FreeResultSet(result);
+
+		format(query, sizeof(query), "SELECT c.primary_x, c.primary_y, c.primary_z, p.name FROM property_coords AS c JOIN properties AS p ON c.property_id = p.id WHERE c.type = 8 %s ORDER BY random() LIMIT 1", area);
+
+		result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+		if (!result || !DB_GetRowCount(result))
 		{
 			SendClientMessageLocalized(playerid, I18N_TAXI_MISS_DB_READ_ERROR);
 
-			print("Database error: cannot get random row from property_coords!");
+			print("Database error: no taxi destination available!");
 			print(query);
+
+			if (result)
+			{
+				DB_FreeResultSet(result);
+			}
+
 			return 0;
 		}
-
-		X = DB_GetFieldFloatByName(result, "primary_x");
-		Y = DB_GetFieldFloatByName(result, "primary_y");
-		Z = DB_GetFieldFloatByName(result, "primary_z");
-		DB_GetFieldStringByName(result, "name", name, sizeof(name));
-
-		DB_FreeResultSet(result);
-
-		if (IsPlayerInSphere(playerid, X, Y, Z, 75.0))
-		{
-			continue;
-		}
-
-		break;
 	}
 
-	new
-		Float: pX, 
-		Float: pY, 
-		Float: pZ;
-	GetPlayerPos(playerid, pX, pY, pZ);
+	X = DB_GetFieldFloatByName(result, "primary_x");
+	Y = DB_GetFieldFloatByName(result, "primary_y");
+	Z = DB_GetFieldFloatByName(result, "primary_z");
+	DB_GetFieldStringByName(result, "name", name, sizeof(name));
+
+	DB_FreeResultSet(result);
 
 	gTaxiMission[playerid][CommissionCoef] = (floatabs(pX - X) / 3000 + floatabs(pY - Y) / 3000) / 2;
 
@@ -333,7 +359,7 @@ stock SetTaxiMissionCustomerPos(playerid)
 		Float: X,
 		Float: Y,
 		Float: Z,
-		query[256];
+		query[640];
 	
 	switch (gTaxiMission[playerid][AreaID])
 	{
@@ -355,35 +381,60 @@ stock SetTaxiMissionCustomerPos(playerid)
 			}
 	}
 
-	format(query, sizeof(query), "SELECT c.primary_x, c.primary_y, c.primary_z FROM property_coords AS c JOIN properties AS p ON c.property_id = p.id WHERE c.type = 8 %s ORDER BY random() LIMIT 1", area);
+	new
+		Float: pX,
+		Float: pY,
+		Float: pZ;
 
-	// Set iteration limit to 250, so the last is used if not anything closer appears...
-	for (new i = 0; i < 250; i++)
+	GetPlayerPos(playerid, pX, pY, pZ);
+
+	// Ask for a point that is already close enough
+	format(query, sizeof(query), "SELECT c.primary_x, c.primary_y, c.primary_z FROM property_coords AS c JOIN properties AS p ON c.property_id = p.id WHERE c.type = 8 %s AND ((c.primary_x - %.3f) * (c.primary_x - %.3f) + (c.primary_y - %.3f) * (c.primary_y - %.3f) + (c.primary_z - %.3f) * (c.primary_z - %.3f)) <= %.1f ORDER BY random() LIMIT 1",
+			area, pX, pX, pY, pY, pZ, pZ, TAXI_CUSTOMER_MAX_DIST * TAXI_CUSTOMER_MAX_DIST);
+
+	new
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+	if (!result)
 	{
-		new 
-			DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result) 
+		SendClientMessageLocalized(playerid, I18N_TAXI_MISS_DB_READ_ERROR);
+
+		print("Database error: cannot get random row from property_coords!");
+		print(query);
+
+		return 0;
+	}
+
+	// Nobody nearby: fall back to any point in the area
+	if (!DB_GetRowCount(result))
+	{
+		DB_FreeResultSet(result);
+
+		format(query, sizeof(query), "SELECT c.primary_x, c.primary_y, c.primary_z FROM property_coords AS c JOIN properties AS p ON c.property_id = p.id WHERE c.type = 8 %s ORDER BY random() LIMIT 1", area);
+
+		result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+		if (!result || !DB_GetRowCount(result))
 		{
 			SendClientMessageLocalized(playerid, I18N_TAXI_MISS_DB_READ_ERROR);
 
-			print("Database error: cannot get random row from property_coords!");
+			print("Database error: no taxi customer point available!");
 			print(query);
+
+			if (result)
+			{
+				DB_FreeResultSet(result);
+			}
+
 			return 0;
 		}
-
-		X = DB_GetFieldFloatByName(result, "primary_x");
-		Y = DB_GetFieldFloatByName(result, "primary_y");
-		Z = DB_GetFieldFloatByName(result, "primary_z");
-
-		DB_FreeResultSet(result);
-
-		if (!IsPlayerInSphere(playerid, X, Y, Z, 175.0))
-		{
-			continue;
-		}
-
-		break;
 	}
+
+	X = DB_GetFieldFloatByName(result, "primary_x");
+	Y = DB_GetFieldFloatByName(result, "primary_y");
+	Z = DB_GetFieldFloatByName(result, "primary_z");
+
+	DB_FreeResultSet(result);
 
 	NPC_SetPos(gTaxiMission[playerid][NPCid], X, Y, Z);
 	NPC_SetSkin(gTaxiMission[playerid][NPCid], random(311) + 1);

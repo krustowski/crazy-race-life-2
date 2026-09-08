@@ -121,6 +121,12 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 #include "modules/bank.pwn"
 
 //
+//  Hidden prize pickups.
+//
+
+#include "modules/prizes.pwn"
+
+//
 //  Pickups, Objects, Vehicles, Texts, Mapicons...
 //
 

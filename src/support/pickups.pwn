@@ -10,8 +10,6 @@
 #define PICKUP_TYPE_RESPAWN_AFTER_DEATH		3
 #define PICKUP_TYPE_NO_RESPAWN				19 
 
-#define MAX_PRIZES 					16
-
 #define PICKUP_BRIEFCASE			1210
 #define PICKUP_INFO					1239
 #define PICKUP_HEART				1240
@@ -73,22 +71,6 @@ new
 	gPickupSFCentrumExit,
 	gPickupBankLSEnter,
 	gPickupBankLSExit;
-
-enum PrizeType
-{
-	PRIZE_NONE,
-	PRIZE_TIKI,
-	PRIZE_PUMPKIN
-}
-
-enum Prize
-{
-	ID,
-	PrizeType: Type,
-	PICKUP: Pickup
-}
-
-new gPrizes[MAX_PRIZES][Prize];
 
 //
 //
@@ -270,94 +252,6 @@ public InitPickups()
 //
 //
 
-stock InitPrizes()
-{
-	new 
-		i = 0, 
-		query[256];
-
-	format(query, sizeof(query), "SELECT id, type, x, y, z FROM prize_coords WHERE hidden = 0");
-
-	new 
-		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) {
-		print("Database error: cannot load prize coords!");
-		return 0;
-	}
-
-	new 
-		Float: X, 
-		Float: Y, 
-		Float: Z;
-
-	do
-	{
-		X = DB_GetFieldFloatByName(result, "x");
-		Y = DB_GetFieldFloatByName(result, "y");
-		Z = DB_GetFieldFloatByName(result, "z");
-
-		gPrizes[i][ID] = DB_GetFieldIntByName(result, "id");
-		gPrizes[i][Type] = PrizeType: DB_GetFieldIntByName(result, "type");
-
-		switch (gPrizes[i][Type])
-		{
-			case PRIZE_TIKI:
-				{
-					gPrizes[i][Pickup] = PICKUP: EnsurePickupCreated(PICKUP_TIKI, PICKUP_TYPE_NO_RESPAWN, X, Y, Z);
-				}
-			case PRIZE_PUMPKIN:
-				{
-					gPrizes[i][Pickup] = PICKUP: EnsurePickupCreated(PICKUP_PUMPKIN, PICKUP_TYPE_NO_RESPAWN, X, Y, Z);
-				}
-			default:
-				{}
-		}
-
-		i++;
-	}
-	while (DB_SelectNextRow(result));
-
-	DB_FreeResultSet(result);
-	print("Prizes initialized!");
-
-	return 1;
-}
-
-stock UpdatePrize(playerid, prizeid)
-{
-	new 
-		query[128];
-
-	format(query, sizeof(query), "UPDATE prize_coords SET hidden = 1 WHERE id = %d", gPrizes[prizeid][ID]);
-
-	new 
-		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) {
-		print("Database error: cannot write prize update!");
-		return 0;
-	}
-
-	DB_FreeResultSet(result);
-
-	switch (gPrizes[prizeid][Type])
-	{
-		case PRIZE_TIKI:
-			{
-				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ PRIZE ] You have found the tiki prize ($10M)! Cg");
-				GivePlayerMoney(playerid, 10000000);
-			}
-		case PRIZE_PUMPKIN:
-			{
-				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ PRIZE ] You have found the pumpkin prize ($1.5M)! Cg");
-				GivePlayerMoney(playerid, 1500000);
-			}
-		default:
-			{}
-	}
-
-	return 1;
-}
-
 enum DeathMoneyPickup
 {
 	PickupID,
@@ -458,12 +352,9 @@ stock CheckGenericPickup(playerid, pickupid)
 	// 	return SetPlayerPos(playerid, dX, dY, dZ);
 	// }
 
-	for (new i = 0; i < MAX_PRIZES; i++)
+	if (CheckPrizePickup(playerid, pickupid))
 	{
-		if (PICKUP: pickupid == gPrizes[i][Pickup])
-		{
-			return UpdatePrize(playerid, i);
-		}
+		return 1;
 	}
 
 	if (pickupid == gPickupSFCentrumEnter)

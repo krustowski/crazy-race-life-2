@@ -206,10 +206,7 @@ public OnPlayerDisconnect(playerid, reason)
 	AbortCombatMission(playerid, false);
 	AbortRampageMission(playerid);
 
-	if (gDrugMission[playerid][Active])
-	{
-		ToggleDrugMission(playerid);
-	}
+	AbortPlayerDrugMission(playerid);
 
 	// Save player's data and set such player to unauthorized.
 	if (reason == 1 || reason == 2)
@@ -463,7 +460,7 @@ public OnNPCDeath(npcid, killerid, WEAPON:reason)
 		{
 			if (gRampageNPCs[missionid][i][ID] == npcid)
 			{
-				SetTimerEx("RecreateRampageNPC", 250, false, "iii", killerid, missionid, i);
+				SetTimerEx("RecreateRampageNPC", 60000, false, "iii", killerid, missionid, i);
 				break;
 			}
 		}
@@ -624,6 +621,8 @@ public OnVehicleSpawn(vehicleid)
 
 		// Lock the vehicle for everyone
 		SetVehicleParamsEx(vehicleid, false, false, false, true, false, false, false);
+
+		break;
 	}
 
 	SetVehicleNumberPlate(vehicleid, VEHICLE_PLATE);

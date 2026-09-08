@@ -107,10 +107,6 @@ new advertList[][PlayerLocale][] =
 	//  Housing
 	//
 	{
-		"[ GAME ] Locations of Green House mapicon host some properties for sell",
-		"[ HRA ] Lokace oznacene ikonou Zeleneho domku hostuji nemovitosti ke koupeni!"
-	},
-	{
 		"[ TIP ] There are plenty properties for rent! Go rent some or outbuy a currently rented ones by othe players",
 		"[ TIP ] Ve hre se nachazi spousta nemovitosti k pronajmu! Pronajmi si nejakou, klidne i odkupem jiz pronajate prodejny jinymi hraci"
 	},

@@ -3,6 +3,10 @@
 #endif
 #define _CRL2_DIALOGS
 
+// Top-3-per-area property ranking rows: 4 areas x 3 ranks, with headroom for
+// RANK() returning extra rows on ties.
+#define MAX_PROPERTY_RANK_ROWS	32
+
 //
 //  dialogs.pwn
 //  Dialogs frontend logic
@@ -157,7 +161,10 @@ enum
 	DIALOG_RAMPAGE_EDITOR_MAIN = 0xC0,
 	DIALOG_RAMPAGE_EDITOR_NAME,
 	DIALOG_RAMPAGE_EDITOR_WEAPON,
-	DIALOG_RAMPAGE_EDITOR_LOCATION_TYPE
+	DIALOG_RAMPAGE_EDITOR_LOCATION_TYPE,
+
+	// 0xD0 belongs to the taxi enum below.
+	DIALOG_PRIZE_EDITOR_MAIN = 0xE0
 }
 
 enum
@@ -910,12 +917,13 @@ stock ShowGameEditorListDialog(playerid)
 {
 	new 
 		stringToPrint[256];
-	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s\n%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s\n%s\n%s\n%s\n%s\n%s",
 			"Property Editor",
 			"Trucking Editor",
 			"Race Editor",
 			"Police Bribe Editor",
-			"Rampage Editor"
+			"Rampage Editor",
+			"Prize Editor"
 		);
 
 	return ShowPlayerDialog(playerid, DIALOG_EDITOR_LIST, DIALOG_STYLE_LIST, "Game Editors", stringToPrint, "Select", "Cancel");
@@ -1266,15 +1274,9 @@ stock ShowHighScoresPlayTimeDialog(playerid)
 
 stock ShowHighScoresPropertiesDialog(playerid)
 {
-	new areas[4][] = 
-	{
-		"%",
-		"LV: %",
-		"SF: %",
-		"LS: %"
-	};
-
-	new areaNames[4][] = 
+	// Areas 0..3 = whole map, LV, SF, LS -- matching the CASE buckets in the two
+	// queries below
+	new areaNames[4][] =
 	{
 		"Whole Map",
 		"Las Venturas",
@@ -1283,74 +1285,121 @@ stock ShowHighScoresPropertiesDialog(playerid)
 	};
 
 	new
-		totalArea[4];
+		totalArea[4],
+		query[768];
 
-	for (new i = 0; i < sizeof(totalArea); i++)
+	//
+	//  Totals per area, in one pass
+	//
+
+	query = "WITH base AS (SELECT name FROM properties WHERE type = 2) SELECT 0 AS area, COUNT(*) AS total FROM base UNION ALL SELECT 1, COUNT(*) FROM base WHERE name LIKE 'LV: %' UNION ALL SELECT 2, COUNT(*) FROM base WHERE name LIKE 'SF: %' UNION ALL SELECT 3, COUNT(*) FROM base WHERE name LIKE 'LS: %' ORDER BY area";
+
+	new
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+	if (!result)
 	{
-		new
-			query_total[128] = "SELECT COUNT(*) AS total FROM properties WHERE name LIKE '%s' AND type = 2";
+		print("Database error: cannot read high_scores data for properties (total count)!");
+		print(query);
 
-		format(query_total, sizeof(query_total), query_total, 
-				areas[i]
-			);
-
-		new 
-			DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query_total);
-		if (!result)
-		{
-			print("Database error: cannot read high_scores data for properties (total count)!");
-			print(query_total);
-			return 0;
-		}
-
-		totalArea[i] = DB_GetFieldIntByName(result, "total");
-
-		DB_FreeResultSet(result);
+		return 0;
 	}
+
+	if (DB_GetRowCount(result))
+	{
+		do
+		{
+			new
+				area = DB_GetFieldIntByName(result, "area");
+
+			if (area >= 0 && area < sizeof(totalArea))
+			{
+				totalArea[area] = DB_GetFieldIntByName(result, "total");
+			}
+		}
+		while (DB_SelectNextRow(result));
+	}
+
+	DB_FreeResultSet(result);
+
+	//
+	//  Top 3 per area, in one pass. Rows come back ordered by area then rank, but
+	//  they are buffered rather than printed directly: an area with no owners
+	//  still needs its heading, and RANK() can return more than three rows on a
+	//  tie.
+	//
+
+	new
+		rowArea[MAX_PROPERTY_RANK_ROWS],
+		rowRank[MAX_PROPERTY_RANK_ROWS],
+		rowCount[MAX_PROPERTY_RANK_ROWS],
+		rowNickname[MAX_PROPERTY_RANK_ROWS][MAX_PLAYER_NAME],
+		rowTotal = 0;
+
+	query = "WITH base AS (SELECT user_id, name FROM properties WHERE occupied = 1 AND type = 2 AND user_id > 0), tagged AS (SELECT user_id, 0 AS area FROM base UNION ALL SELECT user_id, 1 FROM base WHERE name LIKE 'LV: %' UNION ALL SELECT user_id, 2 FROM base WHERE name LIKE 'SF: %' UNION ALL SELECT user_id, 3 FROM base WHERE name LIKE 'LS: %'), counted AS (SELECT area, user_id, COUNT(*) AS property_count, RANK() OVER (PARTITION BY area ORDER BY COUNT(*) DESC) AS rank FROM tagged GROUP BY area, user_id) SELECT c.area, c.rank, c.property_count, u.nickname FROM counted AS c JOIN users AS u ON u.id = c.user_id WHERE c.rank <= 3 ORDER BY c.area, c.rank";
+
+	result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for properties!");
+		print(query);
+
+		return 0;
+	}
+
+	if (DB_GetRowCount(result))
+	{
+		do
+		{
+			if (rowTotal >= MAX_PROPERTY_RANK_ROWS)
+			{
+				break;
+			}
+
+			rowArea[rowTotal] = DB_GetFieldIntByName(result, "area");
+			rowRank[rowTotal] = DB_GetFieldIntByName(result, "rank");
+			rowCount[rowTotal] = DB_GetFieldIntByName(result, "property_count");
+
+			DB_GetFieldStringByName(result, "nickname", rowNickname[rowTotal], MAX_PLAYER_NAME);
+
+			rowTotal++;
+		}
+		while (DB_SelectNextRow(result));
+	}
+
+	DB_FreeResultSet(result);
+
+	//
+	//  Render.
+	//
 
 	new
 		stringToPrint[1024] = "{FFD700}Top 3 players by rented property count:{FFFFFF}\n";
 
-	for (new i = 0; i < 4; i++)
+	for (new i = 0; i < sizeof(areaNames); i++)
 	{
-		new
-			query_rank_area[512] = "SELECT rank, u.nickname, property_count FROM ( SELECT user_id, COUNT(*) AS property_count, RANK() OVER (ORDER BY COUNT(*) DESC) AS rank FROM properties WHERE name LIKE '%s' AND occupied = 1 AND type = 2 AND user_id > 0 GROUP BY user_id ) JOIN users AS u ON u.id == user_id WHERE rank <= 3";
-
-		format(query_rank_area, sizeof(query_rank_area), query_rank_area, 
-				areas[i]
-			);
-
 		format(stringToPrint, sizeof(stringToPrint), "%s\n\n{FFD700}%s{FFFFFF}:\n", stringToPrint, areaNames[i]);
 
-		new 
-			DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query_rank_area);
-		if (!result)
+		for (new j = 0; j < rowTotal; j++)
 		{
-			print("Database error: cannot read high_scores data for properties!");
-			print(query_rank_area);
-			return 0;
-		}
+			if (rowArea[j] != i)
+			{
+				continue;
+			}
 
-		do
-		{
-			new 
-				count = DB_GetFieldIntByName(result, "property_count"), 
-				rank = DB_GetFieldIntByName(result, "rank"), 
-				nickname[MAX_PLAYER_NAME];
+			// An area with no type-2 properties would divide by zero here.
+			new
+				Float: share = totalArea[i] ? floatmul(floatdiv(rowCount[j], totalArea[i]), 100.0) : 0.0;
 
-			DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
-
-			format(stringToPrint, sizeof(stringToPrint), "%s\n%d. {00FF00}%3d{FFFFFF} (%2.2f %%)\t\t{FFD700}%s{FFFFFF}", 
-					stringToPrint, 
-					rank, 
-					count, 
-					floatmul(floatdiv(count, totalArea[i]), 100.0),
-					nickname
+			format(stringToPrint, sizeof(stringToPrint), "%s\n%d. {00FF00}%3d{FFFFFF} (%2.2f %%)\t\t{FFD700}%s{FFFFFF}",
+					stringToPrint,
+					rowRank[j],
+					rowCount[j],
+					share,
+					rowNickname[j]
 				);
 		}
-		while (DB_SelectNextRow(result));
-
-		DB_FreeResultSet(result);
 	}
 
 	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_PROPERTIES, DIALOG_STYLE_MSGBOX, "High Scores: Properties", stringToPrint, "Close", "");

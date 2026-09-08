@@ -935,7 +935,7 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							{
 								new 
 									vehicleid = gProperties[i][Vehicle][ID],
-									bool: isowner = bool: IsPlayerOwner(playerid, gProperties[i][ID]),
+									bool: isowner = bool: IsPlayerOwnerOfArrayID(playerid, i),
 									bool: ishacker = IsPlayerInTeam(playerid, TEAM_HACKERS);
 
 								if (!vehicleid) 
@@ -1144,9 +1144,47 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							return ShowRampageEditorMainDialog(playerid);
 						}
+					case 5:
+						{
+							return ShowPrizeEditorMainDialog(playerid);
+						}
 				}
 
 				return 1;
+			}
+		case DIALOG_PRIZE_EDITOR_MAIN:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				// listitem indexes data rows directly; the header is not one.
+				if (listitem < 0 || listitem >= gPrizeCount)
+				{
+					return 1;
+				}
+
+				if (!TogglePrizeHidden(listitem))
+				{
+					return SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Could not update the prize!");
+				}
+
+				new
+					stringToPrint[128],
+					typeName[16];
+
+				GetPrizeTypeName(gPrizes[listitem][Type], typeName, sizeof(typeName));
+
+				format(stringToPrint, sizeof(stringToPrint), "[ EDIT ] %s prize #%d is now %s.",
+						typeName,
+						gPrizes[listitem][ID],
+						gPrizes[listitem][Hidden] ? ("hidden") : ("shown")
+				);
+				SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
+
+				// Reopen so the admin sees the new state and can keep toggling.
+				return ShowPrizeEditorMainDialog(playerid);
 			}
 		case DIALOG_RAMPAGE_EDITOR_MAIN:
 			{

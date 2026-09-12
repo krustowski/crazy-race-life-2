@@ -23,6 +23,16 @@
 
 #include "support/includes.pwn"
 
+// Repeat hits on the *same* pickup are ignored for this long, so the player gets
+// a window to leave. Standing there past the window re-opens it, which is the
+// old behaviour, just slower
+#define PICKUP_RETRIGGER_DELAY_MS	5000
+
+new
+	gLastPickupID[MAX_PLAYERS],
+	gLastPickupTick[MAX_PLAYERS];
+
+
 main()
 {
 	PrintAsciiLogoToLogs();
@@ -203,6 +213,9 @@ public OnPlayerDisconnect(playerid, reason)
 	// against whoever takes this slot next.
 	gKillDetachTries[playerid] = 0;
 	gSpawnDetachTries[playerid] = 0;
+
+	gLastPickupID[playerid] = 0;
+	gLastPickupTick[playerid] = 0;
 
 	// Hide the vehicle velocity game text.
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
@@ -950,6 +963,17 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 	{
 		return 1;
 	}
+
+	new
+		tick = GetTickCount();
+
+	if (gLastPickupID[playerid] == pickupid && (tick - gLastPickupTick[playerid]) < PICKUP_RETRIGGER_DELAY_MS)
+	{
+		return 1;
+	}
+
+	gLastPickupID[playerid] = pickupid;
+	gLastPickupTick[playerid] = tick;
 
 	if (CheckMedicalPickup(playerid, pickupid))
 	{

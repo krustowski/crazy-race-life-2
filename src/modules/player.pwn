@@ -26,7 +26,6 @@
 #include "support/i18n.pwn"
 #include "db/sql.pwn"
 #include "modules/team.pwn"
-#include "modules/tutorial.pwn"
 #include "support/helpers.pwn"
 
 //

@@ -466,8 +466,10 @@ stock AbortCombatMission(playerid, bool: success)
 	if (success)
 	{
 		GetLocalizedString(playerid, I18N_COMBAT_MISS_FINISHED, gameText, sizeof(gameText));
-
 		GameTextForPlayer(playerid, gameText, 3000, 3); 
+
+		FireQuestEvent(playerid, QUEST_EVT_COMBAT_DONE);
+
 		SaveCombatMissionScore(playerid);
 	}
 	else

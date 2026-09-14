@@ -226,6 +226,7 @@ stock CheckTaxiMissionCheckpoint(playerid)
 	format(stringToPrint, sizeof(stringToPrint), gI18nMessages[I18N_TAXI_MISS_COMMISSION][ gPlayers[playerid][Locale] ], commission);
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 
+	FireQuestEvent(playerid, QUEST_EVT_TAXI_DONE);
 	TogglePlayerControllable(playerid, false);
 
 	NPC_ExitVehicle(gTaxiMission[playerid][NPCid]);

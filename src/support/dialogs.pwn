@@ -2376,3 +2376,52 @@ stock ShowNPCRecordingDialog(playerid)
 {
 	return ShowPlayerDialog(playerid, DIALOG_NPC_RECORD_SUFFIX, DIALOG_STYLE_INPUT, "NPC Recording Suffix", "Enter a suffix (xxx) for the recording file name (NPC_TRACK_xxx):\n\n", "Apply", "Cancel");
 }
+
+stock ShowPlayerQuestListDialog(playerid)
+{
+	new
+		stringToPrint[1024] = "Quest ID and Name\tReward\tProgress\tTarget";
+
+
+	for (new i = 1; i < MAX_QUESTS; i++)
+	{
+		if (!gQuests[i][ID])
+		{
+			continue;
+		}
+
+		new
+			color = 0xFFFFFF,
+			PlayerLocale: locale = gPlayers[playerid][Locale];
+
+		if (gPlayerQuests[playerid][i][Completed])
+		{
+			color = 0x00FF00;
+		}
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n{%06x}%s\t%d\t%d\t%d",
+				stringToPrint,
+				color,
+				gQuestLabels[i][locale],
+				gQuests[i][Reward],
+				gPlayerQuests[playerid][i][Progress],
+				gQuests[i][Target]
+			);
+	}
+
+	return ShowPlayerDialog(playerid, DIALOG_QUEST_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Quest List", stringToPrint, "Show", "Close");
+}
+
+stock ShowPlayerQuestDescDialog(playerid, questid)
+{
+	new
+		PlayerLocale: locale = gPlayers[playerid][Locale],
+		stringToPrint[512];
+
+	format(stringToPrint, sizeof(stringToPrint), "%s\n\n%s",
+			gQuestLabels[questid][locale],
+			gQuestDesc[questid][locale]
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_QUEST_DESC, DIALOG_STYLE_MSGBOX, "Quest Description", stringToPrint, "Back", "");
+}

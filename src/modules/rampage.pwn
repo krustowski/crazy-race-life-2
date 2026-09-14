@@ -346,6 +346,7 @@ stock AbortRampageMission(playerid)
 
     if (gRampageMission[playerid][KilledCount])
     {
+        FireQuestEvent(playerid, QUEST_EVT_RAMPAGE_DONE);
         SaveRampageMissionScore(playerid);
     }
     

@@ -276,7 +276,8 @@ stock SaveScores()
 {
 	new 
 		topScore = 0, 
-		topPlayerID;
+		topPlayerID,
+		topPlayerOrmID;
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -288,7 +289,8 @@ stock SaveScores()
 		if (topScore <= gDeathmatch[i][Score])
 		{
 			topScore = gDeathmatch[i][Score];
-			topPlayerID = gPlayers[i][OrmID];
+			topPlayerID = i;
+			topPlayerOrmID = gPlayers[i][OrmID];
 		}
 	}
 
@@ -298,13 +300,15 @@ stock SaveScores()
 		return 1;
 	}
 
+	FireQuestEvent(topPlayerID, QUEST_EVT_DEATHMATCH_WON);
+
 	new query[256];
 
 	format(query, sizeof(query), "INSERT INTO high_scores (type, spec_id, value, user_id) VALUES (%d, '%d', %d, %d)",
 			2,
 			1,
 			topScore,
-			topPlayerID
+			topPlayerOrmID
 	      );
 
 	new 
@@ -366,6 +370,8 @@ stock RegisterToDeathmatch(playerid)
 
 		gDeathmatchTimers[Start] = Timer: SetTimer("StartDeathmatch", 45 * 1000, false);
 	}
+
+	FireQuestEvent(playerid, QUEST_EVT_DEATHMATCH_PLAYED);
 
 	new 
 		gameText[64];

@@ -164,6 +164,8 @@ stock CheckTruckingCheckpoint(playerid)
 	gPlayerMissions[playerid][TimeElapsed] = 0;
 	gPlayerMissions[playerid][DoneCount] += 1;
 
+	FireQuestEvent(playerid, QUEST_EVT_TRUCKING_DONE);
+
 	GetLocalizedString(playerid, I18N_TRUCK_MISS_COMMISSION_FMT, stringToPrint, sizeof(stringToPrint));
 	format(stringToPrint, sizeof(stringToPrint), stringToPrint, commission);
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);

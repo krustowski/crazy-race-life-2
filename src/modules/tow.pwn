@@ -310,6 +310,8 @@ stock CheckTowMissionCheckpoint(playerid)
 	gTowMission[playerid][TimeElapsed] = 0;
 	//gTowMission[playerid][DoneCount] += 1;
 
+	FireQuestEvent(playerid, QUEST_EVT_TOW_DONE);
+
 	GetLocalizedString(playerid, I18N_TOW_VEHICLE_TOWED_COMMISSION_FMT, stringToPrint, sizeof(stringToPrint));
 	format(stringToPrint, sizeof(stringToPrint), stringToPrint, 
 			commission

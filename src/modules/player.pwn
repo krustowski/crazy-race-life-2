@@ -470,6 +470,8 @@ public UpdatePlayerScore()
 	return 1;
 }
 
+#include "modules/quest.pwn"
+
 stock OnPlayerPrivMsg(playerid, receiverid, text[])
 {
 	if (GetPlayerMoney(playerid) < 10) 
@@ -519,7 +521,9 @@ stock OnPlayerPrivMsg(playerid, receiverid, text[])
 	GameTextForPlayer(playerid, gameTextSent, 3000, 3); 
 	GameTextForPlayer(receiverid, gameTextReceived, 3000, 3);
 
-	GivePlayerMoney(playerid, -10); 
+	GivePlayerMoney(playerid, -10);
+
+	FireQuestEvent(playerid, QUEST_EVT_PM_SENT);
 
 	return 1;
 }
@@ -642,6 +646,8 @@ stock DepositMoneyToBankAccount(playerid, amount)
 
 	new 
 		stringToPrint[256];
+
+	FireQuestEvent(playerid, QUEST_EVT_BANK_DEPOSIT);
 
 	GetLocalizedString(playerid, I18N_ATM_DEPOSITED_FMT, stringToPrint, sizeof(stringToPrint));
 	format(stringToPrint, sizeof(stringToPrint), stringToPrint, amount, gPlayers[playerid][Bank]);
@@ -1594,6 +1600,8 @@ stock ResetPlayerState(playerid)
 	return 1;
 }
 
+#include "modules/quest.pwn"
+
 stock SetPlayerTeamEx(playerid, teamid)
 {	
 	for (new i = 0; i < MAX_TEAM_WEAPONS; i++)
@@ -1619,6 +1627,8 @@ stock SetPlayerTeamEx(playerid, teamid)
 
 	format(stringToPrint, sizeof(stringToPrint), "[ TEAM ] Player %s joined the %s team!", gPlayers[playerid][Name], gTeams[teamid][TeamName]);
 	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+
+	FireQuestEvent(playerid, QUEST_EVT_TEAM_JOINED);
 
 	SavePlayerData(playerid);
 

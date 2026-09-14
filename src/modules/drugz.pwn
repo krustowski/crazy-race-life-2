@@ -368,6 +368,8 @@ stock SaveDrugMissionScore(playerid)
 	return 1;
 }
 
+#include "modules/quest.pwn"
+
 stock AbortPlayerDrugMission(playerid)
 {
 	if (!gDrugMission[playerid][Active])
@@ -377,7 +379,11 @@ stock AbortPlayerDrugMission(playerid)
 
 	KillTimer(gDrugMission[playerid][TimerElapsed]);
 
-	SaveDrugMissionScore(playerid);
+	if (gDrugMission[playerid][Count])
+	{
+		FireQuestEvent(playerid, QUEST_EVT_DRUG_DONE);
+		SaveDrugMissionScore(playerid);
+	}
 
 	gPlayers[playerid][InMinigame] = false;
 

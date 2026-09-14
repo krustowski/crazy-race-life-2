@@ -789,6 +789,8 @@ stock Race_SetNextCheckpoint(playerid, raceid)
 	return 1;
 }
 
+#include "modules/quest.pwn"
+
 stock Race_AbortMinigame(playerid, bool: success = false)
 {
 	if (!gPlayerRace[playerid][IsRegistered])
@@ -849,6 +851,8 @@ stock Race_AbortMinigame(playerid, bool: success = false)
 
 		GetLocalizedString(playerid, I18N_RACE_FINISHED_GAMETEXT, gameText, sizeof(gameText));
 		GameTextForPlayer(playerid, gameText, 3000, 3);
+
+		FireQuestEvent(playerid, QUEST_EVT_RACE_FINISHED);
 
 		Race_SaveNewScore(raceid, playerid, gPlayerRace[playerid][TimeElapsed], GetVehicleModel(GetPlayerVehicleID(playerid)));
 	}

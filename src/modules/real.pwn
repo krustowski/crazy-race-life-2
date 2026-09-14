@@ -1223,6 +1223,8 @@ stock RentProperty(playerid, propertyID)
 
 	SpawnProperty(arrayid);
 
+	FireQuestEvent(playerid, QUEST_EVT_PROPERTY_RENTED);
+
 	GivePlayerMoney(playerid, -gProperties[arrayid][Cost]);
 	SendClientMessageLocalized(playerid, I18N_REAL_RENTED_SUCCESSFULLY);
 
@@ -1325,6 +1327,8 @@ stock BuyPlayerProperty(playerid, propertyID)
 	gProperties[arrayID][UserID] = gPlayers[playerid][OrmID];
 
 	GivePlayerMoney(playerid, -gProperties[arrayID][Cost]);
+
+	FireQuestEvent(playerid, QUEST_EVT_PROPERTY_BOUGHT);
 
 	// Play property bought theme sound
 	//PlayerPlaySound(playerid, 182, 0.0, 0.0, 0.0);

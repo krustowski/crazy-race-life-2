@@ -86,8 +86,6 @@ enum Player
 	Timer: LoginTimer,
 	Timer: PlayTimeTimer,
 
-	TutorialStats[Tutorial],
-
 	// Temporary and concurrent vars
 	ClickedPlayerID, 
 	PMTargetID,
@@ -260,35 +258,6 @@ stock LoadPlayerData(playerid)
 
 		DB_FreeResultSet(result_drugz);
 
-		//
-		// Tutorial
-		//
-
-		format(query, sizeof(query), "SELECT active, property_rented_count, property_bought_count, race_finished_count, joined_team, trucking_missions_done, taxi_missions_done, sent_pm, deposited_money_to_bank, deathmatch_played FROM tutorials WHERE user_id = %d", gPlayers[playerid][OrmID]);
-
-		new 
-			DBResult: result_tutorial = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result_tutorial) 
-		{
-			print("Database error: cannot fetch user data (tutorial)!");
-		}
-
-		if (DB_GetRowCount(result_tutorial))
-		{
-			gPlayers[playerid][TutorialStats][Active] = bool: DB_GetFieldIntByName(result_tutorial, "active");
-			gPlayers[playerid][TutorialStats][PropertyRentedCount] = DB_GetFieldIntByName(result_tutorial, "property_rented_count");
-			gPlayers[playerid][TutorialStats][PropertyBoughtCount] = DB_GetFieldIntByName(result_tutorial, "property_bought_count");
-			gPlayers[playerid][TutorialStats][RaceFinishedCount] = DB_GetFieldIntByName(result_tutorial, "race_finished_count");
-			gPlayers[playerid][TutorialStats][JoinedTeam] = bool: DB_GetFieldIntByName(result_tutorial, "joined_team");
-			gPlayers[playerid][TutorialStats][TruckingMissionsDone] = DB_GetFieldIntByName(result_tutorial, "trucking_missions_done");
-			gPlayers[playerid][TutorialStats][TaxiMissionsDone] = DB_GetFieldIntByName(result_tutorial, "taxi_missions_done");
-			gPlayers[playerid][TutorialStats][SentPM] = bool: DB_GetFieldIntByName(result_tutorial, "sent_pm");
-			gPlayers[playerid][TutorialStats][DepositedMoneyToBank] = DB_GetFieldIntByName(result_tutorial, "deposited_money_to_bank");
-			gPlayers[playerid][TutorialStats][DeathmatchPlayed] = bool: DB_GetFieldIntByName(result_tutorial, "deathmatch_played");
-		}
-
-		DB_FreeResultSet(result_tutorial);
-
 		GivePlayerMoney(playerid, gPlayers[playerid][Cash]);
 		SetPlayerHealth(playerid, gPlayers[playerid][Health]);
 		SetPlayerArmour(playerid, gPlayers[playerid][Armour]);
@@ -423,34 +392,6 @@ stock SavePlayerData(playerid)
 		}
 
 		DB_FreeResultSet(result_drugz);
-
-		//
-		//  Tutorial
-		//
-
-		format(query, sizeof(query), "INSERT INTO tutorials (user_id, active, property_rented_count, property_bought_count, race_finished_count, joined_team, trucking_missions_done, taxi_missions_done, sent_pm, deposited_money_to_bank, deathmatch_played) VALUES (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) ON CONFLICT(user_id) DO UPDATE SET active = excluded.active, property_rented_count = excluded.property_rented_count, property_bought_count = excluded.property_bought_count, race_finished_count = excluded.race_finished_count, joined_team = excluded.joined_team, trucking_missions_done = excluded.trucking_missions_done, taxi_missions_done = excluded.taxi_missions_done, sent_pm = excluded.sent_pm, deposited_money_to_bank = excluded.deposited_money_to_bank, deathmatch_played = excluded.deathmatch_played", 
-			gPlayers[playerid][OrmID],
-			gPlayers[playerid][TutorialStats][Active],
-			gPlayers[playerid][TutorialStats][PropertyRentedCount],
-			gPlayers[playerid][TutorialStats][PropertyBoughtCount],
-			gPlayers[playerid][TutorialStats][RaceFinishedCount],
-			gPlayers[playerid][TutorialStats][JoinedTeam],
-			gPlayers[playerid][TutorialStats][TruckingMissionsDone],
-			gPlayers[playerid][TutorialStats][TaxiMissionsDone],
-			gPlayers[playerid][TutorialStats][SentPM],
-			gPlayers[playerid][TutorialStats][DepositedMoneyToBank],
-			gPlayers[playerid][TutorialStats][DeathmatchPlayed]
-		);
-
-		new 
-			DBResult: result_tutorial = DB_ExecuteQuery(gDbConnectionHandle, query);
-		if (!result_tutorial) 
-		{
-			printf("Database error: cannot write user data (tutorial, ID: %d)!", gPlayers[playerid][OrmID]);
-			print(query);
-		}
-
-		DB_FreeResultSet(result_tutorial);
 		
 		SendClientMessageLocalized(playerid, I18N_AUTOSAVE_SUCCESS);
 	}

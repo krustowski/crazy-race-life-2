@@ -1851,34 +1851,34 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				return SetCombatMission(playerid, listitem + 1);
 			}
-		case DIALOG_TUTORIAL_MAIN:
-			{
-				if (!response)
-				{
-					return 1;
-				}
+		// case DIALOG_TUTORIAL_MAIN:
+		// 	{
+		// 		if (!response)
+		// 		{
+		// 			return 1;
+		// 		}
 
-				switch (listitem)
-				{
-					case 0: 
-						{
-							if (gPlayers[playerid][TutorialStats][Active])
-							{
-								return ShowTutorialStatsDialog(playerid);
-							}
+		// 		switch (listitem)
+		// 		{
+		// 			case 0: 
+		// 				{
+		// 					if (gPlayers[playerid][TutorialStats][Active])
+		// 					{
+		// 						return ShowTutorialStatsDialog(playerid);
+		// 					}
 							
-							gPlayers[playerid][TutorialStats][Active] = bool: true;
-							return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TUT ] Tutorial mode activated!");
-						}
-					case 1: {
-							if (gPlayers[playerid][TutorialStats][Active])
-							{
-								// Next task
-								return 1;
-							}
-						}
-				}
-			}
+		// 					gPlayers[playerid][TutorialStats][Active] = bool: true;
+		// 					return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TUT ] Tutorial mode activated!");
+		// 				}
+		// 			case 1: {
+		// 					if (gPlayers[playerid][TutorialStats][Active])
+		// 					{
+		// 						// Next task
+		// 						return 1;
+		// 					}
+		// 				}
+		// 		}
+		// 	}
 		case DIALOG_BRIBE_MAIN:
 			{
 				if (!response)

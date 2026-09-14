@@ -131,10 +131,6 @@ public OffRadarCheckpoint(playerid)
 
 stock HandleCarKill(playerid, killerid, WEAPON:reason)
 {
-	// Adjust the wanted level
-	gPlayers[killerid][WantedLevel]++;
-	SetPlayerWantedLevel(killerid, gPlayers[killerid][WantedLevel]);
-
 	new 
 		PLAYER_STATE:killerState = GetPlayerState(killerid),
 		stringToPrint[128];

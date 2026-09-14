@@ -2120,7 +2120,19 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] NPC Recording started! Press N to start another recording");
 			}
+		case DIALOG_QUEST_LIST:
+			{
+				if (!response)
+				{
+					return 1;
+				}
 
+				return ShowPlayerQuestDescDialog(playerid, listitem + 1);
+			}
+		case DIALOG_QUEST_DESC:
+			{
+				return ShowPlayerQuestListDialog(playerid);
+			}
 		default: 
 			{
 				// Dialog ID was not found, search in other scripts

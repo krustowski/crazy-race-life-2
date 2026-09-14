@@ -50,6 +50,7 @@ stock SetPlayerAccountLogin(playerid, const text[])
 
 	LoadPlayerData(playerid);
 	LoadPlayerProperties(playerid);
+	LoadPlayerQuests(playerid);
 
 	RedrawRealZones(playerid);
 
@@ -144,7 +145,7 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 
 	gPlayers[playerid][IsLogged] = true;
 	LoadPlayerData(playerid);
-
+	
 	RedrawRealZones(playerid);
 
 	// Draw mapicons for the user.

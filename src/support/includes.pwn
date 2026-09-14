@@ -100,6 +100,7 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 #include "modules/tow.pwn"
 #include "modules/npcs.pwn"
 #include "modules/pizza.pwn"
+#include "modules/quest.pwn"
 
 //
 //  Trucking subsystem.

@@ -71,6 +71,7 @@ public OnGameModeInit()
 	InitDrugPickups();
 	InitDruggeryPoints();
 
+	InitQuests();
 	InitTeams();
 
 	InitRealEstateProperties();
@@ -614,6 +615,11 @@ public OnPlayerDeath(playerid, killerid, WEAPON: reason)
 	// Hide velocity meters.
 	TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 
+	// Deliberately ahead of the early returns below, so a kill still counts
+	// while the killer is on a rampage or combat mission. The helper decides
+	// which kills qualify.
+	RaisePlayerWantedLevel(playerid, killerid);
+
 	if (gDeathmatch[playerid][InGame] && playerid != killerid && killerid != INVALID_PLAYER_ID)
 	{
 		// Increment the killer's score.
@@ -627,8 +633,11 @@ public OnPlayerDeath(playerid, killerid, WEAPON: reason)
 	if (IsPlayerConnected(killerid) && gRampageMission[killerid][Active])
 	{
 		gRampageMission[killerid][KilledCount]++;
-	
-		return 1;
+
+		if (IsPlayerNPC(playerid))
+		{
+			return 1;
+		}
 	}
 
 	if (gCombatMission[playerid][Active])

@@ -1013,6 +1013,35 @@ public SpawnPlayerDelayed(playerid)
 #include "modules/rampage.pwn"
 #include "modules/pizza.pwn"
 
+stock RaisePlayerWantedLevel(playerid, killerid)
+{
+	if (killerid == INVALID_PLAYER_ID || !IsPlayerConnected(killerid) || killerid == playerid)
+	{
+		return 0;
+	}
+
+	// An NPC gunning someone down is not earning a wanted level.
+	if (IsPlayerNPC(killerid))
+	{
+		return 0;
+	}
+
+	// The deathmatch arena is a sanctioned minigame.
+	if (gDeathmatch[playerid][InGame] || gDeathmatch[killerid][InGame])
+	{
+		return 0;
+	}
+
+	gPlayers[killerid][WantedLevel]++;
+	SetPlayerWantedLevel(killerid, gPlayers[killerid][WantedLevel]);
+
+#if DEBUG_SPAWN
+	printf("[wanted] victim=%d killer=%d -> level=%d", playerid, killerid, gPlayers[killerid][WantedLevel]);
+#endif
+
+	return 1;
+}
+
 stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 {
 #pragma unused oldkeys

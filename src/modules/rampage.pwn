@@ -385,7 +385,11 @@ stock AbortRampageMission(playerid)
 
     GameTextForPlayer(playerid, gI18nMessages[I18N_RAMPAGE_MISS_ABORT][ gPlayers[playerid][Locale] ], 3000, 3); 
 
-    SetTimerEx("SpawnPlayerDelayed", 250, false, "i", playerid);
+    if (IsPlayerAlive(playerid))
+    {
+        SetTimerEx("SpawnPlayerDelayed", 250, false, "i", playerid);
+    }
+
     return 1;
 }
 

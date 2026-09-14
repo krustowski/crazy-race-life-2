@@ -42,6 +42,7 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(port, 4, cmdtext); 	  //all
 	dcmd(prizes, 6, cmdtext); 	  //all
 	dcmd(property, 8, cmdtext);	  //all
+	dcmd(quest, 5, cmdtext); 	  //all
 	dcmd(race, 4, cmdtext);		  //all
 	dcmd(rules, 5, cmdtext); 	  //all
 	dcmd(scores, 6, cmdtext);	  //all
@@ -713,6 +714,12 @@ dcmd_property(playerid, const params[])
 	return ShowPropertyListDialog(playerid);
 }
 
+dcmd_quest(playerid, const params[])
+{
+#pragma unused params
+	return ShowPlayerQuestListDialog(playerid);
+}
+
 dcmd_race(playerid, const params[])
 {
 #pragma unused params
@@ -894,7 +901,7 @@ dcmd_truck(playerid, const params[])
 dcmd_tut(playerid, const params[])
 {
 #pragma unused params
-	return ShowTutorialMainDialog(playerid);
+	return ShowPlayerQuestListDialog(playerid);
 }
 
 dcmd_unlock(playerid, const params[])

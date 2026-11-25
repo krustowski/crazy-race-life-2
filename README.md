@@ -1,13 +1,12 @@
 # CrazyRaceLife2 (CRL2)
 
-A GTA SA:MP/openMP gamemode scripted in the Pawn lang with sqlite-designed SQL connector built-in.
+A GTA SA:MP/openMP freeroam gamemode scripted in the Pawn lang with sqlite-designed SQL connector built-in.
 
-Live demo at:
+Live servers:
 
-```
-95.216.7.113:39876
-```
 [![](https://widgets.gamemonitoring.net/servers/9019170/560x95.webp)](https://gamemonitoring.net/samp/servers/9019170)
+
+[![](https://widgets.gamemonitoring.net/servers/18949736/560x95.webp)](https://gamemonitoring.net/samp/servers/18949736)
 
 ## Features
 

@@ -24,7 +24,7 @@
 #define RESPAWN_DELAY_MS	5000
 
 #include "support/i18n.pwn"
-#include "db/sql.pwn"
+#include "db/sqlite.pwn"
 #include "modules/team.pwn"
 #include "support/helpers.pwn"
 
@@ -61,6 +61,8 @@ enum Player
 	SpawnPoint,
 
 	PlayerLocale: Locale,
+	// Player runs the HD (widescreen) GTA SA, HUD textdraws use the narrower layout (/hd)
+	bool: HDVersion,
 
 	bool: IsLogged,
 	bool: AFK,
@@ -122,54 +124,15 @@ forward GivePlayerWeaponEx(playerid, timerid, weaponid, ammo);
 forward SendPlayerSalary();
 forward UpdatePlayerPlayTime();
 forward UpdatePlayerScore();
-forward UpdateBlackMarketRatio();
 
 #include "modules/drugz.pwn"
 
-public UpdateBlackMarketRatio()
-{
-	new
-		// Symmetric step: -0.20 to +0.20 of current ratio
-		Float: step = floatdiv(float(random(MARKET_STEP_PERCENT * 2 + 1) - MARKET_STEP_PERCENT), 100.0),
-		// Mean reversion: pull toward equilibrium proportional to distance
-		Float: reversion = floatmul(MARKET_REVERSION_RATE, MARKET_RATIO_EQULIBRIUM - gBlackMarketRatio);
-
-	// Update raw value of the market ratio
-	gBlackMarketRatio = gBlackMarketRatio + step + reversion;
-
-	// Hard clamps
-	if (gBlackMarketRatio < MARKET_RATIO_MIN)
-	{
-		gBlackMarketRatio = MARKET_RATIO_MIN;
-	}
-
-	if (gBlackMarketRatio > MARKET_RATIO_MAX)
-	{
-		gBlackMarketRatio = MARKET_RATIO_MAX;
-	}
-
-	// Ratio update message broadcasting
-	for (new i = 0; i < MAX_PLAYERS; i++)
-	{
-		if (!IsPlayerConnected(i) || gPlayers[i][TeamID] != TEAM_DEALERS)
-		{
-			continue;
-		}
-
-		new 
-			msg[64];
-		GetLocalizedString(i, I18N_BLACK_MARKET_RATIO_UPDATE, msg, sizeof(msg));
-
-		format(msg, sizeof(msg), msg,
-				gBlackMarketRatio
-			);
-
-		SendClientMessage(i, COLOR_ORANGE, msg);
-	}
-}
-
 public BatchSavePlayerData()
 {
+	// Several writes per player: commit them together, not one by one.
+	new
+		bool: ownTransaction = BeginDBTransaction();
+
 	for (new i = 0; i < GetMaxPlayers(); i++)
 	{
 		// Ensure only online and logged-in players are subject for autosave
@@ -179,6 +142,11 @@ public BatchSavePlayerData()
 		}
 
 		SavePlayerData(i);
+	}
+
+	if (ownTransaction && !CommitDBTransaction())
+	{
+		print("Database error: player autosave was not committed, it will be retried on the next save!");
 	}
 
 	return 1;
@@ -200,7 +168,7 @@ stock LoadPlayerData(playerid)
 
 		new 
 			query[512];
-		format(query, sizeof(query), "SELECT id, cash, bank, adminlvl, wanted, team, class, health, armour, spawn, properties, locale, playtime FROM users WHERE nickname = '%s';", gPlayers[playerid][Name]);
+		format(query, sizeof(query), "SELECT id, cash, bank, adminlvl, wanted, team, class, health, armour, spawn, properties, locale, playtime, hd_version FROM users WHERE nickname = '%s';", gPlayers[playerid][Name]);
 
 		new 
 			DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
@@ -225,6 +193,7 @@ stock LoadPlayerData(playerid)
 		DB_GetFieldStringByName(result, "properties", propertiesString, sizeof(propertiesString));
 		gPlayers[playerid][Locale] = PlayerLocale: DB_GetFieldIntByName(result, "locale");
 		gPlayers[playerid][PlayTime] = DB_GetFieldIntByName(result, "playtime");
+		gPlayers[playerid][HDVersion] = bool: DB_GetFieldIntByName(result, "hd_version");
 
 		ExtractPropperties(propertiesString, properties);
 		gPlayers[playerid][Properties] = properties;
@@ -266,12 +235,15 @@ stock LoadPlayerData(playerid)
 
 		if (gPlayers[playerid][TeamID])
 		{
-			SetPlayerColor(playerid, gTeams[ _: gPlayers[playerid][TeamID] ][Color]);
+			// gTeams[] starts at team id 1, see InitTeams()
+			SetPlayerColor(playerid, gTeams[ _: gPlayers[playerid][TeamID] - 1 ][Color]);
 		}
 		else
 		{
 			SetPlayerColor(playerid, COLOR_WHITE);
 		}
+
+		ShowPlayerClock(playerid);
 
 		SendClientMessageLocalized(playerid, I18N_USER_DATA_LOAD_SUCCESS);
 
@@ -337,7 +309,7 @@ stock SavePlayerData(playerid)
 		new 
 			query[1024];
 
-		format(query, sizeof(query), "UPDATE users SET cash = %d, bank = %d, adminlvl = %d, wanted = %d, team = %d, class = %d, health = %d, armour = %d, spawn = %d, properties = '%s', locale = %d, playtime = %d WHERE nickname = '%s';", 
+		format(query, sizeof(query), "UPDATE users SET cash = %d, bank = %d, adminlvl = %d, wanted = %d, team = %d, class = %d, health = %d, armour = %d, spawn = %d, properties = '%s', locale = %d, playtime = %d, hd_version = %d WHERE nickname = '%s';",
 				GetPlayerMoney(playerid), 
 				gPlayers[playerid][Bank], 
 				gPlayers[playerid][AdminLevel], 
@@ -350,6 +322,7 @@ stock SavePlayerData(playerid)
 				propertiesString, 
 				_: gPlayers[playerid][Locale],
 				gPlayers[playerid][PlayTime],
+				_: gPlayers[playerid][HDVersion],
 				gPlayers[playerid][Name]
 		);
 
@@ -589,6 +562,227 @@ stock MovePlayerToPlayer(playerid, targetid, bool: reversed)
 	return 1;
 }
 
+//
+//  Admin spectating (/spectate and the clicked player menu).
+//
+
+enum SpectateState
+{
+	SpectatedPlayer,
+	// The vehicle the camera is on, 0 while it is on the player.
+	SpectatedVehicle,
+	// Where the admin was before spectating, to be spawned back there.
+	bool: HasReturnPoint,
+	// From stopping until the respawn that leaving spectate mode causes.
+	bool: ReturnPending,
+	Float: ReturnX,
+	Float: ReturnY,
+	Float: ReturnZ,
+	Float: ReturnAngle,
+	ReturnInterior,
+	ReturnWorld
+}
+
+new
+	gSpectate[MAX_PLAYERS][SpectateState];
+
+forward UpdateSpectators();
+
+stock ResetSpectateState(playerid)
+{
+	gPlayers[playerid][Spectating] = false;
+
+	gSpectate[playerid][SpectatedPlayer] = INVALID_PLAYER_ID;
+	gSpectate[playerid][SpectatedVehicle] = 0;
+	gSpectate[playerid][HasReturnPoint] = false;
+	gSpectate[playerid][ReturnPending] = false;
+}
+
+// The camera only works from the target's interior and world, and a target in
+// a vehicle is watched through the vehicle.
+stock AimSpectateCamera(playerid)
+{
+	new
+		targetid = gSpectate[playerid][SpectatedPlayer],
+		vehicleid = GetPlayerVehicleID(targetid);
+
+	SetPlayerInterior(playerid, GetPlayerInterior(targetid));
+	SetPlayerVirtualWorld(playerid, GetPlayerVirtualWorld(targetid));
+
+	if (vehicleid)
+	{
+		PlayerSpectateVehicle(playerid, vehicleid);
+	}
+	else
+	{
+		PlayerSpectatePlayer(playerid, targetid);
+	}
+
+	gSpectate[playerid][SpectatedVehicle] = vehicleid;
+}
+
+// Starts spectating, or moves an admin already spectating on to another target.
+stock StartSpectating(playerid, targetid)
+{
+	if (!IsPlayerConnected(targetid))
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+	}
+
+	if (targetid == playerid)
+	{
+		return SendClientMessageLocalized(playerid, I18N_PLAYER_ID_INVALID);
+	}
+
+	if (!gPlayers[playerid][Spectating])
+	{
+		// Spectate mode takes the admin out of the world, which a minigame or
+		// mission in progress would not survive.
+		if (gPlayers[playerid][InMinigame] || gDeathmatch[playerid][IsRegistered] || gDeathmatch[playerid][InGame] || gCombatMission[playerid][Active])
+		{
+			return SendClientMessageLocalized(playerid, I18N_IN_MINIGAME_BLOCK);
+		}
+
+		// Back in before the respawn from the last stop: that return point stands.
+		if (!gSpectate[playerid][ReturnPending])
+		{
+			// A property interior exists for its visitor only and goes away on
+			// the respawn, so from one (or from the dead) the admin spawns as usual.
+			gSpectate[playerid][HasReturnPoint] = (IsPlayerAlive(playerid) && !gPlayers[playerid][InsideProperty]);
+			gSpectate[playerid][ReturnInterior] = 0;
+			gSpectate[playerid][ReturnWorld] = GetPlayerVirtualWorld(playerid);
+
+			if (gSpectate[playerid][HasReturnPoint])
+			{
+				GetPlayerPos(playerid, gSpectate[playerid][ReturnX], gSpectate[playerid][ReturnY], gSpectate[playerid][ReturnZ]);
+				GetPlayerFacingAngle(playerid, gSpectate[playerid][ReturnAngle]);
+				gSpectate[playerid][ReturnInterior] = GetPlayerInterior(playerid);
+			}
+		}
+
+		gSpectate[playerid][ReturnPending] = false;
+		gPlayers[playerid][Spectating] = true;
+
+		TogglePlayerSpectating(playerid, true);
+	}
+
+	gSpectate[playerid][SpectatedPlayer] = targetid;
+	AimSpectateCamera(playerid);
+
+	return SendClientMessageLocalized(playerid, I18N_SPECTATE_ENABLED);
+}
+
+stock StopSpectating(playerid)
+{
+	if (!gPlayers[playerid][Spectating])
+	{
+		return 0;
+	}
+
+	gPlayers[playerid][Spectating] = false;
+
+	gSpectate[playerid][SpectatedPlayer] = INVALID_PLAYER_ID;
+	gSpectate[playerid][SpectatedVehicle] = 0;
+	gSpectate[playerid][ReturnPending] = true;
+
+	// Leaving spectate mode respawns the admin, so the spawn info decides where:
+	// FinishSpectateReturn() puts the usual one back once they are there.
+	if (gSpectate[playerid][HasReturnPoint])
+	{
+		SetSpawnInfo(playerid, GetPlayerTeam(playerid), gPlayers[playerid][Skin], gSpectate[playerid][ReturnX], gSpectate[playerid][ReturnY], gSpectate[playerid][ReturnZ], gSpectate[playerid][ReturnAngle]);
+	}
+	else
+	{
+		ApplyPlayerSpawnInfo(playerid);
+	}
+
+	TogglePlayerSpectating(playerid, false);
+
+	return SendClientMessageLocalized(playerid, I18N_SPECTATE_DISABLED);
+}
+
+// Called from OnPlayerSpawn; true when the admin was put back where they had
+// started spectating from, so the usual spawn point must not apply.
+stock bool: FinishSpectateReturn(playerid)
+{
+	if (!gSpectate[playerid][ReturnPending])
+	{
+		return false;
+	}
+
+	gSpectate[playerid][ReturnPending] = false;
+
+	// Spectating took the admin into the target's interior and world.
+	SetPlayerInterior(playerid, gSpectate[playerid][ReturnInterior]);
+	SetPlayerVirtualWorld(playerid, gSpectate[playerid][ReturnWorld]);
+
+	if (!gSpectate[playerid][HasReturnPoint])
+	{
+		return false;
+	}
+
+	gSpectate[playerid][HasReturnPoint] = false;
+
+	ApplyPlayerSpawnInfo(playerid);
+
+	SetPlayerPos(playerid, gSpectate[playerid][ReturnX], gSpectate[playerid][ReturnY], gSpectate[playerid][ReturnZ]);
+	SetPlayerFacingAngle(playerid, gSpectate[playerid][ReturnAngle]);
+
+	return true;
+}
+
+// The target got into or out of a vehicle, or is alive again after a death.
+stock AimSpectatorsOf(targetid)
+{
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (gPlayers[i][Spectating] && gSpectate[i][SpectatedPlayer] == targetid && IsPlayerConnected(i))
+		{
+			AimSpectateCamera(i);
+		}
+	}
+}
+
+stock StopSpectatorsOf(targetid)
+{
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (gPlayers[i][Spectating] && gSpectate[i][SpectatedPlayer] == targetid && IsPlayerConnected(i))
+		{
+			StopSpectating(i);
+		}
+	}
+}
+
+// Re-aims any camera that lost its target without a state change to show for
+// it: an interior entered, a teleport, the target streamed out.
+public UpdateSpectators()
+{
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!gPlayers[i][Spectating] || !IsPlayerConnected(i))
+		{
+			continue;
+		}
+
+		new
+			targetid = gSpectate[i][SpectatedPlayer];
+
+		// Dead or not spawned yet: coming back alive re-aims the camera anyway.
+		if (!IsPlayerAlive(targetid))
+		{
+			continue;
+		}
+
+		if (GetPlayerVehicleID(targetid) != gSpectate[i][SpectatedVehicle] || GetPlayerInterior(targetid) != GetPlayerInterior(i) || !IsPlayerStreamedIn(targetid, i))
+		{
+			AimSpectateCamera(i);
+		}
+	}
+
+	return 1;
+}
+
 stock SetPlayerVehicleNitro(playerid, targetid)
 {
 	if (!IsPlayerConnected(targetid))
@@ -630,6 +824,89 @@ stock SetPlayerVehicleNitro(playerid, targetid)
 
 	GetLocalizedString(playerid, I18N_VEHICLE_MOD_NITRO_INSTALLED_ADMIN, stringToPrint, sizeof(stringToPrint));
 	SendClientMessage(playerid, COLOR_GREY, stringToPrint);
+
+	return 1;
+}
+
+// SetPlayerAdminLevel gives <targetid> the admin <level> (0-5) on behalf of
+// <playerid> and saves it. An RCON admin (/rcon login) may set any level to
+// any logged-in player, themselves included, whatever their own account's
+// level: that is how the first admins get appointed in-game. Admins of level 4
+// and up may only set players below their own level, up to their own level.
+// Returns 1 when the level was set, 0 when it was refused (the reason is sent
+// to <playerid>).
+stock SetPlayerAdminLevel(playerid, targetid, level)
+{
+	new
+		bool: rconAdmin = IsPlayerAdmin(playerid);
+
+	if (!rconAdmin && gPlayers[playerid][AdminLevel] < 4)
+	{
+		SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
+		return 0;
+	}
+
+	if (level < 0 || level > 5)
+	{
+		SendUsageMessage(playerid, "/lvl [playerID] [0-5]");
+		return 0;
+	}
+
+	if (!IsPlayerConnected(targetid))
+	{
+		SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+		return 0;
+	}
+
+	// SavePlayerData() skips such a player, and the login would overwrite it
+	if (!gPlayers[targetid][IsLogged])
+	{
+		SendClientMessageLocalized(playerid, I18N_ADMIN_LVL_SET_NOT_LOGGED);
+		return 0;
+	}
+
+	if (!rconAdmin)
+	{
+		if (targetid == playerid)
+		{
+			SendClientMessageLocalized(playerid, I18N_PLAYER_ID_INVALID);
+			return 0;
+		}
+
+		if (gPlayers[playerid][AdminLevel] <= gPlayers[targetid][AdminLevel] || level > gPlayers[playerid][AdminLevel])
+		{
+			SendClientMessageLocalized(playerid, I18N_ADMIN_LVL_SET_MISMATCH);
+			return 0;
+		}
+	}
+
+	if (level == gPlayers[targetid][AdminLevel])
+	{
+		SendClientMessageLocalized(playerid, I18N_ADMIN_LVL_SET_SAME);
+		return 0;
+	}
+
+	new
+		adminName[MAX_PLAYER_NAME],
+		playerName[MAX_PLAYER_NAME],
+		msg[128];
+
+	GetPlayerName(playerid, adminName, sizeof(adminName));
+	GetPlayerName(targetid, playerName, sizeof(playerName));
+
+	gPlayers[targetid][AdminLevel] = level;
+	SavePlayerData(targetid);
+
+	GetLocalizedString(playerid, I18N_ADMIN_LVL_SET_FMT, msg, sizeof(msg));
+	format(msg, sizeof(msg), msg, adminName, playerName, targetid, level);
+	SendClientMessage(playerid, COLOR_GREY, msg);
+
+	if (targetid != playerid)
+	{
+		GetLocalizedString(targetid, I18N_ADMIN_LVL_SET_FMT, msg, sizeof(msg));
+		format(msg, sizeof(msg), msg, adminName, playerName, targetid, level);
+		SendClientMessage(targetid, COLOR_GREY, msg);
+	}
 
 	return 1;
 }
@@ -703,6 +980,19 @@ stock ProcessDealOffer(playerid)
 	{
 		//print("[TEST] Deal declined");
 		SendClientMessageLocalized(playerid, I18N_DEAL_NOT_ACCEPTED);
+		return 0;
+	}
+
+	// The dealer's stock was checked when they made the offer, but they could
+	// have stashed or sold it since: without this the buyer would still get the
+	// drugs and the dealer's stock would go negative.
+	if (drugid <= DrugType: TYPE_NONE || _: drugid > MAX_DRUG_TYPES || gPlayers[dealerid][Drugs][_: drugid - 1] < amount)
+	{
+		gPlayers[playerid][AcceptedDeal] = false;
+		CleanDealCounterparts(playerid, dealerid);
+
+		SendClientMessageLocalized(playerid, I18N_DEAL_DEALER_OUT_OF_STOCK);
+		SendClientMessageLocalized(dealerid, I18N_DEAL_DEALER_OUT_OF_STOCK);
 		return 0;
 	}
 
@@ -941,10 +1231,6 @@ public SpawnPlayerDelayed(playerid)
 
 	ApplyPlayerSpawnInfo(playerid);
 
-#if DEBUG_SPAWN
-	printf("[spawn] DOSPAWN   pid=%d state=%d invehicle=%d", playerid, _: GetPlayerState(playerid), IsPlayerInAnyVehicle(playerid));
-#endif
-
 	SpawnPlayer(playerid);
 
 	return 1;
@@ -957,6 +1243,7 @@ public SpawnPlayerDelayed(playerid)
 #include "modules/tow.pwn"
 #include "modules/bribe.pwn"
 #include "modules/rampage.pwn"
+#include "modules/rob.pwn"
 #include "modules/pizza.pwn"
 
 stock RaisePlayerWantedLevel(playerid, killerid)
@@ -981,16 +1268,22 @@ stock RaisePlayerWantedLevel(playerid, killerid)
 	gPlayers[killerid][WantedLevel]++;
 	SetPlayerWantedLevel(killerid, gPlayers[killerid][WantedLevel]);
 
-#if DEBUG_SPAWN
+#if DEBUG_ENABLED
 	printf("[wanted] victim=%d killer=%d -> level=%d", playerid, killerid, gPlayers[killerid][WantedLevel]);
 #endif
 
 	return 1;
 }
 
-stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
+stock HandlePlayerKeyStateChange(playerid, KEY: newkeys, KEY: oldkeys)
 {
-#pragma unused oldkeys
+	// Robbing is about holding and releasing a key, so it needs both key sets
+	// and goes ahead of the exact-match switch below.
+	if (HandleRobberyKeys(playerid, newkeys, oldkeys))
+	{
+		return 1;
+	}
+
 	switch (newkeys)
 	{
 		//case KEY_SPRINT:
@@ -1201,6 +1494,13 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 							}
 						case RMET_NPC_COORDS_PRIMARY:
 							{
+								if (gRampageEdit[playerid][NPCCount] >= MAX_RAMPAGE_NPC_COUNT)
+								{
+									gRampageEdit[playerid][EditType] = RMET_NONE;
+									SendClientMessage(playerid, COLOR_RED, "[ EDIT ] NPC limit reached for this rampage!");
+									return ShowRampageEditorMainDialog(playerid);
+								}
+
 								new 
 									Float: X,
 									Float: Y,
@@ -1241,27 +1541,43 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 							}
 						case RMET_WEAPON_COORDS:
 							{
+								if (gRampageEdit[playerid][WeaponNo] >= MAX_RAMPAGE_WEAPON_COUNT)
+								{
+									gRampageEdit[playerid][EditType] = RMET_NONE;
+									SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Weapon pickup limit reached for this rampage!");
+									return ShowRampageEditorMainDialog(playerid);
+								}
+
 								new 
 									Float: X,
 									Float: Y,
 									Float: Z,
-									weaponid = gRampageEdit[playerid][WeaponNo],
+									slot = gRampageEdit[playerid][WeaponNo]++,
 									missionid = gRampageEdit[playerid][MissionID];
 
 								GetPlayerPos(playerid, X, Y, Z);
 
-								gRampageWeapons[missionid][weaponid][Set] = true;
-								gRampageWeapons[missionid][weaponid][Position][CoordX] = X;
-								gRampageWeapons[missionid][weaponid][Position][CoordY] = Y;
-								gRampageWeapons[missionid][weaponid][Position][CoordZ] = Z;
+								// The slot is claimed here; the weapon dialog fills in the id (0 = random).
+								gRampageWeapons[missionid][slot][Set] = true;
+								gRampageWeapons[missionid][slot][WeaponID] = 0;
+								gRampageWeapons[missionid][slot][Position][CoordX] = X;
+								gRampageWeapons[missionid][slot][Position][CoordY] = Y;
+								gRampageWeapons[missionid][slot][Position][CoordZ] = Z;
 
 								gRampageEdit[playerid][EditType] = RMET_NONE;
 
-								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Rampage weapon poistion recorded! Please define the weapon ID (optional)");
+								SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Rampage weapon position recorded! Please define the weapon ID (optional)");
 								return ShowRampageEditorWeaponDialog(playerid);
 							}
 						case RMET_HEALTH_COORDS:
 							{
+								if (gRampageEdit[playerid][HealthNo] >= MAX_RAMPAGE_HEALTH_POINTS_COUNT)
+								{
+									gRampageEdit[playerid][EditType] = RMET_NONE;
+									SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Health pickup limit reached for this rampage!");
+									return ShowRampageEditorMainDialog(playerid);
+								}
+
 								new 
 									Float: X,
 									Float: Y,
@@ -1319,9 +1635,15 @@ stock HandlePlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 
 								GetPlayerPos(playerid, X, Y, Z);
 
-								new 
+								new
 									coord_no = gPlayerRaceEdit[playerid][EditTrackCoordNo],
 									stringToPrint[128];
+
+								if (coord_no >= MAX_RACE_CP)
+								{
+									SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Max track coords count reached!");
+									return ShowRaceEditorOptionsDialog(playerid, gPlayerRaceEdit[playerid][ID]);
+								}
 
 								gPlayerRaceEditTrackCoords[playerid][coord_no][CoordX] = X;
 								gPlayerRaceEditTrackCoords[playerid][coord_no][CoordY] = Y;
@@ -1555,6 +1877,9 @@ stock ResetPlayerState(playerid)
 	gPlayers[playerid][IsLogged] = false;
 	gPlayers[playerid][TeamID] = TEAM_NONE;
 
+	// Not the level of whoever had this slot before: the login loads the own one
+	gPlayers[playerid][AdminLevel] = 0;
+
 	gPlayers[playerid][InMinigame] = false;
 	gPlayers[playerid][SwitchedControllers] = false;
 
@@ -1591,11 +1916,32 @@ stock ResetPlayerState(playerid)
 	// Taxi mission
 	gTaxiMission[playerid][Active] = false;
 
+	// NPC taxi call and ride
+	ResetTaxiPassenger(playerid);
+
+	// Rob mission
+	gRobMission[playerid][Active] = false;
+	gRobMission[playerid][Robbing] = false;
+	gRobMission[playerid][PropertyArrayID] = INVALID_PROPERTY_ID;
+
+	// The previous player's zones went away with their pool, nothing to destroy
+	gRealZoneCount[playerid] = 0;
+
 	// Reset locale to English
 	gPlayers[playerid][Locale] = LOCALE_EN;
 
+	// Classic HUD layout until the account data says otherwise
+	gPlayers[playerid][HDVersion] = false;
+
 	gPlayers[playerid][NPCRecording] = false;
 	gPlayers[playerid][NPCRecordNo] = 0;
+
+	ResetSpectateState(playerid);
+
+	ResetPlayerQuests(playerid);
+
+	// Weapon ledger + anticheat warnings
+	ResetAntiCheatState(playerid);
 
 	return 1;
 }
@@ -1627,6 +1973,11 @@ stock SetPlayerTeamEx(playerid, teamid)
 
 	format(stringToPrint, sizeof(stringToPrint), "[ TEAM ] Player %s joined the %s team!", gPlayers[playerid][Name], gTeams[teamid][TeamName]);
 	SendClientMessageToAll(COLOR_YELLOW, stringToPrint);
+
+	if (gPlayers[playerid][TeamID] == TEAM_ROBBERS)
+	{
+		SendClientMessageLocalized(playerid, I18N_ROB_TEAM_HINT);
+	}
 
 	FireQuestEvent(playerid, QUEST_EVT_TEAM_JOINED);
 

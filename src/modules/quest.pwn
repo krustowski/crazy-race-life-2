@@ -27,7 +27,12 @@ enum QuestEvent
     QUEST_EVT_TOW_DONE,
     QUEST_EVT_COMBAT_DONE,
     QUEST_EVT_RAMPAGE_DONE,
-    QUEST_EVT_DRUG_DONE
+    QUEST_EVT_DRUG_DONE,
+    QUEST_EVT_PROPERTY_ROBBED,
+    QUEST_EVT_TAXI_STOP_REACHED,
+    QUEST_EVT_TAXI_RIDE_STOP,
+    QUEST_EVT_FUEL_BOUGHT,
+    QUEST_EVT_COMMERCIAL_SHARE
 }
 
 enum Quest
@@ -90,6 +95,16 @@ stock InitQuests()
             label[MAX_QUEST_LABEL],
             desc[MAX_QUEST_DESC];
 
+        // A bad row is skipped rather than trusted: an id outside gQuests[]
+        // (0 means "not loaded" there) or a locale PlayerLocale has no slot
+        // for would index out of bounds, a run time error that aborts this
+        // and, at startup, OnGameModeInit with every Init* after it.
+        if (id <= 0 || id >= MAX_QUESTS || _: locale < 0 || _: locale >= _: PlayerLocale)
+        {
+            printf("[quests] skipping a bad quest_labels row (quest %d, locale %d)", id, _: locale);
+            continue;
+        }
+
         DB_GetFieldStringByName(result, "label", label, sizeof(label));
         DB_GetFieldStringByName(result, "desc", desc, sizeof(desc));
 
@@ -146,7 +161,7 @@ stock LoadPlayerQuests(playerid)
             progress = DB_GetFieldIntByName(result, "progress"),
             completed_at = DB_GetFieldIntByName(result, "completed_at");
         
-        if (type > gQuestCount || !gQuests[type][ID])
+        if (type < 1 || type >= MAX_QUESTS || !gQuests[type][ID])
         {
             continue;
         }
@@ -189,6 +204,19 @@ stock CompleteQuest(playerid, questid)
 
     DB_FreeResultSet(result);
 
+    new
+        stringToPrint[144];
+
+    GetLocalizedString(playerid, I18N_QUEST_COMPLETED_FMT, stringToPrint, sizeof(stringToPrint));
+    format(stringToPrint, sizeof(stringToPrint), stringToPrint, gQuestLabels[questid][ gPlayers[playerid][Locale] ], gQuests[questid][Reward]);
+    SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
+
+    // Style 0 is the big "mission passed" one, and no mission uses it, so a
+    // mission's own end text cannot overwrite this one.
+    GetLocalizedString(playerid, I18N_QUEST_COMPLETED_GAMETEXT_FMT, stringToPrint, sizeof(stringToPrint));
+    format(stringToPrint, sizeof(stringToPrint), stringToPrint, gQuests[questid][Reward]);
+    GameTextForPlayer(playerid, stringToPrint, 5000, 0);
+
     return 1;
 }
 
@@ -202,6 +230,7 @@ stock SaveQuestProgress(playerid, questid)
             gQuests[questid][ID],
             gPlayerQuests[playerid][questid][Progress]
         );
+
     new    
         DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
         
@@ -232,18 +261,62 @@ stock FireQuestEvent(playerid, QuestEvent: event, amount = 1)
             continue;
         }
 
-        gPlayerQuests[playerid][i][Progress] += amount;
-
-        if (gPlayerQuests[playerid][i][Progress] >= gQuests[i][Target])
-        {
-            CompleteQuest(playerid, i);
-        }
-        else
-        {
-            SaveQuestProgress(playerid, i);
-        }
+        UpdateQuestProgress(playerid, i, gPlayerQuests[playerid][i][Progress] + amount);
     }
 
     return 1;
 }
 
+// For events that report a level rather than a count, e.g. the share of all
+// commercial properties a player rents: progress becomes the highest level
+// reported so far instead of a running sum, so losing part of it later does
+// not set the quest back.
+stock FireQuestLevelEvent(playerid, QuestEvent: event, level)
+{
+    if (!IsPlayerConnected(playerid))
+    {
+        return 0;
+    }
+
+    for (new i = 1; i < MAX_QUESTS; i++)
+    {
+        if (gQuests[i][Event] != event || gPlayerQuests[playerid][i][Completed])
+        {
+            continue;
+        }
+
+        if (level <= gPlayerQuests[playerid][i][Progress])
+        {
+            continue;
+        }
+
+        UpdateQuestProgress(playerid, i, level);
+    }
+
+    return 1;
+}
+
+stock UpdateQuestProgress(playerid, questid, progress)
+{
+    // Capped, so an amount over the target (e.g. litres of fuel) does not
+    // list a quest as 60 / 1.
+    gPlayerQuests[playerid][questid][Progress] = min(progress, gQuests[questid][Target]);
+
+    if (gPlayerQuests[playerid][questid][Progress] >= gQuests[questid][Target])
+    {
+        return CompleteQuest(playerid, questid);
+    }
+
+    return SaveQuestProgress(playerid, questid);
+}
+
+stock ResetPlayerQuests(playerid)
+{
+    for (new i = 0; i < MAX_QUESTS; i++)
+    {
+        gPlayerQuests[playerid][i][Progress] = 0;
+        gPlayerQuests[playerid][i][Completed] = false;
+    }
+
+    return 1;
+}

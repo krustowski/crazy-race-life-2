@@ -13,7 +13,7 @@ Up to `MAX_PROPERTIES` (384) properties exist, each described by a `Property` st
 There are two `PropertyType`s with different economics:
 
 - **`PROPERTY_TYPE_PERSONAL`** — bought outright (`BuyPlayerProperty`) into one of a player's `MAX_PLAYER_PROPERTIES` (7) slots; a green house-icon pickup means it's free, red means owned. Owners can `SellPlayerProperty` back for 90% of cost.
-- **`PROPERTY_TYPE_COMMERCIAL`** — time-rented (`RentProperty`) rather than bought; on rent, `LockedUntilTime` is set to `gettime() + 3 * 24 * 60 * 60` (a 3-day lock protecting the new tenant), and the online former tenant is notified they were "outbought" once the lock expires and someone else rents it. `SendRealEstateCommission` runs periodically and pays every online, logged-in, non-AFK tenant a commission per owned commercial property (`floor(cost / 50) + random(cost / 100)`).
+- **`PROPERTY_TYPE_COMMERCIAL`** — time-rented (`RentProperty`) rather than bought; on rent, `LockedUntilTime` is set to `gettime() + 3 * 24 * 60 * 60` (a 3-day lock protecting the new tenant), and the online former tenant is notified they were "outbought" once the lock expires and someone else rents it. `SendRealEstateCommission` runs periodically and pays every online, logged-in, non-AFK tenant a commission per owned commercial property (`floor(cost / 50) + random(cost / 100)`). A property robbed within the last 5 minutes (`gPropertyCommissionBlockedUntil[]`, set by [Rob Missions](rob.md)) pays nothing.
 
 Entering a personal property's `ENTRANCE_POINT` either teleports the player into a shared, procedurally generated single-room interior (`SpawnPropertyInterior`: one room object 1500 units in the air above the property, with shirt/health/pills/exit pickups) or, if `CustomInterior` is set, simply repositions the player to a fixed secondary coordinate (a hand-built SA:MP interior) — see the interior screenshots below. A `BLACK_MARKET_POINT` pickup (custom-interior only) opens the drug-dealing dialog; each property keeps its own drug stash synced to the shared `drugz` table (`owner_type = 2`), separate from the player's personal `Drugs[]`.
 
@@ -57,24 +57,24 @@ There is exactly one `UPDATE properties` statement in the codebase (in `RentProp
 
 | Function | Description |
 |---|---|
-| `public InitRealEstateProperties()` (`src/modules/real.pwn:184`) | Startup hook: loads all properties from DB then spawns every property's pickups/vehicle. |
-| `public SendRealEstateCommission()` (`src/modules/real.pwn:203`) | Periodic timer paying online tenants a share of their commercial properties' cost. |
-| `stock SpawnProperty(propertyId)` (`src/modules/real.pwn:363`) | (Re)creates all pickups, 3D text labels and the attached vehicle for one property. |
-| `stock LoadRealEstateData()` (`src/modules/real.pwn:858`) | Loads every property row plus its vehicle, saved skins and drug stash from the database. |
-| `stock SaveRealEstateData()` (`src/modules/real.pwn:729`) | Upserts every property, its vehicle and its drug stash back to the database. |
-| `stock LoadPlayerProperties(playerid)` (`src/modules/real.pwn:651`) | On login, populates `gPlayers[playerid][Properties]` with the player's owned personal properties. |
-| `stock IsPlayerOwner(playerid, propertyId)` (`src/modules/real.pwn:707`) | Whether a player currently owns/occupies a property, by id. A memory lookup — see [Ownership checks](#ownership-checks). |
-| `stock IsPlayerOwnerOfArrayID(playerid, arrayid)` (`src/modules/real.pwn:714`) | The same check in O(1), for callers that already hold the `gProperties[]` index. |
-| `stock BuyPlayerProperty(playerid, propertyID)` (`src/modules/real.pwn:1257`) | Buys a free personal property into an open player slot. |
-| `stock RentProperty(playerid, propertyID)` (`src/modules/real.pwn:1174`) | Rents a commercial property, applying the 3-day re-rent lock. |
-| `stock SellPlayerProperty(playerid, propertyID)` (`src/modules/real.pwn:1347`) | Sells a personal property back for 90% of its cost. |
-| `stock SpawnPropertyInterior(playerid, arrayID)` / `DestroyPropertyInterior(playerid)` (`src/modules/real.pwn:1027`, `:1093`) | Creates/tears down the generic generated-room interior. |
-| `stock SpawnPlayerAtProperty(playerid)` (`src/modules/real.pwn:1112`) | Moves a player to their configured property spawn point; thin wrapper over the lookup below. |
-| `stock GetPlayerPropertySpawnPos(playerid, &Float:x, &Float:y, &Float:z)` (`src/modules/real.pwn:1128`) | Resolves that spawn point's coordinates **without** moving anyone, so `ApplyPlayerSpawnInfo` can hand them to the client before it spawns. |
-| `stock AttachVehicleToProperty(playerid, propertyid)` / `RespawnPropertyVehicle` (`src/modules/real.pwn:2046`, `:2022`) | Assigns/respawns the vehicle parked at a property's vehicle point. |
-| `stock EditProperty(playerid)` (`src/modules/real.pwn:1533`) | Admin editor: saves a new or edited property record and its coordinates. |
-| `stock CheckRealEstatePickup(playerid, pickupid)` (`src/modules/real.pwn:1762`) | Central pickup dispatcher covering every `PropertyPoint` type (offer, entrance, exit, health, black market, shirt, drugz, info). |
-| `stock SavePropertySkin` / `SelectPropertySkin` / `DeletePropertySkin` (`src/modules/real.pwn:2169`, `:2228`, `:2253`) | Manage up to 5 outfits saved per personal property. Wearing one (`SelectPropertySkin`) goes through `SetPlayerSkinEx`, so the choice is **permanent** — it survives respawns and is persisted to `users.class`. |
+| `public InitRealEstateProperties()` (`src/modules/real.pwn:189`) | Startup hook: loads all properties from DB then spawns every property's pickups/vehicle. |
+| `public SendRealEstateCommission()` (`src/modules/real.pwn:208`) | Periodic timer paying online tenants a share of their commercial properties' cost. |
+| `stock SpawnProperty(propertyId)` (`src/modules/real.pwn:383`) | (Re)creates all pickups, 3D text labels and the attached vehicle for one property. |
+| `stock LoadRealEstateData()` (`src/modules/real.pwn:898`) | Loads every property row plus its vehicle, saved skins and drug stash from the database. |
+| `stock SaveRealEstateData()` (`src/modules/real.pwn:758`) | Upserts every property, its vehicle and its drug stash back to the database. |
+| `stock LoadPlayerProperties(playerid)` (`src/modules/real.pwn:671`) | On login, populates `gPlayers[playerid][Properties]` with the player's owned personal properties. |
+| `stock IsPlayerOwner(playerid, propertyId)` (`src/modules/real.pwn:738`) | Whether a player currently owns/occupies a property, by id. A memory lookup — see [Ownership checks](#ownership-checks). |
+| `stock IsPlayerOwnerOfArrayID(playerid, arrayid)` (`src/modules/real.pwn:743`) | The same check in O(1), for callers that already hold the `gProperties[]` index. |
+| `stock BuyPlayerProperty(playerid, propertyID)` (`src/modules/real.pwn:1332`) | Buys a free personal property into an open player slot. |
+| `stock RentProperty(playerid, propertyID)` (`src/modules/real.pwn:1245`) | Rents a commercial property, applying the 3-day re-rent lock. |
+| `stock SellPlayerProperty(playerid, propertyID)` (`src/modules/real.pwn:1436`) | Sells a personal property back for 90% of its cost. |
+| `stock SpawnPropertyInterior(playerid, arrayID)` / `DestroyPropertyInterior(playerid)` (`src/modules/real.pwn:1067`, `:1133`) | Creates/tears down the generic generated-room interior. |
+| `stock SpawnPlayerAtProperty(playerid)` (`src/modules/real.pwn:1152`) | Moves a player to their configured property spawn point; thin wrapper over the lookup below. |
+| `stock GetPlayerPropertySpawnPos(playerid, &Float:x, &Float:y, &Float:z)` (`src/modules/real.pwn:1168`) | Resolves that spawn point's coordinates **without** moving anyone, so `ApplyPlayerSpawnInfo` can hand them to the client before it spawns. |
+| `stock AttachVehicleToProperty(playerid, propertyid)` / `RespawnPropertyVehicle` (`src/modules/real.pwn:2152`, `:2128`) | Assigns/respawns the vehicle parked at a property's vehicle point. |
+| `stock EditProperty(playerid)` (`src/modules/real.pwn:1639`) | Admin editor: saves a new or edited property record and its coordinates. |
+| `stock CheckRealEstatePickup(playerid, pickupid)` (`src/modules/real.pwn:1868`) | Central pickup dispatcher covering every `PropertyPoint` type (offer, entrance, exit, health, black market, shirt, drugz, info). |
+| `stock SavePropertySkin` / `SelectPropertySkin` / `DeletePropertySkin` (`src/modules/real.pwn:2275`, `:2334`, `:2359`) | Manage up to 5 outfits saved per personal property. Wearing one (`SelectPropertySkin`) goes through `SetPlayerSkinEx`, so the choice is **permanent** — it survives respawns and is persisted to `users.class`. |
 
 ## Commands
 

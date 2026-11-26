@@ -6,9 +6,9 @@ The central per-player data module for the whole gamemode: defines the `Player` 
 
 ## Overview
 
-`player.pwn` is included early in `src/support/includes.pwn` (right after the racing/deathmatch modules, before every other gameplay module) specifically so that the `Player` enum and `gPlayers[]` array exist before `team`, `auth`, `real`, `taxi`, `combat`, `tutorial`, `bribe`, `tow`, and `npcs` are pulled in — several of those files (`real.pwn`, `race.pwn`, `trucking.pwn`, `taxi.pwn`, `tow.pwn`, `bribe.pwn`, `rampage.pwn`) are in turn `#include`d from *inside* this file (lines 638–639, 1022–1028), so `player.pwn` effectively anchors the middle of the whole include graph rather than being a self-contained module.
+`player.pwn` is included early in `src/support/includes.pwn` (right after the racing/deathmatch modules, before every other gameplay module) specifically so that the `Player` enum and `gPlayers[]` array exist before `team`, `auth`, `real`, `taxi`, `combat`, `quest`, `bribe`, `tow`, and `npcs` are pulled in — several of those files (`real.pwn`, `race.pwn`, `trucking.pwn`, `taxi.pwn`, `tow.pwn`, `bribe.pwn`, `rampage.pwn`) are in turn `#include`d from *inside* this file (lines 638–639, 1022–1028), so `player.pwn` effectively anchors the middle of the whole include graph rather than being a self-contained module.
 
-The player lifecycle is: connect → `ResetPlayerState` clears all per-player minigame/session flags → the auth module (`modules/auth.pwn`) logs the player in → `LoadPlayerData` pulls the `users`/`drugz`/`tutorials` rows for that nickname into `gPlayers[]` and applies them (health, armour, skin, team, wanted level, color) → gameplay happens, with most modules mutating `gPlayers[playerid][...]` directly → `SavePlayerData` persists cash/bank/admin level/wanted/team/skin/health/armour/spawn/properties/locale/playtime plus the drug inventory and tutorial-progress rows back to SQLite. `BatchSavePlayerData` (a periodic timer) calls `SavePlayerData` for every connected, logged-in player as an autosave.
+The player lifecycle is: connect → `ResetPlayerState` clears all per-player minigame/session flags → the auth module (`modules/auth.pwn`) logs the player in → `LoadPlayerData` pulls the `users`/`drugz` rows for that nickname into `gPlayers[]` and applies them (health, armour, skin, team, wanted level, color) → gameplay happens, with most modules mutating `gPlayers[playerid][...]` directly → `SavePlayerData` persists cash/bank/admin level/wanted/team/skin/health/armour/spawn/properties/locale/playtime/HD layout plus the drug inventory back to SQLite. `BatchSavePlayerData` (a periodic timer) calls `SavePlayerData` for every connected, logged-in player as an autosave.
 
 Three other periodic timers live here: `SendPlayerSalary` (team-based income, skipped for AFK players), `UpdatePlayerPlayTime` (accrues `PlayTime`), and `UpdatePlayerScore` (mirrors `GetPlayerMoney` into the scoreboard via `SetPlayerScore`) — see the Notes section for a bug affecting the latter two.
 
@@ -20,7 +20,7 @@ Three other periodic timers live here: `SendPlayerSalary` (team-based income, sk
 
 `SpawnPlayer()` places a player wherever their *spawn info* says. This gamemode spawns players directly from `OnPlayerConnect` rather than through class selection, so without explicit spawn info the client has none to work from and lands at `(0.0, 0.0, 3.1)` — the void near Blueberry Acres. `OnPlayerSpawn` then teleporting them out with `SetPlayerPos` races the client's own spawn placement and only sometimes wins.
 
-`ApplyPlayerSpawnInfo(playerid)` closes that off: it resolves the destination up front — the player's spawn-point property via `GetPlayerPropertySpawnPos` (`modules/real.pwn`), else `SPAWN_DEFAULT_X/Y/Z` (`src/modules/player.pwn:19`, the LV default also used by `OnPlayerSpawn`) — and hands it to the client with `SetSpawnInfo`, preserving the player's current team and skin. It is called before every `SpawnPlayer()` that matters: connect (`main.pwn`), login and registration (`modules/auth.pwn`), and the respawn fallback here. `OnGameModeInit` also registers one `AddPlayerClass` (`src/main.pwn:54`), which SA-MP requires before any spawn info is meaningful.
+`ApplyPlayerSpawnInfo(playerid)` closes that off: it resolves the destination up front — the player's spawn-point property via `GetPlayerPropertySpawnPos` (`modules/real.pwn`), else `SPAWN_DEFAULT_X/Y/Z` (`src/modules/player.pwn:12`, the LV default also used by `OnPlayerSpawn`) — and hands it to the client with `SetSpawnInfo`, preserving the player's current team and skin. It is called before every `SpawnPlayer()` that matters: connect (`main.pwn`), login and registration (`modules/auth.pwn`), and the respawn fallback here. `OnGameModeInit` also registers one `AddPlayerClass` (`src/main.pwn:60`), which SA-MP requires before any spawn info is meaningful.
 
 The respawn path after a death is:
 
@@ -37,7 +37,7 @@ Health is deliberately **not** restored in `OnPlayerDeath` — doing so while th
 `SPAWN_DETACH_RETRIES` (5) bounds the detach-and-retry loop for a player who died in a vehicle: death does not fire `OnPlayerExitVehicle`, so they stay attached server-side, and a dead player cannot be removed from a vehicle at all — an unbounded retry would never spawn them.
 
 !!! note "Debug tracing"
-    `DEBUG_SPAWN` (`src/support/includes.pwn:39`) gates `[spawn]` trace lines on `OnPlayerRequestClass`, `OnPlayerRequestSpawn`, `OnPlayerSpawn`, `OnPlayerDeath` and `SpawnPlayerDelayed`, printing playerid, player state and position. Set it to `false` to silence them.
+    The temporary `[spawn]` trace lines (and their `DEBUG_SPAWN` switch) are gone now that the spawn handshake is fixed. What debug output is left — `DebugPrint()` and the `[wanted]` line in `RaisePlayerWantedLevel` — is behind `DEBUG_ENABLED` (`src/support/includes.pwn:42`), which is off unless the build turns it on with `make build DEBUG=1` or `make tests DEBUG=1`.
 
 ### Changing a player's skin
 
@@ -51,18 +51,18 @@ A skin lives in three places, and they drift apart silently if you set only one:
 
 `SetPlayerSkinEx(playerid, skinid)` sets all three and is what every skin change should call. Setting only the live ped means the skin is reverted by the next respawn and never reaches the database — which is exactly what `SetPlayerTeamEx` used to do, so a team skin looked right until the player next died.
 
-Current call sites: `SetPlayerTeamEx` (team skin, `src/modules/player.pwn:1628` — invoked *after* `SetPlayerTeam` so the spawn-info refresh carries the new team), `SelectPropertySkin` (property wardrobe, `src/modules/real.pwn:2225`), `/skin` (`src/support/dcmd.pwn`), and the admin skin dialog (`src/support/response.pwn`).
+Current call sites: `SetPlayerTeamEx` (team skin, `src/modules/player.pwn:1865` — invoked *after* `SetPlayerTeam` so the spawn-info refresh carries the new team), `SelectPropertySkin` (property wardrobe, `src/modules/real.pwn:2334`), `/skin` (`src/support/dcmd.pwn`), and the admin skin dialog (`src/support/response.pwn`).
 
 The two remaining bare `SetPlayerSkin` calls — in `OnPlayerSpawn` and `LoadPlayerData` — are *apply* sites that push the already-cached `gPlayers[][Skin]` onto the ped, so they correctly stay as they are.
 
 ## Player Data Model
 
-Every field of the `Player` enum (`src/modules/player.pwn:44`), backing `gPlayers[MAX_PLAYERS][Player]` (`src/modules/player.pwn:114`) — 50 fields in total:
+Every field of the `Player` enum (`src/modules/player.pwn:44`), backing `gPlayers[MAX_PLAYERS][Player]` (`src/modules/player.pwn:114`) — 51 fields in total:
 
 | Field | Type | Purpose |
 |---|---|---|
 | `ID` | int | Declared but not referenced anywhere else in the codebase (appears vestigial). |
-| `OrmID` | int | The row id of this player's `users` table record; used as the FK for `drugz`, `tutorials`, `high_scores`, `black_market_items`. |
+| `OrmID` | int | The row id of this player's `users` table record; used as the FK for `drugz`, `quests`, `high_scores`, `black_market_items`. |
 | `Name[MAX_PLAYER_NAME]` | string | Cached nickname, used as the `WHERE nickname = ...` key for DB lookups. |
 | `PasswordHash[65]` | string | Stored password hash for the auth system (`modules/auth.pwn`). |
 | `PasswordSalt[17]` | string | Per-account salt paired with `PasswordHash`. |
@@ -77,10 +77,11 @@ Every field of the `Player` enum (`src/modules/player.pwn:44`), backing `gPlayer
 | `WantedLevel` | int | Police wanted stars; mirrors `SetPlayerWantedLevel`/`GetPlayerWantedLevel`, incremented by `radar.pwn`'s `HandleCarKill`. |
 | `SpawnPoint` | int | Id of the player's selected spawn location. |
 | `Locale` | `PlayerLocale:` | `LOCALE_EN`/`LOCALE_CZ` — selects which row of `gI18nMessages` is used. See [Localization](../localization.md). |
+| `HDVersion` | bool | Player runs the HD (widescreen) GTA SA; picks the narrower clock TextDraw (`ShowPlayerClock`). Toggled by `/hd`, persisted to `users.hd_version`. |
 | `IsLogged` | bool | True after successful login/registration; gates autosave inclusion and most gameplay. |
 | `AFK` | bool | Away-from-keyboard flag; excludes the player from `SendPlayerSalary` payouts. |
 | `Hidden` | bool | Toggled by `/hide` (admin-only); alpha-fades the player's blip color. |
-| `Spectating` | bool | True while the player is in spectate mode. |
+| `Spectating` | bool | True while the player is in spectate mode; the target and return point are in `gSpectate[]` (see `StartSpectating`). |
 | `Jailed` | bool | Declared but not referenced anywhere else in the codebase (appears vestigial). |
 | `InsideProperty` | bool | True while inside an owned/rented real-estate interior; blocks `/dwarp`, `/port`, etc. |
 | `EditingMode` | bool | True while an admin is in one of the coordinate-recording editors; routes `KEY_NO` in `HandlePlayerKeyStateChange`. |
@@ -95,7 +96,6 @@ Every field of the `Player` enum (`src/modules/player.pwn:44`), backing `gPlayer
 | `OnDeathGunsTimer[11]` | `Timer:`[] | Pending "regive weapon after death" timer handles, one slot per weapon (see `GivePlayerWeaponEx`). |
 | `LoginTimer` | `Timer:` | Handle for the login/registration timeout timer. |
 | `PlayTimeTimer` | `Timer:` | Handle for the player's play-time accrual timer. |
-| `TutorialStats[Tutorial]` | nested struct | Onboarding-checklist progress (rented/bought property, races finished, joined team, trucking/taxi missions done, sent a PM, bank deposit made, deathmatch played); persisted to the `tutorials` table. |
 | `ClickedPlayerID` | int | Last player id selected via an online-player-list dialog. |
 | `PMTargetID` | int | Target playerid for a pending `/pm`-style dialog flow. |
 | `PropertyOwnedID` | int | Currently selected/owned property id in the real-estate dialog flow. |
@@ -116,27 +116,29 @@ Every field of the `Player` enum (`src/modules/player.pwn:44`), backing `gPlayer
 
 | Function | Description |
 |---|---|
-| `stock LoadPlayerData(playerid)` (`src/modules/player.pwn:197`) | Loads `users`, `drugz`, and `tutorials` rows for a logged-in player into `gPlayers[]` and applies them to the live player (health, skin, team, wanted, color). |
-| `stock SavePlayerData(playerid)` (`src/modules/player.pwn:339`) | Persists cash/bank/admin/wanted/team/skin/health/armour/spawn/properties/locale/playtime plus drug inventory and tutorial stats back to SQLite. |
-| `public BatchSavePlayerData()` (`src/modules/player.pwn:174`) | Periodic autosave — calls `SavePlayerData` for every connected, logged-in player. |
-| `public SendPlayerSalary()` (`src/modules/player.pwn:461`) | Periodic team-based income payout, skipping AFK players. |
-| `public UpdatePlayerPlayTime()` (`src/modules/player.pwn:503`) | Periodic accrual of `PlayTime` for connected, logged-in players. |
-| `public UpdatePlayerScore()` (`src/modules/player.pwn:518`) | Periodic scoreboard sync (`SetPlayerScore` from `GetPlayerMoney`). |
-| `public GivePlayerWeaponEx(playerid, timerid, weaponid, ammo)` (`src/modules/player.pwn:190`) | Timer callback that (re)gives a weapon after a death-related delay and clears the matching `OnDeathGunsTimer` slot. |
-| `stock ExtractPropperties(input[], properties[])` (`src/modules/player.pwn:316`) | Parses the comma-separated `users.properties` string back into an int array. |
-| `stock OnPlayerPrivMsg(playerid, receiverid, text[])` (`src/modules/player.pwn:533`) | Sends a `/pm`, charging the sender $10 and playing tones/gametext on both ends. |
-| `stock MovePlayerToPlayer(playerid, targetid, reversed)` (`src/modules/player.pwn:590`) | Admin teleport helper — warps one player (or their vehicle) to another, blocked during deathmatch/combat. |
-| `stock SetPlayerVehicleNitro(playerid, targetid)` (`src/modules/player.pwn:648`) | Admin helper that installs a NoS component on a target's vehicle. |
-| `stock DepositMoneyToBankAccount(playerid, amount)` / `WithdrawMoneyFromBankAccount` (`src/modules/player.pwn:704,724`) | Implements `/bank depo`/`/bank draw`, moving funds between `Cash` (via `GivePlayerMoney`) and `Bank`. |
-| `stock ProcessDealOffer(playerid)` / `CleanDealCounterparts` (`src/modules/player.pwn:744,791`) | Executes an accepted dealer-to-player drug sale (money + inventory transfer) and clears both sides' deal-selection fields. |
-| `stock ProcessBlackMarketOffer(playerid, listitem)` (`src/modules/player.pwn:794`) | Buys a listed black-market offer, crediting the seller's bank (even if offline) and the buyer's drug inventory. |
-| `stock ProcessNewBlackMarketOffer(playerid)` (`src/modules/player.pwn:878`) | Lists a new black-market sell offer from the player's own drug inventory. |
-| `stock bool: IsPlayerInTeam(playerid, teamid)` (`src/modules/player.pwn:907`) | Convenience check against `gPlayers[][TeamID]`. |
-| `stock ApplyPlayerSpawnInfo(playerid)` (`src/modules/player.pwn:926`) | Resolves where the player should appear (their spawn-point property, else the `SPAWN_DEFAULT_*` position) and hands it to the client via `SetSpawnInfo` **before** spawning. See [Spawning and respawning](#spawning-and-respawning). |
-| `stock SetPlayerSkinEx(playerid, skinid)` (`src/modules/player.pwn:941`) | The only correct way to change a skin: updates the live ped, the cached `gPlayers[][Skin]`, **and** the client's spawn info. See [Changing a player's skin](#changing-a-players-skin). |
-| `public SpawnPlayerDelayed(playerid)` (`src/modules/player.pwn:951`) | Fallback respawn timer. Skips a player who is already alive, bounds its detach-and-retry loop, and applies spawn info before calling `SpawnPlayer`. |
-| `stock HandlePlayerKeyStateChange(playerid, newkeys, oldkeys)` (`src/modules/player.pwn:1016`) | Central special-key dispatcher for minigame shortcuts and every admin coordinate editor's "record position" key. |
-| `stock ResetPlayerState(playerid)` (`src/modules/player.pwn:1577`) | Resets all per-session minigame/editor flags on connect (auth, deathmatch, drug mission, trucking, towing, racing, combat, taxi, locale, NPC recording). |
+| `stock LoadPlayerData(playerid)` (`src/modules/player.pwn:162`) | Loads `users` and `drugz` rows for a logged-in player into `gPlayers[]` and applies them to the live player (health, skin, team, wanted, color). |
+| `stock SavePlayerData(playerid)` (`src/modules/player.pwn:279`) | Persists cash/bank/admin/wanted/team/skin/health/armour/spawn/properties/locale/playtime/hd_version plus drug inventory back to SQLite. |
+| `public BatchSavePlayerData()` (`src/modules/player.pwn:130`) | Periodic autosave — calls `SavePlayerData` for every connected, logged-in player. |
+| `public SendPlayerSalary()` (`src/modules/player.pwn:374`) | Periodic team-based income payout, skipping AFK players. |
+| `public UpdatePlayerPlayTime()` (`src/modules/player.pwn:416`) | Periodic accrual of `PlayTime` for connected, logged-in players. |
+| `public UpdatePlayerScore()` (`src/modules/player.pwn:431`) | Periodic scoreboard sync (`SetPlayerScore` from `GetPlayerMoney`). |
+| `public GivePlayerWeaponEx(playerid, timerid, weaponid, ammo)` (`src/modules/player.pwn:155`) | Timer callback that (re)gives a weapon after a death-related delay and clears the matching `OnDeathGunsTimer` slot. |
+| `stock ExtractPropperties(input[], properties[])` (`src/modules/player.pwn:256`) | Parses the comma-separated `users.properties` string back into an int array. |
+| `stock OnPlayerPrivMsg(playerid, receiverid, text[])` (`src/modules/player.pwn:448`) | Sends a `/pm`, charging the sender $10 and playing tones/gametext on both ends. |
+| `stock MovePlayerToPlayer(playerid, targetid, reversed)` (`src/modules/player.pwn:507`) | Admin teleport helper — warps one player (or their vehicle) to another, blocked during deathmatch/combat. |
+| `stock StartSpectating(playerid, targetid)` / `StopSpectating(playerid)` (`src/modules/player.pwn:625,675`) | Admin spectating for `/spectate` and the clicked-player menu. Start remembers where the admin is (`gSpectate[]`) and switches an admin who is already spectating over to the new target; it is blocked while the admin is in a minigame. Stop points the spawn info at that spot, and `FinishSpectateReturn` (called from `OnPlayerSpawn`) puts back the admin's interior and their usual spawn info. |
+| `stock AimSpectateCamera(playerid)` / `public UpdateSpectators()` (`src/modules/player.pwn:603,759`) | Moves the spectator into the target's interior and world, then points the camera at the target, or at their vehicle if they are in one. `OnPlayerStateChange` re-aims every spectator of a player who gets into or out of a vehicle or respawns (`AimSpectatorsOf`). `OnPlayerDisconnect` ends spectating of a player who leaves (`StopSpectatorsOf`). The 1 s `UpdateSpectators` timer re-aims any camera whose target changed interior or vehicle, or is no longer streamed in. |
+| `stock SetPlayerVehicleNitro(playerid, targetid)` (`src/modules/player.pwn:786`) | Admin helper that installs a NoS component on a target's vehicle. |
+| `stock DepositMoneyToBankAccount(playerid, amount)` / `WithdrawMoneyFromBankAccount` (`src/modules/player.pwn:831,853`) | Implements `/bank depo`/`/bank draw`, moving funds between `Cash` (via `GivePlayerMoney`) and `Bank`. |
+| `stock ProcessDealOffer(playerid)` / `CleanDealCounterparts` (`src/modules/player.pwn:873,933`) | Executes an accepted dealer-to-player drug sale (money + inventory transfer) and clears both sides' deal-selection fields. |
+| `stock ProcessBlackMarketOffer(playerid, listitem)` (`src/modules/player.pwn:947`) | Buys a listed black-market offer, crediting the seller's bank (even if offline) and the buyer's drug inventory. |
+| `stock ProcessNewBlackMarketOffer(playerid)` (`src/modules/player.pwn:1031`) | Lists a new black-market sell offer from the player's own drug inventory. |
+| `stock bool: IsPlayerInTeam(playerid, teamid)` (`src/modules/player.pwn:1060`) | Convenience check against `gPlayers[][TeamID]`. |
+| `stock ApplyPlayerSpawnInfo(playerid)` (`src/modules/player.pwn:1079`) | Resolves where the player should appear (their spawn-point property, else the `SPAWN_DEFAULT_*` position) and hands it to the client via `SetSpawnInfo` **before** spawning. See [Spawning and respawning](#spawning-and-respawning). |
+| `stock SetPlayerSkinEx(playerid, skinid)` (`src/modules/player.pwn:1094`) | The only correct way to change a skin: updates the live ped, the cached `gPlayers[][Skin]`, **and** the client's spawn info. See [Changing a player's skin](#changing-a-players-skin). |
+| `public SpawnPlayerDelayed(playerid)` (`src/modules/player.pwn:1104`) | Fallback respawn timer. Skips a player who is already alive, bounds its detach-and-retry loop, and applies spawn info before calling `SpawnPlayer`. |
+| `stock HandlePlayerKeyStateChange(playerid, newkeys, oldkeys)` (`src/modules/player.pwn:1195`) | Central special-key dispatcher for minigame shortcuts and every admin coordinate editor's "record position" key. |
+| `stock ResetPlayerState(playerid)` (`src/modules/player.pwn:1791`) | Resets all per-session minigame/editor flags on connect (auth, deathmatch, drug mission, trucking, towing, racing, combat, taxi, locale, HD layout, NPC recording, spectating). |
 
 ## Commands
 
@@ -144,12 +146,12 @@ Several commands surfaced elsewhere in `dcmd.pwn` call directly into this file: 
 
 ## Data & Integration
 
-- **`gPlayers[]`:** this file defines the array and touches essentially every field at some point (see the Player Data Model table above); it is the canonical read/write site for `IsLogged`, `Cash`/`Bank`, `Drugs[]`, `Properties[]`, `TutorialStats`, and all of the transient dialog-flow fields (`ClickedPlayerID`, `SelectedDrugID`, `NewRaceID`, etc).
-- **Database tables:** `users` (core profile — cash, bank, adminlvl, wanted, team, class/skin, health, armour, spawn, properties, locale, playtime), `drugz` (per-player drug inventory, upserted via `ON CONFLICT`), `tutorials` (onboarding progress, upserted), `black_market_items` (inserted/deleted by the black-market offer functions). See [Database Schema](../database.md).
-- **Calls into / called from:** `modules/drugz.pwn` (drug catalog/pickups and the Drug Mission — included *after* `gPlayers[]` is declared), `modules/team.pwn` (`gTeams[]`, `TEAM_*` constants), `modules/tutorial.pwn` (`Tutorial` enum), `modules/real.pwn`, `modules/race.pwn`, `modules/trucking.pwn`, `modules/taxi.pwn`, `modules/tow.pwn`, `modules/bribe.pwn`, `modules/rampage.pwn`, and `modules/deathmatch.pwn`/`modules/combat.pwn` (all `#include`d from inside this file). `support/i18n.pwn` for every localized message. `radar.pwn`'s `HandleCarKill` reads/writes `WantedLevel`.
+- **`gPlayers[]`:** this file defines the array and touches essentially every field at some point (see the Player Data Model table above); it is the canonical read/write site for `IsLogged`, `Cash`/`Bank`, `Drugs[]`, `Properties[]`, and all of the transient dialog-flow fields (`ClickedPlayerID`, `SelectedDrugID`, `NewRaceID`, etc).
+- **Database tables:** `users` (core profile — cash, bank, adminlvl, wanted, team, class/skin, health, armour, spawn, properties, locale, playtime, hd_version), `drugz` (per-player drug inventory, upserted via `ON CONFLICT`), `black_market_items` (inserted/deleted by the black-market offer functions). See [Database Schema](../database.md).
+- **Calls into / called from:** `modules/drugz.pwn` (drug catalog/pickups and the Drug Mission — included *after* `gPlayers[]` is declared), `modules/team.pwn` (`gTeams[]`, `TEAM_*` constants), `modules/quest.pwn` (`FireQuestEvent`, included at line 473 so the PM/bank/team handlers can reach it), `modules/real.pwn`, `modules/race.pwn`, `modules/trucking.pwn`, `modules/taxi.pwn`, `modules/tow.pwn`, `modules/bribe.pwn`, `modules/rampage.pwn`, and `modules/deathmatch.pwn`/`modules/combat.pwn` (all `#include`d from inside this file). `support/i18n.pwn` for every localized message. `radar.pwn`'s `HandleCarKill` reads/writes `WantedLevel`.
 
 ## Notes
 
 - `ExtractPropperties` (note the typo, kept as-is since it's the real function name) assumes exactly `MAX_PLAYER_PROPERTIES` comma-separated tokens in the stored string; a malformed `users.properties` value could read past the array via the `token1`/`token2` split loop.
 - `ID` and `Jailed` are declared on the `Player` enum but have no other reference anywhere in `src/` — both appear to be unused/vestigial fields.
-- The Drug Mission (`ToggleDrugMission`, `CheckDrugzPickup`, `UpdateDrugMissionInfoText`) no longer lives here — it moved to [`drugz.pwn`](drugz.md) alongside the rest of the drug economy. `UpdateBlackMarketRatio` is the one drug function still defined in this file.
+- The Drug Mission (`ToggleDrugMission`, `CheckDrugzPickup`, `UpdateDrugMissionInfoText`) no longer lives here — it moved to [`drugz.pwn`](drugz.md) alongside the rest of the drug economy, and `UpdateBlackMarketRatio` has followed it there. The deal and black-market offer functions above are the drug code still defined in this file.

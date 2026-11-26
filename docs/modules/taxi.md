@@ -31,16 +31,17 @@ Reaching that checkpoint (`CheckTaxiMissionCheckpoint`, invoked from the main pi
 
 | Function | Description |
 |---|---|
-| `public EnterVehicleTimer(npcid)` (`src/modules/taxi.pwn:67`) | Scripts the waiting customer NPC into the player's stopped taxi. |
-| `public CheckTaxiVehicle(playerid)` (`src/modules/taxi.pwn:109`) | 1.5s watchdog: aborts the checkpoint/marks the vehicle if the player isn't in their taxi. |
-| `public CheckTaxiNearNPC(playerid)` (`src/modules/taxi.pwn:132`) | 2s watchdog: triggers NPC pickup once the taxi is stationary near the customer. |
-| `public CheckNPCInVehicle(playerid)` (`src/modules/taxi.pwn:169`) | Confirms the NPC boarded before generating the drop-off checkpoint. |
-| `stock CheckTaxiMissionCheckpoint(playerid)` (`src/modules/taxi.pwn:211`) | Checkpoint-reached handler: pays commission and starts the next leg. |
-| `stock SetTaxiMissionCheckpoint(playerid)` / `SetTaxiMissionCustomerPos(playerid)` (`src/modules/taxi.pwn:245`, `:358`) | Roll a random destination / customer spawn point for the current area. |
-| `stock SetTaxiMissionCustomer(playerid)` (`src/modules/taxi.pwn:454`) | Creates the customer NPC on first use, or repositions the existing one. |
-| `stock SetPlayerTaxiMission(playerid, areaid)` (`src/modules/taxi.pwn:516`) | Starts/aborts a taxi mission for the given area. |
-| `stock AbortPlayerTaxiMission(playerid)` (`src/modules/taxi.pwn:565`) | Cleans up timers/NPC/textdraw and saves the run's score. |
-| `stock SaveTaxiMissionScore(playerid)` (`src/modules/taxi.pwn:605`) | Writes the completed-fare count to `high_scores`. |
+| `public EnterVehicleTimer(npcid)` (`src/modules/taxi.pwn:79`) | Scripts the waiting customer NPC into the player's stopped taxi. |
+| `public CheckTaxiVehicle(playerid)` (`src/modules/taxi.pwn:124`) | 1.5s watchdog: aborts the checkpoint/marks the vehicle if the player isn't in their taxi. |
+| `public CheckTaxiNearNPC(playerid)` (`src/modules/taxi.pwn:147`) | 2s watchdog: triggers NPC pickup once the taxi is stationary near the customer. |
+| `public CheckNPCInVehicle(playerid)` (`src/modules/taxi.pwn:184`) | Confirms the NPC boarded before generating the drop-off checkpoint. |
+| `stock CheckTaxiMissionCheckpoint(playerid)` (`src/modules/taxi.pwn:226`) | Checkpoint-reached handler: pays commission and starts the next leg. |
+| `stock SetTaxiMissionCheckpoint(playerid)` / `SetTaxiMissionCustomerPos(playerid)` (`src/modules/taxi.pwn:261`, `:373`) | Roll a random destination / customer spawn point for the current area. |
+| `stock SetTaxiMissionCustomer(playerid)` (`src/modules/taxi.pwn:466`) | Creates the customer NPC on first use, or repositions the existing one. |
+| `stock SetPlayerTaxiMission(playerid, areaid)` (`src/modules/taxi.pwn:528`) | Starts/aborts a taxi mission for the given area. |
+| `stock AbortPlayerTaxiMission(playerid)` (`src/modules/taxi.pwn:577`) | Stops every mission timer, including the two only some moments have running (the check that the customer has got in, and the one that lets them out; left running, the first would set a new destination every two seconds of the next mission), destroys the customer NPC and the textdraw, and saves the run's score. |
+| `stock StopTaxiTimer(&timerid)` (`src/modules/taxi.pwn:60`) | Kills a mission timer and forgets its id, so a remembered id cannot later stop whichever timer the server has since given that id. Used for every taxi timer. |
+| `stock SaveTaxiMissionScore(playerid)` (`src/modules/taxi.pwn:623`) | Writes the completed-fare count to `high_scores`. |
 
 ## Commands
 
@@ -53,4 +54,5 @@ Reads/writes `gPlayers[playerid][InMinigame]`, `Locale` (for localized strings),
 ## Notes
 
 - The NPC-slot scan in `SetTaxiMissionCustomer` hardcodes a 25-slot buffer (`new npcs[25]`) rather than reusing a shared constant, unlike `rampage.pwn`'s 128-slot scans.
+- The phone's "Call Taxi" is not part of this mission. It navigates the caller to the nearest stop of the ambient NPC taxis so they can ride along as a passenger. See [taxistop.md](taxistop.md).
 - README lists "NPC drivers... 5x Taxi driver per big city (WIP)" — that refers to the ambient driver NPCs in `modules/npcs.pwn`, not the mission-customer logic documented here.

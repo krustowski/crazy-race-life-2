@@ -9,7 +9,7 @@ An animation-driven pizza delivery minigame for the Pizzaboyz team: pick up a pi
 
 ## Overview
 
-There is no command. The minigame is bound to `KEY_SUBMISSION` in `HandlePlayerKeyStateChange` (`src/modules/player.pwn:1116`), behind an `IsPlayerInTeam(playerid, TEAM_PIZZAGUYS)` check — the same key that starts trucking, taxi and tow work for their respective teams. Pressing it starts a delivery, or aborts one already in progress.
+There is no command. The minigame is bound to `KEY_SUBMISSION` in `HandlePlayerKeyStateChange` (`src/modules/player.pwn:1272`), behind an `IsPlayerInTeam(playerid, TEAM_PIZZAGUYS)` check — the same key that starts trucking, taxi and tow work (of those, only taxi missions are tied to a team, see [Teams](team.md)). Pressing it starts a delivery, or aborts one already in progress.
 
 State lives in `gPizzaMission[MAX_PLAYERS][PizzaMission]`: an `Active` flag, the customer `NPCid`, the current `DeliveryState`, one reused `DeliveryTimer` handle, and the customer's position.
 
@@ -65,12 +65,12 @@ It previously re-rolled a random LS point **up to 250 times** hoping to land nea
 | `public Pizza_OnPizzaHandover(playerid)` (`src/modules/pizza.pwn:137`) | Give/thank animation pair. |
 | `public Pizza_OnPizzaReleased(playerid)` (`src/modules/pizza.pwn:157`) | Detaches the box, pays/eats animation pair. |
 | `public Pizza_OnPizzaFinished(playerid)` (`src/modules/pizza.pwn:179`) | Final stage — currently only unfreezes the player. |
-| `stock Pizza_SetMissionCustomer(playerid)` (`src/modules/pizza.pwn:269`) | Allocates and spawns the customer NPC, then positions it. |
+| `stock Pizza_SetMissionCustomer(playerid)` (`src/modules/pizza.pwn:266`) | Allocates and spawns the customer NPC, then positions it. |
 | `stock Pizza_SetCustomerPos(playerid)` (`src/modules/pizza.pwn:197`) | Picks a nearby LS delivery point in one query and moves the NPC there. |
 
 ## Commands
 
-None. The minigame is key-driven only (`KEY_SUBMISSION`). The in-game phone has a "call pizza" option (`src/support/response.pwn:1022`), but it is gated on `CheckPizzaguysOnline()` — an unimplemented stub in `modules/team.pwn` that always returns 0 — so that path is inert. See [Teams](team.md).
+None. The minigame is key-driven only (`KEY_SUBMISSION`). The in-game phone has a "call pizza" option (`src/support/response.pwn:1002`), but it is gated on `CheckPizzaguysOnline()` — an unimplemented stub in `modules/team.pwn` that always returns 0 — so that path is inert. See [Teams](team.md).
 
 ## Data & Integration
 
@@ -78,7 +78,7 @@ None. The minigame is key-driven only (`KEY_SUBMISSION`). The in-game phone has 
 - **`gPlayers[]`:** touched only via `IsPlayerInTeam` at the key handler. Notably it does **not** set `InMinigame`, so a pizza delivery does not block the player from starting a taxi, trucking or tow mission at the same time.
 - **Calls into:** `modules/npcs.pwn` (`NPC_Create`/`NPC_Spawn`/`NPC_SetPos`/`NPC_SetSkin`/`NPC_Destroy`), `support/helpers.pwn` (`Coords`).
 - **Called from:** `main.pwn`'s `OnPlayerEnterCheckpoint`, and `HandlePlayerKeyStateChange` in `modules/player.pwn`.
-- **Include position:** `src/support/includes.pwn:102`, and again from `modules/player.pwn:1014` (the second include is a no-op — see [Architecture](../architecture.md#include-order-srcsupportincludespwn)).
+- **Include position:** first included from `modules/player.pwn:1164`, which is compiled early because `support/i18n.pwn` pulls `player.pwn` in. The later `#include` at `src/support/includes.pwn:113` is a no-op — see [Architecture](../architecture.md#include-order-srcsupportincludespwn).
 
 ## Incomplete behaviour
 

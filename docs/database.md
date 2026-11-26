@@ -4,7 +4,7 @@ CRL2 persists all game state in a single SQLite database file, `crl2_data.db`, a
 
 ## Migration workflow
 
-- Migration files live in `sql/migrations/`, named `NNNNNN_description.sql` (`000001` through `000009`), each wrapped in `-- +goose up` / `-- +goose Down` markers so the same file carries both the forward migration and its rollback.
+- Migration files live in `sql/migrations/`, named `NNNNNN_description.sql` (`000001` through `000026`), each wrapped in `-- +goose up` / `-- +goose Down` markers so the same file carries both the forward migration and its rollback.
 - Migrations are applied with a vendored [goose](https://github.com/pressly/goose) binary checked into the repo at `utils/goose` (a statically-linked Go executable, not a system-wide install). The `Makefile` target is:
 
   ```make
@@ -15,45 +15,61 @@ CRL2 persists all game state in a single SQLite database file, `crl2_data.db`, a
 - The `run` Makefile target depends on `migrate`, so every deploy (`make run`) applies any pending migrations to `crl2_data.db` before the compiled `.amx` is copied into the server and the container is restarted.
 - A separate `schema` target (`@sqlite3 crl2_data.db '.schema' > sql/base.sql`) can dump the live schema to `sql/base.sql` as a point-in-time snapshot; this file is generated on demand and isn't part of the versioned migration history itself.
 - Migration `000001` (`000001_base.sql`) is a large bootstrap migration (~1500 lines) that both creates almost every table and seeds them with the game's original reference/location data (drug prices, race definitions, trucking points, property listings, ATM coordinates, combat mission layouts, etc.) via `INSERT` statements alongside the `CREATE TABLE IF NOT EXISTS` statements.
-- Several later migrations don't create any table at all — `000003`, `000006`, and `000007` only `INSERT`/`ALTER` existing tables (a new lookup row, a new column, or another new lookup row, respectively).
+- `000010_quests.sql` is the only migration that **drops** a table: it replaces the `tutorials` table (and the `modules/tutorial.pwn` stub that read it) with the four quest tables. Its `Down` half recreates `tutorials` empty — the old progress rows are not recoverable once it has run.
+- `000011_quest_mission_types.sql` creates nothing; it seeds five more `quest_types`/`quest_labels` rows for the tow, drug, rampage, deathmatch-won and combat events that `000010` left without a quest.
+- `000014_rob_quests.sql` creates nothing either; it adds the `QUEST_EVT_PROPERTY_ROBBED` (15) `quest_events` row and three rob quests (5, 50 and 500 robberies).
+- `000022_taxistop_fuel_quests.sql` creates nothing; it adds the `QUEST_EVT_TAXI_STOP_REACHED` (16), `QUEST_EVT_TAXI_RIDE_STOP` (17) and `QUEST_EVT_FUEL_BOUGHT` (18) `quest_events` rows and five quests for the NPC taxi stops and the petrol stations, in all three locales.
+- `000023_commercial_share_quest.sql` creates nothing; it adds the `QUEST_EVT_COMMERCIAL_SHARE` (19) `quest_events` row and the "Rent 100% of commercial properties" quest (target 100, i.e. percent), in all three locales.
+- `000024_fence_sales.sql` creates `fence_sales`, the log of drug sales to the server's [Fence](modules/fence.md), with an index on (`user_id`, `sold_at`) for the rolling hourly limits.
+- `000025_zaza_pickup_sf.sql` creates nothing; it adds one zaza `drug_coords` row south of San Fierro (−1604.23, −1302.11, 56.17).
+- `000026_combat_rockshore_site.sql` creates nothing; it adds combat mission 4, Rockshore Building Site, with its layout: an outdoor mission on the Rockshore East building site whose helicopter flies to the K.A.C.C. Military Fuels helipad. See [`modules/combat.md`](modules/combat.md#missions).
+- `000015_properties_races_rampages.sql` creates nothing; it is a bulk data migration carrying the world data built with the in-game editors since `000014`: 223 properties with their `property_coords` (including the first `BLACK_MARKET_POINT`), races 12–15 with their `race_coords`, and rampages 1–2 with their `rampage_coords` (the same rows as `sql/rampage_dump.sql`). Properties are seeded unowned and unoccupied. Every insert is `INSERT OR IGNORE`, because the production database already holds these rows; there the migration only bumps the version.
+- `000016_combat_sherman_dam.sql` adds `interior` and the `DOOR` target columns (`target_x`/`target_y`/`target_z`/`target_interior`) to `combat_coords` and the `COORD_SPAWN` (10) coord type, moves missions 1 and 2's start positions out of `SetCombatMission` into `SPAWN` rows, and adds combat mission 3, Sherman Dam, with its layout. Its `Down` half drops the columns again (SQLite 3.35+).
+- `000017_properties_followup.sql` creates nothing; like `000015` it seeds world data built in-game, here the three properties added after that snapshot (21601, 21701 Sherman Dam, 21801) with their `property_coords`, unowned and with `INSERT OR IGNORE`, so on the production database it only bumps the version.
+- `000019_taxi_stops.sql` creates `taxi_tracks` and `taxi_stops`: where the ambient NPC taxis stand still for at least 5 s along their recordings. It is generated from `npcmodes/recordings/NPC_TRACK_TAXI_*.rec` by `utils/taxistops/taxi_stops.py`; rerun that rather than editing the rows. See [`modules/taxistop.md`](modules/taxistop.md).
+- Several later migrations don't create any table at all — `000003`, `000006`, `000007`, `000012` and `000013` only `INSERT`/`ALTER` existing tables (a new lookup row, a new column, another new lookup row, another new column, and the Robberz team with its job pickup and high score type, respectively).
+- `000021_truckerz_color.sql` creates nothing; it changes the Truckerz colour from red `FF0000AA` to light magenta `FF66FFAA`, so truckers no longer look like checkpoints on the radar. See [`modules/team.md`](modules/team.md#colours).
 - `000004_locale_types.sql` is the only migration that alters an existing table's constraints: since SQLite's `ALTER TABLE` cannot add a foreign key to an existing table, it adds the `locale` column with a plain `ALTER TABLE`, then copies `users` into `users_copy`, drops `users`, recreates it with the `locale` column *and* its `FOREIGN KEY` clause, and copies the data back.
 
 ## Tables
 
-39 application tables exist across the 9 migrations (plus SQLite's own internal `sqlite_sequence` bookkeeping table, created alongside the rest in `000001` for `AUTOINCREMENT` columns). Grouped by domain:
+46 application tables exist across the 25 migrations (plus SQLite's own internal `sqlite_sequence` bookkeeping table, created alongside the rest in `000001` for `AUTOINCREMENT` columns). Grouped by domain:
 
 ### Users, Auth & Progress
 
 | Table | Columns | Keys | Introduced |
 |---|---|---|---|
-| `users` | `id` INTEGER, `nickname` TEXT NOT NULL, `pwdhash` TEXT NOT NULL, `salt` TEXT NOT NULL, `cash` INTEGER NOT NULL, `bank` INTEGER NOT NULL, `adminlvl` INTEGER NOT NULL, `wanted` INTEGER NOT NULL DEFAULT 0, `team` INTEGER NOT NULL, `class` INTEGER NOT NULL, `health` INTEGER NOT NULL, `armour` INTEGER NOT NULL, `spawn` INTEGER NOT NULL, `properties` TEXT, `locale` INTEGER NOT NULL DEFAULT 0 (added in `000004`), `playtime` INTEGER DEFAULT 0 (added in `000006`) | PK `id` (AUTOINCREMENT); FK `locale` → `locale_types.id` | `000001`; altered `000004`, `000006` |
+| `users` | `id` INTEGER, `nickname` TEXT NOT NULL, `pwdhash` TEXT NOT NULL, `salt` TEXT NOT NULL, `cash` INTEGER NOT NULL, `bank` INTEGER NOT NULL, `adminlvl` INTEGER NOT NULL, `wanted` INTEGER NOT NULL DEFAULT 0, `team` INTEGER NOT NULL, `class` INTEGER NOT NULL, `health` INTEGER NOT NULL, `armour` INTEGER NOT NULL, `spawn` INTEGER NOT NULL, `properties` TEXT, `locale` INTEGER NOT NULL DEFAULT 0 (added in `000004`), `playtime` INTEGER DEFAULT 0 (added in `000006`), `hd_version` INTEGER DEFAULT 0 (added in `000012`) | PK `id` (AUTOINCREMENT); FK `locale` → `locale_types.id` | `000001`; altered `000004`, `000006`, `000012` |
 | `locale_types` | `id` INTEGER, `name` TEXT UNIQUE, `lang_name` TEXT | PK `id` (AUTOINCREMENT) | `000004` |
-| `tutorials` | `id` INTEGER, `user_id` INTEGER NOT NULL UNIQUE, `active` INTEGER DEFAULT 0, `property_rented_count` INTEGER DEFAULT 0, `property_bought_count` INTEGER DEFAULT 0, `race_finished_count` INTEGER DEFAULT 0, `joined_team` INTEGER DEFAULT 0, `trucking_missions_done` INTEGER DEFAULT 0, `taxi_missions_done` INTEGER DEFAULT 0, `sent_pm` INTEGER DEFAULT 0, `deposited_money_to_bank` INTEGER DEFAULT 0, `deathmatch_played` INTEGER DEFAULT 0 | PK `id` (AUTOINCREMENT); FK `user_id` → `users.id` | `000001` |
+| `quest_events` | `id` INTEGER, `name` TEXT UNIQUE | PK `id` (AUTOINCREMENT). Rows mirror the `QuestEvent` enum in `src/modules/quest.pwn` — **ids must agree**, and nothing enforces it. | `000010` |
+| `quest_types` | `id` INTEGER, `event` INTEGER NOT NULL, `target` INTEGER NOT NULL DEFAULT 1, `reward` INTEGER NOT NULL DEFAULT 0, `seq_no` INTEGER NOT NULL DEFAULT 0, `active` INTEGER NOT NULL DEFAULT 1 | PK `id` (AUTOINCREMENT); FK `event` → `quest_events.id`. 9 quests seeded by `000010`, 5 more by `000011`, 3 by `000014`, 5 by `000022` and 1 by `000023`. | `000010` |
+| `quest_labels` | `id` INTEGER, `quest_type` INTEGER NOT NULL, `locale` INTEGER NOT NULL, `label` TEXT NOT NULL, `desc` TEXT NOT NULL | PK `id` (AUTOINCREMENT); FK `quest_type` → `quest_types.id`, `locale` → `locale_types.id`; UNIQUE (`quest_type`, `locale`) | `000010` |
+| `quests` | `id` INTEGER, `user_id` INTEGER NOT NULL, `quest_type` INTEGER NOT NULL, `progress` INTEGER NOT NULL DEFAULT 0, `completed_at` INTEGER | PK `id` (AUTOINCREMENT); FK `user_id` → `users.id`, `quest_type` → `quest_types.id`; UNIQUE (`user_id`, `quest_type`) — the conflict target for the progress upsert | `000010` |
 
 ### Racing & High Scores
 
 | Table | Columns | Keys | Introduced |
 |---|---|---|---|
-| `races` | `id` INTEGER, `name` TEXT, `type` INTEGER, `cost_dollars` INTEGER, `prize_dollars` INTEGER, `start_x`/`start_y`/`start_z` REAL | PK `id`; FK `type` → `race_types.id` | `000001` |
+| `races` | `id` INTEGER, `name` TEXT, `type` INTEGER, `cost_dollars` INTEGER, `prize_dollars` INTEGER, `start_x`/`start_y`/`start_z` REAL | PK `id`; FK `type` → `race_types.id` | `000001`; races 12–15 added by `000015` |
 | `race_types` | `id` INTEGER, `label` TEXT | PK `id` | `000001` |
-| `race_coords` | `id` INTEGER, `race_id` INTEGER, `seq_no` INTEGER, `x`/`y`/`z`/`rot` REAL | PK `id`; FK `race_id` → `races.id` | `000001` |
+| `race_coords` | `id` INTEGER, `race_id` INTEGER, `seq_no` INTEGER, `x`/`y`/`z`/`rot` REAL | PK `id`; FK `race_id` → `races.id` | `000001`; data added by `000015` |
 | `high_scores` | `id` INTEGER, `type` INTEGER, `spec_id` INTEGER, `value` INTEGER NOT NULL, `user_id` INTEGER NOT NULL, `time` INTEGER, `vehicle_model` INTEGER | PK `id`; FK `type` → `high_scores_types.id`, `user_id` → `users.id` | `000001` |
-| `high_scores_types` | `id` INTEGER, `name` TEXT | PK `id`. Rows: `1 TYPE_RACE`, `2 TYPE_DEATHMATCH`, `3 TYPE_MISSON_TAXI`, `4 TYPE_MISSION_TRUCKING`, `5 TYPE_MISSION_COMBAT` (`000001`); `6 TYPE_MISSION_TOW` (`000003`); `7 TYPE_MISSION_RAMPAGE`, `8 TYPE_MISSION_DRUG` (`000008`) | `000001`; data added by `000003`, `000008` |
+| `high_scores_types` | `id` INTEGER, `name` TEXT | PK `id`. Rows: `1 TYPE_RACE`, `2 TYPE_DEATHMATCH`, `3 TYPE_MISSON_TAXI`, `4 TYPE_MISSION_TRUCKING`, `5 TYPE_MISSION_COMBAT` (`000001`); `6 TYPE_MISSION_TOW` (`000003`); `7 TYPE_MISSION_RAMPAGE`, `8 TYPE_MISSION_DRUG` (`000008`); `9 TYPE_MISSION_ROB` (`000013`) | `000001`; data added by `000003`, `000008`, `000013` |
 
 ### Teams & Jobs
 
 | Table | Columns | Keys | Introduced |
 |---|---|---|---|
-| `teams` | `id` INTEGER, `name` TEXT, `color` TEXT, `skins` TEXT, `weapons` TEXT, `ammu` TEXT, `salary_base_dollars` INTEGER NOT NULL, `salary_volatile_dollars` INTEGER NOT NULL, `pickups` TEXT, `menus` TEXT | PK `id` | `000001` |
-| `team_coords` | `id` INTEGER, `team_id` INTEGER NOT NULL, `x`/`y`/`z` REAL | PK `id`; FK `team_id` → `teams.id` | `000001` |
+| `teams` | `id` INTEGER, `name` TEXT, `color` TEXT, `skins` TEXT, `weapons` TEXT, `ammu` TEXT, `salary_base_dollars` INTEGER NOT NULL, `salary_volatile_dollars` INTEGER NOT NULL, `pickups` TEXT, `menus` TEXT | PK `id` | `000001`; row 10 (Robberz) added by `000013`; Truckerz colour changed by `000021` |
+| `team_coords` | `id` INTEGER, `team_id` INTEGER NOT NULL, `x`/`y`/`z` REAL | PK `id`; FK `team_id` → `teams.id` | `000001`; Robberz job pickup added by `000013` |
 
 ### Real Estate & Properties
 
 | Table | Columns | Keys | Introduced |
 |---|---|---|---|
-| `properties` | `id` INTEGER, `type` INTEGER NOT NULL DEFAULT 1, `user_id` INTEGER NOT NULL, `vehicle_id` INTEGER, `name` TEXT NOT NULL, `cost` INTEGER NOT NULL, `occupied` INTEGER DEFAULT 0, `custom_interior` INTEGER DEFAULT 0, `locked_until_timestamp` INTEGER NOT NULL DEFAULT 0 | PK `id`; FK `type` → `property_types.id`, `user_id` → `users.id`, `vehicle_id` → `vehicles.id` | `000001` |
+| `properties` | `id` INTEGER, `type` INTEGER NOT NULL DEFAULT 1, `user_id` INTEGER NOT NULL, `vehicle_id` INTEGER, `name` TEXT NOT NULL, `cost` INTEGER NOT NULL, `occupied` INTEGER DEFAULT 0, `custom_interior` INTEGER DEFAULT 0, `locked_until_timestamp` INTEGER NOT NULL DEFAULT 0 | PK `id`; FK `type` → `property_types.id`, `user_id` → `users.id`, `vehicle_id` → `vehicles.id` | `000001`; data added by `000015` |
 | `property_types` | `id` INTEGER, `name` TEXT UNIQUE | PK `id`. Rows: `1 PROPERTY_PEROSNAL` [sic], `2 PROPERTY_COMMERCIAL` | `000001` |
-| `property_coords` | `id` INTEGER, `property_id` INTEGER NOT NULL, `type` INTEGER, `primary_x`/`primary_y`/`primary_z`/`primary_rot` REAL, `secondary_x`/`secondary_y`/`secondary_z`/`secondary_rot` REAL | PK `id` (AUTOINCREMENT); FK `property_id` → `properties.id`, `type` → `property_coord_types.id` | `000001` |
+| `property_coords` | `id` INTEGER, `property_id` INTEGER NOT NULL, `type` INTEGER, `primary_x`/`primary_y`/`primary_z`/`primary_rot` REAL, `secondary_x`/`secondary_y`/`secondary_z`/`secondary_rot` REAL | PK `id` (AUTOINCREMENT); FK `property_id` → `properties.id`, `type` → `property_coord_types.id` | `000001`; data added by `000015` |
 | `property_coord_types` | `id` INTEGER, `name` TEXT | PK `id`. Rows `1`–`10` (`SPAWN_POINT` ... `SHIRT_POINT`) added in `000001`; row `11 BLACK_MARKET_POINT` added in `000007` | `000001`; data added by `000007` |
 | `property_skins` | `id` INTEGER, `property_id` INTEGER NOT NULL, `skin_id` INTEGER NOT NULL | PK `id` (AUTOINCREMENT); FK `property_id` → `properties.id` | `000001` |
 | `vehicles` | `id` INTEGER, `model` INTEGER, `color1`/`color2` INTEGER, `components` TEXT, `paintjob` INTEGER | PK `id` | `000001` |
@@ -66,7 +82,15 @@ CRL2 persists all game state in a single SQLite database file, `crl2_data.db`, a
 | `trucking_coords` | `id` INTEGER NOT NULL, `type` INTEGER NOT NULL, `x`/`y`/`z`/`rot` REAL NOT NULL, `trucking_id` INTEGER NOT NULL DEFAULT 0 | PK `id`; FK `type` → `trucking_coord_types.id`, `trucking_id` → `trucking_points.id` | `000001` |
 | `trucking_coord_types` | `id` INTEGER UNIQUE NOT NULL, `name` TEXT | no declared PK (has UNIQUE `id`) | `000001` |
 | `trucking_facility_types` | `id` INTEGER, `name` TEXT NOT NULL | PK `id`. Rows: `1 FREIGHT`, `2 GAS_STATION` | `000001` |
+| `gas_stations` | `trucking_id` INTEGER NOT NULL, `fuel`/`capacity` INTEGER NOT NULL (litres), `price` INTEGER NOT NULL ($ per litre) | PK `trucking_id`; FK `trucking_id` → `trucking_points.id`. Seeded for the 19 `GAS_STATION` points ([`modules/fuel.md`](modules/fuel.md)) | `000018` |
 | `truck_type` | `id` INTEGER NOT NULL, `name` TEXT | PK `id`. Rows: `1 FREIGHT`, `2 GAS` | `000001` |
+
+### NPC Taxis
+
+| Table | Columns | Keys | Introduced |
+|---|---|---|---|
+| `taxi_tracks` | `taxi_no` INTEGER NOT NULL (the `NN` of `NPC_TRACK_TAXI_NN_S`, a `gTaxiDriverNPC[]` slot), `segment_no` INTEGER NOT NULL (the `S`, 0–9), `duration_ms` INTEGER NOT NULL | PK (`taxi_no`, `segment_no`). 160 rows, one per recording | `000019` |
+| `taxi_stops` | `id` INTEGER, `taxi_no`/`segment_no` INTEGER NOT NULL, `time_ms` INTEGER NOT NULL (into the segment), `duration_ms` INTEGER NOT NULL (may run on into the next segment), `x`/`y`/`z`/`rot` REAL NOT NULL (the cab's position and heading) | PK `id` (AUTOINCREMENT); FK (`taxi_no`, `segment_no`) → `taxi_tracks`. 182 stops of 5 s or more. Not tied to a property: `modules/taxistop.pwn` pairs each with the nearest commercial property within 40 m when it loads them | `000019` |
 
 ### Drugs & Black Market
 
@@ -79,14 +103,15 @@ CRL2 persists all game state in a single SQLite database file, `crl2_data.db`, a
 | `drug_coords` | `id` INTEGER, `type` INTEGER NOT NULL, `x`/`y`/`z` REAL | PK `id`; FK `type` → `drug_types.id` | `000001` |
 | `black_market_items` | `id` INTEGER, `settler_id` INTEGER NOT NULL, `drug_type` INTEGER NOT NULL, `amount` REAL NOT NULL, `value` REAL NOT NULL | PK `id` (AUTOINCREMENT); FK `settler_id` → `users.id`, `drug_type` → `drug_types.id` | `000005` |
 | `druggery_points` | `id` INTEGER, `x`/`y`/`z` REAL NOT NULL, `note` TEXT | PK `id` (AUTOINCREMENT) | `000009` |
+| `fence_sales` | `id` INTEGER, `user_id` INTEGER NOT NULL, `drug_type` INTEGER NOT NULL, `amount` INTEGER NOT NULL (units), `value` INTEGER NOT NULL (dollars paid), `ratio` REAL NOT NULL (market ratio priced at, before the sale's push-down), `sold_at` INTEGER NOT NULL (unix seconds) | PK `id` (AUTOINCREMENT); FK `user_id` → `users.id`, `drug_type` → `drug_types.id`; index (`user_id`, `sold_at`). One row per sale; the hourly limits sum the last hour, so rows must not be pruned younger than that | `000024` |
 
 ### Combat Missions
 
 | Table | Columns | Keys | Introduced |
 |---|---|---|---|
-| `combat_mission` | `id` INTEGER, `name` TEXT | PK `id`. Rows: `1 Planning Centre`, `2 Biohazard Labs (demo)` | `000001` |
-| `combat_coords` | `id` INTEGER, `type` INTEGER NOT NULL DEFAULT 0, `mission_id` INTEGER, `x`/`y`/`z` REAL NOT NULL | PK `id`; FK `mission_id` → `combat_mission.id`, `type` → `combat_coord_types.id` | `000001` |
-| `combat_coord_types` | `id` INTEGER, `name` TEXT | PK `id`. Rows: `COORD_NULL`, `COORD_BRIEFCASE`, `COORD_NPC`, `COORD_HEALTH`, `COORD_HELI`, `COORD_EXIT`, `COORD_ROOF`, `COORD_CP`, `COORD_NPC_MAN`, `COORD_DOOR` | `000001` |
+| `combat_mission` | `id` INTEGER, `name` TEXT | PK `id`. Rows: `1 Planning Centre`, `2 Biohazard Labs (demo)` (`000001`), `3 Sherman Dam` (`000016`), `4 Rockshore Building Site` (`000026`) | `000001` |
+| `combat_coords` | `id` INTEGER, `type` INTEGER NOT NULL DEFAULT 0, `mission_id` INTEGER, `x`/`y`/`z` REAL NOT NULL, `interior` INTEGER NOT NULL DEFAULT 0, `target_x`/`target_y`/`target_z` REAL, `target_interior` INTEGER | PK `id`; FK `mission_id` → `combat_mission.id`, `type` → `combat_coord_types.id`. `interior` is used by `NPC`, `NPC_MAN` and `SPAWN` rows, the `target_*` columns by `DOOR` rows (NULL: no target) | `000001`; columns added by `000016` |
+| `combat_coord_types` | `id` INTEGER, `name` TEXT | PK `id`. Rows: `COORD_NULL`, `COORD_BRIEFCASE`, `COORD_NPC`, `COORD_HEALTH`, `COORD_HELI`, `COORD_EXIT`, `COORD_ROOF`, `COORD_CP`, `COORD_NPC_MAN`, `COORD_DOOR` (`000001`), `COORD_SPAWN` (`000016`) | `000001` |
 
 ### Police Bribes
 
@@ -98,9 +123,9 @@ CRL2 persists all game state in a single SQLite database file, `crl2_data.db`, a
 
 | Table | Columns | Keys | Introduced |
 |---|---|---|---|
-| `rampages` | `id` INTEGER, `name` TEXT, `location_type` INTEGER NOT NULL | PK `id` (AUTOINCREMENT); FK `location_type` → `rampage_location_types.id` | `000008` |
+| `rampages` | `id` INTEGER, `name` TEXT, `location_type` INTEGER NOT NULL | PK `id` (AUTOINCREMENT); FK `location_type` → `rampage_location_types.id` | `000008`; data added by `000015` |
 | `rampage_location_types` | `id` INTEGER, `name` TEXT | PK `id` (AUTOINCREMENT). Rows: `TYPE_LOCATION_NONE`/`_LV`/`_SF`/`_LS` | `000008` |
-| `rampage_coords` | `id` INTEGER, `rampage_id` INTEGER NOT NULL, `type` INTEGER NOT NULL, `weapon_id` INTEGER, `ammo` INTEGER, `primary_x`/`primary_y`/`primary_z` REAL NOT NULL, `secondary_x`/`secondary_y`/`secondary_z` REAL | PK `id` (AUTOINCREMENT); FK `rampage_id` → `rampages.id`, `type` → `rampage_coord_types.id` | `000008` |
+| `rampage_coords` | `id` INTEGER, `rampage_id` INTEGER NOT NULL, `type` INTEGER NOT NULL, `weapon_id` INTEGER, `ammo` INTEGER, `primary_x`/`primary_y`/`primary_z` REAL NOT NULL, `secondary_x`/`secondary_y`/`secondary_z` REAL | PK `id` (AUTOINCREMENT); FK `rampage_id` → `rampages.id`, `type` → `rampage_coord_types.id` | `000008`; data added by `000015` |
 | `rampage_coord_types` | `id` INTEGER, `name` TEXT | PK `id` (AUTOINCREMENT). Rows: `TYPE_COORD_NONE`/`_PICKUP`/`_NPC_SPAWN`/`_NPC_MOVE`/`_WEAPON_SPAWN`/`_HEALTH_POINT` | `000008` |
 
 ### Prizes & Banking
@@ -113,30 +138,30 @@ CRL2 persists all game state in a single SQLite database file, `crl2_data.db`, a
 
 A couple of the source `CREATE TABLE` statements have minor quirks worth knowing when writing new queries against them: `prize_coords.x`/`y`/`z` are declared `INTEGER` despite storing float coordinates with a `DEFAULT 0.0` (SQLite's dynamic typing means this doesn't actually break anything, but it's inconsistent with every other coordinate table, which uses `REAL`); and `property_types` has a literal typo in its seed data, `PROPERTY_PEROSNAL` instead of `PROPERTY_PERSONAL`.
 
-## `src/db/sql.pwn` — connection bootstrap
+## `src/db/sqlite.pwn` — connection bootstrap
 
-This file is tiny (23 lines) and is the entire database bootstrap layer:
+This file is small and is the entire database bootstrap layer: the connection handle, `InitDB()`, and a few helpers for statements that return no rows.
 
 ```pawn
 new DB: gDbConnectionHandle;
 
-#if !defined _CRL2_TEST_BUILD
-new gDbFile[16] = "crl2_data.db";
+#if defined _CRL2_TEST_BUILD
+new gDbFile[] = "crl2_test.db";
+#else
+new gDbFile[] = "crl2_data.db";
 #endif
 
 stock InitDB()
 {
-#if !defined _CRL2_TEST_BUILD
     gDbConnectionHandle = DB_Open(gDbFile);
     ...
-#else
-    print("[TEST] InitDB stubbed");
-#endif
 }
 ```
 
 - **`gDbConnectionHandle`** (`DB:` handle) is the single global connection handle used by every `DB_ExecuteQuery`/`DB_FreeResultSet` call across the entire codebase — there is no connection pool or per-module handle, just this one global.
-- **`InitDB()`** opens `crl2_data.db` (relative to the server's working directory) via `DB_Open` and prints a success/failure message to the console. It is called once, first, from `main.pwn`'s `OnGameModeInit` (before any other `Init*` function), so every later initializer that queries the database can assume `gDbConnectionHandle` is already set.
-- **`_CRL2_TEST_BUILD`**: when this define is set (used by the `tests` Makefile target, which compiles `tests/run_tests.pwn` instead of `gamemodes/crl2.amx`), `InitDB()` is replaced with a stub that only prints `"[TEST] InitDB stubbed"` and never opens a real SQLite connection or even declares `gDbFile`. This lets the test harness compile and run without a real `crl2_data.db` on disk, at the cost of `gDbConnectionHandle` staying at its default/null value for any test that doesn't set it up separately.
+- **`InitDB()`** opens `crl2_data.db` via `DB_Open`, which open.mp resolves under `scriptfiles/` (so `<server dir>/scriptfiles/crl2_data.db`, not the `crl2_data.db` next to the server binary that `make migrate` runs goose on; it creates an empty database when the file is missing) and prints a success/failure message to the console. It is called once, first, from `main.pwn`'s `OnGameModeInit` (before any other `Init*` function), so every later initializer that queries the database can assume `gDbConnectionHandle` is already set.
+- **`_CRL2_TEST_BUILD`**: when this define is set (by `tests/run_tests.pwn`), `InitDB()` opens `scriptfiles/crl2_test.db` instead. `make tests` deletes that file and rebuilds it from `sql/migrations` with goose before every run, so the tests query the real schema and seed data and never touch live data.
+- **`BeginDBTransaction()` / `CommitDBTransaction()`** wrap a batch of writes in one transaction. Outside a transaction every statement commits on its own and waits for its own disk sync on the main thread, so a loop of writes (the autosave in `SaveRealEstateData()`, `BatchSavePlayerData()`, `SaveGasStationData()`) should be wrapped. `BeginDBTransaction()` returns `false` when a transaction is already open (SQLite cannot nest `BEGIN`), so only the caller that opened it commits, and a nested batch joins the outer one. A failed commit is rolled back, and `CommitDBTransaction()` returns `false` so the caller knows none of the batch reached the disk.
+- **`ExecDBStatement(statement[])`** runs a statement that returns no rows, frees its result and reports whether it succeeded.
 
 `DB_Open`, `DB_ExecuteQuery`, `DB_GetFieldIntByName`, `DB_GetFieldFloatByName`, `DB_GetFieldStringByName`, `DB_SelectNextRow`, `DB_FreeResultSet`, `DB_GetRowCount`, etc. are the SQLite query wrapper natives (`a_mysql`-style API, despite the name, backed by SQLite) supplied by the omp-stdlib dependency — gameplay modules across `src/modules/` and `src/support/` call these directly against `gDbConnectionHandle` to read and write the tables above. This page documents the schema and the connection bootstrap; see the individual [Modules](modules/index.md) pages for what each module actually queries.

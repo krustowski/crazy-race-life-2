@@ -19,16 +19,16 @@ Session state is split across three structures: `gDeathmatch[MAX_PLAYERS][Deathm
 | `public StartDeathmatch()` (`src/modules/deathmatch.pwn:61`) | Fires after the 45s pre-game timer; promotes registered players to active combatants and starts the match timers. |
 | `stock SetDeathmatchPickups()` (`src/modules/deathmatch.pwn:122`) | Spawns the fixed set of health/armour pickups around the arena. |
 | `stock CheckDeathmatchPickups(playerid, pickupid)` (`src/modules/deathmatch.pwn:139`) | Applies full health or armour when a player touches a deathmatch pickup. |
-| `public EndDeathmatch()` (`src/modules/deathmatch.pwn:166`) | Saves the winning score, removes all remaining participants, destroys pickups, and kills timers. |
-| `public UpdateDeathmatchScoreboard()` (`src/modules/deathmatch.pwn:200`) | Per-second tick: recomputes the leaderboard and updates the on-screen textdraw for all in-game players. |
-| `stock SaveScores()` (`src/modules/deathmatch.pwn:275`) | Persists the top scorer's score to `high_scores` (skips if score is 0). |
-| `stock ResetPlayerDeathmatchState(playerid)` (`src/modules/deathmatch.pwn:324`) | Resets weapons/position and issues starting weapons (`30`, `34`) for a match participant. |
-| `stock RegisterToDeathmatch(playerid)` (`src/modules/deathmatch.pwn:335`) | Entry point: registers a player for the next match and starts the pre-game timer if needed. |
-| `stock LeaveDeathmatch(playerid)` (`src/modules/deathmatch.pwn:379`) | Removes a player from an in-progress or pending match and cleans up their gang zone/textdraw. |
+| `public EndDeathmatch()` (`src/modules/deathmatch.pwn:174`) | Saves the winning score, removes all remaining participants, destroys pickups, and kills timers. |
+| `public UpdateDeathmatchScoreboard()` (`src/modules/deathmatch.pwn:217`) | Per-second tick: recomputes the leaderboard and updates the on-screen textdraw for all in-game players. |
+| `stock SaveScores()` (`src/modules/deathmatch.pwn:292`) | Persists the top scorer's score to `high_scores` (skips if score is 0). |
+| `stock ResetPlayerDeathmatchState(playerid)` (`src/modules/deathmatch.pwn:345`) | Resets weapons/position and issues starting weapons (`30`, `34`) for a match participant. |
+| `stock RegisterToDeathmatch(playerid)` (`src/modules/deathmatch.pwn:356`) | Entry point: registers a player for the next match and starts the pre-game timer if needed. |
+| `stock LeaveDeathmatch(playerid)` (`src/modules/deathmatch.pwn:402`) | Removes a player from an in-progress or pending match and cleans up their gang zone/textdraw. |
 
 ## Commands
 
-The `/deathmatch` command (`dcmd_deathmatch`, `src/support/dcmd.pwn:271`) is available to all players and simply opens `ShowDeathmatchOptionsDialog`, whose dialog responses call `RegisterToDeathmatch`/`LeaveDeathmatch` (`src/support/response.pwn`). See [Commands Reference](../commands.md) for full details.
+The `/deathmatch` command (`dcmd_deathmatch`, `src/support/dcmd.pwn:275`) is available to all players and simply opens `ShowDeathmatchOptionsDialog`, whose dialog responses call `RegisterToDeathmatch`/`LeaveDeathmatch` (`src/support/response.pwn`). See [Commands Reference](../commands.md) for full details.
 
 ## Data & Integration
 

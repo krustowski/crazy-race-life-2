@@ -19,7 +19,7 @@ The companion pickup array `gBankPickups[MAX_ATM_PICKUPS]` is declared here but 
 
 ## Commands
 
-The `/bank` command (`dcmd_bank`, `src/support/dcmd.pwn:172`) is available to all players and supports `/bank depo [amount]`, `/bank draw [amount]`, and `/bank balance`. It requires `CheckPlayerBankLocation(playerid)` to succeed before allowing a deposit or withdrawal, and delegates the actual balance changes to `DepositMoneyToBankAccount`/`WithdrawMoneyFromBankAccount` (defined in `src/modules/player.pwn`, not in this file). See [Commands Reference](../commands.md) for full details.
+The `/bank` command (`dcmd_bank`, `src/support/dcmd.pwn:176`) is available to all players and supports `/bank depo [amount]`, `/bank draw [amount]`, and `/bank balance`. It requires `CheckPlayerBankLocation(playerid)` to succeed before allowing a deposit or withdrawal, and delegates the actual balance changes to `DepositMoneyToBankAccount`/`WithdrawMoneyFromBankAccount` (defined in `src/modules/player.pwn`, not in this file). See [Commands Reference](../commands.md) for full details.
 
 ## Data & Integration
 

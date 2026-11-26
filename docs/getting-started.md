@@ -20,6 +20,16 @@ sampctl build
 make build
 ```
 
+The debug output (`DebugPrint()` and a few trace lines) is compiled out by default. To build with it:
+
+```shell
+sampctl build debug   # the "debug" build in pawn.json
+make build DEBUG=1    # the same
+make tests DEBUG=1    # the test build, likewise
+```
+
+Both pass `DEBUG_ENABLED=1` to pawncc on the command line. They do not use a sampctl `constants` entry on purpose: sampctl writes those into the generated `sampctl_build_file.inc`, where they would stay for later builds, including `make tests`, which does not regenerate that file.
+
 `sampctl ensure` pulls the dependencies declared in `pawn.json` (and pinned in `pawn.lock`) into `dependencies/` — this includes `open.mp`/`samp-stdlib`, YSI-Includes, `SA-MP-MySQL`, `Dini`, and a few small utility includes (`code-parse`, `indirection`, `md-sort`).
 
 A successful build produces a compiled `.amx` gamemode file in the `gamemodes/` directory (e.g. `gamemodes/crl2.amx`).
@@ -72,7 +82,22 @@ webhook -hooks configs/webhook.json -verbose &
 
 ## Tests
 
-Pawn-level tests live under `tests/` (with stub includes in `tests/includes/`). The build system treats a `_CRL2_TEST_BUILD` define specially — for example `src/db/sql.pwn` skips the real SQLite connection and stubs it out under test builds so tests don't require a live database file.
+Pawn-level tests live under `tests/` (helpers in `tests/includes/`). Run them with:
+
+```shell
+make tests
+```
+
+This compiles `tests/run_tests.pwn` to `gamemodes/crl2test.amx`, rebuilds `scriptfiles/crl2_test.db` from `sql/migrations`, and runs the suite on `./omp-server`. Results go to `log.txt`; the target prints them and fails unless every test passed.
+
+Nothing is mocked: the tests call the real open.mp natives. Test players are NPCs, so money, health, weapons and connection state come from the server itself. The whole suite runs inside `main()`, before the server's first tick, which shapes how tests are written:
+
+- **Test players are pooled.** `NPC_Destroy()` only takes effect on a later tick, so a destroyed NPC would hold its slot to the end of the run. `DestroyTestPlayer()` returns the NPC to a pool, and `CreateTestPlayer()` hands it out again, renamed and reset to a fresh connection's state (money, weapons, wanted level, interior, checkpoints). Player ids therefore repeat between tests, and neither `ResetPlayerState()` nor the pool wipes `gPlayers[]` or a module's own per-player arrays, so a test sets up whatever state it relies on.
+- **Mind the NPC limit.** NPCs the code under test creates (taxi customers, rampage gunmen, combat NPCs) are real and stay until the run ends, all counting towards the test server's `maxnpc` (50). A full combat mission takes over 20. Exercise such code once, and drive the rest of a test by setting state.
+- **No driving, no ticks.** An NPC never gets into a vehicle or moves inside `main()`, so entry points that want a driver (`Race_RegisterPlayer`, `SetPlayerTaxiMission`, `CheckPlayerForTruckingMission`) are tested from the state they leave behind. Timers never fire either: a test checks that the code stops the timers it started (`IsValidTimer()`), with `TestIdleTimer` for timers of its own.
+- **A run time error ends the suite.** An out-of-bounds index aborts `main()`, and `make tests` stops on it and fails. A crash fix gets a test that shows the abort first.
+
+crashdetect logs a "Long callback execution detected" warning for the run; that is expected. The `ASSERT_*` macros stringify their argument into a `printf` format and cut it at a parenthesised macro, so pass them variables rather than expressions containing string literals, calls with several arguments, or constants such as `INVALID_PICKUP` and `INVALID_NPC_ID`.
 
 ## Documentation Tooling
 
@@ -84,3 +109,13 @@ pip install mkdocs mkdocs-material
 mkdocs serve   # local preview at http://127.0.0.1:8000
 mkdocs build   # static site output in site/
 ```
+
+The pages cite code as `` `src/modules/tow.pwn:125` ``, and those numbers go stale whenever the code above them moves. Check them after changing code:
+
+```shell
+make docs-check            # fails when a reference no longer points at the code it names
+make docs-check FIX=1      # rewrites the ones it can follow to their new line
+make docs-check VERBOSE=1  # also lists the references it cannot check
+```
+
+A reference is checked against the code name written just before it (`` `stock AbortTowMission(playerid)` (`src/modules/tow.pwn:125`) ``), or elsewhere in the same sentence, within two lines. A function's own table row is held to its definition. `FIX=1` follows a drifted line through git history the way `git blame` does, or falls back to the function's definition, and only writes a number when the name is really there. A renamed or deleted function is reported for a human to fix. Write new references the same way, with the name just before the location, so they can be checked. The script is `utils/docscheck/check_line_refs.py`.

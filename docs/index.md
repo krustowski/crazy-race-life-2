@@ -15,7 +15,7 @@ This site documents the gamemode's internals for developers who want to extend, 
 - **[Architecture](architecture.md)** — how `main.pwn` boots the gamemode, the include order in `includes.pwn`, and the conventions used across the codebase (dcmd commands, YSI-style hooks, i18n).
 - **[Database Schema](database.md)** — the SQLite schema, migrations, and the thin `DB_*` wrapper used to talk to it.
 - **[Commands Reference](commands.md)** — every player and admin `/command`, its access level, and where it's implemented.
-- **[Localization](localization.md)** — the `i18n.pwn` translation system (English + partial Czech).
+- **[Localization](localization.md)** — the `i18n.pwn` translation system (English, partial Czech and Bosnian).
 - **[Modules](modules/index.md)** — one page per gameplay feature in `src/modules/` (racing, real estate, taxi/tow/trucking missions, teams, combat, drugs, etc).
 - **[Support Systems](support/world-and-visuals.md)** — the shared infrastructure in `src/support/` that the modules build on (pickups/objects/vehicles, dialogs, timers, networking, ...).
 
@@ -25,18 +25,19 @@ This site documents the gamemode's internals for developers who want to extend, 
 + **ATM Banking** — at least one ATM per city/town/village.
 + **Combat Missions** *(experimental)* — business robbery with NPC shooters; briefcase pickup pays out $50k per mission.
 + **Deathmatch Minigame** — custom arena, "legal" PvP with no wanted level, 4-minute matches with a 45s join window.
-+ **Localization** — English, partial Czech.
++ **Localization** — English, partial Czech and Bosnian.
 + **NPC Drivers** — taxi (5× per big city), trucking (2+), race drivers (WIP).
 + **Personal Cellphone** — bound to `KEY_YES`; PMs, bank balance, service calls (mechanic, pizza, taxi).
 + **Prizes** — Tiki ($10M) and Pumpkin ($1.5M) pickups, auto-hidden once collected.
 + **Racing** — custom air/ground/naval races across the map, with stunts.
 + **Rampage Missions** *(experimental)* — 5-minute NPC street clashes.
 + **Real Estate** — custom spawn point, attached vehicle (with mods), safehouse, up to 5 properties and 5 saved skins per player.
++ **Rob Missions** — Robberz hold LALT/LSHIFT by a commercial property to rob it for up to 20s; robberies within 5 minutes of each other chain into one scored mission.
 + **Taxi Missions** — ad-hoc NPC-spawned rides with randomized customers/destinations and completion-based commission scaling.
 + **Tow Missions** — car impound service, model-based and distance-based bonuses.
 + **Teams** — custom salaries, team-only commands and weapons, `!`-prefixed team chat.
 + **Trucking Missions** — 15+ delivery points with weighted commissions/bonuses.
-+ **Tutorial** *(experimental)* — onboarding vademecum for new players.
++ **Quests** — database-defined onboarding checklist; gameplay modules report progress and quests pay out on completion.
 
 ## Screenshots
 
@@ -59,7 +60,7 @@ See the project's `README.md` (repository root) for the full screenshot gallery 
 ```text
 src/
 ├── main.pwn              # OnGameModeInit/Exit, top-level callbacks
-├── db/sql.pwn            # SQLite connection bootstrap
+├── db/sqlite.pwn         # SQLite connection, transaction helpers
 ├── modules/              # One file per gameplay feature
 └── support/              # Shared infrastructure used by modules
 sql/migrations/           # goose-style SQL migrations (SQLite schema)

@@ -59,7 +59,7 @@ Selecting a row toggles it via `TogglePrizeHidden()`, confirms in chat, and reop
 - **Reads/writes `gPlayers[]`:** none. The module only needs a `playerid` to pay out and to show the dialog.
 - **Calls into:** `support/helpers.pwn` (`EnsurePickupCreated`, the `Coords` enum).
 - **Called from:** `support/pickups.pwn` — `InitPickups()` calls `InitPrizes()`, and `CheckGenericPickup()` calls `CheckPrizePickup()`. `support/response.pwn` handles `DIALOG_PRIZE_EDITOR_MAIN` and routes the `/edit` menu entry.
-- **Include position:** `src/support/includes.pwn:127`, after `modules/bank.pwn`. It must precede `support/response.pwn`; see the note above.
+- **Include position:** `src/support/includes.pwn:146`, after `modules/bank.pwn`. It must precede `support/response.pwn`; see the note above.
 
 ## Notes
 

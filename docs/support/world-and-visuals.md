@@ -14,9 +14,9 @@ Almost the entire file is a single function, `InitObjects()`, consisting of seve
 
 ## Pickups (`src/support/pickups.pwn`, ~484 lines)
 
-Defines the pickup model-id constants (`PICKUP_BRIEFCASE`, `PICKUP_HOUSE_GREEN`, `PICKUP_DRUG_*`, etc.) and the SA-MP/open.mp pickup-type constants (`PICKUP_TYPE_ALWAYS`, `PICKUP_TYPE_RESPAWN_30_SECONDS`, ...) used across the codebase. `InitPickups()` spawns the fixed set of world pickups that don't belong to a specific gameplay module: the admin room health pack, the Hackerz interior entrance/exit/money-bag pickups, one ATM pickup per entry in `gBankLocation` (from `modules/bank.pwn`), a per-team join pickup plus join/leave menu built from a `team_coords`/`teams` join query, a handful of legacy hardcoded property doors, and the SF Centrum / Bank LS teleport pickup pairs. The tiki/pumpkin "hidden prize" pickups have moved out to their own module — `InitPickups()` still calls `InitPrizes()` and `CheckGenericPickup()` still calls `CheckPrizePickup()`, but the data, the database writes and the admin editor all live in [`modules/prizes.pwn`](../modules/prizes.md) now. `CreateDeathMoneyPickup`/`CheckDeathMoneyPickup` implement a small ring buffer (`gDeathMoneyPickups[MAX_DEATH_MONEY_PICKUPS]`, 128 slots) of "money bag" pickups dropped at a player's death position holding their cash, redeemable by whoever picks them up first. `CheckBlackMarketPickup` and `CheckGenericPickup` are dispatch helpers called from `main.pwn`'s `OnPlayerPickUpPickup` to route a touched `pickupid` to the right handler (black market dialog, SF Centrum/Bank LS teleports, Hackerz interior, admin room heal/doors).
+Defines the pickup model-id constants (`PICKUP_BRIEFCASE`, `PICKUP_HOUSE_GREEN`, `PICKUP_DRUG_*`, etc.) and the SA-MP/open.mp pickup-type constants (`PICKUP_TYPE_ALWAYS`, `PICKUP_TYPE_RESPAWN_30_SECONDS`, ...) used across the codebase. `InitPickups()` spawns the fixed set of world pickups that don't belong to a specific gameplay module: the admin room health pack, the Hackerz interior entrance/exit/money-bag pickups, one ATM pickup per entry in `gBankLocation` (from `modules/bank.pwn`), a per-team join pickup plus join/leave menu built from a `team_coords`/`teams` join query, a handful of legacy hardcoded property doors, and the SF Centrum / Bank LS teleport pickup pairs. The tiki/pumpkin "hidden prize" pickups have moved out to their own module — `InitPickups()` still calls `InitPrizes()` and `CheckGenericPickup()` still calls `CheckPrizePickup()`, but the data, the database writes and the admin editor all live in [`modules/prizes.pwn`](../modules/prizes.md) now. `CreateDeathMoneyPickup`/`CheckDeathMoneyPickup` implement a small ring buffer (`gDeathMoneyPickups[MAX_DEATH_MONEY_PICKUPS]`, 128 slots) of "money bag" pickups dropped at a player's death position holding their cash, redeemable by whoever picks them up first. Each bag carries a green `$<amount>` 3D text label floating just above it; when the ring buffer wraps, the uncollected bag (and its label) in the reused slot is destroyed. `CheckBlackMarketPickup` and `CheckGenericPickup` are dispatch helpers called from `main.pwn`'s `OnPlayerPickUpPickup` to route a touched `pickupid` to the right handler (black market dialog, SF Centrum/Bank LS teleports, Hackerz interior, admin room heal/doors).
 
-The actual `CreatePickup` retry logic lives in `EnsurePickupCreated` (`src/support/helpers.pwn:226`), not in this file — pickups.pwn and every gameplay module that spawns a pickup call into that shared helper.
+The actual `CreatePickup` retry logic lives in `EnsurePickupCreated` (`src/support/helpers.pwn:238`), not in this file — pickups.pwn and every gameplay module that spawns a pickup call into that shared helper.
 
 `gAdminDoorDown`/`gAdminDoorUp` are declared (lines 52-53) and checked in `CheckGenericPickup`, but nothing in the codebase ever assigns them a real pickup id — those two branches are effectively dead code.
 
@@ -24,15 +24,15 @@ The actual `CreatePickup` retry logic lives in `EnsurePickupCreated` (`src/suppo
 
 | Function | Description |
 |---|---|
-| `public InitPickups()` (`src/support/pickups.pwn:98`) | Spawns admin/Hackerz/bank/team/legacy-property pickups and builds per-team join menus from the database. |
-| `stock CreateDeathMoneyPickup(playerid)` (`src/support/pickups.pwn:266`) | Drops the dying player's cash as a pickup at their position and resets their money. |
-| `stock CheckDeathMoneyPickup(playerid, pickupid)` (`src/support/pickups.pwn:312`) | Redeems a death-money pickup for whichever player touches it. |
-| `stock CheckBlackMarketPickup(playerid, pickupid)` (`src/support/pickups.pwn:333`) | Opens the black market dialog if the touched pickup is the druggery market spot. |
-| `stock CheckGenericPickup(playerid, pickupid)` (`src/support/pickups.pwn:343`) | Dispatches all other fixed world pickups (druggery entrance, SF Centrum/Bank LS teleports, admin room/doors, Hackerz), and hands prize pickups to `CheckPrizePickup`. |
+| `public InitPickups()` (`src/support/pickups.pwn:97`) | Spawns admin/Hackerz/bank/team/legacy-property pickups and builds per-team join menus from the database. |
+| `stock CreateDeathMoneyPickup(playerid)` (`src/support/pickups.pwn:298`) | Drops the dying player's cash as a pickup with a `$<amount>` 3D text label at their position and resets their money. |
+| `stock CheckDeathMoneyPickup(playerid, pickupid)` (`src/support/pickups.pwn:348`) | Redeems a death-money pickup for whichever player touches it, removing the bag and its label. |
+| `stock CheckBlackMarketPickup(playerid, pickupid)` (`src/support/pickups.pwn:366`) | Opens the black market dialog if the touched pickup is the druggery market spot. |
+| `stock CheckGenericPickup(playerid, pickupid)` (`src/support/pickups.pwn:376`) | Dispatches all other fixed world pickups (druggery entrance, SF Centrum/Bank LS teleports, admin room/doors, Hackerz), and hands prize pickups to `CheckPrizePickup`. |
 
-## Vehicles (`src/support/vehicles.pwn`, ~475 lines)
+## Vehicles (`src/support/vehicles.pwn`, ~1630 lines)
 
-`InitVehicles()` places roughly 150 static spawn vehicles across the map via `AddStaticVehicle(...)` — taxis at train stations and airports, a San Fierro tram, tow trucks at the SF docks, boats for the Bayside race, desert carts for the El Quebrados race, and large unlabeled blocks of vehicles (garages, police helicopters, an off-road area) carried over from the original map design, many still bearing their original Czech comments (`garaz`, `letiste venturas`). At the end it loops every vehicle slot up to `MAX_VEHICLES` and stamps `VEHICLE_PLATE` ("--CRL2--") onto all of them via `SetVehicleNumberPlate`. The file also defines `gVehicleNames[]`, a lookup table of ~212 human-readable vehicle model names (Landstalker, Bravura, ... Utility Trailer) used elsewhere to print a friendly name for a vehicle model.
+`InitVehicles()` places roughly 890 static spawn vehicles across the map via `AddStaticVehicle(...)` — taxis at train stations and airports, a San Fierro tram, tow trucks at the SF docks, boats for the Bayside race, desert carts for the El Quebrados race, and large unlabeled blocks of vehicles (garages, police helicopters, an off-road area) carried over from the original map design, many still bearing their original Czech comments (`garaz`, `letiste venturas`). The last block, after the `Additional map-filler vehicles` marker, is 410 parked cars in multi-storey car parks, parking lots and at the kerb; `utils/mapcheck/check_vehicles.py` checks everything after that marker by default. At the end it loops every vehicle slot up to `MAX_VEHICLES` and stamps `VEHICLE_PLATE` ("--CRL2--") onto all of them via `SetVehicleNumberPlate`. The file also defines `gVehicleNames[]`, a lookup table of ~212 human-readable vehicle model names (Landstalker, Bravura, ... Utility Trailer) used elsewhere to print a friendly name for a vehicle model.
 
 **Key functions:**
 
@@ -40,22 +40,22 @@ The actual `CreatePickup` retry logic lives in `EnsurePickupCreated` (`src/suppo
 |---|---|
 | `public InitVehicles()` (`src/support/vehicles.pwn:11`) | Spawns all static map vehicles and stamps the `--CRL2--` plate onto every vehicle slot. |
 
-`gVehicleNames[]` (`src/support/vehicles.pwn:261`) is a data table, not a function — it maps a vehicle model id (offset from 400) to its display name.
+`gVehicleNames[]` (`src/support/vehicles.pwn:1380`) is a data table, not a function — it maps a vehicle model id (offset from 400) to its display name.
 
-## Texts (`src/support/texts.pwn`, ~83 lines)
+## Texts (`src/support/texts.pwn`, ~92 lines)
 
-`InitTexts()` creates the two global, not-per-player TextDraws: `gGameModeText` (the bottom-left "CrazyRaceLife2" branding label, drawn with the `MINIMAP_TEXT` string) and `gClockText` (the top-right in-game clock, owned and redrawn by `src/support/clock.pwn`'s `DrawClockText`). `AddTexts(playerid)` is called once per connecting human player (it skips NPCs) to create that player's private set of HUD TextDraws — mission/race/tow/rampage/drug-mission info texts and a vehicle-state text — then shows `gClockText` and `gGameModeText` to them.
+`InitTexts()` creates the three global, not-per-player TextDraws: `gGameModeText` (the bottom-left "CrazyRaceLife2" branding label, drawn with the `MINIMAP_TEXT` string), `gClockText` (the top-right in-game clock, owned and redrawn by `src/support/clock.pwn`'s `DrawClockText`), and `gClockTextHD` (the same clock, right-aligned and narrowed to fit the HD/widescreen GTA SA HUD). `AddTexts(playerid)` is called once per connecting human player (it skips NPCs) to create that player's private set of HUD TextDraws — mission/race/tow/rampage/drug-mission info texts and a vehicle-state text — then shows `gGameModeText` and the player's clock variant (`ShowPlayerClock`) to them.
 
 **Key functions:**
 
 | Function | Description |
 |---|---|
 | `public InitTexts()` (`src/support/texts.pwn:16`) | Creates the shared `gGameModeText` and `gClockText` TextDraws. |
-| `public AddTexts(playerid)` (`src/support/texts.pwn:35`) | Creates a connecting player's per-player HUD TextDraws and shows the clock/branding text to them. |
+| `public AddTexts(playerid)` (`src/support/texts.pwn:44`) | Creates a connecting player's per-player HUD TextDraws and shows the clock/branding text to them. |
 
 ## Map Icons (`src/support/mapicons.pwn`, ~259 lines)
 
-Defines the `E_MAPICON_ID_*` enum, a large set of constants mirroring the client's built-in GTA map icon IDs (ammu-nation, police, hospital, save house, and around 60 others). `AddMapicons(playerid)` is the single function in the file, called once per player after a successful login (from `modules/auth.pwn`). It lays down every client-side map icon the player should see: one per ATM (`gBankLocation`), one per named race start point (`gRaces`), a handful of hardcoded "property for sale" markers, the tow mission dock, a save-house icon for each real-estate property the player owns, one team-join icon per row in `team_coords`/`teams` (icon chosen per `PLAYER_TEAM` via a `switch`), and one icon per trucking petrol station (`trucking_coords WHERE type = 2`). Icon indices are assigned locally via an incrementing `mapiconid` counter and all use `MAPICON_LOCAL` scope.
+Defines the `E_MAPICON_ID_*` enum, a large set of constants mirroring the client's built-in GTA map icon IDs (ammu-nation, police, hospital, save house, and around 60 others). `AddMapicons(playerid)` is the main function in the file, called once per player after a successful login (from `modules/auth.pwn`) and again by `BuyPlayerProperty`/`SellPlayerProperty` when the player's save-house icons change. It lays down every client-side map icon the player should see: one per ATM (`gBankLocation`), one per named race start point (`gRaces`), a handful of hardcoded "property for sale" markers, the tow mission dock, a save-house icon for each real-estate property the player owns, one team-join icon per row in `team_coords`/`teams` (icon chosen per `PLAYER_TEAM` via a `switch`), and one icon per trucking petrol station (`trucking_coords WHERE type = 2`). Icon indices are assigned locally via an incrementing `mapiconid` counter and all use `MAPICON_LOCAL` scope. A redraw overwrites the slots in place and then removes every slot past the new count, so a sold property's icon does not linger.
 
 !!! warning "There are only 100 icon slots"
     SA-MP supports exactly 100 map icons per player (ids 0–99); calls beyond that are out of range and corrupt the client's icon table, which crashes it. The total here is **player-dependent** — one save-house icon per owned property on top of ~96 fixed ones — so it silently crossed the limit for players with enough real estate while staying under it for everyone else.
@@ -68,7 +68,7 @@ Ownership is resolved with `IsPlayerOwnerOfArrayID()`, a plain memory comparison
 
 | Function | Description |
 |---|---|
-| `public AddMapicons(playerid)` (`src/support/mapicons.pwn:90`) | Draws every client-side map icon for a just-authenticated player (ATMs, races, housing, teams, trucking). |
+| `public AddMapicons(playerid)` (`src/support/mapicons.pwn:90`) | Draws every client-side map icon for a player (ATMs, races, housing, teams, trucking); safe to call again to redraw. |
 | `stock SetPlayerMapIconSafe(...)` (`src/support/mapicons.pwn:80`) | Bounds-checked wrapper around `SetPlayerMapIcon`; drops any icon whose id would reach `MAX_PLAYER_MAP_ICONS` (100). |
 
 ## Models (`src/support/models.pwn`, ~27 lines)

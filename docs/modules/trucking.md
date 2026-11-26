@@ -21,16 +21,16 @@ The **Trucking Editor** (admin-only, via `/edit` → "Trucking Editor") uses `Tr
 
 | Function | Description |
 |---|---|
-| `public UpdateMissionInfoText(playerid)` (`src/modules/trucking.pwn:116`) | 1s timer updating the mission HUD textdraw. |
-| `stock CheckTruckingCheckpoint(playerid)` (`src/modules/trucking.pwn:140`) | Checkpoint-reached handler: pays commission and immediately rolls the next destination. |
-| `public CheckPlayerTrailerAttached(playerid)` (`src/modules/trucking.pwn:180`) | 1.5s watchdog keeping the delivery checkpoint in sync with trailer/cab state. |
-| `stock SetPlayerTruckingMission(playerid, MissionType: missionType)` (`src/modules/trucking.pwn:226`) | Picks a random destination point matching the mission type, at least `TRUCKING_POINT_MIN_DIST` away, and sets the checkpoint. One query. |
-| `stock InitTrucking()` (`src/modules/trucking.pwn:329`) | Startup hook: loads trucking points/coords and spawns facility vehicles and info pickups. |
-| `stock SetTruckingPoint(playerid)` (`src/modules/trucking.pwn:444`) | Editor: persists a trucking point plus its facility vehicles to the database. |
-| `stock SaveTruckingMissionScore(playerid)` (`src/modules/trucking.pwn:610`) | Writes the completed-delivery count to `high_scores`. |
-| `stock AbortTruckingMission(playerid)` (`src/modules/trucking.pwn:641`) | Ends the active mission, saving the score and cleaning up timers/state. |
-| `stock IsPlayerInTruck(playerid)` (`src/modules/trucking.pwn:671`) | Checks the player's current vehicle model against the recognized truck cab list. |
-| `stock CheckPlayerForTruckingMission(playerid)` (`src/modules/trucking.pwn:700`) | Entry point: validates truck+trailer and starts a mission if not already running. |
+| `public UpdateMissionInfoText(playerid)` (`src/modules/trucking.pwn:122`) | 1s timer updating the mission HUD textdraw. |
+| `stock CheckTruckingCheckpoint(playerid)` (`src/modules/trucking.pwn:143`) | Checkpoint-reached handler: pays commission and immediately rolls the next destination. |
+| `public CheckPlayerTrailerAttached(playerid)` (`src/modules/trucking.pwn:185`) | 1.5s watchdog keeping the delivery checkpoint in sync with trailer/cab state. |
+| `stock SetPlayerTruckingMission(playerid, MissionType: missionType)` (`src/modules/trucking.pwn:231`) | Picks a random destination point matching the mission type, at least `TRUCKING_POINT_MIN_DIST` away, and sets the checkpoint. One query. |
+| `stock InitTrucking()` (`src/modules/trucking.pwn:333`) | Startup hook: loads trucking points (by DB id, keeping their facility `Type`), then their coords onto the point each `trucking_id` names (delivery checkpoint, info pickup + name label), and spawns the facility vehicles. A checkpoint or info coord for an unknown point is skipped with a warning. |
+| `stock SetTruckingPoint(playerid)` (`src/modules/trucking.pwn:458`) | Editor: persists a trucking point plus its facility vehicles to the database. |
+| `stock SaveTruckingMissionScore(playerid)` (`src/modules/trucking.pwn:625`) | Writes the completed-delivery count to `high_scores`. |
+| `stock AbortTruckingMission(playerid)` (`src/modules/trucking.pwn:656`) | Ends the active mission, saving the score and cleaning up timers/state. |
+| `stock IsPlayerInTruck(playerid)` (`src/modules/trucking.pwn:686`) | Checks the player's current vehicle model against the recognized truck cab list. |
+| `stock CheckPlayerForTruckingMission(playerid)` (`src/modules/trucking.pwn:715`) | Entry point: validates truck+trailer and starts a mission if not already running. |
 
 ## Commands
 

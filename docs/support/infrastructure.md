@@ -25,34 +25,35 @@ Wraps the SA-MP/open.mp `HTTP()` native to post player connect/disconnect/kick e
 
 ## Timers (`src/support/timers.pwn`, ~58 lines)
 
-Defines the `ServerTimer` enum — `TIMER_ANTICHEAT_WEAPON`, `TIMER_ANTIFLOOD` (defined but its `SetTimer` call is commented out), `TIMER_ON_RADAR_CHECKPOINT`, `TIMER_AUTOSAVE_DATA`, `TIMER_UPDATE_PLAYER_PLAYTIME`, `TIMER_UPDATE_PLAYER_SCORE`, `TIMER_UPDATE_BLACK_MARKET_RATIO`, `TIMER_SEND_PLAYER_SALARY`, `TIMER_SEND_REAL_ESTATE_COMMISSION`, `TIMER_DRAW_CLOCK_TEXT`, `TIMER_SHOW_ADVERT` — and the backing `gTimers[ServerTimer]` array of `Timer:` handles. `InitTimers()` is the single place every recurring `SetTimer(...)` call in the gamemode is registered: anti-cheat weapon check every 30s, radar checkpoint check every 300ms, autosave every 3 minutes, playtime tick every 10s, score tick every 2s, black market ratio update every 3 minutes, salary/real-estate commission every 5 minutes, clock redraw every 10s, and an advert every 2 minutes. `KillTimers()` iterates `gTimers` and calls `KillTimer` on every handle.
+Defines the `ServerTimer` enum — `TIMER_ANTICHEAT`, `TIMER_ANTIFLOOD` (defined but its `SetTimer` call is commented out), `TIMER_ON_RADAR_CHECKPOINT`, `TIMER_AUTOSAVE_DATA`, `TIMER_UPDATE_PLAYER_PLAYTIME`, `TIMER_UPDATE_PLAYER_SCORE`, `TIMER_UPDATE_BLACK_MARKET_RATIO`, `TIMER_SEND_PLAYER_SALARY`, `TIMER_SEND_REAL_ESTATE_COMMISSION`, `TIMER_DRAW_CLOCK_TEXT`, `TIMER_SHOW_ADVERT` — and the backing `gTimers[ServerTimer]` array of `Timer:` handles. `InitTimers()` is the single place every recurring `SetTimer(...)` call in the gamemode is registered: anti-cheat scan every 3s, radar checkpoint check every 300ms, autosave every 3 minutes, playtime tick every 10s, score tick every 2s, black market ratio update every 3 minutes, salary/real-estate commission every 5 minutes, clock redraw every 10s, and an advert every 2 minutes. `KillTimers()` iterates `gTimers` and calls `KillTimer` on every handle.
 
 **Key functions:**
 
 | Function | Description |
 |---|---|
 | `stock InitTimers()` (`src/support/timers.pwn:29`) | Registers every recurring `SetTimer` call for the gamemode's periodic subsystems. |
-| `stock KillTimers()` (`src/support/timers.pwn:52`) | Cancels every timer tracked in `gTimers`. |
+| `stock KillTimers()` (`src/support/timers.pwn:58`) | Cancels every timer tracked in `gTimers`. |
 
-## Clock (`src/support/clock.pwn`, ~49 lines)
+## Clock (`src/support/clock.pwn`, ~73 lines)
 
-Owns the `gClockText` TextDraw handle (declared here; actually created by `InitTexts()` in `support/texts.pwn`) and `gPreviousHour`, used to avoid redundant world-time updates. `DrawClockText()`, fired every 10 seconds by `TIMER_DRAW_CLOCK_TEXT`, reads the server's real `gettime()` hour/minute/second, formats it as `H:MM`, and re-shows the TextDraw to every connected player. When the hour changes it also calls `SetWorldTime(hour)` once, so the in-game GTA sky/lighting follows the real-world clock without resetting on every tick (per the file's own comment, "a minor hotfix not to change the world time on each tick").
-
-**Key functions:**
-
-| Function | Description |
-|---|---|
-| `public DrawClockText()` (`src/support/clock.pwn:14`) | Redraws the clock TextDraw for all players and updates `SetWorldTime` on the hour. |
-
-## Advertisement (`src/support/advert.pwn`, ~183 lines)
-
-`advertList[][PlayerLocale][]` is a bilingual (English/Czech) table of roughly 32 tip/info/trivia strings grouped by topic (general tips, racing, drugz, housing, teams, missions, police & wanted, trivia, an "endtip"). `ShowAdvert()`, fired every 2 minutes by `TIMER_SHOW_ADVERT`, picks one random advert index and sends it to every connected player using each player's own `gPlayers[i][Locale]`.
+Owns the `gClockText` and `gClockTextHD` TextDraw handles (declared here; actually created by `InitTexts()` in `support/texts.pwn`) and `gPreviousHour`, used to avoid redundant world-time updates. `DrawClockText()`, fired every 10 seconds by `TIMER_DRAW_CLOCK_TEXT`, reads the server's real `gettime()` hour/minute/second, formats it as `H:MM` into both TextDraws, and re-shows the right one to every connected player via `ShowPlayerClock`. Each player sees exactly one of the two: `gClockText` (classic layout) or `gClockTextHD` (narrower, right-aligned at the HUD bars' edge for the HD/widescreen GTA SA, whose HUD is squeezed horizontally and would otherwise put the weapon icon under the clock), chosen by `gPlayers[playerid][HDVersion]` (toggled by `/hd`). When the hour changes it also calls `SetWorldTime(hour)` once, so the in-game GTA sky/lighting follows the real-world clock without resetting on every tick (per the file's own comment, "a minor hotfix not to change the world time on each tick").
 
 **Key functions:**
 
 | Function | Description |
 |---|---|
-| `public ShowAdvert()` (`src/support/advert.pwn:166`) | Sends one random localized advertisement/tip message to every connected player. |
+| `stock ShowPlayerClock(playerid)` (`src/support/clock.pwn:18`) | Hides both clock TextDraws for the player and shows the one matching their `HDVersion` flag. Called on connect (`AddTexts`), after login (`LoadPlayerData`), by `/hd`, and on every clock tick. |
+| `public DrawClockText()` (`src/support/clock.pwn:26`) | Redraws the clock TextDraw for all players and updates `SetWorldTime` on the hour. |
+
+## Advertisement (`src/support/advert.pwn`, ~300 lines)
+
+`advertList[][PlayerLocale][]` is a localized (English/Czech/Bosnian) table of 45 tip/info/trivia strings grouped by topic (general tips, racing, drugz, housing, teams, missions, police & wanted, trivia, what's new, coming soon, an "endtip"). The "what's new" entries carry a `[ NEW ]` tag (`[ NOVINKA ]`/`[ NOVO ]`) and the "coming soon" ones `[ SOON ]` (`[ CHYSTAME ]`/`[ USKORO ]`). The coming-soon entries announce features that are only stubs or prototypes in the code today (fuel consumption, paid pizza deliveries, phone calls to mechanics and pizza players, combat missions for everyone, the Bone County parkour), so drop each one when its feature ships. Chat lines are cut at 144 characters, and every string in all three locales is shorter than that. `ShowAdvert()`, fired every 2 minutes by `TIMER_SHOW_ADVERT`, picks one random advert index and sends it to every connected player using each player's own `gPlayers[i][Locale]`.
+
+**Key functions:**
+
+| Function | Description |
+|---|---|
+| `public ShowAdvert()` (`src/support/advert.pwn:273`) | Sends one random localized advertisement/tip message to every connected player. |
 
 ## Used By
 

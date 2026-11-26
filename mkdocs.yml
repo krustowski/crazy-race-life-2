@@ -53,22 +53,29 @@ nav:
       - Combat Missions: modules/combat.md
       - Deathmatch: modules/deathmatch.md
       - Drugs: modules/drugz.md
+      - Fence: modules/fence.md
       - NPC Drivers: modules/npcs.md
+      - Petrol Stations: modules/fuel.md
       - Player Core: modules/player.md
       - Prizes: modules/prizes.md
+      - Quests: modules/quest.md
       - Racing: modules/race.md
       - Radar: modules/radar.md
       - Rampage Missions: modules/rampage.md
       - Real Estate: modules/real.md
+      - Rob Missions: modules/rob.md
       - Pizza Delivery: modules/pizza.md
       - Taxi Missions: modules/taxi.md
+      - Taxi Stops: modules/taxistop.md
       - Teams: modules/team.md
       - Tow Missions: modules/tow.md
       - Trucking Missions: modules/trucking.md
-      - Tutorial: modules/tutorial.md
   - Support Systems:
       - World & Visuals: support/world-and-visuals.md
       - Player UI & Interaction: support/player-ui.md
       - Infrastructure: support/infrastructure.md
   - Appendix:
       - sampctl CLI: sampctl-docs.md
+  # The gateway serves these docs publicly at /docs/; this is the way in to the
+  # rest of the portal. A signed-in player is sent straight on to it.
+  - Portal sign-in: /login

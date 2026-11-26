@@ -8,42 +8,52 @@ The gamemode entry point is `src/main.pwn`, which only does two things: pull in 
 
 ```text
 AddPlayerClass()             → one class; SA-MP needs it before spawn info means anything
-InitDB()                     → SQLite connection (src/db/sql.pwn)
+InitDB()                     → SQLite connection (src/db/sqlite.pwn)
 InitPoliceBribePickups()     → modules/bribe.pwn
+InitRampageSlots()           → modules/rampage.pwn
 InitRampagePickups()         → modules/rampage.pwn
 InitBankLocations()          → modules/bank.pwn
 InitDrugValues/Pickups()     → modules/drugz.pwn
 InitDruggeryPoints()         → modules/drugz.pwn
+InitQuests()                 → modules/quest.pwn
 InitTeams()                  → modules/team.pwn
 InitRealEstateProperties()   → modules/real.pwn
 Race_Init() / InitHighScores → modules/race.pwn
-InitTrucking()                → modules/trucking.pwn
+InitTrucking()               → modules/trucking.pwn
+InitGasStations()            → modules/fuel.pwn
 InitPickups/Objects/Vehicles/Texts/Timers() → support/*.pwn  (InitPickups also calls InitPrizes, modules/prizes.pwn)
-InitNPCs()                    → modules/npcs.pwn
+InitNPCs()                   → modules/npcs.pwn
+InitTaxiStops()              → modules/taxistop.pwn
 ```
 
 Each `Init*` function is a `stock` that seeds runtime state — usually by reading rows out of SQLite via `DB_*` calls and populating global arrays (pickups, checkpoints, static objects) — rather than a class constructor. See [Database Schema](database.md) for what's actually being loaded.
 
 ## Include order (`src/support/includes.pwn`)
 
-There's no build-time dependency resolution — file order in `includes.pwn` **is** the dependency graph. Each `.pwn` file guards itself with an include-guard define (e.g. `_CRL2_DCMD`) in the same style as the standard library, so double-includes are harmless, but a file used before it's included will fail to compile.
+There's no build-time dependency resolution: the order in which files are first included **is** the dependency graph. `main.pwn` includes only `support/includes.pwn`, but that list is not the whole story, because many modules `#include` the files they depend on themselves. Each `.pwn` file guards itself with an include-guard define (e.g. `_CRL2_DCMD`) in the same style as the standard library, so double-includes are harmless, but a file used before it's included will fail to compile.
 
 Two pawncc rules shape this graph, and both bite silently:
 
-- **`#include` is include-once.** The build passes `-Z+` (compatibility mode), under which pawncc reads each file at most once — a second `#include` of the same path is a no-op, not a re-read. Splitting a module across two include points therefore cannot work: it compiles cleanly and emits nothing.
-- **Globals cannot be forward-referenced.** A function may call a function defined later in the translation unit (pawncc is two-pass for functions), but reading a global variable before its declaration is `error 017: undefined symbol`. This is why a module that touches `gPlayers[]` must be included after `player.pwn` declares it, and why `MAX_DRUG_TYPES` — needed by the `Player` enum itself — lives in `includes.pwn` rather than in `drugz.pwn`. The current order is roughly:
+- **Only the include guard makes `#include` include-once.** Neither `make build` nor `make tests` passes `-Z+`, so pawncc reads a file again at every `#include` of it, and the guard at its top (`#if defined _CRL2_X` / `#endinput`) is what turns the second read into a no-op. A file is therefore compiled where it is *first* included, which is often not its line in `includes.pwn`, and every file needs a guard: `src/db/sqlite.pwn` went without one, so its symbols were defined again at each of its four includes and `make build` failed with `symbol already defined`.
+- **Globals cannot be forward-referenced.** A function may call a function defined later in the translation unit (pawncc is two-pass for functions), but reading a global variable before its declaration is `error 017: undefined symbol`. This is why a module that touches `gPlayers[]` must be included after `player.pwn` declares it, and why `MAX_DRUG_TYPES` — needed by the `Player` enum itself — lives in `includes.pwn` rather than in `drugz.pwn`.
 
-1. Core defines (`MAX_OBJECTS`, `MAX_PLAYERS`, `GAMEMODE_NAME`) + `open.mp`/`core`/`float`/`file`/`string` stdlib.
-2. `db/sql.pwn`, `support/i18n.pwn`, `support/net.pwn`, `support/http.pwn` — low-level infrastructure with no dependencies on gameplay state.
-3. Generated version headers (`includes/crazy_race_life_2_version.inc`, `includes/sampctl_build_file.inc`).
-4. `support/advert.pwn`, `modules/anticheat.pwn`, `support/clock.pwn`.
-5. `modules/race.pwn`, `modules/deathmatch.pwn`.
-6. The player-data core, `modules/player.pwn`, then everything that reads/writes `gPlayers[]`: `team`, `auth`, `real`, `taxi`, `combat`, `tutorial`, `bribe`, `tow`, `npcs`. `modules/drugz.pwn` is included from *inside* `player.pwn`, after `gPlayers[]` is declared, because its Drug Mission code reads that array.
-7. `modules/trucking.pwn`.
-8. `support/helpers.pwn`, `modules/radar.pwn`.
-9. `modules/bank.pwn`, `modules/prizes.pwn` — the latter must precede `support/response.pwn`, which drives its editor dialog.
-10. World-building support: `pickups`, `objects`, `vehicles`, `texts`, `mapicons`, `dialogs`, `response`, `timers`.
-11. `support/dcmd.pwn` last, since command handlers call into every module above.
+The effective order (each file where it is first included, with the file that pulls it in) is:
+
+1. Core defines (`MAX_OBJECTS`, `MAX_PLAYERS`, `MAX_DRUG_TYPES`, `GAMEMODE_NAME`) + `open.mp`/`core`/`float`/`file`/`string` stdlib, then `modules/anticheat_ledger.pwn`. It hooks `GivePlayerWeapon`/`ResetPlayerWeapons`/`SetPlayerAmmo` with `#define`s, which only apply to code after them, so it must precede `support/i18n.pwn`, which pulls in `player.pwn` and most modules.
+2. `db/sqlite.pwn`, then `support/i18n.pwn`. The last line of `i18n.pwn` includes `modules/player.pwn` (after the message tables, which player code reads), and `player.pwn` includes most of the gameplay code, so all of this is compiled here, in this order:
+    - `team`, `support/helpers`, then `drugz`, included from *inside* `player.pwn` after `gPlayers[]` is declared, because its Drug Mission code reads that array. `drugz` pulls in `support/pickups` (→ `bank`), `quest` and `fence`.
+    - `deathmatch`, `combat`.
+    - `real`, which pulls in `support/dialogs`, which in turn pulls in `race`, `trucking`, `includes/crazy_race_life_2_version.inc`, `taxi` and `rampage`.
+    - `tow` (→ `support/vehicles`), `bribe`, `rob`, `pizza`.
+3. Back in `includes.pwn`: `support/net`, `support/http`, `includes/sampctl_build_file.inc`, `support/advert`, `anticheat`, `support/clock`, `auth`, `npcs`, `taxistop`, `fuel`, `radar`, `prizes` (which must precede `support/response`, since that drives its editor dialog), `support/objects` (→ `support/parkour`), `support/texts`, `support/mapicons`, `support/response`, `support/timers`.
+4. `support/dcmd.pwn` last, since command handlers call into every module above.
+
+Every other line in `includes.pwn` (`race`, `deathmatch`, `player`, `team`, `real`, `taxi`, `combat`, `bribe`, `tow`, `pizza`, `quest`, `trucking`, `helpers`, `bank`, `pickups`, `vehicles`, `dialogs`) is a no-op by the time it is reached. To check the order after changing an `#include`, compile with a listing and keep the first `#file` line for each file:
+
+```shell
+pawncc src/main.pwn -l -isrc -idependencies/omp-stdlib -i. -o/tmp/crl2.lst
+grep '^#file' /tmp/crl2.lst | awk '!seen[$0]++'
+```
 
 See [Modules](modules/index.md) and [Support Systems](support/world-and-visuals.md) for what each file actually contains.
 
@@ -68,7 +78,7 @@ User-facing strings are not hardcoded per-callsite; they're looked up through `s
 ## Conventions worth knowing before editing code
 
 - **No OOP, no hooks.** Everything is global functions and global arrays. `forward`/`public` pairs are used for functions invoked by name from timers (`SetTimerEx("Foo", ...)`) or the server itself; plain `stock` for everything else.
-- **`#if defined _CRL2_TEST_BUILD`** gates code that shouldn't run under the test harness (e.g. skipping the real SQLite connection in `src/db/sql.pwn`) — check for this define before assuming a code path always runs.
-- **Every database call blocks the server.** open.mp's `Databases` component is synchronous on the main thread — there is no async variant in the API this gamemode uses — so a query issued inside a loop stalls every player for its duration. crashdetect reports these as "Long callback execution detected"; treat that warning as a query-count problem first. Prefer filtering in SQL, grouping with window functions, or checking cached state (see [Real Estate — Ownership checks](modules/real.md#ownership-checks)) over re-running a query per item.
+- **`#if defined _CRL2_TEST_BUILD`** is set by the test harness. It only switches `InitDB()` (`src/db/sqlite.pwn`) to the throwaway `scriptfiles/crl2_test.db` that `make tests` builds from the migrations. Nothing else is stubbed: the tests run on `./omp-server` against the real natives, with NPCs as players (see [Getting Started — Tests](getting-started.md#tests)).
+- **Every database call blocks the server.** open.mp's `Databases` component is synchronous on the main thread — there is no async variant in the API this gamemode uses — so a query issued inside a loop stalls every player for its duration. crashdetect reports these as "Long callback execution detected"; treat that warning as a query-count problem first. Prefer filtering in SQL, grouping with window functions, or checking cached state (see [Real Estate — Ownership checks](modules/real.md#ownership-checks)) over re-running a query per item. When a loop has to write row by row, wrap it in `BeginDBTransaction()`/`CommitDBTransaction()` so the batch commits once instead of once per statement (see [Database Schema](database.md#srcdbsqlitepwn-connection-bootstrap)).
 - **Coordinates and points are data, not code.** Race checkpoints, property locations, trucking points, and bribe/drug pickups are rows in SQLite (`sql/migrations/`), loaded at `OnGameModeInit` time — adding a new race or property is a migration + data change, not a code change.
 - **Admin gating is inline.** There's no role table; every gated command checks `IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] >= N` directly in `dcmd.pwn`.

@@ -47,7 +47,7 @@ stock GetPrizeModel(PrizeType: type)
 	{
 		case PRIZE_TIKI:	return PICKUP_TIKI;
 		case PRIZE_PUMPKIN:	return PICKUP_PUMPKIN;
-		default:		return 0;
+		default:			return 0;
 	}
 
 	return 0;
@@ -59,7 +59,7 @@ stock GetPrizeReward(PrizeType: type)
 	{
 		case PRIZE_TIKI:	return 10000000;
 		case PRIZE_PUMPKIN:	return 1500000;
-		default:		return 0;
+		default:			return 0;
 	}
 
 	return 0;
@@ -71,7 +71,7 @@ stock GetPrizeTypeName(PrizeType: type, name[], size)
 	{
 		case PRIZE_TIKI:	format(name, size, "Tiki");
 		case PRIZE_PUMPKIN:	format(name, size, "Pumpkin");
-		default:		format(name, size, "None");
+		default:			format(name, size, "None");
 	}
 
 	return 1;

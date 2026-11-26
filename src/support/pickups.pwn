@@ -97,6 +97,7 @@ forward InitPickups();
 public InitPickups()
 {
 	InitPrizes();
+	InitDeathMoneyPickups();
 
 	// Fort Carson
 	CreateMedicalPickup(-322.96, 1055.46, 19.74);
@@ -134,30 +135,6 @@ public InitPickups()
 	{
 		gBankPickups[i] = EnsurePickupCreated(1274, PICKUP_TYPE_ALWAYS, Float:gBankLocation[i][0], Float:gBankLocation[i][1], Float:gBankLocation[i][2]);
 	}
-
-	//
-	//  Drugz.
-	//
-
-	// switch (random(2))
-	// {
-	// 	case 0:
-	// 		{
-	// 			// Dillimore
-	// 			gDruggeryEntrance = EnsurePickupCreated(1318, 1, 645.68, -510.51, 16.33);
-	// 			gDruggery = CreateObject(18056, 645.68, -510.51, 1500.00, 0.0, 0.0, 0.0, 0.0);
-	// 			gDruggeryMarket = EnsurePickupCreated(PICKUP_SKULL, 1, 658.45, -507.50, 1500.00);
-	// 			//gDruggeryExit = EnsurePickupCreated(1318, 1, 658.45, -507.50, 1500.00);
-	// 		}
-	// 	case 1:
-	// 		{
-	// 			// Montgomery
-	// 			gDruggeryEntrance = EnsurePickupCreated(1318, 1, 1280.85, 304.07, 19.55);
-	// 			gDruggery = CreateObject(18056, 1280.85, 304.07, 1500.00, 0.0, 0.0, 0.0, 0.0);
-	// 			gDruggeryMarket = EnsurePickupCreated(PICKUP_SKULL, 1, 1293.66, 301.10, 1500.00);
-	// 			//gDruggeryExit = EnsurePickupCreated(1318, 1, 1293.66, 301.10, 1500.00);
-	// 		}
-	// }
 
 	//
 	//  Jobs/Teams.
@@ -255,20 +232,52 @@ public InitPickups()
 enum DeathMoneyPickup
 {
 	PickupID,
-	Amount
+	Amount,
+	Text3D: Text
 }
 
-new 
+new
 	gDeathMoneyPickups[MAX_DEATH_MONEY_PICKUPS][DeathMoneyPickup],
 	gDeathMoneyPickupsPointer = 0;
+
+stock InitDeathMoneyPickups()
+{
+	for (new i = 0; i < MAX_DEATH_MONEY_PICKUPS; i++)
+	{
+		gDeathMoneyPickups[i][PickupID] = INVALID_PICKUP;
+		gDeathMoneyPickups[i][Amount] = 0;
+		gDeathMoneyPickups[i][Text] = INVALID_3DTEXT_ID;
+	}
+
+	return 1;
+}
+
+stock DestroyDeathMoneyPickup(i)
+{
+	if (gDeathMoneyPickups[i][PickupID] != INVALID_PICKUP)
+	{
+		DestroyPickup(gDeathMoneyPickups[i][PickupID]);
+	}
+
+	if (gDeathMoneyPickups[i][Text] != INVALID_3DTEXT_ID)
+	{
+		Delete3DTextLabel(gDeathMoneyPickups[i][Text]);
+	}
+
+	gDeathMoneyPickups[i][PickupID] = INVALID_PICKUP;
+	gDeathMoneyPickups[i][Amount] = 0;
+	gDeathMoneyPickups[i][Text] = INVALID_3DTEXT_ID;
+
+	return 1;
+}
 
 stock CreateDeathMoneyPickup(playerid)
 {
 	if (GetPlayerMoney(playerid) > 0)
 	{
-		new 
-			Float: X, 
-			Float: Y, 
+		new
+			Float: X,
+			Float: Y,
 			Float: Z;
 
 		GetPlayerPos(playerid, X, Y, Z);
@@ -278,8 +287,12 @@ stock CreateDeathMoneyPickup(playerid)
 			gDeathMoneyPickupsPointer = 0;
 		}
 
-		gDeathMoneyPickups[gDeathMoneyPickupsPointer][PickupID] = EnsurePickupCreated(PICKUP_MOMEY_BAG, 19, Float:X, Float:Y, Float:Z);
+		// The ring buffer wrapped onto a bag nobody collected; drop it rather than leak it.
+		DestroyDeathMoneyPickup(gDeathMoneyPickupsPointer);
+
+		gDeathMoneyPickups[gDeathMoneyPickupsPointer][PickupID] = EnsurePickupCreated(PICKUP_MOMEY_BAG, 19, Float: X, Float: Y, Float: Z);
 		gDeathMoneyPickups[gDeathMoneyPickupsPointer][Amount] = GetPlayerMoney(playerid);
+		gDeathMoneyPickups[gDeathMoneyPickupsPointer][Text] = Create3DTextLabel("$%d", COLOR_GREEN, X, Y, Z + 0.5, 15.0, -1, false, gDeathMoneyPickups[gDeathMoneyPickupsPointer][Amount]);
 		ResetPlayerMoney(playerid);
 
 		gDeathMoneyPickupsPointer++;
@@ -317,11 +330,8 @@ stock CheckDeathMoneyPickup(playerid, pickupid)
 			continue;
 		}
 
-		DestroyPickup(gDeathMoneyPickups[i][PickupID]);
-		gDeathMoneyPickups[i][PickupID] = -1;
-
 		GivePlayerMoney(playerid, gDeathMoneyPickups[i][Amount]);
-		gDeathMoneyPickups[i][Amount] = 0;
+		DestroyDeathMoneyPickup(i);
 
 		return 1;
 	}

@@ -95,6 +95,7 @@ stock ResetTestPlayerNatives(playerid)
 	SetPlayerScore(playerid, 0);
 	DisablePlayerRaceCheckpoint(playerid);
 	DisablePlayerCheckpoint(playerid);
+	SetPlayerAdmin(playerid, false);
 
 	return 1;
 }

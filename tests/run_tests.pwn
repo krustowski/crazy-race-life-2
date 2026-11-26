@@ -40,6 +40,7 @@
 #include "test_taxi.pwn"
 #include "test_rampage.pwn"
 #include "test_combat.pwn"
+#include "test_admin.pwn"
 
 //public OnGameModeInit()
 main()
@@ -131,6 +132,9 @@ main()
 	RUN_TEST(RampageTimeRunsOut);
 
 	RUN_TEST(CombatMissionRun);
+
+	RUN_TEST(AdminLevelByRconAdmin);
+	RUN_TEST(AdminLevelByAdmin);
     
 	// Print summary
 	printf("\n\n=== Test Summary ===\n");

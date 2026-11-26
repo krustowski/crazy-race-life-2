@@ -11,7 +11,7 @@
 #define MAX_COMBAT_PICKUPS			20
 #define MAX_COMBAT_VEHICLES			5
 #define COMBAT_ACCURACY				0.15
-#define COMPAT_BRIEFCASE_DOLLARS	50000
+#define COMBAT_BRIEFCASE_DOLLARS	50000
 
 enum 
 {
@@ -42,15 +42,26 @@ enum CombatPickup
 {
 	Pickup,
 	CombatPickupType: Type,
-	Point[Coords]
+	Point[Coords],
+	// Where a TYPE_DOOR pickup leads: Point in this interior, or -1 for a
+	// door with no target, which is only scenery.
+	Interior
 }
 
 enum CombatMission
 {
 	bool: Active,
 	bool: Dead,
+	// The race checkpoint toward the briefcase man has been shown, by the
+	// exit pickup or by taking the helicopter. Stays set once it is reached.
+	bool: CheckpointShown,
 	MissionID,
 	BriefcaseCount,
+
+	// Start position from the mission's SPAWN row. SpawnInterior is -1 when
+	// the mission has none, and the player then stays where they are.
+	Spawn[Coords],
+	SpawnInterior,
 
 	Text: InfoText,
 
@@ -60,10 +71,17 @@ enum CombatMission
 }
 
 new 
-	gCombatNPC[MAX_COMBAT_NPCS],
+	gCombatNPC[MAX_COMBAT_NPCS] = {INVALID_NPC_ID, ...},
 	gCombatMission[MAX_PLAYERS][CombatMission],
 	gCombatPickups[MAX_COMBAT_PICKUPS][CombatPickup],
-	gCombatVehicles[MAX_COMBAT_VEHICLES];
+	gCombatVehicles[MAX_COMBAT_VEHICLES] = {INVALID_VEHICLE_ID, ...},
+	// The pickup, NPC and vehicle arrays above are shared by the whole server
+	// and every mission uses the same interior, so only one player can run a
+	// combat mission at a time. This is who holds it.
+	gCombatOccupant = INVALID_PLAYER_ID,
+	// Monotonic suffix for NPC names. NPC_Create() fails on a name that is
+	// still taken, so a name is never reused.
+	gCombatNPCSeq = 0;
 
 forward CheckBriefcaseManProximity(playerid, npcid);
 forward UpdateCombatMissionInfoText(playerid);
@@ -85,7 +103,7 @@ public CheckBriefcaseManProximity(playerid, npcid)
 		KillTimer(_: gCombatMission[playerid][TimerBriefcaseMan]);
 
 		new 
-			prize = gCombatMission[playerid][BriefcaseCount] * COMPAT_BRIEFCASE_DOLLARS, 
+			prize = gCombatMission[playerid][BriefcaseCount] * COMBAT_BRIEFCASE_DOLLARS, 
 			stringToPrint[128];
 
 		GetLocalizedString(playerid, I18N_COMBAT_BRIEFCASES_EXCHANGED_FMT, stringToPrint, sizeof(stringToPrint));
@@ -135,6 +153,47 @@ stock CheckCombatCheckpoint(playerid)
 	return 1;
 }
 
+// Shows the race checkpoint at the mission's CP point, the helicopter's
+// destination by the briefcase man.
+stock ShowCombatCheckpoint(playerid)
+{
+	for (new j = 0; j < MAX_COMBAT_PICKUPS; j++)
+	{
+		if (gCombatPickups[j][Type] != TYPE_CP)
+		{
+			continue;
+		}
+
+		gCombatMission[playerid][CheckpointShown] = true;
+
+		SendClientMessageLocalized(playerid, I18N_COMBAT_HELICOPTER_INSTRUCTIONS);
+
+		SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, gCombatPickups[j][Point][CoordX], gCombatPickups[j][Point][CoordY], gCombatPickups[j][Point][CoordZ], 0.0, 0.0, 0.0, 10.0);
+	}
+
+	return 1;
+}
+
+// A mission played outdoors has no exit pickup to show the checkpoint, so
+// taking its helicopter does. Called on entering any vehicle as the driver.
+stock CheckCombatVehicle(playerid, vehicleid)
+{
+	if (!gCombatMission[playerid][Active] || gCombatMission[playerid][CheckpointShown])
+	{
+		return 0;
+	}
+
+	for (new i = 0; i < MAX_COMBAT_VEHICLES; i++)
+	{
+		if (gCombatVehicles[i] == vehicleid)
+		{
+			return ShowCombatCheckpoint(playerid);
+		}
+	}
+
+	return 0;
+}
+
 stock CheckCombatPickup(playerid, pickupid)
 {
 	if (!gCombatMission[playerid][Active])
@@ -174,20 +233,75 @@ stock CheckCombatPickup(playerid, pickupid)
 					SetPlayerInterior(playerid, 0);
 					SetPlayerPos(playerid, gCombatPickups[i][Point][CoordX], gCombatPickups[i][Point][CoordY], gCombatPickups[i][Point][CoordZ]);
 
-					for (new j = 0; j < MAX_COMBAT_PICKUPS; j++)
+					return ShowCombatCheckpoint(playerid);
+				}
+			case TYPE_DOOR:
+				{
+					if (gCombatPickups[i][Interior] < 0)
 					{
-						if (gCombatPickups[j][Type] != TYPE_CP)
-						{
-							continue;
-						}
-
-						SendClientMessageLocalized(playerid, I18N_COMBAT_HELICOPTER_INSTRUCTIONS);
-
-						SetPlayerRaceCheckpoint(playerid, CP_TYPE_GROUND_FINISH, gCombatPickups[j][Point][CoordX], gCombatPickups[j][Point][CoordY], gCombatPickups[j][Point][CoordZ], 0.0, 0.0, 0.0, 10.0);
+						return 1;
 					}
+
+					SetPlayerInterior(playerid, gCombatPickups[i][Interior]);
+					SetPlayerPos(playerid, gCombatPickups[i][Point][CoordX], gCombatPickups[i][Point][CoordY], gCombatPickups[i][Point][CoordZ]);
 
 					return 1;
 				}
+			default:
+				{}
+		}
+	}
+
+	return 0;
+}
+
+// Creates one armed combat NPC for array slot `slot`. Returns INVALID_NPC_ID
+// (leaving the slot untouched) when the slots are exhausted or the NPC
+// component refuses the create.
+stock CreateCombatNPC(slot, const prefix[], interior, Float: X, Float: Y, Float: Z)
+{
+	if (slot >= MAX_COMBAT_NPCS)
+	{
+		printf("Combat: NPC slots exhausted (%d), skipping %s NPC", MAX_COMBAT_NPCS, prefix);
+		return INVALID_NPC_ID;
+	}
+
+	new 
+		npc_name[MAX_PLAYER_NAME];
+
+	format(npc_name, sizeof(npc_name), "[NPC]%s%d", prefix, gCombatNPCSeq++);
+
+	new 
+		npcid = NPC_Create(npc_name);
+
+	if (npcid == INVALID_NPC_ID)
+	{
+		printf("Combat: NPC_Create failed for %s", npc_name);
+		return INVALID_NPC_ID;
+	}
+
+	NPC_Spawn(npcid);
+	NPC_SetInterior(npcid, interior);
+	NPC_SetPos(npcid, X, Y, Z);
+
+	NPC_SetWeapon(npcid, WEAPON: 29);
+	NPC_SetAmmo(npcid, 1000);
+	NPC_EnableInfiniteAmmo(npcid, true);
+	NPC_SetWeaponAccuracy(npcid, WEAPON: 29, COMBAT_ACCURACY);
+
+	return npcid;
+}
+
+// Forgets an NPC id that was destroyed elsewhere (OnNPCDeath), so a later
+// teardown cannot destroy whatever NPC has since inherited that id.
+stock ReleaseCombatNPC(npcid)
+{
+	for (new i = 0; i < MAX_COMBAT_NPCS; i++)
+	{
+		if (gCombatNPC[i] == npcid)
+		{
+			gCombatNPC[i] = INVALID_NPC_ID;
+			return 1;
 		}
 	}
 
@@ -205,7 +319,8 @@ stock PrepareCombatInterior(playerid, missionid)
 	new 
 		query[256];
 
-	format(query, sizeof(query), "SELECT type, x, y, z FROM combat_coords WHERE mission_id = %d", missionid);
+	// ORDER BY id: a ROOF row fills in the EXIT pickups created before it.
+	format(query, sizeof(query), "SELECT type, x, y, z, interior, target_x, target_y, target_z, IFNULL(target_interior, -1) AS target_interior FROM combat_coords WHERE mission_id = %d ORDER BY id", missionid);
 
 	new 
 		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
@@ -216,15 +331,27 @@ stock PrepareCombatInterior(playerid, missionid)
 		return 0;
 	}
 
+	// No layout for this id: starting it would leave the player in a mission
+	// with nothing in it, which they could only abort
+	if (!DB_GetRowCount(result))
+	{
+		DB_FreeResultSet(result);
+		printf("Combat mission %d has no layout!", missionid);
+		return 0;
+	}
+
 	new 
 		npcid = 0,
 		pickupid = 0,
 		vehicleid = 0;
 
+	gCombatMission[playerid][SpawnInterior] = -1;
+
 	do
 	{
 		new 
 			type = DB_GetFieldIntByName(result, "type"),
+			interior = DB_GetFieldIntByName(result, "interior"),
 			Float: X, 
 			Float: Y, 
 			Float: Z;
@@ -244,31 +371,22 @@ stock PrepareCombatInterior(playerid, missionid)
 			case COMBAT_COORD_NPC:
 				{
 					new 
-						npc_name[MAX_PLAYER_NAME];
+						id = CreateCombatNPC(npcid, "combat", interior, X, Y, Z);
 
-					format(npc_name, sizeof(npc_name), "[NPC]combat%d", npcid);
-					gCombatNPC[npcid] = NPC_Create(npc_name);
+					if (id != INVALID_NPC_ID)
+					{
+						new 
+							Float: pX, 
+							Float: pY, 
+							Float: pZ;
 
-					NPC_Spawn(gCombatNPC[npcid]);
-					NPC_SetInterior(gCombatNPC[npcid], 3);
-					NPC_SetPos(gCombatNPC[npcid], X, Y, Z);
+						GetPlayerPos(playerid, pX, pY, pZ);
 
-					NPC_SetWeapon(gCombatNPC[npcid], WEAPON:29);
-					NPC_SetAmmo(gCombatNPC[npcid], 1000);
-					NPC_EnableInfiniteAmmo(gCombatNPC[npcid], true);
-					NPC_SetWeaponAccuracy(gCombatNPC[npcid], WEAPON:29, COMBAT_ACCURACY);
+						NPC_AimAtPlayer(id, playerid, true, 0, true, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+						NPC_Shoot(id, WEAPON:29, playerid, 0, pX, pY, pZ, 0.0, 0.0, 0.0, true);
 
-					new 
-						Float: pX, 
-						Float: pY, 
-						Float: pZ;
-
-					GetPlayerPos(playerid, pX, pY, pZ);
-
-					NPC_AimAtPlayer(gCombatNPC[npcid], playerid, true, 0, true, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-					NPC_Shoot(gCombatNPC[npcid], WEAPON:29, playerid, 0, pX, pY, pZ, 0.0, 0.0, 0.0, true);
-
-					npcid++;
+						gCombatNPC[npcid++] = id;
+					}
 				}
 			case COMBAT_COORD_HEALTH:
 				{
@@ -313,31 +431,33 @@ stock PrepareCombatInterior(playerid, missionid)
 			case COMBAT_COORD_NPC_MAN:
 				{
 					new 
-						npc_name[MAX_PLAYER_NAME];
+						id = CreateCombatNPC(npcid, "bcman", interior, X, Y, Z);
 
-					format(npc_name, sizeof(npc_name), "[NPC]bcman%d", npcid);
-					gCombatNPC[npcid] = NPC_Create(npc_name);
+					if (id != INVALID_NPC_ID)
+					{
+						SetPlayerMarkerForPlayer(playerid, id, COLOR_YELLOW);
 
-					NPC_Spawn(gCombatNPC[npcid]);
-					NPC_SetInterior(gCombatNPC[npcid], 0);
-					NPC_SetPos(gCombatNPC[npcid], X, Y, Z);
+						gCombatMission[playerid][TimerBriefcaseMan] = Timer: SetTimerEx("CheckBriefcaseManProximity", 2000, true, "i,i", playerid, id);
 
-					NPC_SetWeapon(gCombatNPC[npcid], WEAPON:29);
-					NPC_SetAmmo(gCombatNPC[npcid], 1000);
-					NPC_EnableInfiniteAmmo(gCombatNPC[npcid], true);
-					NPC_SetWeaponAccuracy(gCombatNPC[npcid], WEAPON:29, COMBAT_ACCURACY);
-
-					SetPlayerMarkerForPlayer(playerid, gCombatNPC[npcid], COLOR_YELLOW);
-
-					gCombatMission[playerid][TimerBriefcaseMan] = Timer: SetTimerEx("CheckBriefcaseManProximity", 2000, true, "i,i", playerid, gCombatNPC[npcid]);
-
-					npcid++;
+						gCombatNPC[npcid++] = id;
+					}
 				}
 			case COMBAT_COORD_DOOR:
 				{
 					gCombatPickups[pickupid][Pickup] = EnsurePickupCreated(PICKUP_ARROW, 1, X, Y, Z);
 					gCombatPickups[pickupid][Type] = CombatPickupType: TYPE_DOOR;
+					gCombatPickups[pickupid][Point][CoordX] = DB_GetFieldFloatByName(result, "target_x");
+					gCombatPickups[pickupid][Point][CoordY] = DB_GetFieldFloatByName(result, "target_y");
+					gCombatPickups[pickupid][Point][CoordZ] = DB_GetFieldFloatByName(result, "target_z");
+					gCombatPickups[pickupid][Interior] = DB_GetFieldIntByName(result, "target_interior");
 					pickupid++;
+				}
+			case COMBAT_COORD_SPAWN:
+				{
+					gCombatMission[playerid][Spawn][CoordX] = X;
+					gCombatMission[playerid][Spawn][CoordY] = Y;
+					gCombatMission[playerid][Spawn][CoordZ] = Z;
+					gCombatMission[playerid][SpawnInterior] = interior;
 				}
 		}
 	}
@@ -360,14 +480,24 @@ stock SetCombatMission(playerid, missionid)
 		return SendClientMessageLocalized(playerid, I18N_COMBAT_IN_MINIGAME_BLOCK);
 	}
 
+	// One mission at a time server-wide (see gCombatOccupant). A holder who
+	// is gone or no longer active is a stale lock, not a live mission.
+	if (gCombatOccupant != INVALID_PLAYER_ID && gCombatOccupant != playerid
+		&& IsPlayerConnected(gCombatOccupant) && gCombatMission[gCombatOccupant][Active])
+	{
+		return SendClientMessageLocalized(playerid, I18N_COMBAT_OCCUPIED_BLOCK);
+	}
+
 	if (!PrepareCombatInterior(playerid, missionid))
 	{
 		return SendClientMessageLocalized(playerid, I18N_COMBAT_GENERIC_ERROR_NEW_MISS);
 	}
 
+	gCombatOccupant = playerid;
 	gPlayers[playerid][InMinigame] = true;
 
 	gCombatMission[playerid][Active] = true;
+	gCombatMission[playerid][CheckpointShown] = false;
 	gCombatMission[playerid][TimeElapsed] = 0;
 	gCombatMission[playerid][BriefcaseCount] = 0;
 	gCombatMission[playerid][MissionID] = missionid;
@@ -389,17 +519,10 @@ stock SetCombatMission(playerid, missionid)
 	GetLocalizedString(playerid, I18N_COMBAT_MISS_START, gameText, sizeof(gameText));
 	GameTextForPlayer(playerid, gameText, 3000, 3); 
 
-	switch (missionid)
+	if (gCombatMission[playerid][SpawnInterior] >= 0)
 	{
-		case 1:
-			{
-				SetPlayerInterior(playerid, 3);
-				SetPlayerPos(playerid, 376.27, 186.46, 1008.38);
-			}
-		case 2:
-			{
-				SetPlayerPos(playerid, 20.900000, 2233.000000, 101.100000);
-			}
+		SetPlayerInterior(playerid, gCombatMission[playerid][SpawnInterior]);
+		SetPlayerPos(playerid, gCombatMission[playerid][Spawn][CoordX], gCombatMission[playerid][Spawn][CoordY], gCombatMission[playerid][Spawn][CoordZ]);
 	}
 
 	return 1;
@@ -443,20 +566,58 @@ stock AbortCombatMission(playerid, bool: success)
 		return 1;
 	}
 
+	// Same reasoning as EndDeathmatch(): a destroyed id goes straight back into
+	// the pool. Leaving it here means the next abort destroys whatever pickup
+	// has since inherited the id -- slots this run never filled still hold ids
+	// from the run before.
 	for (new i = 0; i < MAX_COMBAT_PICKUPS; i++)
 	{
-		DestroyPickup(gCombatPickups[i][Pickup]);
+		if (gCombatPickups[i][Pickup] > 0)
+		{
+			DestroyPickup(gCombatPickups[i][Pickup]);
+		}
+
+		gCombatPickups[i][Pickup] = INVALID_PICKUP;
+		gCombatPickups[i][Type] = CombatPickupType: TYPE_NONE;
 	}
 
+	// Same again for NPCs: only destroy ids we still own, then forget them.
 	for (new i = 0; i < MAX_COMBAT_NPCS; i++)
 	{
-		NPC_Destroy(gCombatNPC[i]);
+		if (NPC_IsValid(gCombatNPC[i]))
+		{
+			NPC_Destroy(gCombatNPC[i]);
+		}
+
+		gCombatNPC[i] = INVALID_NPC_ID;
+	}
+
+	for (new i = 0; i < MAX_COMBAT_VEHICLES; i++)
+	{
+		if (gCombatVehicles[i] != INVALID_VEHICLE_ID)
+		{
+			DestroyVehicle(gCombatVehicles[i]);
+		}
+
+		gCombatVehicles[i] = INVALID_VEHICLE_ID;
 	}
 
 	DisablePlayerRaceCheckpoint(playerid);
 
-	KillTimer(_: gCombatMission[playerid][TimerUpdate]);
-	KillTimer(_: gCombatMission[playerid][TimerBriefcaseMan]);
+	if (gCombatMission[playerid][TimerUpdate] != Timer: INVALID_TIMER)
+	{
+		KillTimer(_: gCombatMission[playerid][TimerUpdate]);
+	}
+
+	// Only armed when the layout has an NPC_MAN row; on other missions the
+	// field would still hold the id from the last run.
+	if (gCombatMission[playerid][TimerBriefcaseMan] != Timer: INVALID_TIMER)
+	{
+		KillTimer(_: gCombatMission[playerid][TimerBriefcaseMan]);
+	}
+
+	gCombatMission[playerid][TimerUpdate] = Timer: INVALID_TIMER;
+	gCombatMission[playerid][TimerBriefcaseMan] = Timer: INVALID_TIMER;
 
 	TextDrawHideForPlayer(playerid, gCombatMission[playerid][InfoText]);
 
@@ -481,7 +642,13 @@ stock AbortCombatMission(playerid, bool: success)
 
 	gPlayers[playerid][InMinigame] = false;
 
+	if (gCombatOccupant == playerid)
+	{
+		gCombatOccupant = INVALID_PLAYER_ID;
+	}
+
 	gCombatMission[playerid][Active] = false;
+	gCombatMission[playerid][CheckpointShown] = false;
 	gCombatMission[playerid][TimeElapsed] = 0;
 	gCombatMission[playerid][BriefcaseCount] = 0;
 

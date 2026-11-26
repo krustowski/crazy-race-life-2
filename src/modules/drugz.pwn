@@ -8,15 +8,33 @@
 //  Drug types, the black market and the Drug Mission.
 //
 
-#define MAX_DRUG_PICKUPS	64
-#define MAX_MARKET_ITEMS	128
-#define MAX_DRUGGERY_POINTS	16
+#define MAX_DRUG_PICKUPS		64
+#define MAX_MARKET_ITEMS		128
+#define MAX_DRUGGERY_POINTS		16
 
-#define MARKET_RATIO_MIN	0.01
-#define MARKET_RATIO_MAX	100.0
+#define DRUGGERY_POINT_RANGE	5.0
+
+#define MARKET_RATIO_MIN		0.01
+#define MARKET_RATIO_MAX		100.0
 #define MARKET_RATIO_EQULIBRIUM	1.0
-#define MARKET_REVERSION_RATE	0.005
-#define MARKET_STEP_PERCENT	20
+
+// The ratio walks in log10 space, where MIN..MAX is -2..+2 around the
+// equilibrium at 0, so a step up is as likely as the same step down. A tick is
+// one UpdateBlackMarketRatio call, every 3 minutes (support/timers.pwn).
+#define MARKET_STEP_LOG			0.08	// a plain tick moves the ratio by up to x1.2 either way
+#define MARKET_REVERSION_RATE	0.08	// share of the way back to equilibrium per tick (half-life ~8 ticks)
+#define MARKET_SHOCK_CHANCE		5		// percent of ticks that also get a shock
+#define MARKET_SHOCK_LOG		0.6		// a shock moves the ratio by up to x4 either way
+#define MARKET_SALE_IMPACT_LOG	0.005	// drop per $1000 of drug_prices value sold to the fence
+
+// Once a game day (world time follows the real clock, support/clock.pwn) the
+// market booms: the ratio climbs every tick until it hits MARKET_RATIO_MAX,
+// holds there for MARKET_BOOM_HOLD_TICKS (only fence sales move it), then
+// reverts as usual.
+#define MARKET_BOOM_STEP_LOG	0.4	// x2.5 per tick, 5 ticks from equilibrium to the max
+#define MARKET_BOOM_MAX_TICKS	12	// fence sales can slow the climb, this tick peaks it anyway
+#define MARKET_BOOM_HOLD_TICKS	3
+#define MARKET_BOOM_LATEST_S	(23 * 60 * 60)	// latest start, so the boom peaks the same day
 
 #include "support/helpers.pwn"
 #include "support/pickups.pwn"
@@ -30,10 +48,26 @@ enum BlackMarketItem
 	DrugType: Type
 };
 
-new 
+new
 	gBlackMarketItems[MAX_MARKET_ITEMS][BlackMarketItem],
 	gBlackMarketItemOffer[MAX_PLAYERS][BlackMarketItem],
 	Float: gBlackMarketRatio = 1.0;
+
+enum MarketBoomPhase
+{
+	BOOM_NONE,
+	BOOM_RISING,
+	BOOM_PEAK
+}
+
+new
+	MarketBoomPhase: gMarketBoomPhase = BOOM_NONE,
+	// Ticks spent in the current boom phase
+	gMarketBoomTicks,
+	// Day of the year the boom schedule is for, and the second of that day the
+	// boom starts at (-1: none left that day)
+	gMarketBoomDay = -1,
+	gMarketBoomAt = -1;
 
 enum
 {
@@ -99,7 +133,8 @@ enum DruggeryPoint
 }
 
 new
-	gDruggeryPoints[MAX_DRUGGERY_POINTS][DruggeryPoint];
+	gDruggeryPoints[MAX_DRUGGERY_POINTS][DruggeryPoint],
+	gDruggeryPointCount;
 
 new 
 	gDrugMission[MAX_PLAYERS][DrugMission],
@@ -108,7 +143,8 @@ new
 
 stock InitDrugValues()
 {
-	new DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, "SELECT name, name_alt, price FROM drug_prices ORDER BY id ASC");
+	new
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, "SELECT name, name_alt, price FROM drug_prices ORDER BY id ASC");
 	if (!result) 
 	{
 		print("Database error: cannot fetch drug prices!");
@@ -256,9 +292,11 @@ stock InitDruggeryPoints()
 
 		i++;
 	}
-	while (DB_SelectNextRow(result));
+	while (DB_SelectNextRow(result) && i < MAX_DRUGGERY_POINTS);
 
 	DB_FreeResultSet(result);
+
+	gDruggeryPointCount = i;
 
 	print("Druggery points initialized!");
 
@@ -267,7 +305,7 @@ stock InitDruggeryPoints()
 
 stock CheckDruggeryPointPickup(playerid, pickupid)
 {
-	for (new i = 0; i < MAX_DRUGGERY_POINTS; i++)
+	for (new i = 0; i < gDruggeryPointCount; i++)
 	{
 		if (gDruggeryPoints[i][Pickup] != pickupid)
 		{
@@ -279,11 +317,185 @@ stock CheckDruggeryPointPickup(playerid, pickupid)
 			return 0;
 		}
 
-		return ShowBlackMarketMainDialog(playerid);
+		// Only the druggery points have the fence
+		return ShowBlackMarketMainDialog(playerid, true);
 	}
 
 	return 0;
 }
+
+stock bool: IsPlayerAtDruggeryPoint(playerid)
+{
+	for (new i = 0; i < gDruggeryPointCount; i++)
+	{
+		if (IsPlayerInRangeOfPoint(playerid, DRUGGERY_POINT_RANGE,
+				gDruggeryPoints[i][PointCoords][CoordX],
+				gDruggeryPoints[i][PointCoords][CoordY],
+				gDruggeryPoints[i][PointCoords][CoordZ]))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+//
+//  Market ratio.
+//
+
+forward UpdateBlackMarketRatio();
+
+// Converts a log10 level back into the ratio. Hitting a bound sets it exactly,
+// so a boom peaks at MARKET_RATIO_MAX and not a rounding error below it.
+stock SetBlackMarketRatioLevel(Float: level)
+{
+	if (level >= floatlog(MARKET_RATIO_MAX))
+	{
+		gBlackMarketRatio = MARKET_RATIO_MAX;
+	}
+	else if (level <= floatlog(MARKET_RATIO_MIN))
+	{
+		gBlackMarketRatio = MARKET_RATIO_MIN;
+	}
+	else
+	{
+		gBlackMarketRatio = floatpower(10.0, level);
+	}
+}
+
+// A fence sale floods the market a little: every $1000 of drug_prices value
+// sold lowers the ratio by MARKET_SALE_IMPACT_LOG.
+stock PushBlackMarketRatioDown(baseValue)
+{
+	SetBlackMarketRatioLevel(floatlog(gBlackMarketRatio) - MARKET_SALE_IMPACT_LOG * float(baseValue) / 1000.0);
+}
+
+// When today's boom starts, somewhere between now and MARKET_BOOM_LATEST_S (in
+// seconds since midnight), or -1 when it is too late for one today.
+stock PickMarketBoomTime(now)
+{
+	if (now >= MARKET_BOOM_LATEST_S)
+	{
+		return -1;
+	}
+
+	return now + random(MARKET_BOOM_LATEST_S - now);
+}
+
+// Schedules a boom for every new day and starts it once its time has come. A
+// restart schedules a fresh one for the rest of the day.
+stock UpdateMarketBoomSchedule()
+{
+	new
+		hour,
+		minute,
+		second,
+		today = getdate();
+
+	gettime(hour, minute, second);
+
+	new
+		now = hour * 60 * 60 + minute * 60 + second;
+
+	if (today != gMarketBoomDay)
+	{
+		gMarketBoomDay = today;
+		gMarketBoomAt = PickMarketBoomTime(now);
+	}
+
+	if (gMarketBoomAt != -1 && now >= gMarketBoomAt && gMarketBoomPhase == BOOM_NONE)
+	{
+		gMarketBoomAt = -1;
+		gMarketBoomPhase = BOOM_RISING;
+		gMarketBoomTicks = 0;
+	}
+}
+
+// A random number in -1.0..1.0, in steps of 0.01
+stock Float: RandomMarketUnit()
+{
+	return float(random(201) - 100) / 100.0;
+}
+
+public UpdateBlackMarketRatio()
+{
+	UpdateMarketBoomSchedule();
+
+	new
+		Float: level = floatlog(gBlackMarketRatio),
+		bool: peaked = false;
+
+	switch (gMarketBoomPhase)
+	{
+		case BOOM_RISING:
+			{
+				level += MARKET_BOOM_STEP_LOG;
+
+				if (++gMarketBoomTicks >= MARKET_BOOM_MAX_TICKS)
+				{
+					level = floatlog(MARKET_RATIO_MAX);
+				}
+
+				if (level >= floatlog(MARKET_RATIO_MAX))
+				{
+					gMarketBoomPhase = BOOM_PEAK;
+					gMarketBoomTicks = 0;
+					peaked = true;
+				}
+			}
+		case BOOM_PEAK:
+			{
+				if (++gMarketBoomTicks >= MARKET_BOOM_HOLD_TICKS)
+				{
+					gMarketBoomPhase = BOOM_NONE;
+				}
+			}
+		default:
+			{
+				// Symmetric step, plus a pull toward equilibrium proportional to the distance
+				level += MARKET_STEP_LOG * RandomMarketUnit();
+				level += MARKET_REVERSION_RATE * (floatlog(MARKET_RATIO_EQULIBRIUM) - level);
+
+				// An occasional shock for the faster swings
+				if (random(100) < MARKET_SHOCK_CHANCE)
+				{
+					level += MARKET_SHOCK_LOG * RandomMarketUnit();
+				}
+			}
+	}
+
+	SetBlackMarketRatioLevel(level);
+
+	// Ratio update message broadcasting
+	for (new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (!IsPlayerConnected(i) || gPlayers[i][TeamID] != TEAM_DEALERS)
+		{
+			continue;
+		}
+
+		new
+			msg[MAX_MESSAGE_LEN];
+		GetLocalizedString(i, I18N_BLACK_MARKET_RATIO_UPDATE, msg, sizeof(msg));
+
+		format(msg, sizeof(msg), msg,
+				gBlackMarketRatio
+			);
+
+		SendClientMessage(i, COLOR_ORANGE, msg);
+
+		if (peaked)
+		{
+			GetLocalizedString(i, I18N_FENCE_RATIO_PEAK_FMT, msg, sizeof(msg));
+			format(msg, sizeof(msg), msg, MARKET_RATIO_MAX);
+			SendClientMessage(i, COLOR_ORANGE, msg);
+		}
+	}
+
+	return 1;
+}
+
 //
 //  Drug Mission.
 //
@@ -439,3 +651,5 @@ stock ToggleDrugMission(playerid)
 
 	return 1;
 }
+
+#include "modules/fence.pwn"

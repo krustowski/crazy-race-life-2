@@ -138,6 +138,14 @@ stock SetDeathmatchPickups()
 
 stock CheckDeathmatchPickups(playerid, pickupid)
 {
+	// These exist only for the arena. Belt and braces against the id reuse
+	// described in EndDeathmatch(), and it stops a passer-by helping
+	// themselves to free armour while a round is running.
+	if (!gDeathmatch[playerid][InGame])
+	{
+		return 0;
+	}
+
 	for (new i = 0; i < MAX_DEATHMATCH_PICKUPS; i++)
 	{
 		if (gDeathmatchPickups[i][Pickup] != pickupid)
@@ -180,12 +188,21 @@ public EndDeathmatch()
 		}
 	}
 
+	// Clearing the slot matters as much as destroying the pickup. open.mp hands
+	// a freed id straight back out to the next CreatePickup(), and
+	// OnPlayerPickUpPickup dispatches purely by id -- so a stale id left here
+	// keeps matching in CheckDeathmatchPickups(), which runs ahead of the money
+	// bag, real estate, drugs, black market and bribe checks. Whatever pickup
+	// inherits the id then silently hands out health or armour instead.
 	for (new i = 0; i < MAX_DEATHMATCH_PICKUPS; i++)
 	{
-		if (gDeathmatchPickups[i][Pickup])
+		if (gDeathmatchPickups[i][Pickup] > 0)
 		{
 			DestroyPickup(gDeathmatchPickups[i][Pickup]);
 		}
+
+		gDeathmatchPickups[i][Pickup] = INVALID_PICKUP;
+		gDeathmatchPickups[i][Type] = DeathmatchPickupType: TYPE_NONE;
 	}
 
 	KillTimer(_: gDeathmatchTimers[Elapsed]);

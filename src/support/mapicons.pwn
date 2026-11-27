@@ -235,6 +235,10 @@ public AddMapicons(playerid)
 				{
 					SetPlayerMapIconSafe(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_MADD_DOGG, 0, MAPICON_LOCAL);
 				}
+			case TEAM_ROBBERS:
+				{
+					SetPlayerMapIconSafe(playerid, mapiconid++, X, Y, Z, E_MAPICON_ID_RYDER, 0, MAPICON_LOCAL);
+				}
 		}
 	}
 	while (DB_SelectNextRow(result));
@@ -274,6 +278,12 @@ public AddMapicons(playerid)
 	if (mapiconid > MAX_PLAYER_MAP_ICONS)
 	{
 		printf("[mapicons] player %d needs %d icons but only %d slots exist; %d dropped", playerid, mapiconid, MAX_PLAYER_MAP_ICONS, mapiconid - MAX_PLAYER_MAP_ICONS);
+	}
+
+	// On a redraw the list can shrink (sold property), clear the slots left over from the previous run.
+	for (new i = mapiconid; i < MAX_PLAYER_MAP_ICONS; i++)
+	{
+		RemovePlayerMapIcon(playerid, i);
 	}
 
 	/*SetPlayerMapIcon(playerid, 40, 970.7, 2155.0, 10.8, E_MAPICON_ID_TRUCKING, 0, MAPICON_LOCAL);

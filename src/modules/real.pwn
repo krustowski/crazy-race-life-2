@@ -15,7 +15,7 @@
 #define SPAWN_PICKUP_COUNT		4
 #define INVALID_PROPERTY_ID		-1
 
-#include "db/sql.pwn"
+#include "db/sqlite.pwn"
 #include "support/dialogs.pwn"
 #include "support/pickups.pwn"
 #include "support/helpers.pwn"
@@ -139,10 +139,15 @@ enum PlayerPropertyObject
 	Pickups[SPAWN_PICKUP_COUNT]
 }
 
-new 
+new
 	gPlayerInteriors[MAX_PLAYERS][PlayerPropertyObject],
 	gProperties[MAX_PROPERTIES][Property],
 	gPropertyCoords[MAX_PROPERTIES][MAX_PROPERTY_PICKUPS][PropertyPickup];
+
+// A robbed property pays its tenant no commission until this gettime()
+// timestamp, set by StopRobbery() in rob.pwn.
+new
+	gPropertyCommissionBlockedUntil[MAX_PROPERTIES];
 
 // Utilized by lvl5 admins when editing a property.
 new 
@@ -211,7 +216,7 @@ public SendRealEstateCommission()
 
 		new 
 			query[256];
-		format(query, sizeof(query), "SELECT cost FROM properties WHERE user_id = %d AND type = %d",
+		format(query, sizeof(query), "SELECT id, cost FROM properties WHERE user_id = %d AND type = %d",
 				gPlayers[i][OrmID],
 				_: PROPERTY_TYPE_COMMERCIAL
 			);
@@ -238,7 +243,15 @@ public SendRealEstateCommission()
 		do
 		{
 			new
+				arrayid = GetPropertyArrayIDfromID(DB_GetFieldIntByName(result, "id")),
 				cost = DB_GetFieldIntByName(result, "cost");
+
+			// Robbed lately: no profit from this one for now.
+			if (arrayid != INVALID_PROPERTY_ID && gPropertyCommissionBlockedUntil[arrayid] > gettime())
+			{
+				continue;
+			}
+
 			commission += floatround(cost / 50) + random(cost / 100);
 		}
 		while (DB_SelectNextRow(result));
@@ -282,13 +295,23 @@ public SendRealEstateCommission()
 	return 1;
 }*/
 
+// Player gang zone IDs come from each player's own pool, so they are tracked per player.
 new
-	gGangZone[MAX_PROPERTIES] = {INVALID_GANG_ZONE, ...};
+	gRealZones[MAX_PLAYERS][MAX_PROPERTIES],
+	gRealZoneCount[MAX_PLAYERS];
 
 stock RedrawRealZones(playerid)
 {
+	// Drop every zone drawn last time, so a sold property does not keep its zone.
+	for (new i = 0; i < gRealZoneCount[playerid]; i++)
+	{
+		PlayerGangZoneDestroy(playerid, gRealZones[playerid][i]);
+	}
+
+	gRealZoneCount[playerid] = 0;
+
 	new
-		query[] = "select c.primary_x, c.primary_y, t.color from property_coords AS c JOIN properties AS p ON p.id = c.property_id JOIN users AS u ON u.id = p.user_id JOIN teams AS t ON t.id = u.team where c.type = 8 AND p.user_id > 0";
+		query[] = "select c.primary_x, c.primary_y, t.color from property_coords AS c JOIN properties AS p ON p.id = c.property_id JOIN users AS u ON u.id = p.user_id JOIN teams AS t ON t.id = u.team where c.type = 8 AND p.user_id > 0 AND p.occupied = 1";
 
 	new
 		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
@@ -305,10 +328,7 @@ stock RedrawRealZones(playerid)
 		return 1;
 	}
 
-	new
-		i = 0;
-
-	do 
+	do
 	{
 		new
 			Float: X = DB_GetFieldFloatByName(result, "primary_x"),
@@ -319,24 +339,24 @@ stock RedrawRealZones(playerid)
 		DB_GetFieldStringByName(result, "color", colorString, sizeof(colorString));
 		color = HexToInt(colorString);
 
-		if (IsValidPlayerGangZone(playerid, gGangZone[i]))
-		{
-			PlayerGangZoneDestroy(playerid, gGangZone[i]);
-			gGangZone[i] = INVALID_GANG_ZONE;
-		}
-
 		new
 			const ZONE_OFFSET = 50;
 
-		gGangZone[i] = CreatePlayerGangZone(playerid, X - ZONE_OFFSET, Y - ZONE_OFFSET, X + ZONE_OFFSET, Y + ZONE_OFFSET);
-		PlayerGangZoneShow(playerid, gGangZone[i], color);
+		new
+			zoneid = CreatePlayerGangZone(playerid, X - ZONE_OFFSET, Y - ZONE_OFFSET, X + ZONE_OFFSET, Y + ZONE_OFFSET);
 
-		if (i + 1 == MAX_PROPERTIES)
+		if (zoneid == INVALID_GANG_ZONE)
 		{
 			break;
 		}
 
-		i++;
+		PlayerGangZoneShow(playerid, zoneid, color);
+		gRealZones[playerid][gRealZoneCount[playerid]++] = zoneid;
+
+		if (gRealZoneCount[playerid] == MAX_PROPERTIES)
+		{
+			break;
+		}
 	}
 	while (DB_SelectNextRow(result));
 
@@ -668,20 +688,40 @@ stock LoadPlayerProperties(playerid)
 		return 0;
 	}
 
-	new 
+	// The properties table is the source of truth, drop whatever was loaded from users.properties.
+	for (new j = 0; j < MAX_PLAYER_PROPERTIES; j++)
+	{
+		gPlayers[playerid][Properties][j] = 0;
+	}
+
+	if (!DB_GetRowCount(result))
+	{
+		DB_FreeResultSet(result);
+		return 1;
+	}
+
+	new
 		i = 0;
 
 	do
 	{
-		new 
-			propertyid = DB_GetFieldIntByName(result, "id"),
-			vehicleid = gProperties[ GetPropertyArrayIDfromID(propertyid) ][Vehicle][ID];
+		new
+			propertyid = DB_GetFieldIntByName(result, "id");
+
+		if (i >= MAX_PLAYER_PROPERTIES)
+		{
+			printf("Warning: user %d owns more than %d personal properties, ignoring property %d", gPlayers[playerid][OrmID], MAX_PLAYER_PROPERTIES, propertyid);
+			continue;
+		}
 
 		gPlayers[playerid][Properties][i] = propertyid;
 
-		if (vehicleid)
+		new
+			arrayid = GetPropertyArrayIDfromID(propertyid);
+
+		if (arrayid != INVALID_PROPERTY_ID && gProperties[arrayid][Vehicle][ID])
 		{
-			//SetVehicleParamsForPlayer(vehicleid, playerid, VEHICLE_PARAMS_OFF, VEHICLE_PARAMS_OFF);
+			//SetVehicleParamsForPlayer(gProperties[arrayid][Vehicle][ID], playerid, VEHICLE_PARAMS_OFF, VEHICLE_PARAMS_OFF);
 		}
 
 		i++;
@@ -717,8 +757,14 @@ stock IsPlayerOwnerOfArrayID(playerid, arrayid)
 
 stock SaveRealEstateData()
 {
-	new 
+	new
 		query[1024];
+
+	// Every property gets a property and a drugz upsert (plus one for its
+	// vehicle), so ~400 properties are ~900 writes. Outside a transaction each
+	// would commit and wait on its own disk sync, stalling the server.
+	new
+		bool: ownTransaction = BeginDBTransaction();
 
 	for (new i = 0; i < sizeof(gProperties); i++)
 	{
@@ -768,7 +814,7 @@ stock SaveRealEstateData()
 			DB_FreeResultSet(result_vehicle);
 		}
 
-		format(query, sizeof(query), "INSERT INTO properties (id,type,user_id,vehicle_id,name,cost,occupied,custom_interior,locked_until_timestamp) VALUES (%d, %d, %d, %d, '%s', %d, %d, %d, %d) ON CONFLICT(id) DO UPDATE SET type = excluded.type, occupied = excluded.occupied, user_id = excluded.user_id, custom_interior = excluded.custom_interior, vehicle_id = excluded.vehicle_id, locked_until_timestamp = excluded.locked_until_timestamp",
+		format(query, sizeof(query), "INSERT INTO properties (id,type,user_id,vehicle_id,name,cost,occupied,custom_interior,locked_until_timestamp) VALUES (%d, %d, %d, %d, '%q', %d, %d, %d, %d) ON CONFLICT(id) DO UPDATE SET type = excluded.type, occupied = excluded.occupied, user_id = excluded.user_id, custom_interior = excluded.custom_interior, vehicle_id = excluded.vehicle_id, locked_until_timestamp = excluded.locked_until_timestamp",
 				gProperties[i][ID],
 				_: gProperties[i][Type],
 				gProperties[i][UserID],
@@ -818,6 +864,11 @@ stock SaveRealEstateData()
 		}
 
 		DB_FreeResultSet(result_drugz);
+	}
+
+	if (ownTransaction && !CommitDBTransaction())
+	{
+		print("Database error: real estate autosave was not committed, it will be retried on the next save!");
 	}
 
 	return 1;
@@ -1160,12 +1211,44 @@ stock GetPropertyArrayIDfromID(propertyID)
 	return -1;
 }
 
+// Percentage of all commercial properties the player rents right now. Rounded
+// down, so 100 means every single one of them.
+stock GetPlayerCommercialShare(playerid)
+{
+	new
+		total,
+		rented;
+
+	for (new i = 0; i < MAX_PROPERTIES; i++)
+	{
+		if (!gProperties[i][ID] || gProperties[i][Type] != PROPERTY_TYPE_COMMERCIAL)
+		{
+			continue;
+		}
+
+		total++;
+
+		if (IsPlayerOwnerOfArrayID(playerid, i))
+		{
+			rented++;
+		}
+	}
+
+	if (!total)
+	{
+		return 0;
+	}
+
+	return rented * 100 / total;
+}
+
 stock RentProperty(playerid, propertyID)
 {
 	new 
 		arrayid = GetPropertyArrayIDfromID(propertyID);
 
-	if (arrayid == -1 || !propertyID)
+	// Only commercial properties are rentable, personal ones go through the slot-limited purchase.
+	if (arrayid == -1 || !propertyID || gProperties[arrayid][Type] != PROPERTY_TYPE_COMMERCIAL)
 	{
 		return SendClientMessageLocalized(playerid, I18N_REAL_INVALID_CODE);
 	}
@@ -1224,6 +1307,7 @@ stock RentProperty(playerid, propertyID)
 	SpawnProperty(arrayid);
 
 	FireQuestEvent(playerid, QUEST_EVT_PROPERTY_RENTED);
+	FireQuestLevelEvent(playerid, QUEST_EVT_COMMERCIAL_SHARE, GetPlayerCommercialShare(playerid));
 
 	GivePlayerMoney(playerid, -gProperties[arrayid][Cost]);
 	SendClientMessageLocalized(playerid, I18N_REAL_RENTED_SUCCESSFULLY);
@@ -1287,6 +1371,20 @@ stock BuyPlayerProperty(playerid, propertyID)
 		return SendClientMessageLocalized(playerid, I18N_REAL_NO_MONEY);
 	}
 
+	// Check the location before touching anything, a bail-out would leave a half-bought property.
+	for (new i = 0; i < MAX_PROPERTY_PICKUPS; i++)
+	{
+		if (gPropertyCoords[arrayID][i][PickupType] != OFFER_POINT)
+		{
+			continue;
+		}
+
+		if (!IsPlayerInSphere(playerid, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ], 15.0))
+		{
+			return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);
+		}
+	}
+
 	//
 	//  Ok, proceed with the transaction
 	//
@@ -1297,11 +1395,6 @@ stock BuyPlayerProperty(playerid, propertyID)
 	{
 		if (gPropertyCoords[arrayID][i][PickupType] == OFFER_POINT)
 		{
-			if (!IsPlayerInSphere(playerid, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ], 15.0))
-			{
-				return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);
-			}
-
 			DestroyPickup(gPropertyCoords[arrayID][i][Pickup]);
 			gPropertyCoords[arrayID][i][Pickup] = 0;
 			gPropertyCoords[arrayID][i][Pickup] = EnsurePickupCreated(PICKUP_HOUSE_RED, 1, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ]);
@@ -1334,6 +1427,9 @@ stock BuyPlayerProperty(playerid, propertyID)
 	//PlayerPlaySound(playerid, 182, 0.0, 0.0, 0.0);
 	SaveRealEstateData();
 
+	RedrawRealZonesForAll();
+	AddMapicons(playerid);
+
 	return SendClientMessageLocalized(playerid, I18N_REAL_PROPERTY_ACQ);
 }
 
@@ -1359,43 +1455,56 @@ stock SellPlayerProperty(playerid, propertyID)
 		return SendClientMessageLocalized(playerid, I18N_REAL_SELL_NOT_OWNED);
 	}
 
+	// Check the location before anything is torn down, the entrance pickup may come first.
+	for (new i = 0; i < MAX_PROPERTY_PICKUPS; i++)
+	{
+		if (gPropertyCoords[arrayID][i][PickupType] != OFFER_POINT)
+		{
+			continue;
+		}
+
+		if (!IsPlayerInSphere(playerid, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ], 15.0))
+		{
+			return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);
+		}
+	}
+
 	//
 	//  Ok, sell the property.
 	//
-
-	if (gPlayers[playerid][SpawnPoint] == propertyID)
-	{
-		gPlayers[playerid][SpawnPoint] = 0;
-	}
-
-	// Free the property slot.
-	for (new j = 0; j < MAX_PLAYER_PROPERTIES; j++)
-	{
-		if (gPlayers[playerid][Properties][j] == propertyID)
-		{
-			gPlayers[playerid][Properties][j] = 0;
-			break;
-		}
-	}
 
 	for (new i = 0; i < MAX_PROPERTY_PICKUPS; i++)
 	{
 		if (gPropertyCoords[arrayID][i][PickupType] == ENTRANCE_POINT)
 		{
 			DestroyPickup(gPropertyCoords[arrayID][i][Pickup]);
+
+			// A stale ID would make CheckRealEstatePickup match whatever pickup reuses it.
+			gPropertyCoords[arrayID][i][Pickup] = 0;
 		}
 
 		if (gPropertyCoords[arrayID][i][PickupType] == OFFER_POINT)
 		{
-			if (!IsPlayerInSphere(playerid, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ], 15.0))
-			{
-				return SendClientMessageLocalized(playerid, I18N_REAL_SELL_PICKUP_MISLOC);
-			}
-
 			DestroyPickup(gPropertyCoords[arrayID][i][Pickup]);
 			Delete3DTextLabel(gPropertyCoords[arrayID][i][Text]);
 
 			gPropertyCoords[arrayID][i][Pickup] = EnsurePickupCreated(PICKUP_HOUSE_GREEN, 1, gPropertyCoords[arrayID][i][Primary][CoordX], gPropertyCoords[arrayID][i][Primary][CoordY], gPropertyCoords[arrayID][i][Primary][CoordZ]);
+		}
+	}
+
+	// Free the slot only once the sale can no longer bail out, otherwise the player keeps
+	// the property and gets a free slot on top of it.
+	if (gPlayers[playerid][SpawnPoint] == propertyID)
+	{
+		gPlayers[playerid][SpawnPoint] = 0;
+	}
+
+	for (new j = 0; j < MAX_PLAYER_PROPERTIES; j++)
+	{
+		if (gPlayers[playerid][Properties][j] == propertyID)
+		{
+			gPlayers[playerid][Properties][j] = 0;
+			break;
 		}
 	}
 
@@ -1412,6 +1521,10 @@ stock SellPlayerProperty(playerid, propertyID)
 
 	GivePlayerMoney(playerid, floatround(float(gProperties[arrayID][Cost]) * 0.9));
 	SaveRealEstateData();
+
+	// Zones are read back from the DB, so only redraw once the sale is saved.
+	RedrawRealZonesForAll();
+	AddMapicons(playerid);
 
 	return SendClientMessageLocalized(playerid, I18N_REAL_SELL_SUCCESS);
 }
@@ -1562,7 +1675,7 @@ stock EditProperty(playerid)
 	new 
 		query[2048];
 
-	format(query, sizeof(query), "INSERT INTO properties (id, type, user_id, name, cost, occupied, custom_interior, locked_until_timestamp) VALUES (%d, %d, %d, '%s', %d, %d, %d, %d) ON CONFLICT(id) DO UPDATE SET user_id = excluded.user_id, name = excluded.name, cost = excluded.cost, occupied = excluded.occupied, custom_interior = excluded.custom_interior, locked_until_timestamp = excluded.locked_until_timestamp",
+	format(query, sizeof(query), "INSERT INTO properties (id, type, user_id, name, cost, occupied, custom_interior, locked_until_timestamp) VALUES (%d, %d, %d, '%q', %d, %d, %d, %d) ON CONFLICT(id) DO UPDATE SET user_id = excluded.user_id, name = excluded.name, cost = excluded.cost, occupied = excluded.occupied, custom_interior = excluded.custom_interior, locked_until_timestamp = excluded.locked_until_timestamp",
 			gPropertyEdit[playerid][ID],
 			_: gPropertyEdit[playerid][Type],
 			gPropertyEdit[playerid][UserID],

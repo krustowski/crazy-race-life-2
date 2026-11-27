@@ -28,7 +28,7 @@ services:
     container_name: samp-server
     depends_on:
       - mariadb
-    image: registry.vxn.dev/open.mp/run:ubuntu-22.04
+    image: ${OMP_SERVER_IMAGE:?set OMP_SERVER_IMAGE (in .env) to the open.mp server image}
     networks:
       - samp-net
     volumes:
@@ -38,5 +38,3 @@ services:
     ports:
       - 39876:39876/udp
       - 39876:39876/tcp
-
-

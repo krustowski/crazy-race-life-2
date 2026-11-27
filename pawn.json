@@ -1,7 +1,7 @@
 {
 	"user": "krustowski",
 	"repo": "crazy-race-life-2",
-	"tag": "v0.12.8",
+	"tag": "v0.13.0",
 	"entry": "src/main.pwn",
 	"output": "gamemodes/crl2.amx",
 	"dependencies": [
@@ -10,5 +10,24 @@
 	"local": true,
 	"runtime": {
 		"version": "openmp"
-	}
+	},
+	"builds": [
+		{
+			"name": "main",
+			"args": [
+				"-d3",
+				"-;+",
+				"-(+"
+			]
+		},
+		{
+			"name": "debug",
+			"args": [
+				"-d3",
+				"-;+",
+				"-(+",
+				"DEBUG_ENABLED=1"
+			]
+		}
+	]
 }

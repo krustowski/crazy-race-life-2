@@ -8,13 +8,16 @@
 *.asm
 
 gamemodes/
+filterscripts/
+
+npcmodes/recordings/AIR_*
+npcmodes/recordings/TRAIN_*
 
 # Vendor directory for dependencies
 dependencies/
 
 # Dependency versions lockfile
 pawn.lock
-
 
 #
 # Server/gamemode related files
@@ -25,6 +28,7 @@ pawn.lock
 # but make sure the `rcon_password` field is set externally
 # you can use the environment variable `SAMP_RCON_PASSWORD` to do this.
 server.cfg
+SAMP.CFG
 
 # Plugins directory
 plugins/
@@ -42,9 +46,12 @@ omp-server
 logs/
 server_log.txt
 crashinfo.txt
+SAMP.LOG
+log.txt
 
 # Ban list
 samp.ban
+bans.json
 
 #
 # Common files
@@ -54,12 +61,13 @@ samp.ban
 
 # Other
 */*/crl2_data.db
-crl2_data.db
+crl2_data.*
 scriptfiles/
 */*/*.pem
 tmp/
 gnuplot.html
 npcmodes/*.pwn
+CR922A55.DB
 
 # Generated MkDocs site
 site/
@@ -68,3 +76,18 @@ site/
 utils/mapcheck/cadb-gen/*.cadb
 utils/mapcheck/cadb-gen/cadb-gen
 utils/mapcheck
+utils/*
+
+# local secrets for make
+.env
+
+# the portal's make targets, kept out with its sources for now (see Makefile)
+Makefile.local
+
+# local compose override, wired up from .env (see docker/README.md)
+compose.local.yml
+
+# the portal's compose layer and swarm settings, kept out with its sources
+compose.portal.yml
+
+docker/

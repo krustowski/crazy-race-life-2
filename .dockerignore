@@ -1,0 +1,31 @@
+# The docs image builds from the repository root and needs only mkdocs.yml,
+# docs/ and docker/. Everything below is large, generated, or secret.
+.git
+.env
+site/
+utils/
+dependencies/
+plugins/
+components/
+gamemodes/
+npcmodes/
+scriptfiles/
+logs/
+tmp/
+sql/
+tests/
+include/
+filterscripts/
+src/
+configs/
+*.db
+*.so
+*.amx
+*.pem
+omp-server
+samp03svr
+samp-npc
+announce
+log-core.so
+gnuplot.html
+server_log.txt

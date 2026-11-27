@@ -109,7 +109,8 @@ stock SaveNewPoliceBribePickup(playerid)
 	new 
 		query[256];
 
-	format(query, sizeof(query), "INSERT INTO police_bribe_coords (x, y, z, note) VALUES (%.2f, %.2f, %.2f, '%s')", 
+	// %q: the note is typed in by an admin and may contain an apostrophe
+	format(query, sizeof(query), "INSERT INTO police_bribe_coords (x, y, z, note) VALUES (%.2f, %.2f, %.2f, '%q')",
 			gBribeEdit[playerid][CoordX],
 			gBribeEdit[playerid][CoordY],
 			gBribeEdit[playerid][CoordZ],

@@ -3,337 +3,4007 @@
 
 <head>
 	<meta charset="UTF-8">
-	<title>CrazyRaceLife2 POI Map</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>CRL2 World Map</title>
 	<style>
-		html,
-		body {
-			margin: 0;
-			padding: 0;
-			overflow: hidden;
-			background: #111;
-			font-family: sans-serif;
-			color: #eee;
+		:root {
+			color-scheme: dark;
+			--bg: #0a0d12;
+			--panel: #0d1117;
+			--glass: rgba(13, 17, 23, 0.88);
+			--panel-solid: #0d1117;
+			--raise: rgba(255, 255, 255, 0.04);
+			--raise-2: rgba(255, 255, 255, 0.08);
+			--raise-3: rgba(255, 255, 255, 0.13);
+			--line: rgba(255, 255, 255, 0.08);
+			--text: #e8edf2;
+			--text-2: #a5afba;
+			--text-3: #6d7682;
+			--accent: #ffcf3f;
+			--accent-ink: #1a1405;
+			--series-1: #3987e5;
+			--good: #0ca30c;
+			--avail: #40c057;
+			--warning: #fab219;
+			--critical: #d03b3b;
+			--c-property: #e66767;
+			--c-business: #3987e5;
+			--shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+			--font: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
 		}
 
-		canvas {
-			display: block;
-			cursor: grab;
-		}
-
-		input,
-		button {
-			width: 100%;
-			margin-bottom: 8px;
-			padding: 6px;
-		}
-
-		#tooltip {
-			position: absolute;
-			background: rgba(0, 0, 0, 0.8);
-			padding: 4px 8px;
-			border-radius: 5px;
-			pointer-events: none;
-			display: none;
-			font-size: 13px;
-		}
-
-		#sidebar {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 300px;
-			height: 100%;
-			background: rgba(0, 0, 0, 0.9);
-			padding: 12px;
-			overflow-y: auto;
+		* {
 			box-sizing: border-box;
 		}
 
-		h2 {
-			margin-top: 0;
-			font-size: 18px;
-			color: #ffd700;
+		html,
+		body {
+			margin: 0;
+			height: 100%;
+			overflow: hidden;
+			background: var(--bg);
+			color: var(--text);
+			font: 13px/1.45 var(--font);
+			-webkit-font-smoothing: antialiased;
 		}
 
-		#sidebar input {
-			width: 100%;
-			padding: 6px;
-			margin-bottom: 10px;
-			border: none;
-			border-radius: 5px;
-			background: #222;
-			color: #eee;
+		button,
+		input {
+			font: inherit;
+			color: inherit;
 		}
 
-		.property-item {
-			padding: 4px 6px;
-			margin: 2px 0;
+		button {
 			cursor: pointer;
-			border-radius: 4px;
 		}
 
-		.property-item:hover {
+		:focus-visible {
+			outline: 2px solid var(--accent);
+			outline-offset: 2px;
+		}
+
+		#map {
+			position: fixed;
+			inset: 0;
+			width: 100%;
+			height: 100%;
+			display: block;
+			cursor: grab;
+			touch-action: none;
+		}
+
+		#map.dragging {
+			cursor: grabbing;
+		}
+
+		#map.pointing {
+			cursor: pointer;
+		}
+
+		/* The panel */
+
+		#panel {
+			position: fixed;
+			top: 12px;
+			left: 12px;
+			bottom: 12px;
+			width: 360px;
+			display: flex;
+			flex-direction: column;
+			background: var(--panel);
+			border: 1px solid var(--line);
+			border-radius: 14px;
+			box-shadow: var(--shadow);
+			overflow: hidden;
+			z-index: 5;
+			transition: transform 0.25s ease, opacity 0.25s ease;
+		}
+
+		#panel.collapsed {
+			transform: translateX(calc(-100% - 24px));
+			opacity: 0;
+			pointer-events: none;
+		}
+
+		/* The gateway's font, from its public assets: under /map/ that is
+		   ../assets/. Standalone there is none, and Impact stands in. */
+		@font-face {
+			font-family: "Pricedown";
+			src: url("../assets/pricedown.ttf") format("truetype");
+			font-display: swap;
+		}
+
+		.p-head {
+			padding: 12px 10px 10px 14px;
+		}
+
+		.p-brand {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 10px;
+		}
+
+		/* The logo as the login page has it: the in-game MINIMAP_TEXT
+		   textdraw, font 3 (Pricedown) with a black outline, in the SA HUD
+		   colours that ~g~ ~r~ ~b~ ~y~ resolve to. */
+		.logo {
+			--o: 1.5px;
+			min-width: 0;
+			overflow: hidden;
+			font-family: "Pricedown", Impact, "Arial Black", sans-serif;
+			font-size: 24px;
+			font-weight: 700;
+			line-height: 1.15;
+			white-space: nowrap;
+			text-decoration: none;
+			text-shadow:
+				var(--o) 0 #000, calc(-1 * var(--o)) 0 #000, 0 var(--o) #000, 0 calc(-1 * var(--o)) #000,
+				var(--o) var(--o) #000, calc(-1 * var(--o)) var(--o) #000,
+				var(--o) calc(-1 * var(--o)) #000, calc(-1 * var(--o)) calc(-1 * var(--o)) #000;
+		}
+
+		.logo .g {
+			color: #36682c;
+		}
+
+		.logo .r {
+			color: #b4191d;
+		}
+
+		.logo .b {
+			color: #323c7f;
+		}
+
+		.logo .y {
+			color: #e2c063;
+		}
+
+		.logo.small {
+			--o: 1px;
+			font-size: 16px;
+		}
+
+		/* Pricedown is narrow: once it is here the logo can be big. */
+		.pricedown .logo {
+			--o: 2px;
+			font-size: 40px;
+			font-weight: 400;
+		}
+
+		.pricedown .logo.small {
+			--o: 1.5px;
+			font-size: 25px;
+		}
+
+		.p-titles {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 10px;
+			margin-top: 4px;
+			min-height: 24px;
+		}
+
+		.p-sub {
+			min-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			color: var(--text-3);
+			font-size: 12px;
+		}
+
+		.p-sub b {
+			color: var(--text);
+			font-weight: 600;
+		}
+
+		.p-sub a {
+			color: var(--text-2);
+			text-decoration: none;
+		}
+
+		.p-sub a:hover {
+			color: var(--text);
+			text-decoration: underline;
+		}
+
+		.live-chip {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			padding: 3px 9px 3px 7px;
+			border-radius: 99px;
+			background: rgba(12, 163, 12, 0.14);
+			color: #8ce99a;
+			font-size: 12px;
+			font-weight: 600;
+			border: 0;
+		}
+
+		.live-chip[hidden] {
+			display: none;
+		}
+
+		.live-chip.down {
+			background: rgba(208, 59, 59, 0.15);
+			color: #ffa8a8;
+		}
+
+		.dot {
+			display: inline-block;
+			flex: none;
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			background: #888;
+		}
+
+		.dot.up {
+			background: #3c3;
+			box-shadow: 0 0 0 0 rgba(51, 204, 51, 0.6);
+			animation: beat 2s infinite;
+		}
+
+		.dot.down {
+			background: #d33;
+		}
+
+		@keyframes beat {
+			0% {
+				box-shadow: 0 0 0 0 rgba(51, 204, 51, 0.55);
+			}
+
+			70% {
+				box-shadow: 0 0 0 7px rgba(51, 204, 51, 0);
+			}
+
+			100% {
+				box-shadow: 0 0 0 0 rgba(51, 204, 51, 0);
+			}
+		}
+
+		.icon-btn {
+			flex: none;
+			display: grid;
+			place-items: center;
+			width: 30px;
+			height: 30px;
+			border: 0;
+			border-radius: 8px;
+			background: transparent;
+			color: var(--text-2);
+		}
+
+		.icon-btn:hover {
+			background: var(--raise-2);
+			color: var(--text);
+		}
+
+		.search {
+			position: relative;
+			margin: 0 14px 10px;
+		}
+
+		.search svg {
+			position: absolute;
+			left: 10px;
+			top: 50%;
+			transform: translateY(-50%);
+			color: var(--text-3);
+			pointer-events: none;
+		}
+
+		.search input {
+			width: 100%;
+			height: 36px;
+			padding: 0 56px 0 32px;
+			border: 1px solid var(--line);
+			border-radius: 9px;
+			background: var(--raise);
+			outline: none;
+		}
+
+		.search input:focus {
+			border-color: rgba(255, 207, 63, 0.55);
+			background: var(--raise-2);
+		}
+
+		.search input::placeholder {
+			color: var(--text-3);
+		}
+
+		.search .kbd,
+		.search .clear {
+			position: absolute;
+			right: 8px;
+			top: 50%;
+			transform: translateY(-50%);
+		}
+
+		.kbd {
+			padding: 1px 6px;
+			border: 1px solid var(--line);
+			border-radius: 5px;
+			color: var(--text-3);
+			font-size: 11px;
+		}
+
+		.search .clear {
+			border: 0;
+			background: var(--raise-2);
+			border-radius: 6px;
+			padding: 2px 8px;
+			color: var(--text-2);
+			font-size: 12px;
+		}
+
+		.tabs {
+			display: flex;
+			gap: 4px;
+			margin: 0 14px;
+			padding: 3px;
+			border-radius: 10px;
+			background: var(--raise);
+		}
+
+		.tab {
+			flex: 1;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 6px;
+			height: 30px;
+			border: 0;
+			border-radius: 8px;
+			background: transparent;
+			color: var(--text-2);
+			font-weight: 550;
+		}
+
+		.tab:hover {
+			color: var(--text);
+		}
+
+		.tab[aria-selected="true"] {
+			background: var(--raise-3);
+			color: var(--text);
+			box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+		}
+
+		.tab .count {
+			color: var(--text-3);
+			font-weight: 500;
+			font-size: 12px;
+		}
+
+		.tab-body {
+			flex: 1;
+			overflow-y: auto;
+			padding: 12px 14px 18px;
+			scrollbar-width: thin;
+			scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+		}
+
+		.tab-body[hidden] {
+			display: none;
+		}
+
+		h3 {
+			margin: 18px 0 8px;
+			font-size: 11px;
+			font-weight: 650;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			color: var(--text-3);
+			display: flex;
+			align-items: baseline;
+			justify-content: space-between;
+			gap: 8px;
+		}
+
+		h3:first-child {
+			margin-top: 2px;
+		}
+
+		h3 .h-note {
+			text-transform: none;
+			letter-spacing: 0;
+			font-weight: 500;
+		}
+
+		.muted {
+			color: var(--text-3);
+		}
+
+		.note {
+			color: var(--text-3);
+			font-size: 12px;
+			margin: 6px 0 0;
+		}
+
+		/* Places: filters, layers, the list */
+
+		.seg-ctl {
+			display: flex;
+			padding: 3px;
+			gap: 2px;
+			border-radius: 9px;
+			background: var(--raise);
+		}
+
+		.seg-ctl button {
+			flex: 1;
+			height: 26px;
+			border: 0;
+			border-radius: 7px;
+			background: transparent;
+			color: var(--text-2);
+			font-size: 12px;
+			font-weight: 550;
+		}
+
+		.seg-ctl button:hover {
+			color: var(--text);
+		}
+
+		.seg-ctl button[aria-pressed="true"] {
+			background: var(--raise-3);
+			color: var(--text);
+		}
+
+		.seg-ctl button[hidden] {
+			display: none;
+		}
+
+		.chips {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 6px;
+			margin-top: 8px;
+		}
+
+		.chip {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			height: 26px;
+			padding: 0 10px;
+			border: 1px solid var(--line);
+			border-radius: 99px;
+			background: transparent;
+			color: var(--text-2);
+			font-size: 12px;
+		}
+
+		.chip.focus {
+			background: rgba(255, 207, 63, 0.14);
+			color: var(--accent);
+			border-color: transparent;
+		}
+
+		.layer {
+			border-radius: 9px;
+		}
+
+		.linkish {
+			border: 0;
+			padding: 0;
+			background: none;
+			color: var(--accent);
+			font-size: 12px;
+			text-transform: none;
+			letter-spacing: 0;
+		}
+
+		.linkish:hover {
+			text-decoration: underline;
+		}
+
+		.layer+.layer {
+			margin-top: 2px;
+		}
+
+		.layer-head {
+			display: flex;
+			align-items: center;
+			gap: 9px;
+			padding: 5px 6px;
+			border-radius: 9px;
+			cursor: pointer;
+			user-select: none;
+		}
+
+		.layer-head:hover {
+			background: var(--raise);
+		}
+
+		.layer.off .layer-head .badge,
+		.layer.off .layer-name {
+			opacity: 0.4;
+		}
+
+		.layer-name {
+			flex: 1;
+			font-weight: 550;
+		}
+
+		.layer-count {
+			color: var(--text-3);
+			font-variant-numeric: tabular-nums;
+			font-size: 12px;
+		}
+
+		.chev {
+			color: var(--text-3);
+			transition: transform 0.15s;
+		}
+
+		.layer.open .chev {
+			transform: rotate(90deg);
+		}
+
+		.switch {
+			position: relative;
+			flex: none;
+			width: 30px;
+			height: 18px;
+			border: 0;
+			border-radius: 99px;
+			background: var(--raise-3);
+			padding: 0;
+			transition: background 0.15s;
+		}
+
+		.switch::after {
+			content: "";
+			position: absolute;
+			top: 2px;
+			left: 2px;
+			width: 14px;
+			height: 14px;
+			border-radius: 50%;
+			background: #fff;
+			transition: transform 0.15s;
+		}
+
+		.switch[aria-checked="true"] {
+			background: #2f9e44;
+		}
+
+		.switch[aria-checked="true"]::after {
+			transform: translateX(12px);
+		}
+
+		.badge {
+			flex: none;
+			display: grid;
+			place-items: center;
+		}
+
+		.items {
+			padding: 2px 0 6px 12px;
+			margin-left: 10px;
+			border-left: 1px solid var(--line);
+		}
+
+		.item {
+			display: flex;
+			align-items: baseline;
+			gap: 8px;
+			padding: 4px 8px;
+			border-radius: 7px;
+			cursor: pointer;
+		}
+
+		.item:hover {
+			background: var(--raise-2);
+		}
+
+		.item.sel {
+			background: rgba(255, 207, 63, 0.14);
+		}
+
+		.item-name {
+			flex: 1;
+			min-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.item-meta {
+			flex: none;
+			color: var(--text-3);
+			font-size: 12px;
+			font-variant-numeric: tabular-nums;
+			max-width: 46%;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.more {
+			padding: 4px 8px;
+			color: var(--text-3);
+			font-size: 12px;
+		}
+
+		.toggles {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 6px 12px;
+		}
+
+		.toggle {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			color: var(--text-2);
+			cursor: pointer;
+			user-select: none;
+		}
+
+		.toggle:hover {
+			color: var(--text);
+		}
+
+		/* Live */
+
+		.status {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 9px 11px;
+			border-radius: 9px;
+			background: var(--raise);
+			color: var(--text-2);
+		}
+
+		.tiles {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 8px;
+		}
+
+		.tile {
+			padding: 10px 11px 9px;
+			border-radius: 10px;
+			background: var(--raise);
+			border: 1px solid var(--line);
+			min-width: 0;
+		}
+
+		.tile-label {
+			color: var(--text-3);
+			font-size: 11.5px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.tile-value {
+			font-size: 20px;
+			font-weight: 650;
+			letter-spacing: -0.02em;
+			line-height: 1.25;
+		}
+
+		.tile-value small {
+			font-size: 12px;
+			font-weight: 500;
+			color: var(--text-3);
+			letter-spacing: 0;
+		}
+
+		.spark {
+			position: relative;
+			padding: 10px 11px 6px;
+			border-radius: 10px;
+			background: var(--raise);
+			border: 1px solid var(--line);
+		}
+
+		.spark svg {
+			display: block;
+			width: 100%;
+			height: 64px;
+		}
+
+		.spark-cap {
+			display: flex;
+			justify-content: space-between;
+			color: var(--text-3);
+			font-size: 11.5px;
+		}
+
+		.prow {
+			display: grid;
+			grid-template-columns: 10px 1fr auto;
+			align-items: center;
+			column-gap: 9px;
+			padding: 6px 8px;
+			border-radius: 8px;
+			cursor: pointer;
+		}
+
+		.prow:hover {
+			background: var(--raise-2);
+		}
+
+		.prow.following {
+			background: rgba(255, 215, 0, 0.16);
+		}
+
+		.prow.npc {
+			color: #9aa8bd;
+		}
+
+		.prow .pname {
+			min-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			font-weight: 550;
+		}
+
+		.prow.npc .pname {
+			font-weight: 450;
+		}
+
+		.prow .pid {
+			color: var(--text-3);
+			font-weight: 400;
+			font-size: 12px;
+		}
+
+		.prow .pmeta {
+			color: var(--text-3);
+			font-size: 12px;
+			font-variant-numeric: tabular-nums;
+			white-space: nowrap;
+		}
+
+		.prow .bars {
+			grid-column: 2 / 4;
+			display: flex;
+			gap: 3px;
+			margin-top: 3px;
+		}
+
+		.meter {
+			display: block;
+			height: 3px;
+			border-radius: 2px;
+			background: rgba(255, 255, 255, 0.08);
+			overflow: hidden;
+		}
+
+		.meter i {
+			display: block;
+			height: 100%;
+			border-radius: 2px;
+		}
+
+		.stars {
+			color: var(--warning);
+			letter-spacing: 1px;
+		}
+
+		/* Charts */
+
+		.bars-chart {
+			display: grid;
+			grid-template-columns: minmax(72px, auto) 1fr auto;
+			align-items: center;
+			gap: 5px 10px;
+		}
+
+		.bar-row {
+			display: contents;
+		}
+
+		.bar-row.act>* {
+			cursor: pointer;
+		}
+
+		.bar-row.act:hover .bar-label {
+			color: var(--text);
+			text-decoration: underline;
+			text-decoration-color: var(--text-3);
+		}
+
+		.bar-label {
+			color: var(--text-2);
+			max-width: 140px;
+			min-width: 0;
+			display: flex;
+			align-items: center;
+			gap: 7px;
+		}
+
+		.bar-label span {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.bar-track {
+			display: flex;
+			gap: 2px;
+			height: 10px;
+			align-items: stretch;
+		}
+
+		.bar-track i {
+			display: block;
+			min-width: 2px;
+		}
+
+		.bar-track i:last-child {
+			border-radius: 0 4px 4px 0;
+		}
+
+		.bar-val {
+			font-variant-numeric: tabular-nums;
+			color: var(--text);
+			font-size: 12px;
+			text-align: right;
+		}
+
+		.swatch {
+			flex: none;
+			width: 10px;
+			height: 10px;
+			border-radius: 3px;
+			box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12) inset;
+		}
+
+		.legend {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 4px 14px;
+			margin: -2px 0 8px;
+			color: var(--text-2);
+			font-size: 12px;
+		}
+
+		.legend span {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+		}
+
+		.segbar {
+			display: flex;
+			gap: 2px;
+			height: 8px;
+			border-radius: 99px;
+			overflow: hidden;
+			margin: 6px 0 4px;
+		}
+
+		.segbar i {
+			display: block;
+		}
+
+		.mkt {
+			padding: 10px 11px;
+			border-radius: 10px;
+			background: var(--raise);
+			border: 1px solid var(--line);
+		}
+
+		.mkt+.mkt {
+			margin-top: 8px;
+		}
+
+		.mkt-head {
+			display: flex;
+			justify-content: space-between;
+			align-items: baseline;
+		}
+
+		.mkt-head b {
+			font-weight: 600;
+		}
+
+		.mkt-cap {
+			display: flex;
+			justify-content: space-between;
+			color: var(--text-3);
+			font-size: 12px;
+		}
+
+		.rank {
+			display: grid;
+			grid-template-columns: 18px 1fr auto;
+			gap: 8px;
+			align-items: baseline;
+			padding: 5px 6px;
+			border-radius: 7px;
+		}
+
+		.rank.act {
+			cursor: pointer;
+		}
+
+		.rank.act:hover {
+			background: var(--raise-2);
+		}
+
+		.rank .n {
+			color: var(--text-3);
+			font-variant-numeric: tabular-nums;
+			font-size: 12px;
+		}
+
+		.rank .what {
+			min-width: 0;
+		}
+
+		.rank .what div {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.rank .what small {
+			display: block;
+			color: var(--text-3);
+			font-size: 12px;
+		}
+
+		.rank .v {
+			font-variant-numeric: tabular-nums;
+			color: var(--text-2);
+			font-size: 12px;
+			text-align: right;
+		}
+
+		.track {
+			display: grid;
+			grid-template-columns: 1fr auto;
+			column-gap: 10px;
+			padding: 6px 6px 7px;
+			border-radius: 7px;
+			cursor: pointer;
+		}
+
+		.track:hover {
+			background: var(--raise-2);
+		}
+
+		.track-name {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.track-n {
+			font-variant-numeric: tabular-nums;
+			font-size: 12px;
+			color: var(--text-2);
+			align-self: center;
+		}
+
+		.track-meta {
+			grid-column: 1 / -1;
+			color: var(--text-3);
+			font-size: 12px;
+		}
+
+		.track-meta b {
+			color: var(--text-2);
+			font-weight: 600;
+		}
+
+		.track-bar {
+			grid-column: 1 / -1;
+			display: block;
+			height: 3px;
+			margin-top: 5px;
+		}
+
+		.track-bar i {
+			display: block;
+			height: 100%;
+			border-radius: 0 2px 2px 0;
+			background: var(--series-1);
+		}
+
+		.feed-row {
+			display: flex;
+			gap: 9px;
+			align-items: flex-start;
+			padding: 6px;
+			border-radius: 7px;
+		}
+
+		.feed-row.act {
+			cursor: pointer;
+		}
+
+		.feed-row.act:hover {
+			background: var(--raise-2);
+		}
+
+		.feed-row .badge {
+			margin-top: 1px;
+		}
+
+		.feed-row b {
+			font-weight: 600;
+		}
+
+		.feed-row small {
+			color: var(--text-3);
+		}
+
+		.link-out {
+			display: block;
+			margin-top: 18px;
+			padding: 10px;
+			border-radius: 9px;
+			text-align: center;
+			color: var(--text-2);
+			text-decoration: none;
+			background: var(--raise);
+		}
+
+		.link-out:hover {
+			color: var(--text);
+			background: var(--raise-2);
+		}
+
+		/* The card */
+
+		#card {
+			position: fixed;
+			top: 12px;
+			right: 12px;
+			width: 340px;
+			max-height: calc(100% - 120px);
+			display: flex;
+			flex-direction: column;
+			background: var(--panel);
+			border: 1px solid var(--line);
+			border-radius: 14px;
+			box-shadow: var(--shadow);
+			z-index: 6;
+			animation: card-in 0.18s ease-out;
+		}
+
+		#card[hidden] {
+			display: none;
+		}
+
+		@keyframes card-in {
+			from {
+				opacity: 0;
+				transform: translateY(-6px);
+			}
+		}
+
+		.card-head {
+			display: flex;
+			gap: 11px;
+			align-items: flex-start;
+			padding: 14px 10px 10px 14px;
+			border-bottom: 1px solid var(--line);
+		}
+
+		.card-titles {
+			flex: 1;
+			min-width: 0;
+		}
+
+		.card-title {
+			font-size: 15px;
+			font-weight: 650;
+			line-height: 1.3;
+			letter-spacing: -0.01em;
+			overflow-wrap: anywhere;
+		}
+
+		.card-sub {
+			color: var(--text-3);
+			font-size: 12px;
+			margin-top: 1px;
+		}
+
+		.card-body {
+			padding: 10px 14px 14px;
+			overflow-y: auto;
+			scrollbar-width: thin;
+		}
+
+		.pill {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			padding: 3px 10px;
+			border-radius: 99px;
+			font-size: 12px;
+			font-weight: 600;
+			background: var(--raise-2);
+		}
+
+		.pill.avail {
+			background: rgba(64, 192, 87, 0.15);
+			color: #8ce99a;
+		}
+
+		.pill.mine {
+			background: rgba(255, 207, 63, 0.16);
+			color: var(--accent);
+		}
+
+		.pill.taken {
+			background: rgba(230, 103, 103, 0.14);
+			color: #ffa8a8;
+		}
+
+		.facts {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 10px 14px;
+			margin: 12px 0 2px;
+		}
+
+		.fact-k {
+			color: var(--text-3);
+			font-size: 11.5px;
+		}
+
+		.fact-v {
+			font-weight: 600;
+			font-variant-numeric: tabular-nums;
+			overflow-wrap: anywhere;
+		}
+
+		.fact.wide {
+			grid-column: 1 / -1;
+		}
+
+		.card-body h3 {
+			margin-top: 16px;
+		}
+
+		.times {
+			width: 100%;
+			border-collapse: collapse;
+			font-variant-numeric: tabular-nums;
+		}
+
+		.times td {
+			padding: 5px 4px;
+			border-top: 1px solid var(--line);
+		}
+
+		.times tr:first-child td {
+			border-top: 0;
+		}
+
+		.times .medal {
+			width: 22px;
+			color: var(--text-3);
+		}
+
+		.times .t {
+			text-align: right;
+			font-weight: 600;
+		}
+
+		.times .veh {
+			color: var(--text-3);
+			font-size: 12px;
+		}
+
+		.spots {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 6px;
+		}
+
+		.spots b {
+			margin-left: 5px;
+			font-weight: 600;
+			color: var(--text);
+		}
+
+		.spot-dot {
+			display: inline-block;
+			width: 8px;
+			height: 8px;
+			margin-right: 6px;
+			border-radius: 50%;
+			box-shadow: 0 0 0 1.5px rgba(8, 10, 14, 0.9);
+		}
+
+		.spots span {
+			display: inline-flex;
+			align-items: center;
+			padding: 2px 9px;
+			border-radius: 99px;
+			background: var(--raise-2);
+			color: var(--text-2);
+			font-size: 12px;
+		}
+
+		.coords {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 8px;
+			margin-top: 14px;
+			padding: 7px 8px 7px 11px;
+			border-radius: 9px;
+			background: var(--raise);
+			font: 12px/1.3 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+			color: var(--text-2);
+		}
+
+		.actions {
+			display: flex;
+			gap: 8px;
+			margin-top: 10px;
+		}
+
+		.btn {
+			flex: 1;
+			height: 32px;
+			padding: 0 12px;
+			border: 1px solid var(--line);
+			border-radius: 9px;
+			background: var(--raise);
+			color: var(--text);
+			font-weight: 550;
+			font-size: 12.5px;
+		}
+
+		.btn:hover {
+			background: var(--raise-2);
+		}
+
+		.btn.primary {
+			background: var(--accent);
+			color: var(--accent-ink);
+			border-color: transparent;
+		}
+
+		.btn.primary:hover {
+			background: #ffd95c;
+		}
+
+		.btn.small {
+			flex: none;
+			height: 26px;
+			padding: 0 9px;
+			font-size: 12px;
+		}
+
+		.hp-row {
+			display: grid;
+			grid-template-columns: 56px 1fr 34px;
+			align-items: center;
+			gap: 8px;
+			margin-top: 7px;
+			font-size: 12px;
+			color: var(--text-2);
+		}
+
+		.hp-row .meter {
+			height: 6px;
+			border-radius: 3px;
+		}
+
+		.hp-row b {
+			text-align: right;
+			font-variant-numeric: tabular-nums;
+			color: var(--text);
+		}
+
+		/* Map furniture */
+
+		#tooltip {
+			position: fixed;
+			z-index: 20;
+			max-width: 300px;
+			padding: 7px 10px;
+			border-radius: 9px;
+			background: rgba(8, 11, 16, 0.94);
+			border: 1px solid var(--line);
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+			pointer-events: none;
+			display: none;
+			font-size: 12.5px;
+			line-height: 1.45;
+		}
+
+		#tooltip b {
+			font-weight: 650;
+		}
+
+		#tooltip small {
+			color: var(--text-3);
+		}
+
+		#hud {
+			position: fixed;
+			right: 12px;
+			bottom: 12px;
+			display: flex;
+			align-items: flex-end;
+			gap: 8px;
+			z-index: 4;
+			pointer-events: none;
+		}
+
+		#hud>* {
+			pointer-events: auto;
+		}
+
+		.glass {
+			background: var(--glass);
+			backdrop-filter: blur(12px);
+			-webkit-backdrop-filter: blur(12px);
+			border: 1px solid var(--line);
+			border-radius: 10px;
+			box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+		}
+
+		.readout {
+			padding: 6px 10px;
+			min-width: 168px;
+			font-size: 12px;
+		}
+
+		.readout .zone {
+			font-weight: 600;
+		}
+
+		.readout .xy {
+			font: 11.5px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+			color: var(--text-3);
+		}
+
+		.scalebar {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			margin-top: 4px;
+			color: var(--text-3);
+			font-size: 11px;
+		}
+
+		.scalebar i {
+			display: block;
+			height: 5px;
+			border: 1.5px solid var(--text-2);
+			border-top: 0;
+		}
+
+		.zoom {
+			display: flex;
+			flex-direction: column;
+			overflow: hidden;
+		}
+
+		.zoom button {
+			width: 36px;
+			height: 34px;
+			border: 0;
+			background: transparent;
+			color: var(--text-2);
+			display: grid;
+			place-items: center;
+		}
+
+		.zoom button+button {
+			border-top: 1px solid var(--line);
+		}
+
+		.zoom button:hover {
+			background: var(--raise-2);
+			color: var(--text);
+		}
+
+		#panel-open {
+			position: fixed;
+			top: 12px;
+			left: 12px;
+			z-index: 4;
+			display: none;
+			align-items: center;
+			gap: 8px;
+			height: 40px;
+			padding: 0 14px 0 12px;
+			border: 1px solid var(--line);
+			color: var(--text-2);
+			font-weight: 600;
+		}
+
+		#panel.collapsed~#panel-open {
+			display: flex;
+		}
+
+		#loading {
+			position: fixed;
+			left: 50%;
+			bottom: 18px;
+			transform: translateX(-50%);
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			padding: 8px 14px 8px 10px;
+			z-index: 8;
+			font-size: 12.5px;
+			color: var(--text-2);
+		}
+
+		#loading[hidden] {
+			display: none;
+		}
+
+		.spinner {
+			width: 18px;
+			height: 18px;
+			border-radius: 50%;
+			border: 2px solid rgba(255, 255, 255, 0.15);
+			border-top-color: var(--accent);
+			animation: spin 0.8s linear infinite;
+		}
+
+		@keyframes spin {
+			to {
+				transform: rotate(360deg);
+			}
+		}
+
+		.progress {
+			width: 90px;
+			height: 4px;
+			border-radius: 2px;
 			background: rgba(255, 255, 255, 0.1);
+			overflow: hidden;
 		}
 
+		.progress i {
+			display: block;
+			height: 100%;
+			width: 0;
+			background: var(--accent);
+			transition: width 0.15s;
+		}
+
+		#toast {
+			position: fixed;
+			left: 50%;
+			top: 16px;
+			transform: translate(-50%, -8px);
+			padding: 8px 14px;
+			z-index: 30;
+			opacity: 0;
+			transition: opacity 0.2s, transform 0.2s;
+			pointer-events: none;
+			font-size: 12.5px;
+		}
+
+		#toast.show {
+			opacity: 1;
+			transform: translate(-50%, 0);
+		}
+
+		@media (max-width: 760px) {
+			#panel {
+				top: 0;
+				left: 0;
+				bottom: 0;
+				width: 100%;
+				border-radius: 0;
+				border: 0;
+			}
+
+			#card {
+				top: auto;
+				bottom: 0;
+				right: 0;
+				left: 0;
+				width: auto;
+				max-height: 55%;
+				border-radius: 14px 14px 0 0;
+			}
+
+			#hud .readout {
+				display: none;
+			}
+
+			.bar-label {
+				max-width: 110px;
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+
+			*,
+			*::before,
+			*::after {
+				animation: none !important;
+				transition: none !important;
+			}
+		}
 	</style>
 </head>
 
 <body>
-	<canvas id="map"></canvas>
-	<div id="tooltip"></div>
-	<div id="sidebar">
-		<div id="login">
-			<h2>Login</h2>
-			<input id="username" placeholder="Username">
-			<input id="password" type="password" placeholder="Password">
-			<button onclick="login()">Login</button>
-			<p id="loginMsg"></p>
+	<canvas id="map" aria-label="Map of San Andreas"></canvas>
+
+	<aside id="panel" aria-label="Map controls">
+		<div class="p-head">
+			<div class="p-brand">
+				<a class="logo" href="../" title="Back to the portal" aria-label="CrazyRaceLife2: back to the portal"><span class="g">Crazy</span><span class="r">Race</span><span class="b">Life</span><span class="y">2</span></a>
+				<button class="icon-btn" id="panel-close" title="Hide the panel" aria-label="Hide the panel">
+					<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 3 5 8l5 5" /></svg>
+				</button>
+			</div>
+			<div class="p-titles">
+				<div class="p-sub"><b>World map</b> &middot; <a id="back" href="../">&larr; Portal</a> &middot; <span id="viewer-line">San Andreas</span></div>
+				<button class="live-chip" id="live-chip" hidden title="Live: open the Live tab"><span class="dot"></span><span id="live-chip-text">live</span></button>
+			</div>
+		</div>
+		<div class="search">
+			<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="7" cy="7" r="4.6" /><path d="m10.5 10.5 3.2 3.2" /></svg>
+			<input id="search" type="search" placeholder="Search places, owners, players&hellip;" autocomplete="off" spellcheck="false">
+			<span class="kbd" id="search-kbd">/</span>
+			<button class="clear" id="search-clear" hidden>Clear</button>
+		</div>
+		<div class="tabs" role="tablist">
+			<button class="tab" role="tab" id="tab-places" aria-selected="true" aria-controls="body-places">Places <span class="count" id="places-count"></span></button>
+			<button class="tab" role="tab" id="tab-live" aria-selected="false" aria-controls="body-live" hidden>Live <span class="count" id="live-count"></span></button>
+			<button class="tab" role="tab" id="tab-stats" aria-selected="false" aria-controls="body-stats">Stats</button>
 		</div>
 
-		<div id="properties" style="display: none;">
-			<h2>Points of Interest</h2>
-			<input id="search" placeholder="Search by name, owner, ID...">
-			<div id="list"></div>
+		<div class="tab-body" id="body-places" role="tabpanel">
+			<h3>Properties</h3>
+			<div class="seg-ctl" id="status-ctl" role="group" aria-label="Which properties">
+				<button data-status="all" aria-pressed="true">All</button>
+				<button data-status="available" aria-pressed="false">Available</button>
+				<button data-status="taken" aria-pressed="false">Taken</button>
+				<button data-status="mine" aria-pressed="false" hidden>Mine</button>
+			</div>
+			<div class="chips" id="focus-chips"></div>
+			<h3>Layers <span class="h-note" id="layers-note"></span></h3>
+			<div id="layers"></div>
+			<h3>Map</h3>
+			<div class="toggles">
+				<div class="toggle"><button class="switch" role="switch" id="opt-routes" aria-checked="true"></button>Race routes</div>
+				<div class="toggle"><button class="switch" role="switch" id="opt-regions" aria-checked="true"></button>Region names</div>
+				<div class="toggle"><button class="switch" role="switch" id="opt-labels" aria-checked="true"></button>Place names</div>
+				<div class="toggle"><button class="switch" role="switch" id="opt-dim" aria-checked="false"></button>Dim the map</div>
+			</div>
+			<p class="note">Drag to pan, scroll to zoom, click anything for details. <span class="kbd">/</span> searches, <span class="kbd">Esc</span> closes.</p>
+		</div>
+
+		<div class="tab-body" id="body-live" role="tabpanel" hidden>
+			<div id="live-status" class="status"><span class="dot"></span>connecting&hellip;</div>
+			<div class="tiles" id="live-tiles" style="margin-top: 10px"></div>
+			<h3>Players online <span class="h-note">this session</span></h3>
+			<div class="spark" id="spark"></div>
+			<div id="live-regions"></div>
+			<h3>Show</h3>
+			<div class="toggles">
+				<div class="toggle"><button class="switch" role="switch" id="show-players" aria-checked="true"></button>Players</div>
+				<div class="toggle"><button class="switch" role="switch" id="show-npcs" aria-checked="true"></button>NPCs</div>
+				<div class="toggle"><button class="switch" role="switch" id="show-vehicles" aria-checked="false"></button>Parked vehicles</div>
+				<div class="toggle"><button class="switch" role="switch" id="show-trails" aria-checked="true"></button>Trails</div>
+			</div>
+			<h3>Who is on <span class="h-note">click to follow</span></h3>
+			<div id="live-list"></div>
+		</div>
+
+		<div class="tab-body" id="body-stats" role="tabpanel" hidden>
+			<div id="stats-body"><p class="muted">Loading&hellip;</p></div>
+		</div>
+	</aside>
+	<button id="panel-open" class="glass" title="Show the panel">
+		<span class="logo small" aria-hidden="true"><span class="g">Crazy</span><span class="r">Race</span><span class="b">Life</span><span class="y">2</span></span>map
+	</button>
+
+	<div id="card" role="dialog" aria-label="Details" hidden></div>
+	<div id="tooltip" role="tooltip"></div>
+
+	<div id="hud">
+		<div class="glass readout">
+			<div><span class="zone" id="hud-zone">San Andreas</span> <span class="xy" id="hud-xy"></span></div>
+			<div class="scalebar"><i id="scale-bar"></i><span id="scale-label"></span></div>
+		</div>
+		<div class="glass zoom">
+			<button id="zoom-in" title="Zoom in (+)" aria-label="Zoom in"><svg width="14" height="14" viewBox="0 0 14 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M7 2v10M2 7h10" /></svg></button>
+			<button id="zoom-out" title="Zoom out (&minus;)" aria-label="Zoom out"><svg width="14" height="14" viewBox="0 0 14 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 7h10" /></svg></button>
+			<button id="zoom-fit" title="The whole map (0)" aria-label="The whole map"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1.5 5V1.5H5M9 1.5h3.5V5M12.5 9v3.5H9M5 12.5H1.5V9" /></svg></button>
 		</div>
 	</div>
 
+	<div id="loading" class="glass"><span class="spinner"></span><span id="loading-text">Loading the map</span><span class="progress"><i id="loading-bar"></i></span></div>
+	<div id="toast" class="glass"></div>
+
 	<script>
-		const canvas = document.getElementById('map');
-		const ctx = canvas.getContext('2d');
-		const tooltip = document.getElementById('tooltip');
-		const sidebar = document.getElementById('sidebar');
-		const searchInput = document.getElementById('search');
-		const listDiv = document.getElementById('list');
+		'use strict';
 
-		let width = window.innerWidth;
-		let height = window.innerHeight;
-		canvas.width = width;
-		canvas.height = height;
+		// ── What is drawn ────────────────────────────────────────────────
 
-		const img = new Image();
-		img.src = 'gta_sa_map.png';
-
-		let properties = [];
-		let filtered = [];
-		let scale = 0.15;
-		let offsetX = width / 2;
-		let offsetY = height / 2;
-		let isDragging = false;
-		let lastX, lastY;
-
-		/*img.onload = async () => {
-			const res = await fetch('/api/data');
-			if (!res.ok) return alert('Not authorized.');
-
-			properties = await res.json();
-			filtered = properties;
-			updateSidebar();
-			draw();
-		};*/
-
-		function worldToImage(x, y, imgSize) {
-			const scale = imgSize / 6000.0;
-			const ix = (x + 3000.0) * scale;
-			const iy = (3000.0 - y) * scale;
-			return [ix, iy];
+		// Glyphs on a 20-unit square, white on each marker's colour. The same
+		// paths draw the canvas markers and the panel's badges.
+		const ICONS = {
+			house: { d: 'M10 3.2 17.2 9.6H15.2V16.4H11.6V12.4H8.4V16.4H4.8V9.6H2.8Z' },
+			shop: { d: 'M3.4 4.2H16.6L17.6 9H2.4ZM4.4 10H15.6V16.4H11.4V12.6H8.6V16.4H4.4Z' },
+			flag: { d: 'M4.6 2.8H6.4V17.2H4.6ZM6.4 3.6H16.2L13.8 7.3 16.2 11H6.4Z' },
+			truck: { d: 'M2.4 5.6H11.8V13.2H2.4ZM12.6 7.8H15.4L17.6 10.6V13.2H12.6ZM3.8 14.6A1.8 1.8 0 1 0 7.4 14.6 1.8 1.8 0 1 0 3.8 14.6ZM12.6 14.6A1.8 1.8 0 1 0 16.2 14.6 1.8 1.8 0 1 0 12.6 14.6Z' },
+			drop: { d: 'M10 2.6C12.8 6 15.4 8.9 15.4 11.8A5.4 5.4 0 0 1 4.6 11.8C4.6 8.9 7.2 6 10 2.6Z' },
+			flask: { d: 'M7.6 2.8H12.4V4.4H11.4V8L15.9 15C16.5 16 15.9 17.2 14.7 17.2H5.3C4.1 17.2 3.5 16 4.1 15L8.6 8V4.4H7.6Z' },
+			shield: { d: 'M10 2.6 16.2 4.8V9.6C16.2 13.4 13.6 16.1 10 17.4 6.4 16.1 3.8 13.4 3.8 9.6V4.8Z' },
+			star: { d: starPath(10, 10.6, 7.8, 3.4) },
+			skull: { d: 'M10 2.8C6.1 2.8 3.6 5.5 3.6 9 3.6 11.1 4.6 12.5 6 13.2V15.8C6 16.5 6.5 17 7.2 17H12.8C13.5 17 14 16.5 14 15.8V13.2C15.4 12.5 16.4 11.1 16.4 9 16.4 5.5 13.9 2.8 10 2.8ZM5.8 9.6A1.9 1.9 0 1 0 9.6 9.6 1.9 1.9 0 1 0 5.8 9.6ZM10.4 9.6A1.9 1.9 0 1 0 14.2 9.6 1.9 1.9 0 1 0 10.4 9.6Z', rule: 'evenodd' },
+			target: { d: 'M3.2 10A6.8 6.8 0 1 0 16.8 10 6.8 6.8 0 1 0 3.2 10ZM5.4 10A4.6 4.6 0 1 0 14.6 10 4.6 4.6 0 1 0 5.4 10ZM7.8 10A2.2 2.2 0 1 0 12.2 10 2.2 2.2 0 1 0 7.8 10Z', rule: 'evenodd' },
+			tiki: { d: 'M6 2.8H14V17.2H6ZM7.4 5.6H9.4V8H7.4ZM10.6 5.6H12.6V8H10.6ZM7.6 10.6H12.4V13.4H7.6Z', rule: 'evenodd' },
+			pumpkin: { d: 'M10 6C5.4 6 3 8.7 3 11.6 3 14.7 5.7 17 10 17 14.3 17 17 14.7 17 11.6 17 8.7 14.6 6 10 6ZM9.1 6.4 9.5 2.8H11.1L10.9 6.4Z' },
+			dollar: { text: '$' },
+			person: { d: 'M10 3.2A3.1 3.1 0 1 0 10 9.4 3.1 3.1 0 1 0 10 3.2ZM4.2 16.8C4.2 13.3 6.8 10.7 10 10.7 13.2 10.7 15.8 13.3 15.8 16.8Z' },
+		};
+		for (const icon of Object.values(ICONS)) {
+			if (icon.d) {
+				icon.path = new Path2D(icon.d);
+			}
 		}
 
-		function draw() {
-			ctx.clearRect(0, 0, width, height);
-			ctx.save();
-			ctx.translate(offsetX, offsetY);
-			ctx.scale(scale, scale);
-			ctx.drawImage(img, -img.width / 2, -img.height / 2);
+		function starPath(cx, cy, outer, inner) {
+			let d = '';
+			for (let i = 0; i < 10; i++) {
+				const a = -Math.PI / 2 + i * Math.PI / 5;
+				const r = i % 2 ? inner : outer;
+				d += (i ? 'L' : 'M') + (cx + r * Math.cos(a)).toFixed(2) + ' ' + (cy + r * Math.sin(a)).toFixed(2);
+			}
+			return d + 'Z';
+		}
 
-			for (const p of filtered) {
-				switch (p.type) {
-					case 1: {
-						ctx.fillStyle = "rgba(0, 255, 0, 0.85)";
+		// Every kind of point of interest (pois.go), in the order the panel
+		// lists them. Shape tells them apart as much as colour does.
+		const KINDS = {
+			race: { label: 'Race', plural: 'Races', color: '#d55181', icon: 'flag' },
+			property: { label: 'Property', plural: 'Properties', color: '#e66767', icon: 'house' },
+			business: { label: 'Business', plural: 'Businesses', color: '#3987e5', icon: 'shop' },
+			team: { label: 'Team spawn', plural: 'Team spawns', color: '#22b8cf', icon: 'shield' },
+			trucking: { label: 'Trucking station', plural: 'Trucking', color: '#c98500', icon: 'truck' },
+			atm: { label: 'ATM', plural: 'ATMs', color: '#199e70', icon: 'dollar' },
+			drug: { label: 'Drug spot', plural: 'Drug spots', color: '#9085e9', icon: 'drop' },
+			market: { label: 'Black market', plural: 'Black markets', color: '#34363d', icon: 'flask' },
+			bribe: { label: 'Police bribe', plural: 'Police bribes', color: '#6c7a91', icon: 'star' },
+			rampage: { label: 'Rampage', plural: 'Rampages', color: '#c92a2a', icon: 'skull' },
+			combat: { label: 'Combat mission', plural: 'Combat missions', color: '#66752a', icon: 'target' },
+			tiki: { label: 'Tiki', plural: 'Tikis', color: '#2f9e44', icon: 'tiki' },
+			pumpkin: { label: 'Pumpkin', plural: 'Pumpkins', color: '#f76707', icon: 'pumpkin' },
+		};
+		const MINE = '#ffcf3f';
+		const AVAILABLE = '#40c057';
 
-						if (p.occupied) {
-							ctx.fillStyle = "rgba(255, 0, 0, 0.85)";
-						}
+		// San Andreas's main zones, as the game draws them: the first that
+		// holds a point names where it is.
+		const REGIONS = [
+			['Los Santos', 44.6, -2892.9, 2997.0, -768.0],
+			['Las Venturas', 869.4, 596.3, 2997.0, 2993.8],
+			['Bone County', -480.5, 596.3, 869.4, 2993.8],
+			['Tierra Robada', -2997.4, 1659.6, -480.5, 2993.8],
+			['Tierra Robada', -1213.9, 596.3, -480.5, 1659.6],
+			['San Fierro', -2997.4, -1115.5, -1213.9, 1659.6],
+			['Red County', -1213.9, -768.0, 2997.0, 596.3],
+			['Flint County', -1213.9, -2892.9, 44.6, -768.0],
+			['Whetstone', -2997.4, -2892.9, -1213.9, -1115.5],
+		];
+		const REGION_LABELS = [
+			['Los Santos', 1700, -1650, 1], ['San Fierro', -2150, 300, 1], ['Las Venturas', 1950, 1750, 1],
+			['Bone County', 200, 1600, 0], ['Tierra Robada', -1400, 2300, 0], ['Red County', 700, -150, 0],
+			['Flint County', -560, -1700, 0], ['Whetstone', -2150, -2100, 0],
+		];
+		const REGION_ORDER = ['Los Santos', 'San Fierro', 'Las Venturas', 'Red County', 'Flint County', 'Whetstone', 'Bone County', 'Tierra Robada'];
+
+		function regionAt(x, y) {
+			for (const [name, x0, y0, x1, y1] of REGIONS) {
+				if (x >= x0 && x <= x1 && y >= y0 && y <= y1) {
+					return name;
+				}
+			}
+			return null;
+		}
+
+		function regionBounds(name) {
+			const boxes = REGIONS.filter(r => r[0] === name);
+			return [Math.min(...boxes.map(r => r[1])), Math.min(...boxes.map(r => r[2])),
+			Math.max(...boxes.map(r => r[3])), Math.max(...boxes.map(r => r[4]))];
+		}
+
+		// ── Formatting ───────────────────────────────────────────────────
+
+		function esc(s) {
+			return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+		}
+
+		const nf = new Intl.NumberFormat('en-US');
+		const cf = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 });
+		const int = n => nf.format(Math.round(n));
+		const compact = n => n < 10000 ? int(n) : cf.format(n);
+		const money = n => '$' + int(n);
+		const moneyShort = n => '$' + compact(n);
+		const plural = (n, one, many) => `${int(n)} ${n === 1 ? one : (many || one + 's')}`;
+
+		function raceTime(ms) {
+			const tenths = ms % 1000 !== 0;
+			const s = ms / 1000;
+			const m = Math.floor(s / 60);
+			const rest = (s - m * 60).toFixed(tenths ? 1 : 0).padStart(tenths ? 4 : 2, '0');
+			return `${m}:${rest}`;
+		}
+
+		function distance(m) {
+			return m >= 1000 ? (m / 1000).toFixed(1) + ' km' : Math.round(m) + ' m';
+		}
+
+		function luminance(hex) {
+			const n = parseInt(hex.slice(1, 7), 16);
+			return (0.299 * (n >> 16 & 255) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) / 255;
+		}
+
+		// A badge in the panel: the marker as the map draws it.
+		function badge(icon, color, size = 22) {
+			const ic = ICONS[icon];
+			const ink = luminance(color) > 0.62 ? '#14161a' : '#fff';
+			const glyph = ic.text
+				? `<text x="10" y="14.6" text-anchor="middle" font-size="13" font-weight="800" fill="${ink}" font-family="system-ui, sans-serif">${esc(ic.text)}</text>`
+				: `<path d="${ic.d}" fill="${ink}" fill-rule="${ic.rule || 'nonzero'}" transform="translate(10 10) scale(0.78) translate(-10 -10)"/>`;
+			return `<span class="badge"><svg width="${size}" height="${size}" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9.6" fill="${color}"/>${glyph}</svg></span>`;
+		}
+
+		// ── State ────────────────────────────────────────────────────────
+
+		const $ = id => document.getElementById(id);
+		const canvas = $('map');
+		const ctx = canvas.getContext('2d');
+		const panel = $('panel');
+		const tooltip = $('tooltip');
+		const card = $('card');
+		const searchInput = $('search');
+
+		let W = 0, H = 0, dpr = 1;
+		// The view: the world point at the middle of the free screen, and
+		// screen pixels per world unit. SA's world runs -3000..3000 on both
+		// axes, north up.
+		const view = { x: 0, y: 0, zoom: 0.15 };
+		let flight = null;
+
+		let mapFull = null; // the 6144-pixel raster
+		let mapSmall = null; // a 2048-pixel copy, for the view from afar
+
+		let pois = [];
+		const byKey = new Map(); // "race:5" -> its POI
+		let stats = null;
+		let viewer = '';
+		let selected = null; // {poi} or {player: id}
+		let selectedAt = 0;
+		let hovered = null;
+		let hits = []; // what was drawn where, top last
+		let query = '';
+		let tokens = [];
+		let status = 'all';
+		let ownerFocus = null;
+		let teamFocus = null;
+
+		const prefs = loadPrefs();
+		const startTab = prefs.tab;
+
+		function loadPrefs() {
+			const base = { off: [], open: [], routes: true, regions: true, labels: true, dim: false, tab: 'places', collapsed: innerWidth < 760, trails: true };
+			try {
+				return Object.assign(base, JSON.parse(localStorage.getItem('crl2-map') || '{}'));
+			} catch (e) {
+				return base;
+			}
+		}
+
+		function savePrefs() {
+			try {
+				localStorage.setItem('crl2-map', JSON.stringify(prefs));
+			} catch (e) {
+				// private window: the defaults again next time
+			}
+		}
+
+		// ── The view ─────────────────────────────────────────────────────
+
+		// The screen x the view centres on: the middle of what the panel
+		// leaves free.
+		function originX() {
+			const covered = !panel.classList.contains('collapsed') && innerWidth >= 760 ? panel.offsetWidth + 12 : 0;
+			return (covered + W) / 2;
+		}
+
+		const sx = x => originX() + (x - view.x) * view.zoom;
+		const sy = y => H / 2 - (y - view.y) * view.zoom;
+		const wx = px => view.x + (px - originX()) / view.zoom;
+		const wy = py => view.y - (py - H / 2) / view.zoom;
+
+		function freeWidth() {
+			return (W - originX()) * 2;
+		}
+
+		function minZoom() {
+			return Math.min(freeWidth(), H) / 6000 * 0.6;
+		}
+
+		const MAX_ZOOM = 3;
+		const clampZoom = z => Math.min(MAX_ZOOM, Math.max(minZoom(), z));
+
+		function resize() {
+			dpr = window.devicePixelRatio || 1;
+			W = innerWidth;
+			H = innerHeight;
+			canvas.width = Math.round(W * dpr);
+			canvas.height = Math.round(H * dpr);
+			requestRender();
+		}
+
+		function zoomAt(px, py, factor) {
+			const x = wx(px), y = wy(py);
+			view.zoom = clampZoom(view.zoom * factor);
+			view.x = x - (px - originX()) / view.zoom;
+			view.y = y + (py - H / 2) / view.zoom;
+			requestRender();
+		}
+
+		const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+		function flyTo(x, y, zoom, ms = 650) {
+			zoom = clampZoom(zoom);
+			if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+				ms = 0;
+			}
+			flight = { from: { ...view }, to: { x, y, zoom }, t0: performance.now(), ms };
+			requestRender();
+		}
+
+		function stepFlight(now) {
+			const t = flight.ms ? Math.min(1, (now - flight.t0) / flight.ms) : 1;
+			const k = ease(t), { from, to } = flight;
+			view.x = from.x + (to.x - from.x) * k;
+			view.y = from.y + (to.y - from.y) * k;
+			view.zoom = Math.exp(Math.log(from.zoom) + (Math.log(to.zoom) - Math.log(from.zoom)) * k);
+			if (t >= 1) {
+				flight = null;
+				writeHash();
+				return false;
+			}
+			return true;
+		}
+
+		// What the card covers: the right of the screen, or on a phone its
+		// bottom.
+		function cardWidth() {
+			return !card.hidden && innerWidth >= 760 ? card.offsetWidth + 12 : 0;
+		}
+
+		function cardHeight() {
+			return !card.hidden && innerWidth < 760 ? card.offsetHeight : 0;
+		}
+
+		function fitBounds(x0, y0, x1, y1, pad = 70, most = 1.2) {
+			const free = freeWidth() - cardWidth();
+			const high = H - cardHeight();
+			const zoom = clampZoom(Math.min(most, (free - pad * 2) / Math.max(x1 - x0, 1), (high - pad * 2) / Math.max(y1 - y0, 1)));
+			flyTo((x0 + x1) / 2 + cardWidth() / 2 / zoom, (y0 + y1) / 2 - cardHeight() / 2 / zoom, zoom);
+		}
+
+		// To a point, clear of the card.
+		function flyToPoint(x, y, zoom) {
+			zoom = clampZoom(zoom);
+			flyTo(x + cardWidth() / 2 / zoom, y - cardHeight() / 2 / zoom, zoom);
+		}
+
+		// On a phone the panel covers the map: out of the way once something
+		// on the map is asked for.
+		function revealMap() {
+			if (innerWidth < 760 && !panel.classList.contains('collapsed')) {
+				setCollapsed(true);
+			}
+		}
+
+		function fitWorld(animate = true) {
+			const zoom = Math.min(freeWidth(), H) / 6000 * 0.96;
+			if (animate) {
+				flyTo(0, 0, zoom);
+			} else {
+				Object.assign(view, { x: 0, y: 0, zoom });
+			}
+		}
+
+		// ── The map raster ───────────────────────────────────────────────
+
+		async function loadMap() {
+			const bar = $('loading-bar');
+			try {
+				const res = await fetch('gta_sa_map.png');
+				if (!res.ok || !res.body) {
+					throw new Error(res.statusText);
+				}
+				const total = Number(res.headers.get('Content-Length')) || 0;
+				const reader = res.body.getReader();
+				const chunks = [];
+				let got = 0;
+				for (; ;) {
+					const { done, value } = await reader.read();
+					if (done) {
 						break;
 					}
-					case 2: {
-						ctx.fillStyle = "rgba(0, 0, 255, 0.85)";
-						break;
-					}
-					case 3: {
-						ctx.fillStyle = "rgba(255, 255, 0, 0.85)";
-						break;
-					}
-					case 4: {
-						ctx.fillStyle = "rgba(12, 138, 58, 0.85)";
-						break;
-					}
-					case 5: {
-						ctx.fillStyle = "rgba(255, 20, 147, 0.85)";
-						break;
-					}
-					case 6: {
-						ctx.fillStyle = "rgba(20, 87, 1, 0.85)";
-						break;
-					}
-					case 7: {
-						ctx.fillStyle = "rgba(128, 0, 128, 0.85)";
-						break;
-					}
-					case 8: {
-						ctx.fillStyle = "rgba(0, 255, 255, 0.85)";
-						break;
-					}
-					case 9: {
-						ctx.fillStyle = "rgba(255, 117, 24, 0.85)";
-						break;
-					}
-					case 10: {
-						ctx.fillStyle = "rgba(255, 192, 203, 0.85)";
-						break;
+					chunks.push(value);
+					got += value.length;
+					if (total) {
+						bar.style.width = Math.min(100, got / total * 100) + '%';
 					}
 				}
-
-				const [ix, iy] = worldToImage(p.x, p.y, img.width);
-				const px = ix - img.width / 2;
-				const py = iy - img.height / 2;
-				ctx.beginPath();
-				ctx.arc(px, py, 10, 0, Math.PI * 2);
-				ctx.fill();
+				$('loading-text').textContent = 'Drawing the map';
+				mapFull = await createImageBitmap(new Blob(chunks, { type: 'image/png' }));
+			} catch (e) {
+				// No streams or no ImageBitmap: the plain way.
+				mapFull = await new Promise((ok, fail) => {
+					const img = new Image();
+					img.onload = () => ok(img);
+					img.onerror = fail;
+					img.src = 'gta_sa_map.png';
+				}).catch(() => null);
 			}
+			if (!mapFull) {
+				$('loading-text').textContent = 'The map image would not load';
+				$('loading').querySelector('.spinner').remove();
+				return;
+			}
+			requestRender();
+			$('loading').hidden = true;
+			try {
+				mapSmall = await createImageBitmap(mapFull, { resizeWidth: 2048, resizeHeight: 2048, resizeQuality: 'high' });
+				requestRender();
+			} catch (e) {
+				// the full raster serves every zoom
+			}
+		}
 
+		// ── Drawing ──────────────────────────────────────────────────────
+
+		let queued = false;
+
+		function requestRender() {
+			if (!queued) {
+				queued = true;
+				requestAnimationFrame(frame);
+			}
+		}
+
+		function frame(now) {
+			queued = false;
+			let again = false;
+			if (flight) {
+				again = stepFlight(now);
+			} else if (follow !== null && markers.has(follow)) {
+				[view.x, view.y] = markerPos(markers.get(follow), now);
+			}
+			again = liveMoving(now) || again;
+			again = now - selectedAt < 1600 || again; // the ring's pulse
+			render(now);
+			if (again) {
+				requestRender();
+			}
+		}
+
+		function render(now) {
+			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+			ctx.fillStyle = '#0a0d12';
+			ctx.fillRect(0, 0, W, H);
+			drawMap();
+			hits = [];
+			if (prefs.regions) {
+				drawRegionNames();
+			}
+			drawRoutes();
+			drawFocus();
+			drawPOIs();
+			drawLabels(drawSpots());
+			drawLive(now);
+			drawSelection(now);
+			updateHud();
+		}
+
+		function drawMap() {
+			const x0 = sx(-3000), y0 = sy(3000), size = 6000 * view.zoom;
+			const src = mapSmall && view.zoom * dpr < 0.3 ? mapSmall : mapFull;
+			if (!src) {
+				// Until the raster comes: the world's outline and a grid.
+				ctx.fillStyle = '#121822';
+				ctx.fillRect(x0, y0, size, size);
+				ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+				ctx.lineWidth = 1;
+				ctx.beginPath();
+				for (let i = 1; i < 12; i++) {
+					ctx.moveTo(x0 + size * i / 12, y0);
+					ctx.lineTo(x0 + size * i / 12, y0 + size);
+					ctx.moveTo(x0, y0 + size * i / 12);
+					ctx.lineTo(x0 + size, y0 + size * i / 12);
+				}
+				ctx.stroke();
+				return;
+			}
+			// Only what is on screen, from the raster: at close range the
+			// whole of it would be drawn for a corner.
+			const vx0 = Math.max(0, x0), vy0 = Math.max(0, y0);
+			const vx1 = Math.min(W, x0 + size), vy1 = Math.min(H, y0 + size);
+			if (vx1 > vx0 && vy1 > vy0) {
+				const f = src.width / size;
+				ctx.imageSmoothingEnabled = true;
+				ctx.imageSmoothingQuality = 'high';
+				ctx.drawImage(src, (vx0 - x0) * f, (vy0 - y0) * f, (vx1 - vx0) * f, (vy1 - vy0) * f, vx0, vy0, vx1 - vx0, vy1 - vy0);
+			}
+			if (prefs.dim) {
+				ctx.fillStyle = 'rgba(6, 10, 18, 0.5)';
+				ctx.fillRect(x0, y0, size, size);
+			}
+		}
+
+		function haloText(text, x, y, font, fill = '#fff', halo = 'rgba(6,8,12,0.85)', width = 3) {
+			ctx.font = font;
+			ctx.lineJoin = 'round';
+			ctx.lineWidth = width;
+			ctx.strokeStyle = halo;
+			ctx.strokeText(text, x, y);
+			ctx.fillStyle = fill;
+			ctx.fillText(text, x, y);
+		}
+
+		function drawRegionNames() {
+			// Seen from afar; gone once the streets matter.
+			const fade = Math.max(0, Math.min(1, (0.55 - view.zoom) / 0.2));
+			if (!fade) {
+				return;
+			}
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'middle';
+			ctx.globalAlpha = fade * 0.9;
+			for (const [name, x, y, city] of REGION_LABELS) {
+				const size = Math.max(10, Math.min(city ? 30 : 20, view.zoom * (city ? 120 : 80)));
+				ctx.save();
+				ctx.letterSpacing = (size * 0.18).toFixed(1) + 'px';
+				haloText(name.toUpperCase(), sx(x), sy(y), `${city ? 800 : 700} ${size}px ${getFont()}`,
+					city ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.8)', 'rgba(6,8,12,0.55)', city ? 4 : 3);
+				ctx.restore();
+			}
+			ctx.globalAlpha = 1;
+		}
+
+		let fontCache = null;
+
+		function getFont() {
+			return fontCache || (fontCache = getComputedStyle(document.body).fontFamily);
+		}
+
+		function poiShown(p) {
+			if (selected && selected.poi === p) {
+				return true;
+			}
+			return passes(p);
+		}
+
+		function drawRoutes() {
+			const sel = selected && selected.poi && selected.poi.kind === 'race' ? selected.poi : null;
+			const hov = hovered && hovered.poi && hovered.poi.kind === 'race' ? hovered.poi : null;
+			ctx.lineJoin = 'round';
+			ctx.lineCap = 'round';
+			if (prefs.routes && layerOn('race')) {
+				for (const p of pois) {
+					if (p.kind !== 'race' || p === sel || p === hov || !passes(p) || !p.route) {
+						continue;
+					}
+					traceRoute(p);
+					ctx.setLineDash(p.info.type === 'Air' ? [6, 6] : []);
+					ctx.strokeStyle = 'rgba(213, 81, 129, 0.5)';
+					ctx.lineWidth = 2;
+					ctx.stroke();
+				}
+				ctx.setLineDash([]);
+			}
+			if (hov && hov !== sel) {
+				drawRoute(hov, false);
+			}
+			if (sel) {
+				drawRoute(sel, true);
+			}
+		}
+
+		function traceRoute(p) {
+			ctx.beginPath();
+			p.route.forEach(([x, y], i) => i ? ctx.lineTo(sx(x), sy(y)) : ctx.moveTo(sx(x), sy(y)));
+		}
+
+		// A race's way, picked out: casing, its colour, which way it goes,
+		// each checkpoint numbered and the finish flagged.
+		function drawRoute(p, full) {
+			const color = KINDS.race.color;
+			traceRoute(p);
+			ctx.setLineDash([]);
+			ctx.strokeStyle = 'rgba(8, 10, 14, 0.85)';
+			ctx.lineWidth = 7;
+			ctx.stroke();
+			ctx.setLineDash(p.info.type === 'Air' ? [12, 8] : []);
+			ctx.strokeStyle = color;
+			ctx.lineWidth = 4;
+			ctx.stroke();
+			ctx.setLineDash([]);
+			if (!full) {
+				return;
+			}
+			const pts = p.route.map(([x, y]) => [sx(x), sy(y)]);
+			ctx.fillStyle = '#fff';
+			for (let i = 1; i < pts.length; i++) {
+				const [ax, ay] = pts[i - 1], [bx, by] = pts[i];
+				const len = Math.hypot(bx - ax, by - ay);
+				if (len < 46) {
+					continue;
+				}
+				const a = Math.atan2(by - ay, bx - ax);
+				ctx.save();
+				ctx.translate((ax + bx) / 2, (ay + by) / 2);
+				ctx.rotate(a);
+				ctx.beginPath();
+				ctx.moveTo(4, 0);
+				ctx.lineTo(-3, -4);
+				ctx.lineTo(-1, 0);
+				ctx.lineTo(-3, 4);
+				ctx.closePath();
+				ctx.fill();
+				ctx.restore();
+			}
+			let lastX = -1e9, lastY = -1e9;
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'middle';
+			for (let i = 1; i < pts.length; i++) {
+				const [x, y] = pts[i];
+				if (i === pts.length - 1) {
+					drawBadge(x, y, 10, '#15171c', ICONS.flag);
+					hits.push({ x, y, r: 12, spot: { label: 'Finish', parent: p } });
+					continue;
+				}
+				// Numbers where they have room.
+				if (Math.hypot(x - lastX, y - lastY) < 18) {
+					ctx.beginPath();
+					ctx.arc(x, y, 3, 0, Math.PI * 2);
+					ctx.fillStyle = '#fff';
+					ctx.fill();
+					continue;
+				}
+				ctx.beginPath();
+				ctx.arc(x, y, 8, 0, Math.PI * 2);
+				ctx.fillStyle = '#fff';
+				ctx.fill();
+				ctx.lineWidth = 2;
+				ctx.strokeStyle = color;
+				ctx.stroke();
+				ctx.fillStyle = '#15171c';
+				ctx.font = `700 9.5px ${getFont()}`;
+				ctx.fillText(String(i), x, y + 0.5);
+				hits.push({ x, y, r: 9, spot: { label: `Checkpoint ${i}`, parent: p } });
+				lastX = x;
+				lastY = y;
+			}
+		}
+
+		// What goes with the selection: dashed ties to a place's other spots
+		// (drawn over the markers, by drawSpots), rings round a team's other
+		// spawns or an owner's other properties.
+		function drawFocus() {
+			const p = selected && selected.poi;
+			if (!p) {
+				return;
+			}
+			if (p.points && p.kind !== 'race') {
+				const ax = sx(p.x), ay = sy(p.y);
+				ctx.setLineDash([4, 4]);
+				ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+				ctx.lineWidth = 1.5;
+				ctx.beginPath();
+				for (const q of p.points) {
+					ctx.moveTo(ax, ay);
+					ctx.lineTo(sx(q.x), sy(q.y));
+				}
+				ctx.stroke();
+				ctx.setLineDash([]);
+			}
+			const kin = pois.filter(q => q !== p && (
+				(p.kind === 'team' && q.kind === 'team' && q.info.team === p.info.team) ||
+				(p.owner && q.owner === p.owner)));
+			ctx.lineWidth = 2;
+			ctx.strokeStyle = p.kind === 'team' ? p.info.color || KINDS.team.color : 'rgba(255,255,255,0.85)';
+			ctx.setLineDash([3, 3]);
+			for (const q of kin) {
+				ctx.beginPath();
+				ctx.arc(sx(q.x), sy(q.y), markerRadius() + 6, 0, Math.PI * 2);
+				ctx.stroke();
+			}
+			ctx.setLineDash([]);
+		}
+
+		// The selection's spots, each coloured for what it is; their labels go
+		// to drawLabels.
+		function drawSpots() {
+			const p = selected && selected.poi;
+			const labels = [];
+			if (!p || !p.points || p.kind === 'race') {
+				return labels;
+			}
+			const ax = sx(p.x), ay = sy(p.y);
+			for (const q of p.points) {
+				const x = sx(q.x), y = sy(q.y);
+				if (Math.hypot(x - ax, y - ay) < 4) {
+					continue; // where the place itself is drawn
+				}
+				ctx.beginPath();
+				ctx.arc(x, y, 6.2, 0, Math.PI * 2);
+				ctx.fillStyle = 'rgba(8,10,14,0.9)';
+				ctx.fill();
+				ctx.beginPath();
+				ctx.arc(x, y, 4.6, 0, Math.PI * 2);
+				ctx.fillStyle = spotColor(q.label);
+				ctx.fill();
+				hits.push({ x, y, r: 9, spot: { label: q.label, parent: p } });
+				labels.push({ text: q.label, x: x + 9, y, align: 'left' });
+			}
+			return labels;
+		}
+
+		// Game colours: red is trouble, yellow something to pick up, green
+		// help.
+		const SPOT_COLORS = {
+			'Enemy': '#ff6b6b', 'Enemy path': '#ffa8a8', 'Weapon': '#fcc419', 'Health': '#51cf66',
+			'Briefcase': '#fcc419', 'Briefcase man': '#ff922b', 'Spawn': '#51cf66', 'Checkpoint': '#ff922b',
+			'Destination': '#ff922b', 'Vehicle': '#74c0fc', 'Helicopter': '#74c0fc',
+			'Gas trailer': '#ffe066', 'Freight trailer': '#ffe066',
+		};
+
+		function spotColor(label) {
+			return SPOT_COLORS[label] || '#ffffff';
+		}
+
+		function markerRadius() {
+			return Math.max(3.5, Math.min(10, 2.5 + view.zoom * 16));
+		}
+
+		function colorOf(p) {
+			if (p.mine) {
+				return MINE;
+			}
+			if (p.kind === 'team') {
+				return p.info.color || KINDS.team.color;
+			}
+			return KINDS[p.kind].color;
+		}
+
+		function drawBadge(x, y, r, fill, icon, ring = 'rgba(8, 10, 14, 0.9)') {
+			ctx.beginPath();
+			ctx.arc(x, y, r + 1.6, 0, Math.PI * 2);
+			ctx.fillStyle = ring;
+			ctx.fill();
+			ctx.beginPath();
+			ctx.arc(x, y, r, 0, Math.PI * 2);
+			ctx.fillStyle = fill;
+			ctx.fill();
+			if (!icon || r < 6.5) {
+				return;
+			}
+			ctx.fillStyle = luminance(fill) > 0.62 ? '#14161a' : '#fff';
+			if (icon.text) {
+				ctx.font = `800 ${(r * 1.35).toFixed(1)}px ${getFont()}`;
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'middle';
+				ctx.fillText(icon.text, x, y + r * 0.08);
+				return;
+			}
+			const k = r * 1.45 / 14;
+			ctx.save();
+			ctx.translate(x, y);
+			ctx.scale(k, k);
+			ctx.translate(-10, -10);
+			ctx.fill(icon.path, icon.rule || 'nonzero');
 			ctx.restore();
 		}
 
-		canvas.addEventListener('mousedown', e => {
-			isDragging = true;
-			lastX = e.clientX;
-			lastY = e.clientY;
-			canvas.style.cursor = "grabbing";
-		});
-		canvas.addEventListener('mouseup', e => {
-			isDragging = false;
-			canvas.style.cursor = "grab";
-		});
-		canvas.addEventListener('mousemove', e => {
-			if (isDragging) {
-				offsetX += e.clientX - lastX;
-				offsetY += e.clientY - lastY;
-				lastX = e.clientX;
-				lastY = e.clientY;
-				draw();
-			} else {
-				showTooltip(e);
+		function drawPOI(p, r) {
+			const x = sx(p.x), y = sy(p.y);
+			drawBadge(x, y, r, colorOf(p), ICONS[KINDS[p.kind].icon]);
+			// A pip for what can be had.
+			if (p.info && p.info.for_sale && !p.mine) {
+				const pr = Math.max(2.5, r * 0.4);
+				ctx.beginPath();
+				ctx.arc(x + r * 0.78, y - r * 0.78, pr + 1.4, 0, Math.PI * 2);
+				ctx.fillStyle = 'rgba(8,10,14,0.9)';
+				ctx.fill();
+				ctx.beginPath();
+				ctx.arc(x + r * 0.78, y - r * 0.78, pr, 0, Math.PI * 2);
+				ctx.fillStyle = AVAILABLE;
+				ctx.fill();
 			}
-		});
-		canvas.addEventListener('wheel', e => {
-			const zoom = Math.exp(-e.deltaY * 0.001);
-			scale *= zoom;
-			draw();
-		});
+			hits.push({ x, y, r: r + 4, poi: p });
+		}
 
-		function showTooltip(e) {
-			const rect = canvas.getBoundingClientRect();
-			const cx = e.clientX - rect.left;
-			const cy = e.clientY - rect.top;
-			const xRel = (cx - offsetX) / scale;
-			const yRel = (cy - offsetY) / scale;
+		function drawPOIs() {
+			const r = markerRadius();
+			const m = r + 4;
+			const top = [];
+			for (const p of pois) {
+				if (!poiShown(p)) {
+					continue;
+				}
+				const x = sx(p.x), y = sy(p.y);
+				if (x < -m || y < -m || x > W + m || y > H + m) {
+					continue;
+				}
+				if ((hovered && hovered.poi === p) || (selected && selected.poi === p) || p.mine) {
+					top.push(p);
+					continue;
+				}
+				drawPOI(p, r);
+			}
+			for (const p of top) {
+				drawPOI(p, (selected && selected.poi === p) || (hovered && hovered.poi === p) ? r + 2 : r);
+			}
+		}
 
-			let hover = null;
-			for (const p of filtered) {
-				const [ix, iy] = worldToImage(p.x, p.y, img.width);
-				const px = ix - img.width / 2;
-				const py = iy - img.height / 2;
-				const dx = xRel - px;
-				const dy = yRel - py;
-				const dist = Math.sqrt(dx * dx + dy * dy);
-				if (dist < 25 / scale) {
-					hover = p;
-					break;
+		// Names, where one does not cover another: the selection's first, its
+		// spots', then markers' close up, what is fewest first.
+		const LABEL_RANK = { race: 0, rampage: 1, combat: 1, team: 2, trucking: 3, market: 3, property: 4, business: 5 };
+
+		const labelWidths = new Map();
+
+		function drawLabels(spotLabels) {
+			const r = markerRadius();
+			const font = `600 11px ${getFont()}`;
+			const sel = selected && selected.poi;
+			const wanted = [];
+			const named = h => {
+				let text = h.poi.name.replace(/^(LS|SF|LV): /, '');
+				return text.length > 30 ? text.slice(0, 29) + '…' : text;
+			};
+			for (const h of hits) {
+				if (h.poi && h.poi === sel) {
+					wanted.push({ text: named(h), x: h.x, y: h.y + r + 4, align: 'center', rank: -2 });
 				}
 			}
-
-			if (hover) {
-				tooltip.style.display = "block";
-				tooltip.style.left = e.clientX + 30 + "px";
-				tooltip.style.top = e.clientY + 12 + "px";
-				tooltip.innerHTML = `
-      <b>#${hover.id}</b> ${hover.name || '(no name)'}<br>
-      ${hover.owner || '(unowned)'}<br>
-      <small>(${hover.x.toFixed(0)}, ${hover.y.toFixed(0)})</small>
-    `;
-			} else {
-				tooltip.style.display = "none";
+			for (const l of spotLabels) {
+				wanted.push({ ...l, rank: -1 });
+			}
+			if (prefs.labels && view.zoom >= 0.75) {
+				for (const h of hits) {
+					if (h.poi && h.poi !== sel && LABEL_RANK[h.poi.kind] !== undefined) {
+						wanted.push({ text: named(h), x: h.x, y: h.y + r + 4, align: 'center', rank: LABEL_RANK[h.poi.kind] });
+					}
+				}
+			}
+			wanted.sort((a, b) => a.rank - b.rank);
+			ctx.font = font;
+			const placed = [];
+			for (const l of wanted) {
+				let w = labelWidths.get(l.text);
+				if (w === undefined) {
+					w = ctx.measureText(l.text).width;
+					labelWidths.set(l.text, w);
+				}
+				const x0 = l.align === 'center' ? l.x - w / 2 : l.x;
+				const box = l.align === 'center' ? [x0 - 2, l.y - 1, x0 + w + 2, l.y + 13] : [x0 - 2, l.y - 7, x0 + w + 2, l.y + 7];
+				if (placed.some(b => b[0] < box[2] && box[0] < b[2] && b[1] < box[3] && box[1] < b[3])) {
+					continue;
+				}
+				placed.push(box);
+				ctx.textAlign = l.align;
+				ctx.textBaseline = l.align === 'center' ? 'top' : 'middle';
+				haloText(l.text, l.x, l.y, font);
 			}
 		}
 
-		searchInput.addEventListener('input', () => {
-			const q = searchInput.value.toLowerCase();
-			filtered = properties.filter(p =>
-				p.name.toLowerCase().includes(q) ||
-				p.owner.toLowerCase().includes(q) ||
-				String(p.id).includes(q)
-			);
-			updateSidebar();
-			draw();
+		function drawSelection(now) {
+			let x, y;
+			if (selected && selected.poi) {
+				x = sx(selected.poi.x);
+				y = sy(selected.poi.y);
+			} else if (selected && selected.player !== undefined && markers.has(selected.player)) {
+				[x, y] = markerPos(markers.get(selected.player), now).map((v, i) => i ? sy(v) : sx(v));
+			} else {
+				return;
+			}
+			const t = Math.min(1, (now - selectedAt) / 1600);
+			const r = markerRadius() + 7;
+			if (t < 1) {
+				ctx.beginPath();
+				ctx.arc(x, y, r + t * 22, 0, Math.PI * 2);
+				ctx.strokeStyle = `rgba(255, 207, 63, ${(1 - t) * 0.9})`;
+				ctx.lineWidth = 3;
+				ctx.stroke();
+			}
+			ctx.beginPath();
+			ctx.arc(x, y, r, 0, Math.PI * 2);
+			ctx.strokeStyle = 'rgba(8,10,14,0.8)';
+			ctx.lineWidth = 5;
+			ctx.stroke();
+			ctx.strokeStyle = MINE;
+			ctx.lineWidth = 2.5;
+			ctx.stroke();
+		}
+
+		function updateHud() {
+			// A bar of a round length, at most 110 pixels.
+			const steps = [10, 25, 50, 100, 250, 500, 1000, 2000, 5000];
+			let len = steps[0];
+			for (const s of steps) {
+				if (s * view.zoom <= 110) {
+					len = s;
+				}
+			}
+			$('scale-bar').style.width = (len * view.zoom).toFixed(0) + 'px';
+			$('scale-label').textContent = distance(len);
+		}
+
+		// ── Pointing ─────────────────────────────────────────────────────
+
+		const pointers = new Map();
+		let drag = null;
+
+		function hitAt(x, y) {
+			let best = null, bestD = Infinity;
+			// Last drawn is on top: it wins a tie.
+			for (let i = hits.length - 1; i >= 0; i--) {
+				const h = hits[i];
+				const d = Math.hypot(h.x - x, h.y - y);
+				if (d <= h.r && d < bestD - 0.5) {
+					best = h;
+					bestD = d;
+				}
+			}
+			return best;
+		}
+
+		canvas.addEventListener('pointerdown', e => {
+			canvas.setPointerCapture(e.pointerId);
+			pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+			flight = null;
+			if (pointers.size === 1) {
+				drag = { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, moved: false };
+			} else if (pointers.size === 2) {
+				const [a, b] = [...pointers.values()];
+				drag = { pinch: Math.hypot(a.x - b.x, a.y - b.y), moved: true };
+			}
 		});
 
-		function updateSidebar() {
-			listDiv.innerHTML = '';
-			for (const p of filtered) {
-				const div = document.createElement('div');
-				div.className = 'property-item';
-				div.textContent = `#${p.id} ${p.name || '(no name)'}`;
-				div.onclick = () => focusProperty(p);
-				listDiv.appendChild(div);
+		canvas.addEventListener('pointermove', e => {
+			if (pointers.has(e.pointerId)) {
+				pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+			}
+			if (drag && pointers.size === 2) {
+				const [a, b] = [...pointers.values()];
+				const d = Math.hypot(a.x - b.x, a.y - b.y);
+				zoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, d / drag.pinch);
+				drag.pinch = d;
+				return;
+			}
+			if (drag && pointers.size === 1) {
+				if (!drag.moved && Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) > 4) {
+					drag.moved = true;
+					setFollow(null);
+					canvas.classList.add('dragging');
+					hideTip();
+				}
+				if (drag.moved) {
+					view.x -= (e.clientX - drag.x) / view.zoom;
+					view.y += (e.clientY - drag.y) / view.zoom;
+					requestRender();
+				}
+				drag.x = e.clientX;
+				drag.y = e.clientY;
+				return;
+			}
+			hover(e.clientX, e.clientY);
+		});
+
+		function endPointer(e, cancelled) {
+			pointers.delete(e.pointerId);
+			if (drag && !drag.moved && !cancelled && pointers.size === 0) {
+				click(e.clientX, e.clientY);
+			}
+			if (pointers.size === 1) {
+				const [p] = [...pointers.values()];
+				drag = { x: p.x, y: p.y, moved: true };
+			} else if (pointers.size === 0) {
+				drag = null;
+				canvas.classList.remove('dragging');
+				writeHash();
 			}
 		}
 
-		function focusProperty(p) {
-			const [ix, iy] = worldToImage(p.x, p.y, img.width);
-			const px = ix - img.width / 2;
-			const py = iy - img.height / 2;
-			offsetX = width / 2 - px * scale;
-			offsetY = height / 2 - py * scale;
-			draw();
+		canvas.addEventListener('pointerup', e => endPointer(e, false));
+		canvas.addEventListener('pointercancel', e => endPointer(e, true));
+		canvas.addEventListener('pointerleave', () => {
+			if (!drag) {
+				setHovered(null);
+				hideTip();
+			}
+		});
 
-			tooltip.style.display = "block";
-			tooltip.style.left = "350px";
-			tooltip.style.top = "20px";
-			tooltip.innerHTML = `
-    <b>#${p.id}</b> ${p.name}<br>
-    Type: ${p.type}<br>
-    Owner: ${p.owner}<br>
-    <small>(${p.x.toFixed(0)}, ${p.y.toFixed(0)})</small>
-  `;
+		canvas.addEventListener('wheel', e => {
+			e.preventDefault();
+			flight = null;
+			const dy = e.deltaMode === 1 ? e.deltaY * 32 : e.deltaY;
+			zoomAt(e.clientX, e.clientY, Math.exp(-dy * 0.0016));
+			hover(e.clientX, e.clientY);
+			clearTimeout(wheelTimer);
+			wheelTimer = setTimeout(writeHash, 300);
+		}, { passive: false });
+		let wheelTimer = null;
 
+		canvas.addEventListener('dblclick', e => {
+			const x = wx(e.clientX), y = wy(e.clientY);
+			const zoom = clampZoom(view.zoom * 2);
+			// Keep the point under the pointer where it is.
+			flyTo(x - (e.clientX - originX()) / zoom, y + (e.clientY - H / 2) / zoom, zoom, 350);
+		});
+
+		function setHovered(h) {
+			const key = h ? (h.poi || h.spot || h.player || h.vehicle) : null;
+			const old = hovered ? (hovered.poi || hovered.spot || hovered.player || hovered.vehicle) : null;
+			hovered = h;
+			canvas.classList.toggle('pointing', !!h);
+			if (key !== old) {
+				requestRender();
+			}
 		}
-		async function login() {
-			const username = document.getElementById('username').value;
-			const password = document.getElementById('password').value;
-			const res = await fetch('/api/login', {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({username, password})
+
+		function hover(cx, cy) {
+			const x = wx(cx), y = wy(cy);
+			$('hud-zone').textContent = regionAt(x, y) || (Math.abs(x) > 3000 || Math.abs(y) > 3000 ? 'Off the map' : 'San Andreas');
+			$('hud-xy').textContent = `${x.toFixed(0)}, ${y.toFixed(0)}`;
+			const h = hitAt(cx, cy);
+			setHovered(h);
+			if (!h) {
+				hideTip();
+				return;
+			}
+			showTip(cx, cy, tipFor(h));
+		}
+
+		function tipFor(h) {
+			if (h.player) {
+				return playerTip(h.player);
+			}
+			if (h.vehicle) {
+				const v = h.vehicle;
+				return `<b>${esc(modelName(v.model))}</b> #${v.id}<br>health ${v.health}` +
+					(v.interior ? `<br>in interior ${v.interior}` : '') +
+					`<br><small>(${v.x.toFixed(0)}, ${v.y.toFixed(0)}, ${v.z.toFixed(0)})</small>`;
+			}
+			if (h.spot) {
+				return `<b>${esc(h.spot.label)}</b><br><small>${esc(h.spot.parent.name)}</small>`;
+			}
+			const p = h.poi;
+			return `<b>${esc(p.name)}</b><br><small>${esc(subtitle(p))}</small>` + (tipLine(p) ? `<br>${tipLine(p)}` : '');
+		}
+
+		function tipLine(p) {
+			const i = p.info || {};
+			switch (p.kind) {
+				case 'property':
+				case 'business':
+					return p.mine ? 'Yours' : i.for_sale ? `For sale &middot; ${money(i.cost)}` : `${esc(p.owner)} &middot; ${moneyShort(i.cost)}`;
+				case 'race':
+					return `${distance(i.length_m)} &middot; prize ${moneyShort(i.prize)}` + (i.top ? ` &middot; record ${raceTime(i.top[0].time_ms)}` : '');
+				case 'team':
+					return plural(i.members, 'member');
+				case 'drug':
+					return `${money(i.price)} a dose`;
+				case 'rampage':
+				case 'combat':
+					return plural(i.runs, 'run');
+				default:
+					return '';
+			}
+		}
+
+		function showTip(cx, cy, html) {
+			tooltip.innerHTML = html;
+			tooltip.style.display = 'block';
+			const w = tooltip.offsetWidth, h = tooltip.offsetHeight;
+			let x = cx + 16, y = cy + 14;
+			if (x + w > W - 8) {
+				x = cx - w - 14;
+			}
+			if (y + h > H - 8) {
+				y = cy - h - 12;
+			}
+			tooltip.style.left = x + 'px';
+			tooltip.style.top = y + 'px';
+		}
+
+		function hideTip() {
+			tooltip.style.display = 'none';
+		}
+
+		function click(cx, cy) {
+			const h = hitAt(cx, cy);
+			if (!h) {
+				select(null);
+				return;
+			}
+			if (h.poi) {
+				select({ poi: h.poi });
+			} else if (h.spot) {
+				select({ poi: h.spot.parent });
+			} else if (h.player) {
+				select({ player: h.player.id });
+			}
+		}
+
+		// ── Points of interest ───────────────────────────────────────────
+
+		function prepare(p) {
+			p.key = `${p.kind}:${p.id}`;
+			p.info = p.info || {};
+			p.region = regionAt(p.x, p.y);
+			p.text = [p.name, p.owner, KINDS[p.kind].label, p.region, p.info.street, p.info.vehicle, p.info.facility, p.info.note, '#' + p.id]
+				.filter(Boolean).join(' ').toLowerCase();
+			byKey.set(p.key, p);
+			return p;
+		}
+
+		function subtitle(p) {
+			const kind = p.kind === 'trucking' && p.info.facility ? p.info.facility : KINDS[p.kind].label;
+			return [kind, p.region].filter(Boolean).join(' · ');
+		}
+
+		function layerOn(kind) {
+			return !prefs.off.includes(kind);
+		}
+
+		function passes(p, anyLayer) {
+			if (!anyLayer && !layerOn(p.kind)) {
+				return false;
+			}
+			if (ownerFocus !== null && p.owner !== ownerFocus) {
+				return false;
+			}
+			if (teamFocus !== null && !(p.kind === 'team' && p.info.team === teamFocus)) {
+				return false;
+			}
+			if (p.kind === 'property' || p.kind === 'business') {
+				if ((status === 'available' && !p.info.for_sale) || (status === 'taken' && p.info.for_sale) || (status === 'mine' && !p.mine)) {
+					return false;
+				}
+			}
+			return tokens.every(t => p.text.includes(t));
+		}
+
+		async function loadPOIs() {
+			const [data, prizes, who, numbers] = await Promise.all([
+				fetch('api/data').then(r => r.ok ? r.json() : null).catch(() => null),
+				// The prize spawns are for admins: below the gateway's bar this
+				// is a 403, and the map goes without them.
+				fetch('api/prizes').then(r => r.ok ? r.json() : []).catch(() => []),
+				fetch('api/viewer').then(r => r.ok ? r.json() : {}).catch(() => ({})),
+				fetch('api/stats').then(r => r.ok ? r.json() : null).catch(() => null),
+			]);
+			if (!data) {
+				$('layers').innerHTML = '<p class="muted">Could not load points of interest.</p>';
+				return;
+			}
+			viewer = who.nickname || '';
+			stats = numbers;
+			pois = data.concat(prizes).map(prepare);
+			for (const p of pois) {
+				p.mine = !!viewer && p.owner === viewer;
+			}
+			if (viewer) {
+				$('viewer-line').textContent = viewer;
+				document.querySelector('[data-status="mine"]').hidden = !pois.some(p => p.mine);
+			}
+			renderPlaces();
+			renderStats();
+			readHash();
+			requestRender();
+		}
+
+		// ── Places ───────────────────────────────────────────────────────
+
+		const ITEM_CAP = 150;
+
+		function itemMeta(p) {
+			const i = p.info;
+			switch (p.kind) {
+				case 'property':
+				case 'business':
+					return p.mine ? 'yours' : i.for_sale ? `for sale · ${moneyShort(i.cost)}` : p.owner;
+				case 'race':
+					return `${distance(i.length_m)} · ${plural(i.finishes, 'finish', 'finishes')}`;
+				case 'team':
+					return plural(i.members, 'member');
+				case 'drug':
+					return money(i.price);
+				case 'trucking':
+					return p.region || '';
+				default:
+					return p.region || '';
+			}
+		}
+
+		function renderPlaces() {
+			const groups = new Map(Object.keys(KINDS).map(k => [k, { all: 0, shown: [] }]));
+			for (const p of pois) {
+				const g = groups.get(p.kind);
+				g.all++;
+				if (passes(p, true)) {
+					g.shown.push(p);
+				}
+			}
+			const filtering = tokens.length || ownerFocus !== null || teamFocus !== null;
+			let html = '';
+			let total = 0;
+			for (const [kind, g] of groups) {
+				if (!g.all) {
+					continue;
+				}
+				const k = KINDS[kind];
+				const on = layerOn(kind);
+				if (on) {
+					total += g.shown.length;
+				}
+				if (filtering && !g.shown.length) {
+					continue;
+				}
+				const open = prefs.open.includes(kind) || (filtering && g.shown.length);
+				const color = kind === 'team' ? KINDS.team.color : k.color;
+				html += `<div class="layer${on ? '' : ' off'}${open ? ' open' : ''}" data-kind="${kind}">
+					<div class="layer-head" data-open="${kind}">
+						<button class="switch" role="switch" aria-checked="${on}" data-layer="${kind}" aria-label="Show ${esc(k.plural)}"></button>
+						${badge(k.icon, color, 20)}
+						<span class="layer-name">${esc(k.plural)}</span>
+						<span class="layer-count">${g.shown.length === g.all ? int(g.all) : `${int(g.shown.length)} / ${int(g.all)}`}</span>
+						<svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="m4.5 2.5 3.5 3.5-3.5 3.5" /></svg>
+					</div>`;
+				if (open) {
+					const list = g.shown.slice().sort((a, b) => a.name.localeCompare(b.name, 'en', { numeric: true }));
+					html += '<div class="items">';
+					for (const p of list.slice(0, ITEM_CAP)) {
+						const sel = selected && selected.poi === p ? ' sel' : '';
+						html += `<div class="item${sel}" data-key="${esc(p.key)}"><span class="item-name">${esc(p.name)}</span><span class="item-meta">${esc(itemMeta(p) || '')}</span></div>`;
+					}
+					if (list.length > ITEM_CAP) {
+						html += `<div class="more">and ${int(list.length - ITEM_CAP)} more: search to narrow it down</div>`;
+					}
+					if (!list.length) {
+						html += '<div class="more">Nothing here with these filters.</div>';
+					}
+					html += '</div>';
+				}
+				html += '</div>';
+			}
+			if (filtering && !total && !html) {
+				html = '<p class="muted">Nothing matches. Try a name, an owner, a region, or a kind of place.</p>';
+			}
+			$('layers').innerHTML = html;
+			$('places-count').textContent = pois.length ? int(total) : '';
+			$('layers-note').innerHTML = filtering && total ? '<button class="linkish" id="fit-results">Fit on the map</button>' : 'click to list';
+			renderFocusChips();
+		}
+
+		function renderFocusChips() {
+			let html = '';
+			if (ownerFocus !== null) {
+				html += `<button class="chip focus" data-unfocus="owner">Owner: ${esc(ownerFocus)} &times;</button>`;
+			}
+			if (teamFocus !== null) {
+				const t = pois.find(p => p.kind === 'team' && p.info.team === teamFocus);
+				html += `<button class="chip focus" data-unfocus="team">Team: ${esc(t ? t.name : teamFocus)} &times;</button>`;
+			}
+			$('focus-chips').innerHTML = html;
+			$('focus-chips').style.display = html ? '' : 'none';
+		}
+
+		$('layers').addEventListener('click', e => {
+			const sw = e.target.closest('[data-layer]');
+			if (sw) {
+				const kind = sw.dataset.layer;
+				prefs.off = layerOn(kind) ? prefs.off.concat(kind) : prefs.off.filter(k => k !== kind);
+				savePrefs();
+				renderPlaces();
+				requestRender();
+				return;
+			}
+			const item = e.target.closest('[data-key]');
+			if (item) {
+				const p = byKey.get(item.dataset.key);
+				select({ poi: p }, true);
+				return;
+			}
+			const head = e.target.closest('[data-open]');
+			if (head) {
+				const kind = head.dataset.open;
+				prefs.open = prefs.open.includes(kind) ? prefs.open.filter(k => k !== kind) : prefs.open.concat(kind);
+				savePrefs();
+				renderPlaces();
+			}
+		});
+
+		$('layers').addEventListener('mouseover', e => {
+			const item = e.target.closest('[data-key]');
+			const p = item ? byKey.get(item.dataset.key) : null;
+			if ((hovered && hovered.poi) !== p) {
+				hovered = p ? { poi: p } : null;
+				requestRender();
+			}
+		});
+		$('layers').addEventListener('mouseleave', () => {
+			if (hovered && hovered.poi) {
+				hovered = null;
+				requestRender();
+			}
+		});
+
+		$('layers-note').addEventListener('click', e => {
+			if (e.target.id === 'fit-results') {
+				const shown = pois.filter(p => passes(p));
+				if (shown.length) {
+					fitPOIs(shown);
+				}
+			}
+		});
+
+		$('status-ctl').addEventListener('click', e => {
+			const b = e.target.closest('[data-status]');
+			if (b) {
+				setStatus(b.dataset.status);
+			}
+		});
+
+		function setStatus(s) {
+			status = s;
+			for (const b of document.querySelectorAll('[data-status]')) {
+				b.setAttribute('aria-pressed', String(b.dataset.status === s));
+			}
+			renderPlaces();
+			requestRender();
+		}
+
+		$('focus-chips').addEventListener('click', e => {
+			const b = e.target.closest('[data-unfocus]');
+			if (b) {
+				if (b.dataset.unfocus === 'owner') {
+					ownerFocus = null;
+				} else {
+					teamFocus = null;
+				}
+				renderPlaces();
+				requestRender();
+			}
+		});
+
+		function focusOwner(name) {
+			ownerFocus = name;
+			teamFocus = null;
+			showTab('places');
+			renderPlaces();
+			const mine = pois.filter(p => p.owner === name);
+			if (mine.length) {
+				fitPOIs(mine);
+			}
+		}
+
+		function focusTeam(id) {
+			teamFocus = id;
+			ownerFocus = null;
+			showTab('places');
+			if (!layerOn('team')) {
+				prefs.off = prefs.off.filter(k => k !== 'team');
+			}
+			renderPlaces();
+			const spawns = pois.filter(p => p.kind === 'team' && p.info.team === id);
+			if (spawns.length) {
+				fitPOIs(spawns);
+			}
+		}
+
+		function fitPOIs(list) {
+			revealMap();
+			if (list.length === 1) {
+				flyToPoint(list[0].x, list[0].y, Math.max(view.zoom, 0.8));
+				return;
+			}
+			fitBounds(Math.min(...list.map(p => p.x)), Math.min(...list.map(p => p.y)),
+				Math.max(...list.map(p => p.x)), Math.max(...list.map(p => p.y)));
+		}
+
+		let searchTimer = null;
+		searchInput.addEventListener('input', () => {
+			clearTimeout(searchTimer);
+			searchTimer = setTimeout(applySearch, 90);
+			$('search-clear').hidden = !searchInput.value;
+			$('search-kbd').hidden = !!searchInput.value;
+		});
+
+		function applySearch() {
+			query = searchInput.value.trim().toLowerCase();
+			tokens = query.split(/\s+/).filter(Boolean);
+			renderPlaces();
+			updateLiveList();
+			requestRender();
+		}
+
+		$('search-clear').addEventListener('click', () => {
+			searchInput.value = '';
+			searchInput.dispatchEvent(new Event('input'));
+			searchInput.focus();
+		});
+
+		for (const [id, key] of [['opt-routes', 'routes'], ['opt-regions', 'regions'], ['opt-labels', 'labels'], ['opt-dim', 'dim']]) {
+			bindSwitch(id, () => prefs[key], v => {
+				prefs[key] = v;
+				savePrefs();
+				requestRender();
 			});
-			if (res.ok) {
-				document.getElementById('login').style.display = 'none';
-				document.getElementById('properties').style.display = 'block';
-				loadProperties();
+		}
+
+		function bindSwitch(id, get, set) {
+			const sw = $(id);
+			sw.setAttribute('aria-checked', String(get()));
+			const flip = e => {
+				e.preventDefault();
+				const v = !get();
+				sw.setAttribute('aria-checked', String(v));
+				set(v);
+			};
+			sw.addEventListener('click', flip);
+			sw.setAttribute('aria-label', sw.closest('.toggle').textContent.trim());
+			sw.closest('.toggle').addEventListener('click', e => {
+				if (e.target !== sw) {
+					flip(e);
+				}
+			});
+		}
+
+		// ── The card ─────────────────────────────────────────────────────
+
+		function select(sel, fly) {
+			selected = sel;
+			selectedAt = performance.now();
+			if (!sel) {
+				card.hidden = true;
+				card.innerHTML = '';
+				renderPlaces();
+				writeHash();
+				requestRender();
+				return;
+			}
+			if (fly) {
+				revealMap();
+			}
+			if (sel.poi) {
+				const p = sel.poi;
+				card.innerHTML = poiCard(p);
+				card.hidden = false;
+				if (fly) {
+					if (p.kind === 'race' && p.route && p.route.length > 1) {
+						fitBounds(Math.min(...p.route.map(q => q[0])), Math.min(...p.route.map(q => q[1])),
+							Math.max(...p.route.map(q => q[0])), Math.max(...p.route.map(q => q[1])), 90);
+					} else if (p.points && p.points.length) {
+						const all = p.points.concat([{ x: p.x, y: p.y }]);
+						const x0 = Math.min(...all.map(q => q.x)), x1 = Math.max(...all.map(q => q.x));
+						const y0 = Math.min(...all.map(q => q.y)), y1 = Math.max(...all.map(q => q.y));
+						if (x1 - x0 > 60 || y1 - y0 > 60) {
+							fitBounds(x0, y0, x1, y1, 110, 2.4);
+						} else {
+							// Near together, a house's door and its car: close
+							// enough to tell apart.
+							const far = Math.max(...p.points.map(q => Math.hypot(q.x - p.x, q.y - p.y)), 1);
+							flyToPoint(p.x, p.y, Math.max(view.zoom, Math.min(MAX_ZOOM, 44 / far)));
+						}
+					} else {
+						flyToPoint(p.x, p.y, Math.max(view.zoom, 0.9));
+					}
+				}
+				renderPlaces();
 			} else {
-				document.getElementById('loginMsg').innerText = 'Invalid credentials.';
+				card.innerHTML = playerCard();
+				card.hidden = false;
+				if (fly && markers.has(sel.player)) {
+					const p = markers.get(sel.player).p;
+					flyToPoint(p.x, p.y, Math.max(view.zoom, 0.8));
+				}
+			}
+			card.hidden = false;
+			writeHash();
+			requestRender();
+		}
+
+		function cardHead(icon, color, title, sub) {
+			return `<div class="card-head">${badge(icon, color, 30)}
+				<div class="card-titles"><div class="card-title">${esc(title)}</div><div class="card-sub">${esc(sub)}</div></div>
+				<button class="icon-btn" data-act="close" title="Close (Esc)" aria-label="Close">
+					<svg width="14" height="14" viewBox="0 0 14 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m3 3 8 8M11 3l-8 8" /></svg>
+				</button></div>`;
+		}
+
+		const fact = (k, v, wide) => v === undefined || v === null || v === '' ? '' :
+			`<div class="fact${wide ? ' wide' : ''}"><div class="fact-k">${esc(k)}</div><div class="fact-v">${v}</div></div>`;
+
+		function coordsRow(x, y, z) {
+			const text = `${x.toFixed(1)}, ${y.toFixed(1)}` + (z !== undefined ? `, ${z.toFixed(1)}` : '');
+			return `<div class="coords"><span>${text}</span><button class="btn small" data-copy="${text}">Copy</button></div>`;
+		}
+
+		function poiCard(p) {
+			const i = p.info;
+			let body = '';
+			switch (p.kind) {
+				case 'property':
+				case 'business': {
+					const pill = p.mine ? '<span class="pill mine">Yours</span>'
+						: i.for_sale ? `<span class="pill avail">${p.kind === 'business' ? 'Free to rent' : 'For sale'}</span>`
+							: `<span class="pill taken">${p.kind === 'business' ? 'Rented' : 'Owned'} by ${esc(p.owner)}</span>`;
+					const locked = i.locked_until && i.locked_until * 1000 > Date.now()
+						? new Date(i.locked_until * 1000).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' }) : '';
+					body += pill + '<div class="facts">' +
+						fact('Price', money(i.cost)) +
+						fact('Vehicle', i.vehicle ? esc(i.vehicle) : '') +
+						fact('Interior', i.custom_interior ? 'Custom' : '') +
+						fact('Locked until', locked ? esc(locked) : '') +
+						'</div>';
+					body += spotChips(p);
+					if (p.owner) {
+						const n = pois.filter(q => q.owner === p.owner).length;
+						body += `<div class="actions"><button class="btn" data-act="owner">All of ${esc(p.owner)}&rsquo;s places (${int(n)})</button></div>`;
+					}
+					break;
+				}
+				case 'race': {
+					body += '<div class="facts">' +
+						fact('Kind', esc(i.type || '—')) +
+						fact('Length', `${distance(i.length_m)}`) +
+						fact('Entry fee', money(i.fee)) +
+						fact('Prize', money(i.prize)) +
+						fact('Checkpoints', int(i.checkpoints)) +
+						fact('Finishes', `${int(i.finishes)} <span class="muted">by ${plural(i.racers, 'racer')}</span>`) +
+						'</div>';
+					if (i.top) {
+						const medals = ['1st', '2nd', '3rd', '4th', '5th'];
+						body += '<h3>Best times</h3><table class="times">' + i.top.map((t, n) =>
+							`<tr><td class="medal">${medals[n]}</td><td>${esc(t.nickname)}<div class="veh">${esc(t.vehicle || '')}</div></td><td class="t">${raceTime(t.time_ms)}</td></tr>`).join('') + '</table>';
+					} else {
+						body += '<p class="note">Nobody has finished it yet. The first to do so sets the record.</p>';
+					}
+					break;
+				}
+				case 'team':
+					body += '<div class="facts">' +
+						fact('Members', int(i.members)) +
+						fact('Pay', `${money(i.salary)} <span class="muted">+ up to ${money(i.salary_bonus)}</span>`) +
+						fact('Colour', `<span class="legend" style="margin:0"><span><i class="swatch" style="background:${esc(i.color || KINDS.team.color)}"></i>${esc((i.color || '').toUpperCase())}</span></span>`) +
+						fact('Spawns', int(pois.filter(q => q.kind === 'team' && q.info.team === i.team).length)) +
+						'</div><div class="actions"><button class="btn" data-act="team">Show only this team&rsquo;s spawns</button></div>';
+					break;
+				case 'trucking':
+					body += '<div class="facts">' + fact('Facility', esc(i.facility || '—')) + fact('Places', int((p.points || []).length)) + '</div>';
+					body += spotChips(p);
+					break;
+				case 'drug':
+					body += '<div class="facts">' + fact('Price', `${money(i.price)} <span class="muted">a dose</span>`) + fact('Street name', i.street ? esc(i.street) : '') + '</div>';
+					break;
+				case 'rampage':
+					body += '<div class="facts">' +
+						fact('Area', esc(i.area || p.region || '—')) +
+						fact('Runs', int(i.runs)) +
+						fact('Enemies', int(i.enemies)) +
+						fact('Weapons', int(i.weapons)) +
+						fact('Health packs', int(i.health)) +
+						fact('Record', i.record ? `${plural(i.record.value, 'kill')} <span class="muted">by ${esc(i.record.nickname)}</span>` : '—') +
+						'</div>' + spotChips(p);
+					break;
+				case 'combat':
+					body += '<div class="facts">' +
+						fact('Runs', int(i.runs)) +
+						fact('Record', i.record ? `${plural(i.record.value, 'briefcase')} <span class="muted">by ${esc(i.record.nickname)}</span>` : '—') +
+						'</div>';
+					if (p.points) {
+						body += spotChips(p, 'Outdoors') + '<p class="note">The rest of the mission is indoors, in an interior.</p>';
+					}
+					break;
+				case 'tiki':
+				case 'pumpkin':
+					body += (i.placed ? '<span class="pill avail">In the world</span>' : '<span class="pill">Not placed</span>') +
+						(i.note ? `<p class="note">${esc(i.note)}</p>` : '');
+					break;
+			}
+			body += coordsRow(p.x, p.y, p.z);
+			body += `<div class="actions"><button class="btn primary" data-act="zoom">Zoom here</button></div>`;
+			return cardHead(KINDS[p.kind].icon, colorOf(p), p.name, subtitle(p) + (p.kind === 'race' ? '' : ` · #${p.id}`)) +
+				`<div class="card-body">${body}</div>`;
+		}
+
+		function spotChips(p, title = 'On the map') {
+			if (!p.points || !p.points.length) {
+				return '';
+			}
+			const counts = new Map();
+			for (const q of p.points) {
+				counts.set(q.label, (counts.get(q.label) || 0) + 1);
+			}
+			return `<h3>${esc(title)}</h3><div class="spots">` + [...counts].map(([label, n]) =>
+				`<span><i class="spot-dot" style="background:${spotColor(label)}"></i>${esc(label)}${n > 1 ? ` <b>${n}</b>` : ''}</span>`).join('') + '</div>';
+		}
+
+		function playerCard() {
+			const m = markers.get(selected.player);
+			if (!m) {
+				return cardHead('person', '#555', 'Gone', 'Left the server') + '<div class="card-body"><p class="muted">No longer on.</p></div>';
+			}
+			const p = m.p;
+			const kinds = { player: 'Player', puppet: 'Test player', npc: 'NPC', 'npc-client': 'NPC client' };
+			const region = regionAt(p.x, p.y);
+			const following = follow === p.id;
+			let body = `<span class="pill">${esc(p.state)}</span>`;
+			body += `<div class="hp-row">Health <span class="meter"><i style="width:${Math.min(100, p.health)}%;background:#e03131"></i></span><b>${Math.round(p.health)}</b></div>`;
+			body += `<div class="hp-row">Armour <span class="meter"><i style="width:${Math.min(100, p.armour)}%;background:#adb5bd"></i></span><b>${Math.round(p.armour)}</b></div>`;
+			body += '<div class="facts">' +
+				fact('Vehicle', p.vehicle !== undefined ? `${esc(modelName(p.model))} <span class="muted">#${p.vehicle}${p.seat ? `, seat ${p.seat}` : ''}</span>` : 'On foot') +
+				fact('Score', int(p.score)) +
+				(p.kind === 'player' ? fact('Ping', `${int(p.ping)} ms`) : '') +
+				fact('Wanted', p.wanted ? `<span class="stars">${'★'.repeat(Math.min(p.wanted, 6))}</span> ${p.wanted}` : 'Clean') +
+				fact('Interior', p.interior ? String(p.interior) : '') +
+				'</div>';
+			body += coordsRow(p.x, p.y, p.z);
+			body += `<div class="actions"><button class="btn primary" data-act="follow">${following ? 'Stop following' : 'Follow'}</button></div>`;
+			const color = isNpc(p) ? '#8ca0be' : (p.color && p.color !== '#000000' ? p.color : '#ffd700');
+			return cardHead('person', color, p.name, `${kinds[p.kind] || p.kind} #${p.id}` + (region ? ` · ${region}` : '')) +
+				`<div class="card-body">${body}</div>`;
+		}
+
+		card.addEventListener('click', e => {
+			const copy = e.target.closest('[data-copy]');
+			if (copy) {
+				copyText(copy.dataset.copy);
+				return;
+			}
+			const b = e.target.closest('[data-act]');
+			if (!b) {
+				return;
+			}
+			const p = selected && selected.poi;
+			switch (b.dataset.act) {
+				case 'close':
+					select(null);
+					break;
+				case 'zoom':
+					if (p) {
+						select({ poi: p }, true);
+					}
+					break;
+				case 'owner':
+					focusOwner(p.owner);
+					break;
+				case 'team':
+					focusTeam(p.info.team);
+					break;
+				case 'follow':
+					setFollow(follow === selected.player ? null : selected.player);
+					break;
+			}
+		});
+
+		async function copyText(text) {
+			try {
+				await navigator.clipboard.writeText(text);
+				toast(`Copied ${text}`);
+			} catch (e) {
+				toast('Could not copy: the browser said no');
 			}
 		}
 
-		async function loadProperties() {
-			const res = await fetch('/api/data');
-			if (!res.ok) return alert('Not authorized.');
+		let toastTimer = null;
 
-			properties = await res.json();
-			filtered = properties;
-			updateSidebar();
-			draw();
+		function toast(text) {
+			const t = $('toast');
+			t.textContent = text;
+			t.classList.add('show');
+			clearTimeout(toastTimer);
+			toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
 		}
+
+		// ── Stats ────────────────────────────────────────────────────────
+
+		function tile(label, value, extra) {
+			return `<div class="tile"><div class="tile-label">${esc(label)}</div><div class="tile-value">${value}${extra ? ` <small>${extra}</small>` : ''}</div></div>`;
+		}
+
+		// Horizontal bars, one row each: [{label, parts: [[value, color]], value, act, tip, swatch}]
+		function barChart(rows) {
+			const max = Math.max(1, ...rows.map(r => r.parts.reduce((s, [v]) => s + v, 0)));
+			return '<div class="bars-chart">' + rows.map(r => {
+				const parts = r.parts.filter(([v]) => v > 0).map(([v, c]) =>
+					`<i style="width:${(v / max * 100).toFixed(2)}%;background:${c}"></i>`).join('');
+				return `<div class="bar-row${r.act ? ' act' : ''}"${r.act ? ` data-act="${esc(r.act)}"` : ''}${r.tip ? ` data-tip="${esc(r.tip)}"` : ''}>
+					<span class="bar-label">${r.swatch ? `<i class="swatch" style="background:${r.swatch}"></i>` : ''}<span>${esc(r.label)}</span></span>
+					<span class="bar-track">${parts}</span>
+					<span class="bar-val">${r.value}</span></div>`;
+			}).join('') + '</div>';
+		}
+
+		function renderStats() {
+			const el = $('stats-body');
+			const houses = pois.filter(p => p.kind === 'property');
+			const biz = pois.filter(p => p.kind === 'business');
+			const taken = houses.concat(biz).filter(p => !p.info.for_sale).length;
+			const races = pois.filter(p => p.kind === 'race');
+			let html = '<div class="tiles">';
+			html += tile('Places on the map', int(pois.length));
+			html += tile('Properties taken', int(taken), `of ${int(houses.length + biz.length)}`);
+			if (stats) {
+				const missions = stats.missions.filter(m => m.type !== 1).reduce((s, m) => s + m.runs, 0);
+				const finishes = (stats.missions.find(m => m.type === 1) || { runs: 0 }).runs;
+				html += tile('Registered players', int(stats.players));
+				html += tile('Hours played', compact(stats.playtime_ms / 3.6e6));
+				html += tile('Race finishes', int(finishes));
+				html += tile('Mission runs', int(missions));
+			}
+			html += '</div>';
+
+			const mine = pois.filter(p => p.mine);
+			if (mine.length) {
+				const worth = mine.reduce((s, p) => s + p.info.cost, 0);
+				html += `<h3>Yours</h3><div class="mkt act" data-act="mine" style="cursor:pointer"><div class="mkt-head"><b>${plural(mine.length, 'place')}</b><span>${moneyShort(worth)}</span></div><div class="mkt-cap"><span>Click to show only yours on the map</span></div></div>`;
+			}
+
+			html += '<h3>Property market</h3>';
+			for (const [label, list, color, word] of [['Properties', houses, 'var(--c-property)', 'owned'], ['Businesses', biz, 'var(--c-business)', 'rented']]) {
+				const free = list.filter(p => p.info.for_sale);
+				const cheapest = free.length ? Math.min(...free.map(p => p.info.cost)) : 0;
+				html += `<div class="mkt"><div class="mkt-head"><b>${label}</b><span class="muted">${int(list.length)}</span></div>
+					<div class="segbar" data-tip="${esc(`${int(list.length - free.length)} ${word}, ${int(free.length)} available`)}"><i style="flex:${list.length - free.length};background:${color}"></i><i style="flex:${free.length};background:${AVAILABLE}"></i></div>
+					<div class="mkt-cap"><span>${int(list.length - free.length)} ${word}</span><span>${int(free.length)} available${free.length ? ` · from ${moneyShort(cheapest)}` : ''}</span></div></div>`;
+			}
+			html += `<div class="legend" style="margin-top:8px"><span><i class="swatch" style="background:var(--c-property)"></i>Properties</span><span><i class="swatch" style="background:var(--c-business)"></i>Businesses</span><span><i class="swatch" style="background:${AVAILABLE}"></i>Available</span></div>`;
+
+			html += '<h3>Where they are <span class="h-note">click to go</span></h3>';
+			html += `<div class="legend"><span><i class="swatch" style="background:var(--c-property)"></i>Properties</span><span><i class="swatch" style="background:var(--c-business)"></i>Businesses</span></div>`;
+			const byRegion = REGION_ORDER.map(name => {
+				const h = houses.filter(p => p.region === name).length;
+				const b = biz.filter(p => p.region === name).length;
+				return { label: name, parts: [[h, 'var(--c-property)'], [b, 'var(--c-business)']], value: int(h + b), act: `region:${name}`, tip: `${name}: ${int(h)} properties, ${int(b)} businesses` };
+			}).filter(r => r.value !== '0').sort((a, b) => (b.parts[0][0] + b.parts[1][0]) - (a.parts[0][0] + a.parts[1][0]));
+			html += barChart(byRegion);
+
+			if (stats && stats.landlords.length) {
+				html += '<h3>Biggest landlords <span class="h-note">click to see theirs</span></h3>';
+				html += stats.landlords.map((l, n) => `<div class="rank act" data-act="owner:${esc(l.nickname)}"><span class="n">${n + 1}</span>
+					<span class="what"><div>${esc(l.nickname)}</div><small>${[l.properties ? plural(l.properties, 'property', 'properties') : '', l.businesses ? plural(l.businesses, 'business', 'businesses') : ''].filter(Boolean).join(', ')}</small></span>
+					<span class="v">${moneyShort(l.value)}</span></div>`).join('');
+			}
+
+			if (races.length) {
+				html += '<h3>Race tracks <span class="h-note">by finishes</span></h3>';
+				const most = Math.max(1, ...races.map(r => r.info.finishes));
+				html += races.slice().sort((a, b) => b.info.finishes - a.info.finishes || a.name.localeCompare(b.name)).map(r => {
+					const top = r.info.top && r.info.top[0];
+					return `<div class="track" data-act="poi:${esc(r.key)}">
+						<div class="track-name">${esc(r.name)}</div><div class="track-n">${int(r.info.finishes)}</div>
+						<div class="track-meta">${top ? `record <b>${raceTime(top.time_ms)}</b> by ${esc(top.nickname)}` : 'no record yet'} · ${distance(r.info.length_m)}${r.info.type === 'Air' ? ' · air' : ''}</div>
+						<span class="track-bar"><i style="width:${(r.info.finishes / most * 100).toFixed(1)}%"></i></span></div>`;
+				}).join('');
+			}
+
+			if (stats && stats.missions.length) {
+				html += '<h3>Runs by mission</h3>';
+				html += barChart(stats.missions.map(m => ({
+					label: m.label,
+					parts: [[m.runs, 'var(--series-1)']],
+					value: int(m.runs),
+					tip: `${m.label}: ${plural(m.runs, 'run')} by ${plural(m.players, 'player')}`,
+				})));
+			}
+
+			if (stats && stats.teams.length) {
+				html += `<h3>Teams <span class="h-note">${int(stats.teamless)} in none</span></h3>`;
+				html += barChart(stats.teams.map(t => ({
+					label: t.name,
+					swatch: t.color,
+					parts: [[t.members, 'var(--series-1)']],
+					value: int(t.members),
+					act: `team:${t.id}`,
+					tip: `${t.name}: ${plural(t.members, 'member')}`,
+				})));
+			}
+
+			if (stats && stats.recent.length) {
+				html += '<h3>Latest results</h3>';
+				html += stats.recent.map(r => {
+					const race = r.type === 1 ? races.find(p => p.name === r.where) : null;
+					const icon = { 1: 'flag', 4: 'truck', 5: 'target', 7: 'skull', 8: 'drop', 9: 'shop' }[r.type] || 'star';
+					const color = { 1: KINDS.race.color, 4: KINDS.trucking.color, 5: KINDS.combat.color, 7: KINDS.rampage.color, 8: KINDS.drug.color }[r.type] || '#5c6573';
+					return `<div class="feed-row${race ? ' act' : ''}"${race ? ` data-act="poi:${esc(race.key)}"` : ''}>${badge(icon, color, 20)}<div>${runText(r)}</div></div>`;
+				}).join('');
+			}
+
+			html += '<a class="link-out" href="../stats/">Every leaderboard and the economy, in Stats &rarr;</a>';
+			el.innerHTML = html;
+		}
+
+		function runText(r) {
+			const who = `<b>${esc(r.nickname)}</b>`;
+			const where = esc(r.where || '');
+			switch (r.type) {
+				case 1:
+					return `${who} finished ${where || 'a race'} in <b>${raceTime(r.value)}</b>` + (r.vehicle ? `<br><small>in a ${esc(r.vehicle)}</small>` : '');
+				case 2:
+					return `${who} scored ${int(r.value)} in a deathmatch`;
+				case 3:
+					return `${who} drove ${plural(r.value, 'taxi fare')}`;
+				case 4:
+					return `${who} made ${plural(r.value, 'delivery', 'deliveries')}`;
+				case 5:
+					return `${who} took ${plural(r.value, 'briefcase')}` + (where ? ` at ${where}` : '');
+				case 6:
+					return `${who} towed ${plural(r.value, 'vehicle')}`;
+				case 7:
+					return `${who} killed ${int(r.value)} in ${where || 'a rampage'}`;
+				case 8:
+					return `${who} finished a drug run <small>(${int(r.value)})</small>`;
+				case 9:
+					return `${who} got away with ${money(r.value)}`;
+				default:
+					return `${who}: ${esc(r.label)}, ${int(r.value)}`;
+			}
+		}
+
+		$('stats-body').addEventListener('click', e => {
+			const b = e.target.closest('[data-act]');
+			if (!b) {
+				return;
+			}
+			const [what, ...rest] = b.dataset.act.split(':');
+			const arg = rest.join(':');
+			if (what === 'poi') {
+				select({ poi: byKey.get(arg) }, true);
+			} else if (what === 'owner') {
+				focusOwner(arg);
+			} else if (what === 'team') {
+				focusTeam(Number(arg));
+			} else if (what === 'region') {
+				revealMap();
+				fitBounds(...regionBounds(arg), 40);
+			} else if (what === 'mine') {
+				showTab('places');
+				setStatus('mine');
+				fitPOIs(pois.filter(p => p.mine));
+			}
+		});
+
+		// Tooltips for the panel's charts.
+		panel.addEventListener('mousemove', e => {
+			const t = e.target.closest('[data-tip]');
+			if (t) {
+				showTip(e.clientX, e.clientY, esc(t.dataset.tip));
+			} else if (!e.target.closest('#spark')) {
+				hideTip();
+			}
+		});
+		panel.addEventListener('mouseleave', hideTip);
+
+		// ── Tabs, the panel ──────────────────────────────────────────────
+
+		function showTab(name) {
+			if (name === 'live' && $('tab-live').hidden) {
+				name = 'places';
+			}
+			for (const t of ['places', 'live', 'stats']) {
+				$('tab-' + t).setAttribute('aria-selected', String(t === name));
+				$('body-' + t).hidden = t !== name;
+			}
+			prefs.tab = name;
+			savePrefs();
+			if (name === 'live') {
+				renderLivePanel();
+			}
+		}
+
+		for (const t of ['places', 'live', 'stats']) {
+			$('tab-' + t).addEventListener('click', () => showTab(t));
+		}
+		$('live-chip').addEventListener('click', () => showTab('live'));
+
+		function setCollapsed(collapsed) {
+			// Keep the map where it is while the free part of the screen moves.
+			const before = originX();
+			panel.classList.toggle('collapsed', collapsed);
+			view.x -= (originX() - before) / view.zoom;
+			prefs.collapsed = collapsed;
+			savePrefs();
+			requestRender();
+		}
+
+		$('panel-close').addEventListener('click', () => setCollapsed(true));
+		$('panel-open').addEventListener('click', () => setCollapsed(false));
+		$('zoom-in').addEventListener('click', () => flyTo(view.x, view.y, view.zoom * 1.8, 300));
+		$('zoom-out').addEventListener('click', () => flyTo(view.x, view.y, view.zoom / 1.8, 300));
+		$('zoom-fit').addEventListener('click', () => fitWorld());
+
+		document.addEventListener('keydown', e => {
+			const typing = e.target.matches('input, textarea');
+			if (e.key === 'Escape') {
+				if (typing && searchInput.value) {
+					$('search-clear').click();
+				} else if (typing) {
+					searchInput.blur();
+				} else if (follow !== null) {
+					setFollow(null);
+				} else if (selected) {
+					select(null);
+				} else if (ownerFocus !== null || teamFocus !== null) {
+					ownerFocus = teamFocus = null;
+					renderPlaces();
+					requestRender();
+				}
+				return;
+			}
+			if (typing || e.ctrlKey || e.metaKey || e.altKey) {
+				return;
+			}
+			if (e.key === '/') {
+				e.preventDefault();
+				if (panel.classList.contains('collapsed')) {
+					setCollapsed(false);
+				}
+				searchInput.focus();
+				searchInput.select();
+			} else if (e.key === '+' || e.key === '=') {
+				flyTo(view.x, view.y, view.zoom * 1.8, 250);
+			} else if (e.key === '-') {
+				flyTo(view.x, view.y, view.zoom / 1.8, 250);
+			} else if (e.key === '0') {
+				fitWorld();
+			}
+		});
+
+		// ── The address: what is selected and where the view is ──────────
+
+		let hashTimer = null;
+
+		function writeHash() {
+			clearTimeout(hashTimer);
+			hashTimer = setTimeout(() => {
+				const parts = [];
+				if (selected && selected.poi) {
+					parts.push('sel=' + encodeURIComponent(selected.poi.key));
+				}
+				parts.push(`at=${view.x.toFixed(0)},${view.y.toFixed(0)},${view.zoom.toFixed(3)}`);
+				history.replaceState(null, '', '#' + parts.join('&'));
+			}, 250);
+		}
+
+		function readHash() {
+			const h = new URLSearchParams(location.hash.slice(1));
+			const at = (h.get('at') || '').split(',').map(Number);
+			if (at.length === 3 && at.every(Number.isFinite) && at[2] > 0) {
+				Object.assign(view, { x: at[0], y: at[1], zoom: clampZoom(at[2]) });
+			}
+			const p = byKey.get(h.get('sel') || '');
+			if (p) {
+				select({ poi: p }, at.length !== 3);
+			}
+		}
+
+		// ── The live layer ───────────────────────────────────────────────
+
+		// The live layer (live.go): players and NPCs from r2 samp's live map,
+		// each marker going smoothly from one snapshot to the next.
+		const liveStatus = $('live-status');
+		const liveList = $('live-list');
+		const live = { players: true, npcs: true };
+
+		let markers = new Map(); // player id -> {p, fromX, fromY, t0, dur, trail}
+		const listRows = new Map(); // player id -> its row in the live list
+		let liveVehicles = [];
+		let models = {};
+		let follow = null; // the player id the view stays on
+		let vehicleTimer = null;
+		let lastSnapshot = null;
+		const online = []; // [{t, n}]: players on, every 5 s, for the sparkline
+
+		function isNpc(p) {
+			return p.kind === 'npc' || p.kind === 'npc-client';
+		}
+
+		function shown(p) {
+			// Choosing a class, or watching someone: nowhere on the map.
+			if (p.state === 'none' || p.state === 'spectating') {
+				return false;
+			}
+			return isNpc(p) ? live.npcs : live.players;
+		}
+
+		function modelName(model) {
+			return models[model] || `model ${model}`;
+		}
+
+		function markerPos(m, now) {
+			const t = Math.min(1, Math.max(0, (now - m.t0) / m.dur));
+			return [m.fromX + (m.p.x - m.fromX) * t, m.fromY + (m.p.y - m.fromY) * t];
+		}
+
+		function liveMoving(now) {
+			for (const m of markers.values()) {
+				if (now - m.t0 < m.dur) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		function onSnapshot(snap) {
+			const now = performance.now();
+			const dur = Math.min(snap.interval || 1000, 2000);
+			const next = new Map();
+			for (const p of snap.players) {
+				const old = markers.get(p.id);
+				let fromX = p.x, fromY = p.y, trail = [];
+				if (old && old.p.name === p.name) {
+					const [x, y] = markerPos(old, now);
+					// A jump (a teleport, a respawn) is not drawn as a run.
+					if (Math.hypot(p.x - x, p.y - y) < 300) {
+						fromX = x;
+						fromY = y;
+						trail = old.trail;
+						const last = trail[trail.length - 1];
+						if (!last || Math.hypot(last[0] - old.p.x, last[1] - old.p.y) > 2) {
+							trail.push([old.p.x, old.p.y]);
+							if (trail.length > 40) {
+								trail.shift();
+							}
+						}
+					}
+				}
+				next.set(p.id, { p, fromX, fromY, t0: now, dur, trail });
+			}
+			markers = next;
+			lastSnapshot = snap;
+			if (follow !== null && !markers.has(follow)) {
+				follow = null;
+			}
+			const people = snap.players.filter(p => !isNpc(p)).length;
+			const t = Date.now();
+			const lastPoint = online[online.length - 1];
+			if (lastPoint && t - lastPoint.t < 5000) {
+				lastPoint.n = Math.max(lastPoint.n, people);
+			} else {
+				online.push({ t, n: people });
+				if (online.length > 720) {
+					online.shift();
+				}
+			}
+			updateLiveList();
+			if (selected && selected.player !== undefined && !card.hidden) {
+				card.innerHTML = playerCard();
+			}
+			requestRender();
+		}
+
+		function onStatus(s) {
+			const chip = $('live-chip');
+			chip.hidden = false;
+			if (s.up) {
+				liveStatus.innerHTML = '<span class="dot up"></span>connected';
+				chip.classList.remove('down');
+				chip.querySelector('.dot').className = 'dot up';
+				return;
+			}
+			liveStatus.innerHTML = `<span class="dot down"></span>${esc(s.error || 'samp is not answering')}`;
+			chip.classList.add('down');
+			chip.querySelector('.dot').className = 'dot down';
+			$('live-chip-text').textContent = 'offline';
+			$('live-count').textContent = '';
+			markers = new Map();
+			lastSnapshot = null;
+			liveList.innerHTML = '';
+			listRows.clear();
+			renderLivePanel();
+			requestRender();
+		}
+
+		function updateLiveList() {
+			const snap = lastSnapshot;
+			if (!snap) {
+				return;
+			}
+			const people = snap.players.filter(p => !isNpc(p));
+			const npcs = snap.players.filter(isNpc);
+			liveStatus.innerHTML = `<span class="dot up"></span>${esc(snap.hostname)}: ` +
+				`${people.length} player${people.length === 1 ? '' : 's'}, ${npcs.length} NPC${npcs.length === 1 ? '' : 's'}`;
+			$('live-chip-text').textContent = `${people.length} on`;
+			$('live-count').textContent = people.length ? String(people.length) : '';
+			// Changed in place, not made again: a click between two snapshots
+			// has to find the row it began on.
+			const order = people.concat(npcs).filter(p => !tokens.length || tokens.every(t => p.name.toLowerCase().includes(t)));
+			const ids = new Set(order.map(p => p.id));
+			for (const [id, div] of listRows) {
+				if (!ids.has(id)) {
+					div.remove();
+					listRows.delete(id);
+				}
+			}
+			order.forEach((p, i) => {
+				let div = listRows.get(p.id);
+				if (!div) {
+					div = document.createElement('div');
+					div.onclick = () => {
+						const id = p.id;
+						if (follow === id) {
+							setFollow(null);
+						} else {
+							revealMap();
+							select({ player: id });
+							setFollow(id);
+						}
+					};
+					listRows.set(p.id, div);
+				}
+				div.className = 'prow' + (isNpc(p) ? ' npc' : '') + (p.id === follow ? ' following' : '');
+				let meta = '';
+				if (p.vehicle !== undefined) {
+					meta = modelName(p.model);
+				} else if (p.state === 'none') {
+					meta = 'choosing a class';
+				} else if (p.state === 'spectating') {
+					meta = 'spectating';
+				}
+				if (p.kind === 'player') {
+					meta += (meta ? ' · ' : '') + `${p.ping} ms`;
+				}
+				const color = isNpc(p) ? '#8ca0be' : (p.color && p.color !== '#000000' ? p.color : '#ffd700');
+				const stars = p.wanted ? ` <span class="stars">${'★'.repeat(Math.min(p.wanted, 6))}</span>` : '';
+				const html = `<span class="dot" style="background:${esc(color)}"></span>` +
+					`<span class="pname">${esc(p.name)} <span class="pid">#${p.id}</span>${stars}</span>` +
+					`<span class="pmeta">${esc(meta)}</span>` +
+					(isNpc(p) ? '' : `<span class="bars"><span class="meter" style="flex:1"><i style="width:${Math.min(100, p.health)}%;background:#e03131"></i></span><span class="meter" style="flex:1"><i style="width:${Math.min(100, p.armour)}%;background:#adb5bd"></i></span></span>`);
+				if (div.innerHTML !== html) {
+					div.innerHTML = html;
+				}
+				div.title = p.id === follow ? 'Click to stop following' : 'Click to follow';
+				if (liveList.children[i] !== div) {
+					liveList.insertBefore(div, liveList.children[i] || null);
+				}
+			});
+			if (!$('body-live').hidden) {
+				renderLivePanel();
+			}
+		}
+
+		function renderLivePanel() {
+			const snap = lastSnapshot;
+			const players = snap ? snap.players.filter(p => !isNpc(p)) : [];
+			const npcs = snap ? snap.players.filter(isNpc) : [];
+			const driving = players.filter(p => p.vehicle !== undefined).length;
+			const pings = players.filter(p => p.kind === 'player').map(p => p.ping);
+			const peak = Math.max(0, ...online.map(h => h.n));
+			$('live-tiles').innerHTML =
+				tile('Players', int(players.length), peak > players.length ? `peak ${int(peak)}` : '') +
+				tile('NPCs', int(npcs.length)) +
+				tile('Driving', int(driving), players.length ? `of ${int(players.length)}` : '') +
+				tile('Average ping', pings.length ? int(pings.reduce((a, b) => a + b, 0) / pings.length) : '—', pings.length ? 'ms' : '');
+			$('spark').innerHTML = sparkline();
+			const counts = new Map();
+			for (const p of players) {
+				const r = regionAt(p.x, p.y) || 'Elsewhere';
+				counts.set(r, (counts.get(r) || 0) + 1);
+			}
+			$('live-regions').innerHTML = counts.size ? '<h3>Where they are</h3>' + barChart([...counts].sort((a, b) => b[1] - a[1]).map(([name, n]) => ({
+				label: name,
+				parts: [[n, 'var(--series-1)']],
+				value: int(n),
+				act: name !== 'Elsewhere' ? `region:${name}` : '',
+				tip: `${name}: ${plural(n, 'player')}`,
+			}))) : '';
+		}
+
+		$('live-regions').addEventListener('click', e => {
+			const b = e.target.closest('[data-act]');
+			if (b && b.dataset.act.startsWith('region:')) {
+				revealMap();
+				fitBounds(...regionBounds(b.dataset.act.slice(7)), 40);
+			}
+		});
+
+		function sparkline() {
+			if (online.length < 2) {
+				return '<div class="muted" style="padding:14px 0">The line fills in as snapshots come.</div>';
+			}
+			const w = 320, h = 64, top = 8, bottom = 6;
+			const t0 = online[0].t, t1 = online[online.length - 1].t;
+			const max = Math.max(1, ...online.map(p => p.n));
+			const X = t => (t - t0) / Math.max(1, t1 - t0) * (w - 8) + 2;
+			const Y = n => h - bottom - n / max * (h - top - bottom);
+			const pts = online.map(p => `${X(p.t).toFixed(1)},${Y(p.n).toFixed(1)}`).join(' ');
+			const last = online[online.length - 1];
+			const clock = t => new Date(t).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+			return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" data-t0="${t0}" data-t1="${t1}">
+				<line x1="0" x2="${w}" y1="${h - bottom}" y2="${h - bottom}" stroke="rgba(255,255,255,0.1)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+				<polygon points="2,${h - bottom} ${pts} ${X(last.t).toFixed(1)},${h - bottom}" fill="rgba(57,135,229,0.12)"/>
+				<polyline points="${pts}" fill="none" stroke="#3987e5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+				<line id="spark-x" x1="0" x2="0" y1="${top}" y2="${h - bottom}" stroke="rgba(255,255,255,0.35)" stroke-width="1" vector-effect="non-scaling-stroke" visibility="hidden"/>
+			</svg>
+			<div class="spark-cap"><span>${clock(t0)}</span><span>now: <b style="color:var(--text)">${int(last.n)}</b> · most ${int(max)}</span></div>`;
+		}
+
+		$('spark').addEventListener('mousemove', e => {
+			const svg = $('spark').querySelector('svg');
+			if (!svg || online.length < 2) {
+				return;
+			}
+			const r = svg.getBoundingClientRect();
+			const f = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+			const t = online[0].t + f * (online[online.length - 1].t - online[0].t);
+			let best = online[0];
+			for (const p of online) {
+				if (Math.abs(p.t - t) < Math.abs(best.t - t)) {
+					best = p;
+				}
+			}
+			const line = svg.querySelector('#spark-x');
+			const x = (best.t - online[0].t) / Math.max(1, online[online.length - 1].t - online[0].t) * 312 + 2;
+			line.setAttribute('x1', x);
+			line.setAttribute('x2', x);
+			line.setAttribute('visibility', 'visible');
+			showTip(e.clientX, e.clientY, `<b>${plural(best.n, 'player')}</b><br><small>${new Date(best.t).toLocaleTimeString('en-GB')}</small>`);
+		});
+		$('spark').addEventListener('mouseleave', () => {
+			const line = $('spark').querySelector('#spark-x');
+			if (line) {
+				line.setAttribute('visibility', 'hidden');
+			}
+			hideTip();
+		});
+
+		function setFollow(id) {
+			if (follow === id) {
+				return;
+			}
+			follow = id;
+			if (id !== null && markers.has(id)) {
+				const p = markers.get(id).p;
+				flyTo(p.x, p.y, Math.max(view.zoom, 0.7), 450);
+			}
+			updateLiveList();
+			if (selected && selected.player !== undefined && !card.hidden) {
+				card.innerHTML = playerCard();
+			}
+			requestRender();
+		}
+
+		// In screen pixels, after the map: the same size at every zoom.
+		function drawLive(now) {
+			if (live.vehicles) {
+				// Dark with a light edge: seen on the roads and the buildings.
+				ctx.fillStyle = 'rgba(40, 40, 40, 0.9)';
+				ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+				ctx.lineWidth = 1;
+				for (const v of liveVehicles) {
+					if (v.driver !== undefined) {
+						continue; // its driver's marker shows where it is
+					}
+					const x = sx(v.x), y = sy(v.y);
+					if (x < -10 || y < -10 || x > W + 10 || y > H + 10) {
+						continue;
+					}
+					ctx.fillRect(x - 3.5, y - 3.5, 7, 7);
+					ctx.strokeRect(x - 3.5, y - 3.5, 7, 7);
+					hits.push({ x, y, r: 8, vehicle: v });
+				}
+			}
+			if (!markers.size) {
+				return;
+			}
+			const font = `600 12px ${getFont()}`;
+			if (live.trails) {
+				ctx.lineCap = 'round';
+				for (const m of markers.values()) {
+					if (!shown(m.p) || !m.trail.length) {
+						continue;
+					}
+					const pts = m.trail.concat([markerPos(m, now)]);
+					const color = isNpc(m.p) ? '140,160,190' : hexRgb(playerColor(m.p));
+					for (let i = 1; i < pts.length; i++) {
+						ctx.beginPath();
+						ctx.moveTo(sx(pts[i - 1][0]), sy(pts[i - 1][1]));
+						ctx.lineTo(sx(pts[i][0]), sy(pts[i][1]));
+						ctx.strokeStyle = `rgba(${color},${(i / pts.length * 0.75).toFixed(3)})`;
+						ctx.lineWidth = isNpc(m.p) ? 2 : 3;
+						ctx.stroke();
+					}
+				}
+			}
+			const labels = [];
+			for (const m of markers.values()) {
+				const p = m.p;
+				if (!shown(p)) {
+					continue;
+				}
+				const [wx_, wy_] = markerPos(m, now);
+				const px = sx(wx_), py = sy(wy_);
+				if (px < -40 || py < -40 || px > W + 40 || py > H + 40) {
+					continue;
+				}
+				// SA's heading: 0 is north and it turns anticlockwise; north
+				// is up on the map.
+				const a = (p.angle || 0) * Math.PI / 180;
+				const dx = -Math.sin(a), dy = -Math.cos(a);
+				const s = isNpc(p) ? 6 : 8;
+				ctx.globalAlpha = p.interior ? 0.45 : 1; // inside, near its door
+				ctx.beginPath();
+				ctx.moveTo(px + dx * s * 1.6, py + dy * s * 1.6);
+				ctx.lineTo(px - dx * s - dy * s, py - dy * s + dx * s);
+				ctx.lineTo(px - dx * s * 0.4, py - dy * s * 0.4);
+				ctx.lineTo(px - dx * s + dy * s, py - dy * s - dx * s);
+				ctx.closePath();
+				ctx.fillStyle = isNpc(p) ? 'rgba(140, 160, 190, 0.95)' : playerColor(p);
+				ctx.fill();
+				ctx.lineWidth = p.id === follow ? 3 : 1.5;
+				ctx.strokeStyle = p.id === follow ? '#fff' : 'rgba(0, 0, 0, 0.8)';
+				ctx.stroke();
+				ctx.globalAlpha = 1;
+				hits.push({ x: px, y: py, r: 13, player: p });
+				// NPCs are many: their names only up close.
+				if (!isNpc(p) || view.zoom > 0.42) {
+					labels.push([p, px + s * 1.8, py]);
+				}
+			}
+			ctx.font = font;
+			ctx.textAlign = 'left';
+			ctx.textBaseline = 'middle';
+			for (const [p, x, y] of labels) {
+				const npc = isNpc(p);
+				const text = p.name;
+				const w = ctx.measureText(text).width;
+				ctx.globalAlpha = p.interior ? 0.6 : 1;
+				ctx.fillStyle = npc ? 'rgba(8,10,14,0.55)' : 'rgba(8,10,14,0.78)';
+				roundRect(x - 1, y - 9, w + 12, 18, 9);
+				ctx.fill();
+				ctx.fillStyle = npc ? '#c7d0dd' : '#fff';
+				ctx.fillText(text, x + 5, y + 0.5);
+				ctx.globalAlpha = 1;
+			}
+		}
+
+		function playerColor(p) {
+			return p.color && p.color !== '#000000' ? p.color : '#ffd700';
+		}
+
+		function hexRgb(hex) {
+			const n = parseInt(String(hex).slice(1, 7), 16) || 0;
+			return `${n >> 16 & 255},${n >> 8 & 255},${n & 255}`;
+		}
+
+		function roundRect(x, y, w, h, r) {
+			ctx.beginPath();
+			ctx.moveTo(x + r, y);
+			ctx.arcTo(x + w, y, x + w, y + h, r);
+			ctx.arcTo(x + w, y + h, x, y + h, r);
+			ctx.arcTo(x, y + h, x, y, r);
+			ctx.arcTo(x, y, x + w, y, r);
+			ctx.closePath();
+		}
+
+		function playerTip(p) {
+			const kinds = { player: 'player', puppet: 'test player', npc: 'NPC', 'npc-client': 'NPC client' };
+			let s = `<b>${esc(p.name)}</b> #${p.id} &middot; ${esc(kinds[p.kind] || p.kind)}<br>${esc(p.state)}`;
+			if (p.vehicle !== undefined) {
+				s += ` &middot; ${esc(modelName(p.model))} #${p.vehicle}` + (p.seat ? ` (seat ${p.seat})` : '');
+			}
+			s += `<br>health ${p.health} &middot; armour ${p.armour} &middot; score ${p.score}`;
+			if (p.kind === 'player') {
+				s += ` &middot; ping ${p.ping}`;
+			}
+			if (p.wanted) {
+				s += ` &middot; wanted ${p.wanted}`;
+			}
+			if (p.interior) {
+				s += `<br>in interior ${p.interior}`;
+			}
+			return s + `<br><small>(${p.x.toFixed(0)}, ${p.y.toFixed(0)}, ${p.z.toFixed(0)})</small>`;
+		}
+
+		async function loadVehicles() {
+			try {
+				const res = await fetch('api/vehicles');
+				if (res.ok) {
+					liveVehicles = (await res.json()).vehicles || [];
+				}
+			} catch (e) {
+				// samp away: the status line says so
+			}
+			requestRender();
+		}
+
+		function setVehicles(on) {
+			live.vehicles = on;
+			clearInterval(vehicleTimer);
+			if (on) {
+				loadVehicles();
+				vehicleTimer = setInterval(loadVehicles, 10000);
+			} else {
+				liveVehicles = [];
+				requestRender();
+			}
+		}
+
+		// Parked vehicles start off whatever was left on last time: crl2 has
+		// hundreds, and they cost samp a request every 10 s.
+		live.trails = prefs.trails;
+		bindSwitch('show-players', () => live.players, v => { live.players = v; requestRender(); });
+		bindSwitch('show-npcs', () => live.npcs, v => { live.npcs = v; requestRender(); });
+		bindSwitch('show-vehicles', () => !!live.vehicles, setVehicles);
+		bindSwitch('show-trails', () => live.trails, v => { live.trails = prefs.trails = v; savePrefs(); requestRender(); });
+
+		function startLive() {
+			const es = new EventSource('api/live');
+			const reveal = () => {
+				if ($('tab-live').hidden) {
+					$('tab-live').hidden = false;
+					if (startTab === 'live') {
+						showTab('live');
+					}
+				}
+			};
+			es.addEventListener('status', e => {
+				reveal();
+				onStatus(JSON.parse(e.data));
+			});
+			es.addEventListener('live', e => {
+				reveal();
+				onSnapshot(JSON.parse(e.data));
+			});
+			es.onerror = () => {
+				// Closed for good: a 204, this mapui has no live map (the
+				// tab stays hidden), or the gateway's session ran out.
+				if (es.readyState === EventSource.CLOSED) {
+					onStatus({ up: false, error: 'the live map has closed: reload the page' });
+				} else {
+					onStatus({ up: false, error: 'mapui is not answering: trying again' });
+				}
+				if ($('tab-live').hidden) {
+					$('live-chip').hidden = true;
+				}
+			};
+		}
+
+		// ── Off we go ────────────────────────────────────────────────────
+
+		addEventListener('resize', resize);
+		document.fonts.load('40px Pricedown').then(faces => {
+			document.body.classList.toggle('pricedown', faces.length > 0);
+		}).catch(() => { });
+		panel.classList.toggle('collapsed', !!prefs.collapsed);
+		resize();
+		fitWorld(false);
+		showTab(prefs.tab === 'live' ? 'places' : prefs.tab);
+		loadMap();
+		loadPOIs();
+		fetch('api/models').then(res => res.ok ? res.json() : {}).then(m => {
+			models = m;
+			updateLiveList();
+		}).catch(() => { });
+		startLive();
 	</script>
 </body>
 

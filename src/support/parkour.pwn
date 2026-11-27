@@ -1,3 +1,8 @@
+#if defined _CRL2_PARKOUR
+	#endinput
+#endif
+#define _CRL2_PARKOUR
+
 stock InitParkour()
 {
 	CreateObject(984, -257.400390, 2194.700200, 110.400000, 0.917000, 88.363000, 262.123000);

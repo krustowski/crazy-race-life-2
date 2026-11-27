@@ -16,7 +16,7 @@
 #define STRONG_TAGS
 
 // Hotfix for the OOM errors
-#pragma dynamic 1000000
+#pragma dynamic 		1000000
 
 #include <open.mp>
 
@@ -32,13 +32,18 @@
 //  Basic definitions.
 //
 
-#define DEBUG_ENABLED 	true
+// Build the gamemode with features only available when running on the r2 samp
+// server.
+#define R2_SERVER			false
 
-// Temporary: traces the spawn/death handshake to the server log so a repeating
-// "Loading..." screen can be attributed to a callback.
-#define DEBUG_SPAWN		true
+// Debug output: DebugPrint() and trace lines such as [wanted]. Off unless the
+// build turns it on: `make build DEBUG=1` (the sampctl "debug" build) or
+// `make tests DEBUG=1`, both of which pass DEBUG_ENABLED=1 to pawncc.
+#if !defined DEBUG_ENABLED
+	#define DEBUG_ENABLED	false
+#endif
 
-#define SECOND_MS		1000
+#define SECOND_MS			1000
 
 #define SOUND_MUSIC10
 #define SOUND_OFF
@@ -47,13 +52,23 @@ new const GAMEMODE_NAME[] = "CrazyRaceLife2";
 
 new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 
-#include "db/sql.pwn"
-#include "support/i18n.pwn"
-#include "support/net.pwn"
-#include "support/http.pwn"
+new const GAMEMODE_CREDITS_OG[] = "krusty, kompry, DRaGsTeR (2008-2010)";
+new const GAMEMODE_CREDITS_NEW[] = "amdulka, cranyy, neosung, tack (2025-2026)";
 
 #include "includes/crazy_race_life_2_version.inc"
 #include "includes/sampctl_build_file.inc"
+
+//
+//  Anticheat weapon ledger. It hooks GivePlayerWeapon & co., so it has to come
+//  before anything that hands out weapons (i18n.pwn pulls most modules in).
+//
+
+#include "modules/anticheat_ledger.pwn"
+
+#include "db/sqlite.pwn"
+#include "support/i18n.pwn"
+#include "support/net.pwn"
+#include "support/http.pwn"
 
 //
 //  Advertisement.
@@ -99,6 +114,7 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 #include "modules/tow.pwn"
 #include "modules/npcs.pwn"
 #include "modules/pizza.pwn"
+#include "modules/taxistop.pwn"
 #include "modules/quest.pwn"
 
 //
@@ -106,6 +122,12 @@ new const MINIMAP_TEXT[] = "~g~Crazy~r~Race~b~Life~y~2";
 //
 
 #include "modules/trucking.pwn"
+
+//
+//  Petrol stations topped up by NPC tankers.
+//
+
+#include "modules/fuel.pwn"
 
 //
 //  Radar + Vehicle velocity/props.

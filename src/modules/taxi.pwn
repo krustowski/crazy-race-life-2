@@ -54,6 +54,20 @@ new
 	gTaxiMission[MAX_PLAYERS][TaxiMission],
 	gTaxiEnterTimer[MAX_PLAYERS];
 
+// Stops a mission timer and forgets its id. A remembered id outlives the
+// timer, and once the server hands that id to another timer, killing it
+// again would stop that one instead.
+stock StopTaxiTimer(&timerid)
+{
+	if (timerid)
+	{
+		KillTimer(timerid);
+		timerid = 0;
+	}
+
+	return 1;
+}
+
 forward UpdateTaxiMissionInfoText(playerid);
 forward CheckTaxiNearNPC(playerid);
 forward EnterVehicleTimer(npcid);
@@ -80,12 +94,12 @@ public EnterVehicleTimer(npcid)
 
 	if (!gTaxiMission[driverid][Active])
 	{
-		KillTimer(gTaxiEnterTimer[npcid]);
+		StopTaxiTimer(gTaxiEnterTimer[npcid]);
 		NPC_Destroy(npcid);
 		return 1;
 	}
 
-	KillTimer(gTaxiEnterTimer[npcid]);
+	StopTaxiTimer(gTaxiEnterTimer[npcid]);
 
 	NPC_EnterVehicle(npcid, vehicleid, 3, NPC_MOVE_TYPE: 1);
 
@@ -96,6 +110,9 @@ public EnterVehicleTimer(npcid)
 
 public ExitVehicleTimer(playerid)
 {
+	// One-shot: it has fired, so its id is no longer ours
+	gTaxiMission[playerid][TimerNPCExit] = 0;
+
 	strcopy(gTaxiMission[playerid][NextDestinationName], "");
 
 	TogglePlayerControllable(playerid, true);
@@ -148,7 +165,7 @@ public CheckTaxiNearNPC(playerid)
 
 	if (IsPlayerInSphere(gTaxiMission[playerid][NPCid], pX, pY, pZ, 15.0) && veolcity[0] == 0.0 && veolcity[1] == 0.0)
 	{
-		KillTimer(gTaxiMission[playerid][TimerCheckNearNPC]);
+		StopTaxiTimer(gTaxiMission[playerid][TimerCheckNearNPC]);
 
 		SendClientMessageLocalized(playerid, I18N_TAXI_MISS_NPC_ENTERING);
 
@@ -175,7 +192,7 @@ public CheckNPCInVehicle(playerid)
 
 	if (IsPlayerInAnyVehicle(npcid) && NPC_GetVehicleID(npcid) == gTaxiMission[playerid][VehicleID])
 	{
-		KillTimer(gTaxiMission[playerid][TimerCheckNPCInVehicle]);
+		StopTaxiTimer(gTaxiMission[playerid][TimerCheckNPCInVehicle]);
 
 		if (!SetTaxiMissionCheckpoint(playerid))
 		{
@@ -564,13 +581,19 @@ stock AbortPlayerTaxiMission(playerid)
 		return 1;
 	}
 
-	KillTimer(gTaxiMission[playerid][TimerCheckNearNPC]);
-	KillTimer(gTaxiMission[playerid][TimerCheckVehicle]);
-	KillTimer(gTaxiMission[playerid][TimerUpdate]);
+	// All of them, including the two only some moments of a mission have
+	// running: the check that the customer has got in (left running, it would
+	// set a new destination every two seconds of the next mission) and the
+	// one that lets them out.
+	StopTaxiTimer(gTaxiMission[playerid][TimerCheckNearNPC]);
+	StopTaxiTimer(gTaxiMission[playerid][TimerCheckVehicle]);
+	StopTaxiTimer(gTaxiMission[playerid][TimerUpdate]);
+	StopTaxiTimer(gTaxiMission[playerid][TimerCheckNPCInVehicle]);
+	StopTaxiTimer(gTaxiMission[playerid][TimerNPCExit]);
 
 	if (gTaxiMission[playerid][NPCid] && gTaxiMission[playerid][NPCid] < 1000)
 	{
-		KillTimer(gTaxiEnterTimer[ gTaxiMission[playerid][NPCid] ]);
+		StopTaxiTimer(gTaxiEnterTimer[ gTaxiMission[playerid][NPCid] ]);
 		NPC_Destroy(gTaxiMission[playerid][NPCid]);
 	}
 

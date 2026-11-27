@@ -12,7 +12,7 @@
 #define MAX_TEAM_MENUS		16
 #define MAX_TEAM_WEAPONS	11
 
-#include "db/sql.pwn"
+#include "db/sqlite.pwn"
 
 enum PLAYER_TEAM
 {
@@ -25,7 +25,8 @@ enum PLAYER_TEAM
 	TEAM_GARBAGEMEN,
 	TEAM_PIZZAGUYS,
 	TEAM_HACKERS,
-	TEAM_DEALERS
+	TEAM_DEALERS,
+	TEAM_ROBBERS
 }
 
 enum Team

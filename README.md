@@ -1,12 +1,13 @@
 # CrazyRaceLife2 (CRL2)
 
-A GTA SA:MP/openMP freeroam gamemode scripted in the Pawn lang with sqlite-designed SQL connector built-in.
+A GTA SA:MP/open.mp freeroam gamemode scripted in the Pawn lang with SQL (SQLite) connector built-in.
 
 Live servers:
 
 [![](https://widgets.gamemonitoring.net/servers/9019170/560x95.webp)](https://gamemonitoring.net/samp/servers/9019170)
 
 [![](https://widgets.gamemonitoring.net/servers/18949736/560x95.webp)](https://gamemonitoring.net/samp/servers/18949736)
+
 
 ## Features
 
@@ -24,11 +25,11 @@ Live servers:
     + "Legal" player killing, no wanted level added per kill
     + 4-minute long matches, 45-second interval before a match for players to join
 + Localization
-    + English + Czech (partly, WIP)
+    + English + Czech + Bosnian (partly, WIP)
 + NPC drivers
-	+ 5x Taxi driver per big city (WIP)
-	+ 2+ Trucking drivers 
-	+ Race Drivers (WIP)
+	+ 5x Taxi driver per big city + 5x Taxi driver around whole map (20 in total)
+	+ 5x Trucking driver
+	+ 2x Race driver
 + Personal cellphone
     + Accessed easily via the `KEY_YES` key (Y usually)
     + Send private messages directly to a player
@@ -37,18 +38,25 @@ Live servers:
 + Prizes
     + Tiki ($10M) and Pumpkin ($1.5M) pickups
     + Hidden on pick up automatically
++ Quests
+    + Onboarding and achievement checklist for new players, with cash rewards
+    + Defined in the database, progress saved per player
+    + Replaced the former tutorial (`/tut` is now an alias for `/quest`)
 + Racing
     + Custom races all across the map
     + Air, ground and naval
     + Stunts
-+ Rampage Missions (experimental)
++ Rampage Missions
 	+ 5-minute long clashes with NPCs on the street
 + Real Estate
     + Custom spawn point
     + Custom vehicle attached (including the modifitaions)
     + Custom safehouse
-    + Up to 5 properties per player
+    + Up to 7 properties per player
     + Save custom skins (up to 5 per property)
++ Rob Missions
+	+ Robberz team: hold LALT/LSHIFT by a commercial property to rob it for up to 20 seconds
+	+ Robberies chain into one mission until 5 minutes pass without one
 + Taxi Missions
     + Ad-hoc NPC spawned for a player
     + Randomized customer locations and targets
@@ -67,9 +75,6 @@ Live servers:
     + 15+ trucking points (petrol stations etc)
     + Custom missions
     + Weighted commission/bonus per done mission/delivery
-+ Tutorial (experimental)
-    + A vademecum subsystem for new players
-    + Work in progress
 
 
 ## Preview
@@ -142,19 +147,23 @@ Live servers:
 *^ Detail of a detached trailer (decomposing in the sea waters). Custom information text is shown until the trailer is reattached back to the truck registered for the mission.*
 
 
-### MapUI
+### MapUI (legacy)
 
-MapUI is an util to parse and visualize the database data (coords) on the high-res GTA SA map (source: [reddit](https://www.reddit.com/r/sanandreas/comments/9856u1/high_resolution_map_for_grand_theft_auto_san/)). To run it, go to `utils/mapui` and just run it in console like this:
+MapUI is an util to parse and visualize the database data (coords) on the high-res GTA SA map (source: [reddit](https://www.reddit.com/r/sanandreas/comments/9856u1/high_resolution_map_for_grand_theft_auto_san/)): every place the gamemode puts on the map with its details (race routes and best times, owners, team pay, mission records), map-side stats, and — given the live map — every player and NPC as they move. To run it, go to `utils/mapui` and just run it in console like this:
 
 ```shell
-go run main.go
+cd utils/mapui && go run .
 ```
 
-The MapUI tool is the available at [http://localhost:3000](http://localhost:3000).
+The MapUI tool is then available at [http://localhost:8082](http://localhost:8082); see [utils/mapui/README.md](utils/mapui/README.md).
 
 ![](.github/img/crl2_mapui_detail.jpg)
 
-*^ Detailed tooltip for a commercial property in the MapUI util.*
+*^ Detailed tooltip for a commercial property in the MapUI util (legacy).*
+
+### Web portal
+
+MapUI also runs as part of a web portal, together with a stats dashboard (statsui: leaderboards, live server info, RCON for admins) and these docs, behind a gateway where players sign in with their game account. `make portal` runs it locally at [http://127.0.0.1:8070](http://127.0.0.1:8070); `compose.yml` and `make stack-deploy` run it as a Docker swarm stack. Its sources and these Make targets are kept out of the repository for now (the targets in a gitignored `Makefile.local`, which `Makefile` includes when present). See [docs/portal.md](docs/portal.md).
 
 
 ## How to build
@@ -176,6 +185,15 @@ make build
 ```
 
 The compiled `.amx` gamemode file should then pop up in the `gamemodes` directory.
+
+To build with the debug output on, and to run the test suite (on `./omp-server`, against a database built fresh from the migrations):
+
+```
+make build DEBUG=1
+make tests
+```
+
+See [docs/getting-started.md](docs/getting-started.md) for the details, and for the optional airline filterscript (`make airline`).
 
 
 ## How to run
@@ -211,11 +229,15 @@ The examples above are shown respectively to the config file names mentioned.
     /credits    --- shows gamemode credits and version
 	/dance      --- enables special animations (dancing)
 	/deal       --- lists subcommands for dealerz 
+	/drug       --- toggles the Drug Mission (Dealerz only)
 	/deathmatch --- lists subcommands for the deathmatch module
 	/drugz      --- lists substances in pockets
 	/dwarp      --- teleports the player in vehicle to racing the common location
 	/fix        --- repairs the player's vehicle
+	/fork       --- toggles the forklift controls (while driving a forklift)
+	/fuel       --- buys a fill-up at the nearest petrol station
 	/givecash   --- sends cash to other player
+	/hd         --- (un)sets the HUD layout for the HD (widescreen) GTA SA
 	/help       --- lists helper information
 	/hide       --- (un)hides the player on map
 	/kill       --- to commit suicide
@@ -228,6 +250,7 @@ The examples above are shown respectively to the config file names mentioned.
 	/port       --- enables to warp to special locations on map
 	/prizes     --- dumps the information about Tiki and Pumpkin prizes
 	/property   --- lists subcommands for property handling
+	/quest      --- lists the quests and your progress
 	/race       --- lists subcommands for racing module
 	/rules      --- dumps the server rules information
 	/scores     --- shows the High Scores table
@@ -237,18 +260,23 @@ The examples above are shown respectively to the config file names mentioned.
 	/tow        --- starts a Tow mission
 	/text       --- sends a public message to other player
 	/truck      --- enables/disables the Trucking missions
-	/tut        --- shows the tutorial statistics
+	/tut        --- same as /quest
 	/unlock     --- unlocks the player's vehicle
 	/wanted     --- shows the wanted list of online players
 ```
 
 ### Admin Command List
 
+Each level includes the commands of the levels below it. Admins logged in over RCON pass every level check.
+
 #### Level 1
 ```
 	/acmd       --- lists admin commands per level
 	/admincol   --- changes the player color according 
+	/casino     --- teleports the admin into the casino
+	/ccmd       --- prints the /cam usage (unfinished)
 	/clear      --- flushes the chat
+	/combat     --- lists the combat missions, or aborts the active one
 	/flip       --- flips and repairs a player's car
 	/hp         --- sets the 100 HP + armour to player
 	/nitro      --- sets the nitrous level to player
@@ -270,6 +298,7 @@ The examples above are shown respectively to the config file names mentioned.
 	/elevator   --- operates the Admin elevator
 	/kick       --- kicks the player from server
 	/packet     --- prints the packet loss per player
+	/radio      --- toggles the internet radio stream
 	/reset      --- resets cash for a player
 	/spectate   --- sets the spectate mode on a player
 	/vehicle    --- spawns a vehicle by ID
@@ -283,6 +312,7 @@ The examples above are shown respectively to the config file names mentioned.
 	/edit       --- shows a dialog window with all common editors
 	/fakechat   --- sends the fake chat as a player
 	/lvl        --- sets the Admin level to player
+	/npcrec     --- records an NPC route, or stops the recording
 	/restart    --- sets the countdown for 60 seconds to restart the server
 ```
 

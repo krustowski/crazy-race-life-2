@@ -97,7 +97,7 @@ Every function follows the same shape: build a formatted string — often by que
 
 ## Dialog Responses (`src/support/response.pwn`, ~2012 lines)
 
-The entire file is one function: `HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])` — a roughly 2000-line `switch (dialogid)` with one `case DIALOG_*:` per constant defined in `dialogs.pwn`. `main.pwn:875` defines `public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])` whose entire body is `return HandleDialogResponse(...)`, so this file is the de facto implementation of that SA-MP/open.mp callback.
+The entire file is one function: `HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])` — a roughly 2000-line `switch (dialogid)` with one `case DIALOG_*:` per constant defined in `dialogs.pwn`. `main.pwn:861` defines `public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])` whose entire body is `return HandleDialogResponse(...)`, so this file is the de facto implementation of that SA-MP/open.mp callback.
 
 The switch cases fall into recognizable groups, in file order:
 
@@ -118,11 +118,11 @@ The switch cases fall into recognizable groups, in file order:
 
 | Function | Description |
 |---|---|
-| `stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])` (`src/support/response.pwn:11`) | Single dispatcher for every `ShowPlayerDialog` response in the gamemode; called from `OnDialogResponse` in `src/main.pwn:875`. |
+| `stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])` (`src/support/response.pwn:11`) | Single dispatcher for every `ShowPlayerDialog` response in the gamemode; called from `OnDialogResponse` in `src/main.pwn:861`. |
 
 ## Helpers (`src/support/helpers.pwn`, ~432 lines)
 
-A general-purpose collection of `stock` utilities pulled in by nearly every module (`#include`d directly by `support/includes.pwn:133`, and by several modules individually). There are too many small helpers to list exhaustively; they group roughly as:
+A general-purpose collection of `stock` utilities pulled in by nearly every module (`#include`d directly by `support/includes.pwn:136`, and by several modules individually). There are too many small helpers to list exhaustively; they group roughly as:
 
 - **Player/session utilities** — `SystemMsg`, `InvalidCommand`, `BanAll`/`KickAll`, and `DelayedKick`/`DoDelayedKick` (kicks via a short timer rather than immediately, so a prior message/dialog reaches the client and the disconnect settles before the slot is reused).
 - **String helpers** — `chrfind`, `IsNumeric`, `SplitIntoTwo` (splits a command's parameter string on a delimiter), `SanitizeString` (escapes single quotes for safe SQL string literals).
@@ -136,15 +136,15 @@ A general-purpose collection of `stock` utilities pulled in by nearly every modu
 
 | Function | Description |
 |---|---|
-| `public AutosaveData()` (`src/support/helpers.pwn:39`) | Periodic timer callback: saves all player data and real estate state. |
+| `public AutosaveData()` (`src/support/helpers.pwn:36`) | Periodic timer callback: saves all player data and real estate state. |
 | `public StartServerReset()` (`src/support/helpers.pwn:45`) | Issues an RCON `gmx` to restart the game mode. |
 | `stock DelayedKick(playerid, delay = 1000)` (`src/support/helpers.pwn:106`) | Schedules `Kick(playerid)` via a timer so pending messages/dialogs reach the client first. |
 | `stock IsNumeric(const input[])` (`src/support/helpers.pwn:123`) | Checks whether a string is all digits (used to validate dialog input). |
 | `stock IsPlayerInSphere(playerid, Float:x, Float:y, Float:z, Float:radius)` (`src/support/helpers.pwn:141`) | Radius check against a player's current position. |
 | `stock EnsurePickupCreated(model, type, Float:X, Float:Y, Float:Z)` (`src/support/helpers.pwn:237`) | Retries `CreatePickup` up to 50 times and returns the resulting pickup id. |
 | `stock GetWeaponModel(weaponid)` (`src/support/helpers.pwn:266`) | Table lookup from weapon id (0–46) to the GTA:SA pickup object model; 0 for fist, the unused 19–21 and out-of-range ids. |
-| `stock IsVehicleRcTram(vehicleid)` (`src/support/helpers.pwn:325`) | True if the vehicle's model is a tram or one of the RC vehicle models. |
-| `stock SplitIntoTwo(const input[], token1[], token2[], tokenSize, const delimiter[2] = " ")` (`src/support/helpers.pwn:345`) | Splits a command parameter string into two tokens on a delimiter. |
+| `stock IsVehicleRcTram(vehicleid)` (`src/support/helpers.pwn:322`) | True if the vehicle's model is a tram or one of the RC vehicle models. |
+| `stock SplitIntoTwo(const input[], token1[], token2[], tokenSize, const delimiter[2] = " ")` (`src/support/helpers.pwn:342`) | Splits a command parameter string into two tokens on a delimiter. |
 | `stock SanitizeString(const input[], output[], size)` (`src/support/helpers.pwn:485`) | Escapes single quotes for embedding a string in a SQL literal. |
 
 ## Parkour (`src/support/parkour.pwn`, ~97 lines)

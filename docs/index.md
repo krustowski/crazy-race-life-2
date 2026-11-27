@@ -11,11 +11,12 @@ A live demo runs at `95.216.7.113:39876`.
 
 This site documents the gamemode's internals for developers who want to extend, fix, or operate CRL2:
 
-- **[Getting Started](getting-started.md)** — building and running the gamemode with `sampctl`, local development, NPC connections and the Telegram webhook.
+- **[Getting Started](getting-started.md)** — building and running the gamemode with `sampctl`, the airline filterscript, local development, NPC connections, the Telegram webhook, tests and the docs tooling.
 - **[Architecture](architecture.md)** — how `main.pwn` boots the gamemode, the include order in `includes.pwn`, and the conventions used across the codebase (dcmd commands, YSI-style hooks, i18n).
 - **[Database Schema](database.md)** — the SQLite schema, migrations, and the thin `DB_*` wrapper used to talk to it.
 - **[Commands Reference](commands.md)** — every player and admin `/command`, its access level, and where it's implemented.
 - **[Localization](localization.md)** — the `i18n.pwn` translation system (English, partial Czech and Bosnian).
+- **[Web Portal](portal.md)** — the stats dashboard, the map and these docs behind a sign-in with the game account: who can see what, running it locally, and deploying it as a swarm stack.
 - **[Modules](modules/index.md)** — one page per gameplay feature in `src/modules/` (racing, real estate, taxi/tow/trucking missions, teams, combat, drugs, etc).
 - **[Support Systems](support/world-and-visuals.md)** — the shared infrastructure in `src/support/` that the modules build on (pickups/objects/vehicles, dialogs, timers, networking, ...).
 
@@ -53,7 +54,7 @@ This site documents the gamemode's internals for developers who want to extend, 
 ![Trucking mission](assets/img/crl2_trucking_marked_truck.png)
 *Trucking mission HUD, truck marked while the mission is paused.*
 
-See the project's `README.md` (repository root) for the full screenshot gallery and MapUI (map data visualizer) instructions.
+See the project's `README.md` (repository root) for the full screenshot gallery. The map of everything the gamemode places (MapUI) is part of the [Web Portal](portal.md).
 
 ## Source Layout
 

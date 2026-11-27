@@ -2,6 +2,8 @@
 
 CRL2 persists all game state in a single SQLite database file, `crl2_data.db`, at the repository root. Schema changes are tracked as sequential, goose-style SQL migrations under `sql/migrations/`, and the gamemode itself only ever opens the database and hands the connection handle to the `DB_*` query wrapper — it does not create or alter tables at runtime.
 
+The gamemode is not the only reader. The [Web Portal](portal.md) tools open the same file read-only and query its tables directly: the gateway reads `users` to sign players in, and statsui and mapui read most of the rest. A migration that renames or drops a column must be checked against them too (see [When the schema changes](portal.md#when-the-schema-changes)).
+
 ## Migration workflow
 
 - Migration files live in `sql/migrations/`, named `NNNNNN_description.sql` (`000001` through `000026`), each wrapped in `-- +goose up` / `-- +goose Down` markers so the same file carries both the forward migration and its rollback.

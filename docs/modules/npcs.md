@@ -10,25 +10,25 @@ Three parallel sets of state track the three NPC kinds — race (`gRaceDriverNPC
 
 The lifecycle is driven entirely by SA-MP/open.mp NPC callbacks in `src/main.pwn`, which call back into this file:
 
-1. `InitNPCs()` (called once from `OnGameModeInit` in `main.pwn:92`) creates every race/taxi/truck vehicle and its matching `NPC_Create()` bot up front.
+1. `InitNPCs()` (called once from `OnGameModeInit` in `main.pwn:77`) creates every race/taxi/truck vehicle and its matching `NPC_Create()` bot up front.
 2. `OnNPCCreate` (`main.pwn`) fires per bot and, via three staggered one-shot timers (100/200/300 ms), calls `Race_SpawnNPC` / `Taxi_SpawnNPC` / `Truck_SpawnNPC`, which position the NPC at its spawn row, set its skin, and call `NPC_Spawn`.
 3. `OnNPCSpawn` (`main.pwn`) puts the NPC in its vehicle's driver seat (`DRIVER_SEAT` = 0) and, after a 1s timer, calls `Race_StartInitialPlayback` / `Taxi_StartInitialPlayback` / `Truck_StartInitialPlayback`, which starts recording file `NPC_TRACK_<KIND>_<idx:02d>_0`.
 4. `OnNPCPlaybackEnd` (`main.pwn`) calls all three `*NPC_StartNextPlayback()` stocks unconditionally (each is a no-op if the `npcid` doesn't map to that kind); each advances to the next playback file in sequence, wrapping back to `_0` after `NUM_PLAYBACK_FILES` (10) segments for taxi/truck, or always resetting to `_0` for race (single-loop track). Truck segments run from one petrol station to the next. When one ends within range of a station that has room in its tank, `TruckNPC_StartNextPlayback` waits `TRUCK_UNLOAD_MS` (30 s) before `Truck_PlayNextSegment` starts the next file, so the tanker can top the station up ([fuel.md](fuel.md)).
 
 `ENABLE_NPC_MARKER` (compile-time, currently `true`) toggles whether spawned driver NPCs get a visible blip/nametag color or stay invisible on the map (`0x00000000`). When enabled, `OnNPCSpawn` applies `TAXI_NPC_MARKER_COLOR` (the Taximen team color, `gTeams[TEAM_TAXIMEN - 1]` — `InitTeams` skips the stub row, so `gTeams[0]` is team id 1), `TRUCK_NPC_MARKER_COLOR` (the Truckerz team color) and `RACE_NPC_MARKER_COLOR` (a random RGB re-rolled on every spawn, with the same `0xAA` alpha as the team colors).
 
-Note that combat/"rampage" NPCs (spawned and killed via `OnNPCRespawn`/`OnNPCDeath` in `main.pwn`) are a separate system owned by `modules/rampage.pwn`, not this file.
+Note that combat/"rampage" NPCs (spawned and killed via `OnNPCRespawn`/`OnNPCDeath` in `main.pwn`) are a separate system owned by `modules/rampage.pwn`, not this file. The two airliners are NPCs of the optional airline filterscript, not of the gamemode, but they take two NPC slots that the taxi and pizza customers would otherwise get ([Getting Started](../getting-started.md#airline-filterscript)).
 
 ## Key Functions
 
 | Function | Description |
 |---|---|
-| `stock InitNPCs()` (`src/modules/npcs.pwn:164`) | One-time setup: creates all race/taxi/truck vehicles (and truck trailers) and their `NPC_Create()` bots. |
-| `stock GetRaceIndexByNPC(npcid)` / `GetTaxiIndexByNPC` / `GetTruckIndexByNPC` (`src/modules/npcs.pwn:112,125,151`) | Reverse-lookup an NPC id back to its slot index in the relevant array, or `-1`. |
-| `stock GetTaxiIndexByVehicle(vehicleid)` (`src/modules/npcs.pwn:138`) | Same for a taxi's vehicle id; used by [taxistop.md](taxistop.md) to tell an NPC taxi passenger apart. |
-| `public Race_SpawnNPC(npcid)` / `Taxi_SpawnNPC` / `Truck_SpawnNPC` (`src/modules/npcs.pwn:270,287,309`) | Forwarded, timer-invoked: position + skin the NPC at its spawn row, then `NPC_Spawn`. |
-| `public Race_StartInitialPlayback(npcid)` / `Taxi_StartInitialPlayback` / `Truck_StartInitialPlayback` (`src/modules/npcs.pwn:331,348,373`) | Forwarded, timer-invoked once per NPC: starts the first (`_0`) recording file and marks playback started so it isn't restarted. |
-| `stock RaceNPC_StartNextPlayback(npcid)` / `TaxiNPC_StartNextPlayback` / `TruckNPC_StartNextPlayback` (`src/modules/npcs.pwn:390,413,442`) | Called from `OnNPCPlaybackEnd`; advances to the next `NPC_TRACK_<KIND>_<idx>_<seq>` file, wrapping after `NUM_PLAYBACK_FILES`. |
+| `stock InitNPCs()` (`src/modules/npcs.pwn:168`) | One-time setup: creates all race/taxi/truck vehicles (and truck trailers) and their `NPC_Create()` bots. |
+| `stock GetRaceIndexByNPC(npcid)` / `GetTaxiIndexByNPC` / `GetTruckIndexByNPC` (`src/modules/npcs.pwn:116,129,155`) | Reverse-lookup an NPC id back to its slot index in the relevant array, or `-1`. |
+| `stock GetTaxiIndexByVehicle(vehicleid)` (`src/modules/npcs.pwn:142`) | Same for a taxi's vehicle id; used by [taxistop.md](taxistop.md) to tell an NPC taxi passenger apart. |
+| `public Race_SpawnNPC(npcid)` / `Taxi_SpawnNPC` / `Truck_SpawnNPC` (`src/modules/npcs.pwn:253,270,288`) | Forwarded, timer-invoked: position + skin the NPC at its spawn row, then `NPC_Spawn`. |
+| `public Race_StartInitialPlayback(npcid)` / `Taxi_StartInitialPlayback` / `Truck_StartInitialPlayback` (`src/modules/npcs.pwn:306,323,342`) | Forwarded, timer-invoked once per NPC: starts the first (`_0`) recording file and marks playback started so it isn't restarted. |
+| `stock RaceNPC_StartNextPlayback(npcid)` / `TaxiNPC_StartNextPlayback` / `TruckNPC_StartNextPlayback` (`src/modules/npcs.pwn:359,382,406`) | Called from `OnNPCPlaybackEnd`; advances to the next `NPC_TRACK_<KIND>_<idx>_<seq>` file, wrapping after `NUM_PLAYBACK_FILES`. |
 
 ## Commands
 

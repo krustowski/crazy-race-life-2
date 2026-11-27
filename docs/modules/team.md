@@ -141,8 +141,8 @@ When you set a team colour:
 | `stock ExtractSkinsFromString(const input[], ints[5])` (`src/modules/team.pwn:137`) | Splits a comma-separated skin-ID string into an array. |
 | `stock ExtractWeaponsAmmuFromString(const input[], ints[MAX_TEAM_WEAPONS])` (`src/modules/team.pwn:158`) | Splits a comma-separated weapon or ammo string into an array. |
 | `stock CheckTaxiDriversOnline()` / `CheckCarMechanicsOnline()` / `CheckPizzaguysOnline()` (`src/modules/team.pwn:179`, `:184`, `:189`) | Stubs that always return 0. |
-| `stock SetPlayerTeamEx(playerid, teamid)` (`src/modules/player.pwn:1865`) | Joins a team; `teamid` is the `gTeams[]` index, not the team id. |
-| `stock bool: IsPlayerInTeam(playerid, PLAYER_TEAM: teamid)` (`src/modules/player.pwn:1060`) | The team check used by taxi, pizza, mechanics, hackers and robbers. Commands in `dcmd.pwn` compare `gPlayers[playerid][TeamID]` directly. |
+| `stock SetPlayerTeamEx(playerid, teamid)` (`src/modules/player.pwn:1951`) | Joins a team; `teamid` is the `gTeams[]` index, not the team id. |
+| `stock bool: IsPlayerInTeam(playerid, PLAYER_TEAM: teamid)` (`src/modules/player.pwn:1143`) | The team check used by taxi, pizza, mechanics, hackers and robbers. Commands in `dcmd.pwn` compare `gPlayers[playerid][TeamID]` directly. |
 
 ### Data & integration
 

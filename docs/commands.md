@@ -101,12 +101,14 @@ Declared under the `//--------------[ ADMIN COMMANDS ]-------------|` banner at 
 | `/ban` | Bans a target player (SA-MP native `Ban()`, IP-based), broadcasting a message first. |
 | `/edit` | Opens the game editors hub dialog (property, trucking, race, police bribe, rampage and prize editors). |
 | `/fakechat` | Broadcasts a fake public chat line attributed to a target player. |
-| `/lvl` | Sets a target player's admin level (`0`-`5`); the caller's own level must exceed the target's current level. |
+| `/lvl` | Sets a logged-in target player's admin level (`0`-`5`) and saves it to their account; the target must be below the caller's own level, and the new level at most the caller's. An RCON admin may set any level to anyone, themselves included (see below). The player-click "Set admin level" dialog applies the same rules (`SetPlayerAdminLevel`, `src/modules/player.pwn`). |
 | `/npcrec` | Opens the NPC route recording dialog, or stops an active recording session ([`modules/npcs.md`](modules/npcs.md)). |
 | `/restart` | Starts (or cancels, if already running) a server-restart countdown; defaults to 60 seconds. |
 
 ### RCON / Level 5
 No `dcmd_` handler in `dcmd.pwn` gates specifically on level 5. Every admin command's guard is the same `!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < N` shape, so a full RCON admin (`IsPlayerAdmin(playerid) == true`) bypasses **every** level check regardless of their stored `AdminLevel`, and no command requires more than level 4. Level 5 exists only as an assignable value — `/lvl` accepts `0`-`5` — but nothing in `dcmd.pwn` checks for it.
+
+To appoint the first admin(s) on a fresh database, where every account is at level `0`: log in to your game account, run `/rcon login <rcon_password>`, then `/lvl <yourID> 5` (and `/lvl <playerID> <level>` for anyone else who is logged in). The level is written to `users.adminlvl` straight away, so it sticks after the RCON session ends.
 
 ## Notes
 

@@ -34,7 +34,7 @@ gameplay        → FireQuestEvent()      called by the module that owns the eve
        └─ progress ≥ target → CompleteQuest()      upsert progress + completed_at, pay reward, announce it
 ```
 
-`InitQuests` (`src/main.pwn:74`) joins `quest_types` to `quest_labels` filtered on `active = 1`, so one row comes back per quest **per locale** — the `if (!gQuests[id][ID])` guard is what keeps `gQuestCount` counting quests rather than rows. A row whose quest id is outside `1 .. MAX_QUESTS - 1` or whose locale has no `PlayerLocale` slot is skipped and logged, rather than indexing out of bounds, which would abort `OnGameModeInit` and every `Init*` after it.
+`InitQuests` (`src/main.pwn:60`) joins `quest_types` to `quest_labels` filtered on `active = 1`, so one row comes back per quest **per locale** — the `if (!gQuests[id][ID])` guard is what keeps `gQuestCount` counting quests rather than rows. A row whose quest id is outside `1 .. MAX_QUESTS - 1` or whose locale has no `PlayerLocale` slot is skipped and logged, rather than indexing out of bounds, which would abort `OnGameModeInit` and every `Init*` after it.
 
 `LoadPlayerQuests` runs from `SetPlayerAccountLogin` (`src/modules/auth.pwn:53`) only. The registration path deliberately skips it: a brand-new account has no `quests` rows to read. Right after it, the login path reports the player's current commercial share (see [Level events](#level-events)), so commercial properties rented before the quest existed count without another rent.
 
@@ -47,9 +47,9 @@ gameplay        → FireQuestEvent()      called by the module that owns the eve
 | `QUEST_EVT_PROPERTY_RENTED` | `real.pwn:1309` | Rent a property |
 | `QUEST_EVT_PROPERTY_BOUGHT` | `real.pwn:1424` | Buy a property |
 | `QUEST_EVT_RACE_FINISHED` | `race.pwn:888` | Finish a race |
-| `QUEST_EVT_TEAM_JOINED` | `player.pwn:1896` | Join a team |
+| `QUEST_EVT_TEAM_JOINED` | `player.pwn:1982` | Join a team |
 | `QUEST_EVT_PM_SENT` | `player.pwn:499` | Send a private message |
-| `QUEST_EVT_BANK_DEPOSIT` | `player.pwn:844` | Deposit money in the bank |
+| `QUEST_EVT_BANK_DEPOSIT` | `player.pwn:927` | Deposit money in the bank |
 | `QUEST_EVT_DEATHMATCH_PLAYED` | `deathmatch.pwn:391` | Play a deathmatch round |
 | `QUEST_EVT_DEATHMATCH_WON` | `deathmatch.pwn:320` | Win a deathmatch round |
 | `QUEST_EVT_TRUCKING_DONE` | `trucking.pwn:170` | Complete 3 trucking runs |
@@ -102,7 +102,7 @@ Tow 3 vehicles              15000    0          3
 
 Completed rows are coloured green (`0x00FF00`) via an embedded `{%06x}` prefix, incomplete ones white. The list is built in a 2048-character buffer; the 23 quests take about 1220. Selecting a row opens `DIALOG_QUEST_DESC`, a plain message box showing the label and the localized description; its only button returns to the list.
 
-Both dialog functions live in `support/dialogs.pwn` (`:2561`, `:2593`) with every other `Show*Dialog`, not in `quest.pwn` — see [Include position](#data-integration).
+Both dialog functions live in `support/dialogs.pwn` (`:2562`, `:2594`) with every other `Show*Dialog`, not in `quest.pwn` — see [Include position](#data-integration).
 
 ## Key Functions
 
@@ -126,15 +126,15 @@ Both dialog functions live in `support/dialogs.pwn` (`:2561`, `:2593`) with ever
 
 - **Database tables:** `quest_events`, `quest_types`, `quest_labels`, `quests` — all introduced in `000010_quests.sql`, with five more mission quests added by `000011_quest_mission_types.sql`, the three rob quests by `000014_rob_quests.sql`, the taxi stop and fuel quests by `000022_taxistop_fuel_quests.sql`, and the commercial share quest by `000023_commercial_share_quest.sql`. See [Database Schema](../database.md).
 - **Reads `gPlayers[]`:** `OrmID` (the `users.id` foreign key for every quest row) and `Locale` (which label/description to show). Writes nothing back to `gPlayers[]`; the reward goes out through `GivePlayerMoney`.
-- **Called from:** twelve gameplay modules, via `FireQuestEvent` or `FireQuestLevelEvent`, plus the login path in `auth.pwn` (see the [Events](#events) table). `support/response.pwn:2152` handles both dialogs; `support/dcmd.pwn` binds the two commands.
-- **Include position:** first included from `modules/drugz.pwn:581` (`drugz.pwn` itself comes in from `modules/player.pwn:128`), so the `QUEST_EVT_*` constants exist before `drugz.pwn:594` and `player.pwn:499` use them. The later includes at `modules/player.pwn:446`, `modules/player.pwn:1863` and `src/support/includes.pwn:115` are no-ops (the file is guarded by `_CRL2_QUEST`, and `-Z+` reads it only once) — see [Architecture](../architecture.md#include-order-srcsupportincludespwn).
+- **Called from:** twelve gameplay modules, via `FireQuestEvent` or `FireQuestLevelEvent`, plus the login path in `auth.pwn` (see the [Events](#events) table). `support/response.pwn:2137` handles both dialogs; `support/dcmd.pwn` binds the two commands.
+- **Include position:** first included from `modules/drugz.pwn:583` (`drugz.pwn` itself comes in from `modules/player.pwn:128`), so the `QUEST_EVT_*` constants exist before `drugz.pwn:596` and `player.pwn:499` use them. The later includes at `modules/player.pwn:446`, `modules/race.pwn:825`, `modules/player.pwn:1949` and `src/support/includes.pwn:118` are no-ops: no build passes `-Z+`, so pawncc reads the file again each time, and its `_CRL2_QUEST` guard ends each later read at once — see [Architecture](../architecture.md#include-order-srcsupportincludespwn).
 
 !!! warning "Why the dialogs are not in `quest.pwn`"
-    `quest.pwn` is compiled from inside `player.pwn` at line 473 — well before `support/dialogs.pwn` and its `DIALOG_*` constants exist. Defining the quest dialogs in `quest.pwn` requires `#include "support/dialogs.pwn"` there, which drags `dialogs.pwn` (and, through it, `taxi.pwn`) in ahead of the `bool:`-tagged `IsPlayerInTeam` at `player.pwn:1060`, producing a *"function with tag result used before definition, forcing reparse"* warning. Keeping the two `Show*` functions in `dialogs.pwn` avoids the cycle entirely.
+    `quest.pwn` is compiled from inside `player.pwn` at line 446 — well before `support/dialogs.pwn` and its `DIALOG_*` constants exist. Defining the quest dialogs in `quest.pwn` requires `#include "support/dialogs.pwn"` there, which drags `dialogs.pwn` (and, through it, `taxi.pwn`) in ahead of the `bool:`-tagged `IsPlayerInTeam` at `player.pwn:1143`, producing a *"function with tag result used before definition, forcing reparse"* warning. Keeping the two `Show*` functions in `dialogs.pwn` avoids the cycle entirely.
 
 ## Notes
 
-- **`ShowPlayerQuestDescDialog(playerid, listitem + 1)`** (`support/response.pwn:2159`) maps a dialog row back to a quest id by adding 1. That is only correct while active quest ids are contiguous from 1. Deactivate any quest (`quest_types.active = 0`) and `InitQuests` skips it, the list skips it, and every row *after* the gap opens the wrong description. A lookup array built alongside the list — the same pattern `gPlayers[][OnlinePlayerList]` uses for player lists — would make this robust.
+- **`ShowPlayerQuestDescDialog(playerid, listitem + 1)`** (`support/response.pwn:2144`) maps a dialog row back to a quest id by adding 1. That is only correct while active quest ids are contiguous from 1. Deactivate any quest (`quest_types.active = 0`) and `InitQuests` skips it, the list skips it, and every row *after* the gap opens the wrong description. A lookup array built alongside the list — the same pattern `gPlayers[][OnlinePlayerList]` uses for player lists — would make this robust.
 - **`seq_no` is selected but unused.** `InitQuests` requests `t.seq_no` and the assignment is commented out (`quest.pwn:93`), there is no `SeqNo` field in the `Quest` enum, and the query has no `ORDER BY`. Display order comes from the `i = 1 .. MAX_QUESTS` loop, i.e. ascending id. The column is currently decorative.
 - **Descriptions seeded by `000010` contain a literal `\n`.** SQLite stores the escape as two characters rather than a line break, so quest 1's description renders a visible `\n` in game. `000011` avoids escapes entirely. Fix the old rows with `UPDATE quest_labels SET desc = replace(desc, '\n', char(10)) WHERE quest_type = 1;`.
 - **The combat quest is unreachable for ordinary players.** `/combat` is gated behind `AdminLevel >= 1` (`support/dcmd.pwn:1205`), so quest 14 sits at 0/1 for everyone else. Set `quest_types.active = 0` for id 14 to hide it until the command is opened up.

@@ -16,7 +16,7 @@ Almost the entire file is a single function, `InitObjects()`, consisting of seve
 
 Defines the pickup model-id constants (`PICKUP_BRIEFCASE`, `PICKUP_HOUSE_GREEN`, `PICKUP_DRUG_*`, etc.) and the SA-MP/open.mp pickup-type constants (`PICKUP_TYPE_ALWAYS`, `PICKUP_TYPE_RESPAWN_30_SECONDS`, ...) used across the codebase. `InitPickups()` spawns the fixed set of world pickups that don't belong to a specific gameplay module: the admin room health pack, the Hackerz interior entrance/exit/money-bag pickups, one ATM pickup per entry in `gBankLocation` (from `modules/bank.pwn`), a per-team join pickup plus join/leave menu built from a `team_coords`/`teams` join query, a handful of legacy hardcoded property doors, and the SF Centrum / Bank LS teleport pickup pairs. The tiki/pumpkin "hidden prize" pickups have moved out to their own module — `InitPickups()` still calls `InitPrizes()` and `CheckGenericPickup()` still calls `CheckPrizePickup()`, but the data, the database writes and the admin editor all live in [`modules/prizes.pwn`](../modules/prizes.md) now. `CreateDeathMoneyPickup`/`CheckDeathMoneyPickup` implement a small ring buffer (`gDeathMoneyPickups[MAX_DEATH_MONEY_PICKUPS]`, 128 slots) of "money bag" pickups dropped at a player's death position holding their cash, redeemable by whoever picks them up first. Each bag carries a green `$<amount>` 3D text label floating just above it; when the ring buffer wraps, the uncollected bag (and its label) in the reused slot is destroyed. `CheckBlackMarketPickup` and `CheckGenericPickup` are dispatch helpers called from `main.pwn`'s `OnPlayerPickUpPickup` to route a touched `pickupid` to the right handler (black market dialog, SF Centrum/Bank LS teleports, Hackerz interior, admin room heal/doors).
 
-The actual `CreatePickup` retry logic lives in `EnsurePickupCreated` (`src/support/helpers.pwn:238`), not in this file — pickups.pwn and every gameplay module that spawns a pickup call into that shared helper.
+The actual `CreatePickup` retry logic lives in `EnsurePickupCreated` (`src/support/helpers.pwn:235`), not in this file — pickups.pwn and every gameplay module that spawns a pickup call into that shared helper.
 
 `gAdminDoorDown`/`gAdminDoorUp` are declared (lines 52-53) and checked in `CheckGenericPickup`, but nothing in the codebase ever assigns them a real pickup id — those two branches are effectively dead code.
 
@@ -24,11 +24,11 @@ The actual `CreatePickup` retry logic lives in `EnsurePickupCreated` (`src/suppo
 
 | Function | Description |
 |---|---|
-| `public InitPickups()` (`src/support/pickups.pwn:97`) | Spawns admin/Hackerz/bank/team/legacy-property pickups and builds per-team join menus from the database. |
-| `stock CreateDeathMoneyPickup(playerid)` (`src/support/pickups.pwn:298`) | Drops the dying player's cash as a pickup with a `$<amount>` 3D text label at their position and resets their money. |
-| `stock CheckDeathMoneyPickup(playerid, pickupid)` (`src/support/pickups.pwn:348`) | Redeems a death-money pickup for whichever player touches it, removing the bag and its label. |
-| `stock CheckBlackMarketPickup(playerid, pickupid)` (`src/support/pickups.pwn:366`) | Opens the black market dialog if the touched pickup is the druggery market spot. |
-| `stock CheckGenericPickup(playerid, pickupid)` (`src/support/pickups.pwn:376`) | Dispatches all other fixed world pickups (druggery entrance, SF Centrum/Bank LS teleports, admin room/doors, Hackerz), and hands prize pickups to `CheckPrizePickup`. |
+| `public InitPickups()` (`src/support/pickups.pwn:102`) | Spawns admin/Hackerz/bank/team/legacy-property pickups and builds per-team join menus from the database. |
+| `stock CreateDeathMoneyPickup(playerid)` (`src/support/pickups.pwn:279`) | Drops the dying player's cash as a pickup with a `$<amount>` 3D text label at their position and resets their money. |
+| `stock CheckDeathMoneyPickup(playerid, pickupid)` (`src/support/pickups.pwn:329`) | Redeems a death-money pickup for whichever player touches it, removing the bag and its label. |
+| `stock CheckBlackMarketPickup(playerid, pickupid)` (`src/support/pickups.pwn:347`) | Opens the black market dialog if the touched pickup is the druggery market spot. |
+| `stock CheckGenericPickup(playerid, pickupid)` (`src/support/pickups.pwn:357`) | Dispatches all other fixed world pickups (druggery entrance, SF Centrum/Bank LS teleports, admin room/doors, Hackerz), and hands prize pickups to `CheckPrizePickup`. |
 
 ## Vehicles (`src/support/vehicles.pwn`, ~1630 lines)
 
@@ -40,7 +40,7 @@ The actual `CreatePickup` retry logic lives in `EnsurePickupCreated` (`src/suppo
 |---|---|
 | `public InitVehicles()` (`src/support/vehicles.pwn:11`) | Spawns all static map vehicles and stamps the `--CRL2--` plate onto every vehicle slot. |
 
-`gVehicleNames[]` (`src/support/vehicles.pwn:1380`) is a data table, not a function — it maps a vehicle model id (offset from 400) to its display name.
+`gVehicleNames[]` (`src/support/vehicles.pwn:1376`) is a data table, not a function — it maps a vehicle model id (offset from 400) to its display name.
 
 ## Texts (`src/support/texts.pwn`, ~92 lines)
 

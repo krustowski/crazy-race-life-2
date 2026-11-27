@@ -44,6 +44,7 @@ nav:
   - Database Schema: database.md
   - Commands Reference: commands.md
   - Localization: localization.md
+  - Web Portal: portal.md
   - Modules:
       - modules/index.md
       - Anti-Cheat: modules/anticheat.md

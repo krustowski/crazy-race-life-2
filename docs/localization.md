@@ -31,18 +31,18 @@ Keys loosely follow a `I18N_<FEATURE>_<EVENT>[_FMT]` shape. The `_FMT` suffix is
 
 | Function | Description |
 |---|---|
-| `SendClientMessageLocalized(playerid, msg_id)` (`src/support/i18n.pwn:2183`) | `forward`/`public` pair. Sends `gI18nMessages[msg_id][gPlayers[playerid][Locale]]` to `playerid` via `SendClientMessage`, using the pre-assigned `gI18nMessageColor[msg_id]` as the message color. Only suitable for strings with **no** placeholders — it does not call `format()`, so any `%s`/`%d` in the string would be sent literally. |
-| `GetLocalizedString(playerid, msg_id, str[], size)` (`src/support/i18n.pwn:2188`) | `stock`. Copies the localized string for `playerid`'s locale into the caller-provided buffer `str` (via `format(str, size, "%s", ...)`), for the caller to then `format()` again with real arguments before sending. This is the required pattern for any `_FMT`-style key. |
+| `SendClientMessageLocalized(playerid, msg_id)` (`src/support/i18n.pwn:2193`) | `forward`/`public` pair. Sends `gI18nMessages[msg_id][gPlayers[playerid][Locale]]` to `playerid` via `SendClientMessage`, using the pre-assigned `gI18nMessageColor[msg_id]` as the message color. Only suitable for strings with **no** placeholders — it does not call `format()`, so any `%s`/`%d` in the string would be sent literally. |
+| `GetLocalizedString(playerid, msg_id, str[], size)` (`src/support/i18n.pwn:2198`) | `stock`. Copies the localized string for `playerid`'s locale into the caller-provided buffer `str` (via `format(str, size, "%s", ...)`), for the caller to then `format()` again with real arguments before sending. This is the required pattern for any `_FMT`-style key. |
 
-Both functions — and the `gI18nMessages`/`gI18nMessageColor` arrays they read — are defined at the very end of `i18n.pwn`, after a `#include "modules/player.pwn"` (`src/support/i18n.pwn:2179`) that pulls in the `gPlayers`/`PlayerLocale` field definition the two functions depend on.
+Both functions — and the `gI18nMessages`/`gI18nMessageColor` arrays they read — are defined at the very end of `i18n.pwn`, after a `#include "modules/player.pwn"` (`src/support/i18n.pwn:2189`) that pulls in the `gPlayers`/`PlayerLocale` field definition the two functions depend on.
 
 Not every call site goes through these two helpers: several modules (e.g. `src/modules/taxi.pwn`, `src/modules/rampage.pwn`, `src/modules/player.pwn`, `src/support/dcmd.pwn`) index `gI18nMessages[msg_id][gPlayers[playerid][Locale]]` directly, mainly to feed `GameTextForPlayer(...)` (which has no localized wrapper of its own) or a manual `format()` call.
 
 ## Adding a New String
 
 1. Add a new `I18N_<FEATURE>_<EVENT>` entry to the anonymous enum in `src/support/i18n.pwn` (around line 44-323) — place it in (or start a new) `// Section` comment block matching the feature it belongs to, to keep the grouping meaningful.
-2. Add a matching `{ "English text", "Czech text", "Bosnian text" }` triple to `gI18nMessages` (`src/support/i18n.pwn:669`) **at the same array index** — the enum ordering and the array ordering must stay in lockstep, since there are no named keys, only positional ones.
-3. Add a color to `gI18nMessageColor` (`src/support/i18n.pwn:355`), also at the same index — this is what `SendClientMessageLocalized` uses. **This step is the easiest one to forget**, and forgetting it is silent (see the gotcha below).
+2. Add a matching `{ "English text", "Czech text", "Bosnian text" }` triple to `gI18nMessages` (`src/support/i18n.pwn:673`) **at the same array index** — the enum ordering and the array ordering must stay in lockstep, since there are no named keys, only positional ones.
+3. Add a color to `gI18nMessageColor` (`src/support/i18n.pwn:359`), also at the same index — this is what `SendClientMessageLocalized` uses. **This step is the easiest one to forget**, and forgetting it is silent (see the gotcha below).
 4. If the string takes runtime values, include the `printf`-style placeholders in **every** variant — EN, CZ and BS (and keep argument order identical between them, since some grammatical reorderings won't be possible with positional `%s`/`%d`) — naming the key with a trailing `_FMT` is customary but not enforced.
 5. Use `SendClientMessageLocalized(playerid, I18N_KEY)` for static strings, or `GetLocalizedString(...)` + `format(...)` + `SendClientMessage(...)` for anything needing substitution.
 
@@ -60,7 +60,7 @@ Not every call site goes through these two helpers: several modules (e.g. `src/m
 
     Appending within a section is safer than reordering, but even an append needs all three.
 
-Setting a player's locale is done via the `/locale` command (see [Commands Reference](commands.md)) — it opens a dialog whose response handler (`src/support/response.pwn:1919`) writes the chosen index straight into `gPlayers[playerid][Locale]`.
+Setting a player's locale is done via the `/locale` command (see [Commands Reference](commands.md)) — it opens a dialog whose response handler (`src/support/response.pwn:1904`) writes the chosen index straight into `gPlayers[playerid][Locale]`.
 
 ## Coverage Notes
 

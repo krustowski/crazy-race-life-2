@@ -56,6 +56,22 @@ gamemode0 crl2
 
 The gamemode connects to a bundled SQLite database file (`crl2_data.db` in the repo root) on `OnGameModeInit` — see [Database Schema](database.md) for the schema and how migrations are applied.
 
+### Airline filterscript
+
+`filterscripts/airline.pwn` is an optional filterscript, separate from the gamemode. It flies two AT-400s as NPCs, back to back between Las Venturas and San Fierro, playing the recordings `AIR_LVSF` and `AIR_SFLV`. Build it with:
+
+```shell
+make airline
+```
+
+This writes the two recordings into `npcmodes/recordings/` with `utils/airline/gen_recordings.py`, then compiles `filterscripts/airline.amx`. Both outputs are gitignored. Copy the AMX into the server's `filterscripts/` and the recordings into its `npcmodes/recordings/`, then load it next to the gamemode (`filterscripts airline` in `server.cfg`; on open.mp, `"side_scripts": ["filterscripts/airline"]` under `pawn`). `python3 utils/airline/check_route.py` checks the recordings: where the legs meet, how close the planes come, the flight dynamics, and with `--cadb` the clearance over the terrain.
+
+Loaded before the gamemode, the airline takes vehicle IDs 1 and 2 and two NPC slots. The taxi and pizza missions count every NPC (`NPC_GetAll`), so they get two fewer customers.
+
+### Web portal
+
+The stats dashboard, the map and these docs run as a web portal in front of the same database. `make portal` starts it locally, given the portal's gitignored `Makefile.local`; see [Web Portal](portal.md).
+
 ## Local Development
 
 ### Connecting with open.mp on Linux
@@ -108,7 +124,10 @@ pip install mkdocs mkdocs-material
 
 mkdocs serve   # local preview at http://127.0.0.1:8000
 mkdocs build   # static site output in site/
+make docs      # the same as mkdocs build
 ```
+
+The [Web Portal](portal.md) serves the built `site/` publicly at `/docs/`, and the navigation's "Portal sign-in" entry links to its `/login`. That link only works under the portal, so it is dead in `mkdocs serve`.
 
 The pages cite code as `` `src/modules/tow.pwn:125` ``, and those numbers go stale whenever the code above them moves. Check them after changing code:
 

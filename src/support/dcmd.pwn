@@ -29,7 +29,9 @@ public LoadDcmdAll(playerid, cmdtext[]) {
 	dcmd(dwarp, 5, cmdtext); 	  //all
 	dcmd(fix, 3, cmdtext); 		  //all
 	dcmd(fork, 4, cmdtext); 	  //all
+	dcmd(fuel, 4, cmdtext); 	  //all
 	dcmd(givecash, 8, cmdtext);       //all
+	dcmd(hd, 2, cmdtext);             //all
 	dcmd(help, 4, cmdtext);           //all
 	dcmd(hide, 4, cmdtext); 	  //all
 	dcmd(kill, 4, cmdtext); 	  //all
@@ -406,6 +408,12 @@ dcmd_fork(playerid, const params[])
 	return SendClientMessageLocalized(playerid, I18N_FORK_CMD_APPLIED);
 }
 
+dcmd_fuel(playerid, const params[])
+{
+#pragma unused params
+	return BuyFuel(playerid);
+}
+
 dcmd_givecash(playerid, const params[])
 {
 	new token1[32], token2[32];
@@ -454,6 +462,16 @@ dcmd_givecash(playerid, const params[])
 	SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
 
 	return 1;
+}
+
+dcmd_hd(playerid, const params[])
+{
+#pragma unused params
+	gPlayers[playerid][HDVersion] = !gPlayers[playerid][HDVersion];
+
+	ShowPlayerClock(playerid);
+
+	return SendClientMessageLocalized(playerid, gPlayers[playerid][HDVersion] ? I18N_HD_CMD_APPLIED : I18N_HD_CMD_REVERTED);
 }
 
 dcmd_help(playerid, const params[])
@@ -1534,58 +1552,23 @@ dcmd_kick(playerid, const params[])
 
 dcmd_lvl(playerid, const params[])
 {
+	// RCON admins may run it whatever their account's level, see SetPlayerAdminLevel()
 	if (!IsPlayerAdmin(playerid) && gPlayers[playerid][AdminLevel] < 4) 
 	{
 		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
 	}
 
-	new token1[32], token2[32];
-	new count = SplitIntoTwo(params, token1, token2, sizeof(token1));
+	new 
+		token1[32], 
+		token2[32],
+		count = SplitIntoTwo(params, token1, token2, sizeof(token1));
 
-	if (!strlen(params) || count != 2 || !IsNumeric(token1) || !IsNumeric(token2))
+	if (count != 2 || !strlen(token1) || !strlen(token2) || !IsNumeric(token1) || !IsNumeric(token2))
 	{
-		SendUsageMessage(playerid, "/lvl [playerID] [0-5]");
+		return SendUsageMessage(playerid, "/lvl [playerID] [0-5]");
 	}
 
-	new targetId = strval(token1), targetLvl = strval(token2);
-
-	if (!IsPlayerConnected(targetId)) 
-	{
-		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
-	}
-
-	if (gPlayers[playerid][AdminLevel] <= gPlayers[targetId][AdminLevel])
-	{
-		return SendClientMessageLocalized(playerid, I18N_ADMIN_LVL_SET_MISMATCH);
-	}
-
-	if (targetId == playerid) 
-	{
-		return SendClientMessageLocalized(playerid, I18N_PLAYER_ID_INVALID);
-	}
-
-	if (targetLvl < 0 || targetLvl > 5)
-	{
-		SendUsageMessage(playerid, "/lvl [playerID] [0-5]");
-	}
-
-	if (targetLvl == gPlayers[targetId][AdminLevel])
-	{
-		return SendClientMessageLocalized(playerid, I18N_ADMIN_LVL_SET_SAME);
-	}
-
-	new adminName[MAX_PLAYER_NAME], playerName[MAX_PLAYER_NAME];
-
-	GetPlayerName(playerid, adminName, sizeof(adminName));
-	GetPlayerName(targetId, playerName, sizeof(playerName));
-
-	gPlayers[targetId][AdminLevel] = targetLvl;
-	SavePlayerData(targetId);
-
-	new msg[128];
-	GetLocalizedString(playerid, I18N_ADMIN_LVL_SET_FMT, msg, sizeof(msg));
-	format(msg, sizeof(msg), msg, adminName, playerName, targetId, targetLvl);
-	SendClientMessage(playerid, COLOR_GREY, msg);
+	SetPlayerAdminLevel(playerid, strval(token1), strval(token2));
 
 	return 1;
 }
@@ -1669,7 +1652,7 @@ dcmd_radio(playerid, const params[])
 	if (!gPlayers[playerid][Listening])
 	{
 		gPlayers[playerid][Listening] = true;
-		return PlayAudioStreamForPlayer(playerid, "https://icecast8.play.cz/freeradio128.mp3");
+		return PlayAudioStreamForPlayer(playerid, "http://icecast8.play.cz/freeradio128.mp3");
 	}
 	else
 	{
@@ -1809,38 +1792,25 @@ dcmd_spectate(playerid, const params[])
 		return SendClientMessageLocalized(playerid, I18N_LOW_ADMIN_LEVEL);
 	}
 
-	if ((!strlen(params) || !IsNumeric(params)) && !gPlayers[playerid][Spectating])
+	if (!strlen(params) && gPlayers[playerid][Spectating])
+	{
+		return StopSpectating(playerid);
+	}
+
+	if (!strlen(params) || !IsNumeric(params))
 	{
 		return SendUsageMessage(playerid, "/spectate [playerID]");
 	}
 
-	if (gPlayers[playerid][Spectating])
-	{
-		TogglePlayerSpectating(playerid, false);
-		gPlayers[playerid][Spectating] = false;
-
-		return SendClientMessageLocalized(playerid, I18N_SPECTATE_DISABLED);
-	}
-
 	new targetId = strval(params);
 
-	if (!IsPlayerConnected(targetId))
+	// The same ID again stops spectating, another one moves the camera over.
+	if (gPlayers[playerid][Spectating] && targetId == gSpectate[playerid][SpectatedPlayer])
 	{
-		return SendClientMessageLocalized(playerid, I18N_PLAYER_NOT_CONNECTED);
+		return StopSpectating(playerid);
 	}
 
-	if (playerid == targetId)
-	{
-		return SendClientMessageLocalized(playerid, I18N_PLAYER_ID_INVALID);
-	}
-
-	TogglePlayerSpectating(playerid, true);
-	PlayerSpectatePlayer(playerid, targetId);
-
-	gPlayers[playerid][Spectating] = true;
-	SendClientMessageLocalized(playerid, I18N_SPECTATE_ENABLED);
-
-	return 1;
+	return StartSpectating(playerid, targetId);
 }
 
 dcmd_vehicle(playerid, const params[])

@@ -163,7 +163,7 @@ The MapUI tool is then available at [http://localhost:8082](http://localhost:808
 
 ### Web portal
 
-MapUI also runs as part of a web portal, together with a stats dashboard (statsui: leaderboards, live server info, RCON for admins) and these docs, behind a gateway where players sign in with their game account. `make portal` runs it locally at [http://127.0.0.1:8070](http://127.0.0.1:8070); `compose.yml` and `make stack-deploy` run it as a Docker swarm stack. Its sources and these Make targets are kept out of the repository for now (the targets in a gitignored `Makefile.local`, which `Makefile` includes when present). See [docs/portal.md](docs/portal.md).
+MapUI also runs as part of a web portal, together with a stats dashboard (statsui: leaderboards, live server info, RCON for admins) and these docs, behind a gateway where players sign in with their game account. `make portal` runs it locally at [http://127.0.0.1:8070](http://127.0.0.1:8070); `compose.portal.yml`, a layer on `compose.yml`, runs it in containers, and `make stack-deploy` runs it as a Docker swarm stack. Its sources, these Make targets and that compose file are kept out of the repository for now (the targets in a gitignored `Makefile.local`, which `Makefile` includes when present). See [docs/portal.md](docs/portal.md).
 
 
 ## How to build

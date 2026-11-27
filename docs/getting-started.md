@@ -56,6 +56,8 @@ gamemode0 crl2
 
 The gamemode connects to a bundled SQLite database file (`crl2_data.db` in the repo root) on `OnGameModeInit` — see [Database Schema](database.md) for the schema and how migrations are applied.
 
+To run the server in Docker, `compose.yml` starts it as `samp-server`, serving `/opt/open.mp/data`, next to a MariaDB container. It names no image of its own: set `OMP_SERVER_IMAGE` in `.env` to the open.mp server image to run, or compose stops with an error. `make run` then applies the migrations, copies `gamemodes/crl2.amx` into `/opt/open.mp/data/gamemodes/` and restarts the container.
+
 ### Airline filterscript
 
 `filterscripts/airline.pwn` is an optional filterscript, separate from the gamemode. It flies two AT-400s as NPCs, back to back between Las Venturas and San Fierro, playing the recordings `AIR_LVSF` and `AIR_SFLV`. Build it with:

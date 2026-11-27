@@ -30,7 +30,7 @@ Given a live map to read, mapui draws every player and NPC as they move, and sta
 
 ## Running it locally
 
-For now the portal's sources (`utils/gateway`, `utils/statsui`, most of `utils/mapui`, `docker/`) are kept out of the repository, and so are its Make targets (`portal`, `stats`, `images`, `images-push`, `stack-secrets`, `stack-deploy`, `stack-rm`). The targets live in a gitignored `Makefile.local`, which `Makefile` includes when it exists. Without that file, none of the targets below exist.
+For now the portal's sources (`utils/gateway`, `utils/statsui`, most of `utils/mapui`, `docker/`) are kept out of the repository, and so are its Make targets (`portal`, `stats`, `images`, `images-push`, `stack-secrets`, `stack-deploy`, `stack-rm`) and its compose file, `compose.portal.yml`. The targets live in a gitignored `Makefile.local`, which `Makefile` includes when it exists. Without that file, none of the targets below exist.
 
 ```shell
 make portal
@@ -49,31 +49,32 @@ cd utils/mapui && go run .     # mapui on http://127.0.0.1:8082
 
 ## Containers and the swarm stack
 
-`compose.yml` defines the four services next to the game server and its database. It gives them two networks of their own: `portal-edge`, where the gateway publishes its port (`PORTAL_PORT`), and the internal `portal-net`, where the gateway reaches the other three. statsui and mapui also join `samp-net`, which they need to reach the game server and the live map.
+`compose.portal.yml` defines the four services, with their swarm settings, as a layer on `compose.yml`, which holds the game server and its database. Always pass both files: `docker compose -f compose.yml -f compose.portal.yml`, or list both in `COMPOSE_FILE` in `.env`. `make stack-deploy` passes both. The portal file gives the services two networks of their own: `portal-edge`, where the gateway publishes its port (`PORTAL_PORT`), and the internal `portal-net`, where the gateway reaches the other three. statsui and mapui also join `samp-net`, which they need to reach the game server and the live map.
 
 ```shell
 make images            # build the four images
 make images-push       # build them and push them to CRL2_REGISTRY, tagged CRL2_TAG
 make stack-secrets     # once per swarm: crl2_rcon_password (from .env) and a fresh crl2_rcon_token
 docker node update --label-add crl2_data=true <node>
-make stack-deploy      # deploy compose.yml as the stack STACK (default crl2)
+make stack-deploy      # deploy both files as the stack STACK (default crl2)
 make stack-rm          # remove the stack
 ```
 
 - **Label the node.** The gateway, statsui and mapui bind-mount the gamemode's data directory (`CRL2_DATA_DIR`) read-only at `/data` and open `/data/crl2_data.db`. Their tasks are therefore pinned to the node labelled `crl2_data=true`, and without that label they stay pending.
-- **`make stack-deploy` strips the top-level `name:`.** `docker compose` uses that key but the stack schema rejects it, so stripping it lets one file serve both.
+- **`make stack-deploy` strips the top-level `name:`** from `compose.yml`. `docker compose` uses that key but the stack schema rejects it, so stripping it lets one file serve both. The stack therefore also includes `compose.yml`'s own services (the game server and MariaDB), and needs `OMP_SERVER_IMAGE` set like any other use of that file.
 - **`docker stack deploy` does not read `.env`.** `make stack-deploy` gets the values through `Makefile.local`; to deploy by hand, export them in the shell first.
 - **Put TLS in front** and set `GATEWAY_SECURE=1`. Without it, session cookies travel in the clear.
 - **Sessions survive a redeploy** because the gateway keeps its signing key in the `gateway-keys` volume. Running more than one gateway replica needs a shared key instead (`GATEWAY_SESSION_KEY_FILE`).
 
-!!! danger "Never run `docker compose down -v` with this file on the game host"
-    `mariadb-data` is declared in the same file, and `-v` deletes it. Stop the portal by name instead: `docker compose stop gateway statsui mapui docs`.
+!!! danger "Never run `docker compose down -v` with these files on the game host"
+    `mariadb-data` is declared in `compose.yml`, which every portal run merges in, and `-v` deletes it. Stop the portal by name instead: `docker compose stop gateway statsui mapui docs`.
 
 | Variable | Default | Meaning |
 |---|---|---|
 | `CRL2_DATA_DIR` | `/opt/open.mp/data` | Host directory holding `crl2_data.db` (and the server log), mounted read-only |
 | `PORTAL_PORT` | `8080` | The gateway's published port |
-| `CRL2_REGISTRY`, `CRL2_TAG` | `registry.vxn.dev/crl2`, `latest` | Image names |
+| `CRL2_REGISTRY`, `CRL2_TAG` | *(local)*, `latest` | Image names, `$CRL2_REGISTRY/<service>:$CRL2_TAG` |
+| `OMP_SERVER_IMAGE` | *(required)* | The open.mp server image `compose.yml` runs |
 | `STACK` | `crl2` | Stack name, for the Make targets |
 | `CRL2_SERVER` | `server:39876` | The game server statsui queries |
 | `CRL2_RCON_PASSWORD` | *(unset)* | The server's `rcon_password`; `make stack-secrets` stores it as `crl2_rcon_password` |

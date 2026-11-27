@@ -83,6 +83,64 @@ new
 //  Race-related functions.
 //
 
+// Fills gRaces[] from one row of the races table: the race's data, an empty
+// start grid and no timers, plus its start pickup and label. Returns the race
+// id, or 0 for a row that does not fit in gRaces[].
+static Race_LoadFromRow(DBResult: result)
+{
+	new
+		id = DB_GetFieldIntByName(result, "id");
+
+	if (id <= 0 || id >= MAX_RACE_COUNT)
+	{
+		return 0;
+	}
+
+	new
+		raceName[MAX_RACE_NAME];
+	DB_GetFieldStringByName(result, "name", raceName, sizeof(raceName));
+	gRaces[id][Name] = raceName;
+
+	gRaces[id][ID] = id;
+	
+	gRaces[id][Type] = DB_GetFieldIntByName(result, "type");
+	gRaces[id][CostDollars] = DB_GetFieldIntByName(result, "cost_dollars");
+	gRaces[id][PrizeDollars] = DB_GetFieldIntByName(result, "prize_dollars");
+
+	gRaces[id][UpdateRaceInfoTimer] = Timer: INVALID_TIMER;
+	gRaces[id][StartRaceTimer] = Timer: INVALID_TIMER;
+	gRaces[id][CountdownTimer] = Timer: INVALID_TIMER;
+
+	// Invalidate any cached precalculations
+	gRaces[id][IsPrepared] = false;
+
+	new
+		invalidPlayers[MAX_RACE_PLAYERS] = {INVALID_PLAYER_ID, ...};
+
+	gRaces[id][RegisteredCount] = 0;
+	gRaces[id][RegisteredPlayers] = invalidPlayers;
+
+	new
+		Float: pX,
+		Float: pY,
+		Float: pZ;
+
+	pX = DB_GetFieldFloatByName(result, "start_x");
+	pY = DB_GetFieldFloatByName(result, "start_y");
+	pZ = DB_GetFieldFloatByName(result, "start_z");
+
+	gRaces[id][Start][CoordX] = pX;
+	gRaces[id][Start][CoordY] = pY;
+	gRaces[id][Start][CoordZ] = pZ;
+
+	EnsurePickupCreated(1314, 1, pX, pY, pZ);
+	Create3DTextLabel("%s", COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false, raceName);
+
+	return id;
+}
+
+// Loads every race; for startup. It empties each race's start grid, so it
+// must not run while a race is under way (see Race_LoadRace).
 stock Race_Init()
 {
 	new 
@@ -108,58 +166,7 @@ stock Race_Init()
 
 	do
 	{
-		new
-			id = DB_GetFieldIntByName(result, "id");
-
-		if (!id)
-		{
-			continue;
-		}
-
-		if (id >= MAX_RACE_COUNT)
-		{
-			break;
-		}
-
-		new
-			raceName[MAX_RACE_NAME];
-		DB_GetFieldStringByName(result, "name", raceName, sizeof(raceName));
-		gRaces[id][Name] = raceName;
-
-		gRaces[id][ID] = id;
-		
-		gRaces[id][Type] = DB_GetFieldIntByName(result, "type");
-		gRaces[id][CostDollars] = DB_GetFieldIntByName(result, "cost_dollars");
-		gRaces[id][PrizeDollars] = DB_GetFieldIntByName(result, "prize_dollars");
-
-		gRaces[id][UpdateRaceInfoTimer] = Timer: INVALID_TIMER;
-		gRaces[id][StartRaceTimer] = Timer: INVALID_TIMER;
-		gRaces[id][CountdownTimer] = Timer: INVALID_TIMER;
-
-		// Invalidate any cached precalculations
-		gRaces[id][IsPrepared] = false;
-
-		new
-			invalidPlayers[MAX_RACE_PLAYERS] = {INVALID_PLAYER_ID, ...};
-
-		gRaces[id][RegisteredCount] = 0;
-		gRaces[id][RegisteredPlayers] = invalidPlayers;
-
-		new
-			Float: pX,
-			Float: pY,
-			Float: pZ;
-
-		pX = DB_GetFieldFloatByName(result, "start_x");
-		pY = DB_GetFieldFloatByName(result, "start_y");
-		pZ = DB_GetFieldFloatByName(result, "start_z");
-
-		gRaces[id][Start][CoordX] = pX;
-		gRaces[id][Start][CoordY] = pY;
-		gRaces[id][Start][CoordZ] = pZ;
-
-		EnsurePickupCreated(1314, 1, pX, pY, pZ);
-		Create3DTextLabel("%s", COLOR_ORANGE, pX, pY, pZ, 15.0, -1, false, raceName);
+		Race_LoadFromRow(result);
 	}
 	while (DB_SelectNextRow(result));
 
@@ -167,6 +174,32 @@ stock Race_Init()
 	print("Race props initialized!");
 
 	return 1;
+}
+
+// Loads one race, such as one just saved from the editor, leaving the others
+// alone: reloading them all would drop the racers of a race under way, and
+// stack another start label on every race.
+stock Race_LoadRace(raceid)
+{
+	new 
+		query[256];
+
+	format(query, sizeof(query), "SELECT id, name, type, cost_dollars, prize_dollars, start_x, start_y, start_z FROM races WHERE id = %d", raceid);
+
+	new 
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result) 
+	{
+		printf("Database error: cannot fetch race data (race_id: %d)!", raceid);
+		return 0;
+	}
+
+	new
+		loaded = DB_GetRowCount(result) ? Race_LoadFromRow(result) : 0;
+
+	DB_FreeResultSet(result);
+
+	return (loaded != 0);
 }
 
 stock bool: Race_IsRaceActive(raceid)
@@ -1008,10 +1041,32 @@ stock SaveRaceData(playerid)
 		return 1;
 	}
 
-	new 
-		query[2048];
-	format(query, sizeof(query), "INSERT INTO races (id, name, type, cost_dollars, prize_dollars, start_x, start_y, start_z) VALUES (%d, '%s', %d, %d, %d, %.2f, %.2f, %.2f)",
-			gPlayerRaceEdit[playerid][ID],
+	if (gPlayerRaceEdit[playerid][EditTrackCoordNo] == 0)
+	{
+		SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Record the track coords first!");
+		return ShowRaceEditorOptionsDialog(playerid, raceid);
+	}
+
+	// The race and its track are saved in one transaction, so a failed save
+	// leaves no half-written race behind (its id would then be taken), and
+	// every track coord gets its own INSERT: a single multi-row INSERT of
+	// MAX_RACE_CP coords does not fit in the query buffer and gets cut short.
+	new
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, "BEGIN");
+	if (!result)
+	{
+		SendClientMessageLocalized(playerid, I18N_RACE_DATABASE_ERROR);
+		printf("Database error: cannot begin race transaction (race_id: %d)!", raceid);
+
+		return 0;
+	}
+
+	DB_FreeResultSet(result);
+
+	new
+		query[512];
+	format(query, sizeof(query), "INSERT INTO races (id, name, type, cost_dollars, prize_dollars, start_x, start_y, start_z) VALUES (%d, '%q', %d, %d, %d, %.2f, %.2f, %.2f)",
+			raceid,
 			gPlayerRaceEdit[playerid][Name],
 			1,
 			gPlayerRaceEdit[playerid][CostDollars],
@@ -1021,10 +1076,10 @@ stock SaveRaceData(playerid)
 			gPlayerRaceEdit[playerid][Start][CoordZ]
 		);
 
-	new 
-		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) 
+	result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
 	{
+		DB_FreeResultSet(DB_ExecuteQuery(gDbConnectionHandle, "ROLLBACK"));
 		SendClientMessageLocalized(playerid, I18N_RACE_DATABASE_ERROR);
 		printf("Database error: cannot write new race data (race_id: %d)!", raceid);
 
@@ -1035,40 +1090,43 @@ stock SaveRaceData(playerid)
 
 	//
 
-	format(query, sizeof(query), "INSERT INTO race_coords (race_id, seq_no, x, y, z, rot) VALUES (%d, %d, %.2f, %.2f, %.2f, %.2f)",
-			gPlayerRaceEdit[playerid][ID],
-			1,
-			gPlayerRaceEditTrackCoords[playerid][0][CoordX],
-			gPlayerRaceEditTrackCoords[playerid][0][CoordY],
-			gPlayerRaceEditTrackCoords[playerid][0][CoordZ],
-			0.0
-		);
-
-	for (new i = 1; i < gPlayerRaceEdit[playerid][EditTrackCoordNo]; i++)
+	for (new i = 0; i < gPlayerRaceEdit[playerid][EditTrackCoordNo]; i++)
 	{
-		format(query, sizeof(query), "%s ,(%d, %d, %.2f, %.2f, %.2f, %.2f)",
-				query,
-				gPlayerRaceEdit[playerid][ID],
+		format(query, sizeof(query), "INSERT INTO race_coords (race_id, seq_no, x, y, z, rot) VALUES (%d, %d, %.2f, %.2f, %.2f, %.2f)",
+				raceid,
 				i + 1,
 				gPlayerRaceEditTrackCoords[playerid][i][CoordX],
 				gPlayerRaceEditTrackCoords[playerid][i][CoordY],
 				gPlayerRaceEditTrackCoords[playerid][i][CoordZ],
 				0.0
-		      );
+			);
+
+		result = DB_ExecuteQuery(gDbConnectionHandle, query);
+		if (!result)
+		{
+			DB_FreeResultSet(DB_ExecuteQuery(gDbConnectionHandle, "ROLLBACK"));
+			SendClientMessageLocalized(playerid, I18N_RACE_DATABASE_ERROR);
+			printf("Database error: cannot write new race coord data (race_id: %d, seq_no: %d)!", raceid, i + 1);
+
+			return 0;
+		}
+
+		DB_FreeResultSet(result);
 	}
 
-	result = DB_ExecuteQuery(gDbConnectionHandle, query);
-	if (!result) 
+	result = DB_ExecuteQuery(gDbConnectionHandle, "COMMIT");
+	if (!result)
 	{
+		DB_FreeResultSet(DB_ExecuteQuery(gDbConnectionHandle, "ROLLBACK"));
 		SendClientMessageLocalized(playerid, I18N_RACE_DATABASE_ERROR);
-		printf("Database error: cannot write new race coord data (race_id: %d)!", raceid);
+		printf("Database error: cannot commit new race data (race_id: %d)!", raceid);
 
 		return 0;
 	}
 
 	DB_FreeResultSet(result);
 
-	Race_Init();
+	Race_LoadRace(raceid);
 
 	return 1;
 }

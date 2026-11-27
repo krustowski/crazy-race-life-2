@@ -19,9 +19,6 @@ enum Coords
     Float: CoordR
 }
 
-new 
-	const GAMEMODE_CREDITS[] = "{FFD700}krusty, kompry, DRaGsTeR {FFFFFF}(2008-2010), {FFD700}amdulka, cranyy, tack {FFFFFF}(2025-)";
-
 forward AutosaveData();
 forward StartServerReset();
 
@@ -40,6 +37,7 @@ public AutosaveData()
 {
 	BatchSavePlayerData();
 	SaveRealEstateData();
+	SaveGasStationData();
 }
 
 public StartServerReset()
@@ -261,6 +259,66 @@ stock EnsurePickupCreated(model, type, Float:X, Float:Y, Float:Z)
 	return pId;
 }
 
+// GTA:SA object model for a weapon id, or 0 where no pickup model exists
+// (fist, the unused ids 19-21, anything out of range).
+stock GetWeaponModel(weaponid)
+{
+	static const sWeaponModels[47] = {
+		0,			// 0  fist
+		331,		// 1  brass knuckles
+		333,		// 2  golf club
+		334,		// 3  nightstick
+		335,		// 4  knife
+		336,		// 5  baseball bat
+		337,		// 6  shovel
+		338,		// 7  pool cue
+		339,		// 8  katana
+		341,		// 9  chainsaw
+		321,		// 10 purple dildo
+		322,		// 11 dildo
+		323,		// 12 vibrator
+		324,		// 13 silver vibrator
+		325,		// 14 flowers
+		326,		// 15 cane
+		342,		// 16 grenade
+		343,		// 17 tear gas
+		344,		// 18 molotov
+		0, 0, 0,	// 19-21 unused
+		346,		// 22 colt 45
+		347,		// 23 silenced pistol
+		348,		// 24 desert eagle
+		349,		// 25 shotgun
+		350,		// 26 sawn-off shotgun
+		351,		// 27 combat shotgun
+		352,		// 28 micro smg
+		353,		// 29 mp5
+		355,		// 30 ak-47
+		356,		// 31 m4
+		372,		// 32 tec-9
+		357,		// 33 country rifle
+		358,		// 34 sniper rifle
+		359,		// 35 rpg
+		360,		// 36 hs rocket
+		361,		// 37 flamethrower
+		362,		// 38 minigun
+		363,		// 39 satchel charge
+		364,		// 40 detonator
+		365,		// 41 spraycan
+		366,		// 42 fire extinguisher
+		367,		// 43 camera
+		368,		// 44 night vision goggles
+		369,		// 45 thermal goggles
+		371			// 46 parachute
+	};
+
+	if (weaponid < 0 || weaponid >= sizeof(sWeaponModels))
+	{
+		return 0;
+	}
+
+	return sWeaponModels[weaponid];
+}
+
 stock IsVehicleRcTram(vehicleid)
 {
 	new 
@@ -313,16 +371,17 @@ stock PrintAsciiLogoToLogs()
 {
 	printf(" *************************************************************************************   ");
 	printf(" *");
-	printf(" *       ______                       ____                  __    _ ____    ___          ");
-	printf(" *      / ____/________ _____  __  __/ __ \\____ _________  / /   (_) __/__ |__ \\       ");
-	printf(" *     / /   / ___/ __ `/_  / / / / / /_/ / __ `/ ___/ _ \\/ /   / / /_/ _ \\__/ /       ");
-	printf(" *    / /___/ /  / /_/ / / /_/ /_/ / _, _/ /_/ / /__/  __/ /___/ / __/  __/ __/          ");
-	printf(" *    \\____/_/   \\__,_/ /___/\\__, /_/ |_|\\__,_/\\___/\\___/_____/_/_/  \\___/____/   ");
-	printf(" *                          /____/                                                       ");
+	printf(" *    d888b 8888b d888b 88888 88 88 8888b d888b d888b d888b 88 88 888b d888b d888b");
+	printf(" *    88 88 88 88    88   d8P 88 88 88 88    88 88 88 88 88 88    88   88 88    88");
+	printf(" *    88    888P  d8888  d8P  88 88 888P  d8888 88    88888 88 88 888P 88888 d8888");
+	printf(" *    88 88 88 88 88 88 d8P   88 88 88 88 88 88 88 88 88    88 88 88   88    88");
+	printf(" *    Y888P 88 88 Y8888 88888 Y8888 88 88 Y8888 Y888P Y888P 88 88 88   Y888P Y888P");
+	printf(" *                               88    88                   88");
+	printf(" *                            8888P    Y8888                88888");
 	printf(" ");
-	printf(" *  GameMode CRL2 ");
-	printf(" *  Credits: %s ", GAMEMODE_CREDITS);
-	printf(" *  2008-2010, 2025- ");
+	printf(" *  CrazyRaceLife2 Gamemode (v%d.%d.%d, commit %s)", CRAZY_RACE_LIFE_2_VERSION_MAJOR, CRAZY_RACE_LIFE_2_VERSION_MINOR, CRAZY_RACE_LIFE_2_VERSION_PATCH, SAMPCTL_BUILD_COMMIT_SHORT);
+	printf(" ");
+	printf(" *  Credits: %s, %s", GAMEMODE_CREDITS_OG, GAMEMODE_CREDITS_NEW);
 	printf(" ");
 	printf(" *************************************************************************************   ");
 }

@@ -1,37 +1,26 @@
 /*
  *   
- *    .d8888b.                                    8888888b.                            888      d8b  .d888          .d8888b.  
- *    d88P  Y88b                                   888   Y88b                           888      Y8P d88P"          d88P  Y88b 
- *    888    888                                   888    888                           888          888                   888 
- *    888        888d888 8888b.  88888888 888  888 888   d88P  8888b.   .d8888b .d88b.  888      888 888888 .d88b.       .d88P 
- *    888        888P"      "88b    d88P  888  888 8888888P"      "88b d88P"   d8P  Y8b 888      888 888   d8P  Y8b  .od888P"  
- *    888    888 888    .d888888   d88P   888  888 888 T88b   .d888888 888     88888888 888      888 888   88888888 d88P"      
- *    Y88b  d88P 888    888  888  d88P    Y88b 888 888  T88b  888  888 Y88b.   Y8b.     888      888 888   Y8b.     888"       
- *     "Y8888P"  888    "Y888888 88888888  "Y88888 888   T88b "Y888888  "Y8888P "Y8888  88888888 888 888    "Y8888  888888888  
- *                                             888                                                                             
- *                                        Y8b d88P                                                                             
- *                                         "Y88P"                                                                              
+ *    d8888888b 88888888b d8888888b 888888888 8888 8888 88888888b d8888888b d8888888b d8888888b 8888 8888 8888888b d8888888b d8888888b
+ *    888888888 888888888 888888888 888888888 8888 8888 888888888 888888888 888888888 888888888 8888 8888 88888888 888888888 888888888
+ *    8888 8888 8888 8888      8888     d888P 8888 8888 8888 8888      8888 8888 8888 8888 8888 8888      8888     8888 8888      8888
+ *    8888      8888888P  d88888888   d888P   8888 8888 8888888P  d88888888 8888      888888888 8888 8888 8888888P 888888888 d88888888
+ *    8888 8888 8888 888b 8888 8888 d888P     8888 8888 8888 888b 8888 8888 8888 8888 8888      8888 8888 8888     8888      8888
+ *    888888888 8888 8888 888888888 888888888 888888888 8888 8888 888888888 888888888 888888888 8888 8888 8888     888888888 888888888
+ *    Y8888888P 8888 8888 Y88888888 888888888 Y88888888 8888 8888 Y88888888 Y8888888P Y8888888P 8888 8888 8888     Y8888888P Y8888888P
+ *                                                 8888      8888                               8888
+ *                                            d88888888      888888888b                         888888888
+ *                                            88888888P      Y888888888                         888888888
 
- *  GameMode CRL2
+ *  CrazyRaceLife2 (CRL2) SA:MP/open.mp Gamemode
 
- *  Created: 	Jan 2025 (Extends legacy GameMode CRL (2008-2010))
- *  Credits: 	krusty, kompry, DRaGsTeR, amdulka, cranyy, tack
- *  Language: 	EN, CZ
- *  Version: 	0.12.z
- *
+ *  Created: 	Jan 2025 (extends legacy CRL gamemode (2008-2010))
+ *  Credits: 	krusty, kompry, DRaGsTeR, amdulka, cranyy, neosung, tack
+ *  Language:	EN, CZ, BS
+ *  Version: 	0.13
+
  */
 
 #include "support/includes.pwn"
-
-// Repeat hits on the *same* pickup are ignored for this long, so the player gets
-// a window to leave. Standing there past the window re-opens it, which is the
-// old behaviour, just slower
-#define PICKUP_RETRIGGER_DELAY_MS	5000
-
-new
-	gLastPickupID[MAX_PLAYERS],
-	gLastPickupTick[MAX_PLAYERS];
-
 
 main()
 {
@@ -59,12 +48,9 @@ public OnGameModeInit()
 	// (0.0, 0.0, 0.0) -- Blueberry Acres.
 	AddPlayerClass(0, SPAWN_DEFAULT_X, SPAWN_DEFAULT_Y, SPAWN_DEFAULT_Z, 0.0);
 
-	//
-	// Create pickups, static objects and static vehicles + DrawTexts.
-	//
-
 	InitDB();
 	InitPoliceBribePickups();
+	InitRampageSlots();
 	InitRampagePickups();
 	InitBankLocations();
 	InitDrugValues();
@@ -78,6 +64,7 @@ public OnGameModeInit()
 	Race_Init();
 	InitHighScores();
 	InitTrucking();
+	InitGasStations();
 
 	//InitVehicleModels();
 
@@ -88,6 +75,7 @@ public OnGameModeInit()
 	InitTimers();
 
 	InitNPCs();
+	InitTaxiStops();
 
 	return 1;
 }
@@ -99,6 +87,8 @@ public OnGameModeExit()
 	printf(" * Shutting down...");
 
 	KillTimers();
+
+	SaveGasStationData();
 
 	if (DB_Close(gDbConnectionHandle))
 	{
@@ -155,9 +145,10 @@ public OnPlayerConnect(playerid)
 			"{FFD700}CrazyRaceLife2{FFFFFF} (CRL2)"
 	      );
 	SendClientMessage(playerid, COLOR_GREY, stringToPrint);
-	format(stringToPrint, sizeof(stringToPrint), "%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s%s, %s",
 			"Credits: {00FF00}",
-			GAMEMODE_CREDITS
+			GAMEMODE_CREDITS_OG,
+			GAMEMODE_CREDITS_NEW
 	      );
 	SendClientMessage(playerid, COLOR_GREY, stringToPrint);
 	format(stringToPrint, sizeof(stringToPrint), "%s%d.%d.%d (%s)",
@@ -201,6 +192,9 @@ public OnPlayerConnect(playerid)
 
 public OnPlayerDisconnect(playerid, reason)
 {
+	// NPCs can be spectated too.
+	StopSpectatorsOf(playerid);
+
 	if (IsPlayerNPC(playerid) || NPC_IsValid(playerid))
 	{
 		return 1;
@@ -233,8 +227,12 @@ public OnPlayerDisconnect(playerid, reason)
 	AbortPlayerTaxiMission(playerid);
 	AbortCombatMission(playerid, false);
 	AbortRampageMission(playerid);
+	ResetRampageEditor(playerid);
+	AbortRobMission(playerid);
 
 	AbortPlayerDrugMission(playerid);
+
+	ResetTaxiPassenger(playerid);
 
 	// Save player's data and set such player to unauthorized.
 	if (reason == 1 || reason == 2)
@@ -274,9 +272,6 @@ public OnPlayerDisconnect(playerid, reason)
 
 public OnPlayerRequestClass(playerid, classid)
 {
-#if DEBUG_SPAWN
-	printf("[spawn] REQCLASS  pid=%d class=%d state=%d logged=%d", playerid, classid, _: GetPlayerState(playerid), gPlayers[playerid][IsLogged]);
-#endif
 #pragma unused classid
 	//SetPlayerPos(playerid, 2323.73, 1283.18, 97.60);
 	/*SetPlayerPos(playerid, 1966.1, 1936.1, 127.5);
@@ -308,10 +303,6 @@ public OnPlayerRequestSpawn(playerid)
 		return 0;
 	}
 
-#if DEBUG_SPAWN
-	printf("[spawn] REQSPAWN  pid=%d state=%d", playerid, _: GetPlayerState(playerid));
-#endif
-
 	// Returning 1 is what lets the spawn go ahead: calling SpawnPlayer() here
 	// as well spawns them a second time, and that spawn makes the client ask
 	// again, which is the repeating "Loading..." screen problem pathway.
@@ -320,16 +311,6 @@ public OnPlayerRequestSpawn(playerid)
 
 public OnPlayerSpawn(playerid)
 {
-#if DEBUG_SPAWN
-	new
-		Float: dbgX,
-		Float: dbgY,
-		Float: dbgZ;
-
-	GetPlayerPos(playerid, dbgX, dbgY, dbgZ);
-	printf("[spawn] SPAWN     pid=%d state=%d pos=%.1f,%.1f,%.1f npc=%d logged=%d", playerid, _: GetPlayerState(playerid), dbgX, dbgY, dbgZ, IsPlayerNPC(playerid), gPlayers[playerid][IsLogged]);
-#endif
-
 	if (IsPlayerNPC(playerid) || NPC_IsValid(playerid))
 	{
 		NPC_SetSkin(playerid, 89);
@@ -384,6 +365,12 @@ public OnPlayerSpawn(playerid)
 	{
 		DestroyPropertyInterior(playerid);
 		gPlayers[playerid][InsideProperty] = false;
+	}
+
+	// An admin leaving spectate mode goes back to where they started it.
+	if (FinishSpectateReturn(playerid))
+	{
+		return 1;
 	}
 
 	// Respawn at player's house.
@@ -471,145 +458,73 @@ public OnNPCPlaybackEnd(npcid, recordid)
 
 public OnNPCRespawn(npcid)
 {
-	for (new playerid = 0; playerid < MAX_PLAYERS; playerid++)
+	new
+		missionid,
+		npcindex,
+		ownerid = FindRampageNPC(npcid, missionid, npcindex);
+
+	if (ownerid == INVALID_PLAYER_ID)
 	{
-		if (!gRampageMission[playerid][Active])
-		{
-			continue;
-		}
-
-		new missionid = gRampageMission[playerid][ID];
-
-		for (new i = 0; i < MAX_RAMPAGE_NPC_COUNT; i++)
-		{
-			if (gRampageNPCs[missionid][i][ID] != npcid)
-			{
-				continue;
-			}
-
-			new 
-				Float: tX, 
-				Float: tY, 
-				Float: tZ;
-
-			GetPlayerPos(playerid, tX, tY, tZ);
-
-			NPC_SetHealth(npcid, 50.0);
-			NPC_SetInvulnerable(npcid, false);
-			NPC_SetSkin(npcid, random(300));
-			NPC_SetWeapon(npcid, WEAPON: (random(13) + 22));
-			NPC_AimAtPlayer(npcid, playerid, true, 500, true, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, NPC_ENTITY_CHECK_PLAYER);
-			NPC_Shoot(npcid, WEAPON: NPC_GetWeapon(npcid), playerid, true, tX, tY, tZ, 0.0, 0.0, 0.0, true, NPC_ENTITY_CHECK_ALL);
-
-			return 1;
-		}
+		return 1;
 	}
+
+	// A respawn hands the NPC a fresh weapon; arming sets that weapon's
+	// accuracy too, so it never fires at the component's default aim.
+	ArmRampageNPC(npcid);
+	RampageNPCEngage(npcid, ownerid);
 
 	return 1;
 }
 
 public OnNPCDeath(npcid, killerid, WEAPON:reason)
 {
-	if (gRampageMission[killerid][Active])
-	{
-		new 
-			missionid = gRampageMission[killerid][ID];
+	// No killer (fall, drowning, explosion) arrives as INVALID_PLAYER_ID and
+	// must not be used as an array index.
+	new
+		bool: hasKiller = (killerid != INVALID_PLAYER_ID && killerid < MAX_PLAYERS),
+		bool: killerIsNPC = (hasKiller && (NPC_IsValid(killerid) || IsPlayerNPC(killerid)));
 
-		for (new i = 0; i < MAX_RAMPAGE_NPC_COUNT; i++)
-		{
-			if (gRampageNPCs[missionid][i][ID] == npcid)
-			{
-				SetTimerEx("RecreateRampageNPC", 60000, false, "iii", killerid, missionid, i);
-				break;
-			}
-		}
+	new
+		missionid,
+		npcindex,
+		ownerid = FindRampageNPC(npcid, missionid, npcindex);
+
+	if (ownerid != INVALID_PLAYER_ID)
+	{
+		// A mission NPC comes back in place: slowly when its own player got
+		// it, fast for crossfire, other players or no killer. The killer is
+		// left alone; it is alive, and a respawn would only re-arm it.
+		new
+			recreateDelay = (killerid == ownerid) ? RAMPAGE_RECREATE_DELAY_OWNER_KILL : RAMPAGE_RECREATE_DELAY_CROSSFIRE;
+
+		SetTimerEx("RecreateRampageNPC", recreateDelay, false, "iii", ownerid, missionid, npcindex);
 
 		return 1;
 	}
 
-	if (NPC_IsValid(killerid) || IsPlayerNPC(killerid))
+	if (killerIsNPC)
 	{
-		// Check if npcid belongs to any active rampage mission
-		for (new playerid = 0; playerid < MAX_PLAYERS; playerid++)
-		{
-			if (!gRampageMission[playerid][Active])
-			{
-				continue;
-			}
-
-			new 
-				missionid = gRampageMission[playerid][ID];
-
-			for (new i = 0; i < MAX_RAMPAGE_NPC_COUNT; i++)
-			{
-				if (gRampageNPCs[missionid][i][ID] == npcid)
-				{
-					SetTimerEx("RecreateRampageNPC", 250, false, "iii", playerid, missionid, i);
-					return 1;
-				}
-			}
-		}
-
+		// A bystander NPC caught a stray bullet: bring it back as it was.
+		// Only mission NPCs fight, so nobody gets aimed at anyone here.
 		NPC_Respawn(npcid);
 
-		if (npcid != killerid)
-		{
-			NPC_Respawn(killerid);
-		}
-		else
-		{
-			const NPC_COUNT = 128;
-
-			new
-				npcs[NPC_COUNT];
-
-			NPC_GetAll(npcs, sizeof(npcs));
-
-			for (new j = 0; j < NPC_COUNT; j++)
-			{
-				if (NPC_IsValid(npcs[j]) && NPC_GetWeapon(npcs[j]) > WEAPON: 0)
-				{
-					killerid = npcs[j];
-					break;
-				}
-			}
-		}
-
-		new
-            Float: tX,
-            Float: tY,
-            Float: tZ;
-
-		GetPlayerPos(killerid, tX, tY, tZ);
-
-		NPC_SetHealth(npcid, 50.0);
-		NPC_SetHealth(killerid, 50.0);
-
-		NPC_SetInvulnerable(npcid, false);
-		NPC_SetInvulnerable(killerid, false);
-
-		NPC_SetSkin(npcid, random(300));
-		NPC_SetSkin(killerid, random(300));
-
-		NPC_AimAtPlayer(npcid, killerid, true, 500, true, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, NPC_ENTITY_CHECK_PLAYER);
-		NPC_Shoot(npcid, WEAPON: NPC_GetWeapon(npcid), killerid, true, tX, tY, tZ, 0.0, 0.0, 0.0, true, NPC_ENTITY_CHECK_ALL);
-
 		return 1;
 	}
 
+	ReleaseCombatNPC(npcid);
 	NPC_Destroy(npcid);
 
-	AbortPlayerTaxiMission(killerid);
+	if (hasKiller)
+	{
+		AbortPlayerTaxiMission(killerid);
+	}
 
 	return 1;
 }
 
+
 public OnPlayerDeath(playerid, killerid, WEAPON: reason)
 {
-#if DEBUG_SPAWN
-	printf("[spawn] DEATH     pid=%d killer=%d reason=%d state=%d", playerid, killerid, _: reason, _: GetPlayerState(playerid));
-#endif
-
 	SendDeathMessage(killerid, playerid, _: reason);
 
 	// Hide velocity meters.
@@ -649,6 +564,7 @@ public OnPlayerDeath(playerid, killerid, WEAPON: reason)
 	AbortTruckingMission(playerid);
 	AbortTowMission(playerid);
 	AbortPlayerTaxiMission(playerid);
+	AbortRobMission(playerid);
 
 	Race_AbortMinigame(playerid);
 
@@ -752,6 +668,29 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 
 public OnPlayerText(playerid, text[])
 {
+	if (strlen(text) > 1 && text[0] == '#' && gPlayers[playerid][AdminLevel])
+	{
+		new
+			stringToPrint[256];
+
+		text[0] = ' ';
+		format(stringToPrint, sizeof(stringToPrint), "{00FF00}%s: {FFFFFF}(ID: %d): {00FF00}[Admin Chat]:{FFFFFF}%s",
+				gPlayers[playerid][Name],
+				playerid,
+				text
+			);
+
+		for (new i = 0; i < MAX_PLAYERS; i++)
+		{
+			if (IsPlayerConnected(i) && gPlayers[i][AdminLevel])
+			{
+				SendClientMessage(i, COLOR_LIGHTGREEN, stringToPrint);
+			}
+		}
+
+		return 0;
+	}
+
 	if (strlen(text) > 1 && text[0] == '!' && gPlayers[playerid][TeamID])
 	{
 		new
@@ -858,16 +797,23 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 	return 1;
 }
 
-public OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstate)
+public OnPlayerStateChange(playerid, PLAYER_STATE: newstate, PLAYER_STATE: oldstate)
 {
+	// Anyone spectating this player (NPCs too) follows them into or out of a
+	// vehicle, and back after a respawn.
+	if (newstate == PLAYER_STATE_ONFOOT || newstate == PLAYER_STATE_DRIVER || newstate == PLAYER_STATE_PASSENGER)
+	{
+		AimSpectatorsOf(playerid);
+	}
+
 	if (IsPlayerNPC(playerid) || NPC_IsValid(playerid))
 	{
 		TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 		return 1;
 	}
 
-	// Hide the velocity meter on vehicle exit.
-	if ((oldstate == PLAYER_STATE_DRIVER || oldstate == PLAYER_STATE_PASSENGER) && newstate == PLAYER_STATE_ONFOOT)
+	// Hide the velocity meter on vehicle exit (spectate mode included).
+	if ((oldstate == PLAYER_STATE_DRIVER || oldstate == PLAYER_STATE_PASSENGER) && newstate != PLAYER_STATE_DRIVER && newstate != PLAYER_STATE_PASSENGER)
 	{
 		TextDrawHideForPlayer(playerid, gVehicleStatesText[playerid]);
 	}
@@ -875,6 +821,23 @@ public OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstat
 	if (newstate == PLAYER_STATE_DRIVER || newstate == PLAYER_STATE_PASSENGER)
 	{
 		TextDrawShowForPlayer(playerid, gVehicleStatesText[playerid]);
+	}
+
+	// A ride in an NPC taxi, see modules/taxistop.pwn
+	if (oldstate == PLAYER_STATE_PASSENGER)
+	{
+		StopTaxiRide(playerid);
+	}
+
+	if (newstate == PLAYER_STATE_PASSENGER)
+	{
+		StartTaxiRide(playerid, GetPlayerVehicleID(playerid));
+	}
+
+	// Taking the helicopter of an outdoor combat mission, see modules/combat.pwn
+	if (newstate == PLAYER_STATE_DRIVER)
+	{
+		CheckCombatVehicle(playerid, GetPlayerVehicleID(playerid));
 	}
 
 	/*if (newstate == PLAYER_STATE_DRIVER && GetPlayerVehicleID(playerid) == gAdminAuto)
@@ -903,6 +866,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 public OnPlayerEnterCheckpoint(playerid)
 {
 	if (Pizza_CheckCheckpoint(playerid))
+	{
+		return 1;
+	}
+
+	if (CheckTaxiStopCheckpoint(playerid))
 	{
 		return 1;
 	}
@@ -1298,19 +1266,3 @@ public OnPlayerFinishedDownloading(playerid, virtualworld)
 {
 	return 1;
 }*/
-
-/*
-
- *       ______                       ____                  __    _ ____    ___ 
- *      / ____/________ _____  __  __/ __ \____ _________  / /   (_) __/__ |__ \
- *     / /   / ___/ __ `/_  / / / / / /_/ / __ `/ ___/ _ \/ /   / / /_/ _ \__/ /
- *    / /___/ /  / /_/ / / /_/ /_/ / _, _/ /_/ / /__/  __/ /___/ / __/  __/ __/ 
- *    \____/_/   \__,_/ /___/\__, /_/ |_|\__,_/\___/\___/_____/_/_/  \___/____/ 
- *                          /____/                                              
-
- *  GameMode CRL2 
- *  Credits: krusty, kompry, DRaGsTeR, amdulka, cranyy, tack
- *  Jan 2025
-
- */
-

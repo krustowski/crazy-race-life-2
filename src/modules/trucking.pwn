@@ -76,6 +76,9 @@ enum TruckingkPoint
 	LocationJobPickup[Coords],
 	InfoPickup,
 
+	// The info pickup's name label; a gas station adds its tank to it
+	Text3D: InfoLabel,
+
 	TruckingEditorType: EditType
 }
 
@@ -330,7 +333,6 @@ stock GetRandomDestination()
 stock InitTrucking()
 {
 	new 
-		i = 0, 
 		query[512];
 
 	format(query, sizeof(query), "SELECT id, name, type FROM trucking_points"); 
@@ -360,7 +362,7 @@ stock InitTrucking()
 			type = DB_GetFieldIntByName(result, "type"),
 			name[64];
 
-		if (!id)
+		if (id <= 0 || id >= MAX_TRUCKING_POINTS)
 		{
 			continue;
 		}
@@ -370,9 +372,15 @@ stock InitTrucking()
 		gTruckingPoints[id][Name] = name;
 		gTruckingPoints[id][ID] = id;
 		gTruckingPoints[id][Type] = type;
+		gTruckingPoints[id][InfoLabel] = INVALID_3DTEXT_ID;
 	}
 	while (DB_SelectNextRow(result));
 
+	DB_FreeResultSet(result);
+
+	//
+	//  Coords: each belongs to the point its trucking_id names. A point's
+	//  Type is its facility type from above, not a coord type.
 	//
 
 	format(query, sizeof(query), "SELECT type, x, y, z, rot, trucking_id FROM trucking_coords"); 
@@ -393,26 +401,31 @@ stock InitTrucking()
 			Float: X = DB_GetFieldFloatByName(result, "x"),
 			Float: Y = DB_GetFieldFloatByName(result, "y"),
 			Float: Z = DB_GetFieldFloatByName(result, "z"),
-			Float: R = DB_GetFieldFloatByName(result, "rot");
+			Float: R = DB_GetFieldFloatByName(result, "rot"),
+			pointid = DB_GetFieldIntByName(result, "trucking_id");
+
+		if ((type == CT_CHECKPOINT || type == CT_INFO_PICKUP) && (pointid <= 0 || pointid >= MAX_TRUCKING_POINTS || !gTruckingPoints[pointid][ID]))
+		{
+			printf("Database warning: trucking coord of type %d for unknown point %d", type, pointid);
+			continue;
+		}
 
 		switch (type)
 		{
 			case CT_CHECKPOINT:
 				{
-					gTruckingPoints[i][LocationCheckpoint][CoordX] = X;
-					gTruckingPoints[i][LocationCheckpoint][CoordY] = Y;
-					gTruckingPoints[i][LocationCheckpoint][CoordZ] = Z;
-					gTruckingPoints[i][Type] = type;
-					i++;
+					gTruckingPoints[pointid][LocationCheckpoint][CoordX] = X;
+					gTruckingPoints[pointid][LocationCheckpoint][CoordY] = Y;
+					gTruckingPoints[pointid][LocationCheckpoint][CoordZ] = Z;
 				}
 			case CT_INFO_PICKUP:
 				{
-					gTruckingPoints[i][InfoPickup] = EnsurePickupCreated(1239, 1, X, Y, Z);
+					gTruckingPoints[pointid][LocationInfoPickup][CoordX] = X;
+					gTruckingPoints[pointid][LocationInfoPickup][CoordY] = Y;
+					gTruckingPoints[pointid][LocationInfoPickup][CoordZ] = Z;
 
-					new 
-						trucking_id = DB_GetFieldIntByName(result, "trucking_id");
-
-					Create3DTextLabel("%s", COLOR_ORANGE, X, Y, Z, 15.0, -1, false, gTruckingPoints[trucking_id][Name]);
+					gTruckingPoints[pointid][InfoPickup] = EnsurePickupCreated(1239, 1, X, Y, Z);
+					gTruckingPoints[pointid][InfoLabel] = Create3DTextLabel("%s", COLOR_ORANGE, X, Y, Z, 15.0, -1, false, gTruckingPoints[pointid][Name]);
 				}
 			case CT_JOB_PICKUP:
 				{
@@ -524,9 +537,10 @@ stock SetTruckingPoint(playerid)
 	new 
 		pointId = gTruckingEdit[playerid][ID];
 
+	// %q: the name is typed in by an admin and may contain an apostrophe
 	if (pointId)
 	{
-		format(query, sizeof(query), "UPDATE trucking_points SET name = '%s', type = %d WHERE id = %d", 
+		format(query, sizeof(query), "UPDATE trucking_points SET name = '%q', type = %d WHERE id = %d",
 				gTruckingEdit[playerid][Name],
 				FT_GAS_STATION,
 				pointId
@@ -534,7 +548,7 @@ stock SetTruckingPoint(playerid)
 	}
 	else
 	{
-		format(query, sizeof(query), "INSERT INTO trucking_points (name, type) VALUES ('%s', %d)", 
+		format(query, sizeof(query), "INSERT INTO trucking_points (name, type) VALUES ('%q', %d)",
 				gTruckingEdit[playerid][Name],
 				FT_GAS_STATION
 				//gTruckingEdit[playerid][Type]

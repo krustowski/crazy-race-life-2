@@ -649,26 +649,14 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							ResetPlayerMoney(clickedplayerid);
 						}
 					case 9:
-						// Spectate
+						// Spectate (the same player again stops it)
 						{
-							if (gPlayers[playerid][Spectating])
+							if (gPlayers[playerid][Spectating] && gSpectate[playerid][SpectatedPlayer] == clickedplayerid)
 							{
-								TogglePlayerSpectating(playerid, false);
-
-								gPlayers[playerid][Spectating] = false;
-								return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ SPECTATE ] Mode disabled!");
+								return StopSpectating(playerid);
 							}
 
-							if (playerid == clickedplayerid)
-							{
-								return SendClientMessage(playerid, COLOR_RED, "[ ! ] Invalid player!");
-							}
-
-							TogglePlayerSpectating(playerid, true);
-							PlayerSpectatePlayer(playerid, clickedplayerid);
-
-							gPlayers[playerid][Spectating] = true;
-							return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ SPECTATE ] Mode enabled!");
+							return StartSpectating(playerid, clickedplayerid);
 						}
 					case 10:
 						// Give weapons
@@ -857,29 +845,14 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return SendClientMessage(playerid, COLOR_RED, "[ ! ] Player not connected!");
 				}
 
-				new level = strval(inputtext);
-
-				if (!IsNumeric(inputtext) || level < 0 || level > 5)
+				if (!strlen(inputtext) || !IsNumeric(inputtext) || strval(inputtext) > 5)
 				{
 					return SendClientMessage(playerid, COLOR_RED, "[ ADMIN ] Admin level must between 0 and 5!");
 				}
 
-				if (gPlayers[playerid][AdminLevel] > level || gPlayers[playerid][AdminLevel] < gPlayers[clickedplayerid][AdminLevel])
-				{
-					return SendClientMessage(playerid, COLOR_RED, "[ ADMIM ] Admin level must be lower or equal to one you possess yourself!");
-				}
+				SetPlayerAdminLevel(playerid, clickedplayerid, strval(inputtext));
 
-				new adminName[MAX_PLAYER_NAME], playerName[MAX_PLAYER_NAME], stringToPrint[128];
-
-				GetPlayerName(playerid, adminName, sizeof(adminName));
-				GetPlayerName(clickedplayerid, playerName, sizeof(playerName));
-
-				format(stringToPrint, sizeof(stringToPrint), "[ i ] Admin %s set player %s [ ID: %d ] an Admin (level %d)!", adminName, playerName, clickedplayerid, level);
-
-				gPlayers[clickedplayerid][AdminLevel] = level;
-				SavePlayerData(clickedplayerid);
-
-				return SendClientMessageToAll(COLOR_GREY, stringToPrint);
+				return 1;
 			}
 		case DIALOG_DEATHMATCH_OPTIONS:
 			{
@@ -997,14 +970,9 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							return ShowPhonePMPlayerListDialog(playerid);
 						}
 					case 3:
-						// Taxi
+						// Taxi: the way to the nearest NPC taxi stop
 						{
-							if (!CheckTaxiDriversOnline())
-							{
-								SendClientMessage(playerid, COLOR_YELLOW, "[ PHONE ] No Taxi drivers online!");
-							}
-
-							return ShowPhoneOptionsDialog(playerid);
+							CallTaxi(playerid);
 						}
 					case 4:
 						// Car mechanic
@@ -1142,6 +1110,8 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 					case 4:
 						{
+							ResetRampageEditor(playerid);
+
 							return ShowRampageEditorMainDialog(playerid);
 						}
 					case 5:
@@ -1225,7 +1195,20 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 					case 6:
 						{
-							return SaveRampageMission(playerid);
+							if (SaveRampageMission(playerid))
+							{
+								return 1;
+							}
+
+							// Nothing was reset, so the recordings survive for another try.
+							return ShowRampageEditorMainDialog(playerid);
+						}
+					case 7:
+						{
+							ResetRampageEditor(playerid);
+							SendClientMessage(playerid, COLOR_YELLOW, "[ EDIT ] Rampage recordings discarded, starting over!");
+
+							return ShowRampageEditorMainDialog(playerid);
 						}
 				}
 
@@ -1247,25 +1230,46 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 		case DIALOG_RAMPAGE_EDITOR_WEAPON:
 			{
-				if (!response)
+				new
+					missionid = gRampageEdit[playerid][MissionID],
+					slot = gRampageEdit[playerid][WeaponNo] - 1;
+
+				// The slot was claimed when the position was recorded; without one
+				// there is nothing to bind the id to.
+				if (slot < 0 || slot >= MAX_RAMPAGE_WEAPON_COUNT)
 				{
-					return 1;
+					return ShowRampageEditorMainDialog(playerid);
 				}
 
 				new
-					missionid = gRampageEdit[playerid][MissionID],
-					weaponno = gRampageEdit[playerid][WeaponNo]++,
-					weaponid;
+					weaponid = 0;
 
-				if (!strlen(inputtext) || !IsNumeric(inputtext))
+				if (response && strlen(inputtext) && IsNumeric(inputtext))
 				{
-					weaponid = random(37) + 1;
+					weaponid = strval(inputtext);
 				}
 
-				gRampageWeapons[missionid][weaponno][WeaponID] = weaponid;
+				if (!IsValidRampageWeapon(weaponid))
+				{
+					weaponid = 0;
+				}
+
+				gRampageWeapons[missionid][slot][WeaponID] = weaponid;
 
 				gRampageEdit[playerid][EditType] = RMET_NONE;
-				SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Rampage weapon ID presaved/cached!");
+
+				if (weaponid)
+				{
+					new
+						stringToPrint[96];
+
+					format(stringToPrint, sizeof(stringToPrint), "[ EDIT ] Weapon ID %d bound to the pickup!", weaponid);
+					SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
+				}
+				else
+				{
+					SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] No valid weapon ID, the pickup will give a random gun on every run.");
+				}
 
 				return ShowRampageEditorMainDialog(playerid);
 			}
@@ -1804,13 +1808,17 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 					case 3:
 						{
-							return ShowHighScoresMissionTaxiDialog(playerid);
+							return ShowHighScoresMissionRobDialog(playerid);
 						}
 					case 4:
 						{
-							return ShowHighScoresMissionTowDialog(playerid);
+							return ShowHighScoresMissionTaxiDialog(playerid);
 						}
 					case 5:
+						{
+							return ShowHighScoresMissionTowDialog(playerid);
+						}
+					case 6:
 						{
 							return ShowHighScoresMissionTruckDialog(playerid);
 						}
@@ -1827,6 +1835,10 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				return ShowHighScoresMissionListDialog(playerid);
 			}		
 		case DIALOG_HIGH_SCORES_RAMPAGE:
+			{
+				return ShowHighScoresMissionListDialog(playerid);
+			}
+		case DIALOG_HIGH_SCORES_MISSION_ROB:
 			{
 				return ShowHighScoresMissionListDialog(playerid);
 			}
@@ -1851,34 +1863,6 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				return SetCombatMission(playerid, listitem + 1);
 			}
-		// case DIALOG_TUTORIAL_MAIN:
-		// 	{
-		// 		if (!response)
-		// 		{
-		// 			return 1;
-		// 		}
-
-		// 		switch (listitem)
-		// 		{
-		// 			case 0: 
-		// 				{
-		// 					if (gPlayers[playerid][TutorialStats][Active])
-		// 					{
-		// 						return ShowTutorialStatsDialog(playerid);
-		// 					}
-							
-		// 					gPlayers[playerid][TutorialStats][Active] = bool: true;
-		// 					return SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ TUT ] Tutorial mode activated!");
-		// 				}
-		// 			case 1: {
-		// 					if (gPlayers[playerid][TutorialStats][Active])
-		// 					{
-		// 						// Next task
-		// 						return 1;
-		// 					}
-		// 				}
-		// 		}
-		// 	}
 		case DIALOG_BRIBE_MAIN:
 			{
 				if (!response)
@@ -1944,6 +1928,10 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							return ShowBlackMarketNewDialog(playerid);
 						}
+					case 2:
+						{
+							return ShowFenceDialog(playerid);
+						}
 				}
 			}
 		case DIALOG_BLACK_MARKET_LIST:
@@ -2007,6 +1995,32 @@ stock HandleDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				SendClientMessage(playerid, COLOR_YELLOW, "[ MARKET ] Value set!");
 
 				return ProcessNewBlackMarketOffer(playerid);
+			}
+		case DIALOG_FENCE_LIST:
+			{
+				if (!response || listitem < 0 || listitem >= MAX_DRUG_TYPES)
+				{
+					return 1;
+				}
+
+				gFenceSelectedDrug[playerid] = DrugType: (listitem + 1);
+
+				return ShowFenceAmountDialog(playerid);
+			}
+		case DIALOG_FENCE_AMOUNT:
+			{
+				if (!response)
+				{
+					return 1;
+				}
+
+				if (!IsNumeric(inputtext) || strval(inputtext) <= 0)
+				{
+					SendClientMessageLocalized(playerid, I18N_FENCE_WRONG_AMOUNT);
+					return ShowFenceAmountDialog(playerid);
+				}
+
+				return ProcessFenceSale(playerid, gFenceSelectedDrug[playerid], strval(inputtext));
 			}
 		case DIALOG_DEAL_MAIN:
 			{

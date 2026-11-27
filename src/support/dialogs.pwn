@@ -74,7 +74,8 @@ enum
 	DIALOG_HIGH_SCORES_MISSION_TOW,
 	DIALOG_HIGH_SCORES_MISSION_TRUCK,
 	DIALOG_HIGH_SCORES_RACES,
-	DIALOG_HIGH_SCORES_COMBAT
+	DIALOG_HIGH_SCORES_COMBAT,
+	DIALOG_HIGH_SCORES_MISSION_ROB
 }
 
 enum
@@ -95,7 +96,9 @@ enum
 	DIALOG_BLACK_MARKET_LIST,
 	DIALOG_BLACK_MARKET_NEW,
 	DIALOG_BLACK_MARKET_AMOUNT,
-	DIALOG_BLACK_MARKET_VALUE
+	DIALOG_BLACK_MARKET_VALUE,
+	DIALOG_FENCE_LIST,
+	DIALOG_FENCE_AMOUNT
 };
 
 enum
@@ -121,8 +124,6 @@ enum
 	DIALOG_COMBAT_LIST,
 	DIALOG_HELP_LIST,
 	DIALOG_EDITOR_LIST,
-	DIALOG_TUTORIAL_MAIN,
-	DIALOG_TUTORIAL_STATS,
 	DIALOG_DEATHMATCH_OPTIONS,
 	DIALOG_BRIBE_MAIN,
 	DIALOG_BRIBE_NOTE,
@@ -256,10 +257,12 @@ stock ShowAdminCommandsDialog(playerid)
 		return 1;
 	}
 
-	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Level 1{FFFFFF}\n\n%s%s%s%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Level 1{FFFFFF}\n\n%s%s%s%s%s%s%s%s",
 			"/acmd\t\t\tshows admin commands per level\n",
 			"/admincol ID\t\tchanges the admin color according to color ID\n",
+			"/casino\t\t\tteleports the admin into the casino\n",
 			"/clear\t\t\tflushes the chat\n",
+			"/combat\t\t\tlists the combat missions, or aborts the active one\n",
 			"/flip ID\t\t\tflips the player's car\n",
 			"/hp ID\t\t\tsets the HP to 100 + armour to player ID\n",
 			"/nitro ID\t\tsets the nitrous boost to player's car\n"
@@ -284,13 +287,14 @@ stock ShowAdminCommandsDialog(playerid)
 		return ShowPlayerDialog(playerid, DIALOG_ADMIN_CMDS, DIALOG_STYLE_MSGBOX, "Admin Commands", stringToPrint, "Close", "");
 	}
 
-	format(stringToPrint, sizeof(stringToPrint), "%s\n{FFD700}Level 3{FFFFFF}\n\n%s%s%s%s%s%s%s%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s\n{FFD700}Level 3{FFFFFF}\n\n%s%s%s%s%s%s%s%s%s%s%s",
 			stringToPrint,
 			"/crime ID\t\tplays the crime sound (Police T-Code), experimental\n",
 			"/drunk ID\t\tsets the drunk level to a player ID, experimental\n",
 			"/elevator SUBCMD\t operates the Admin elevator\n",
 			"/kick ID\t\t\tkicks the player ID from server\n",
 			"/packet ID\t\tprints the packet loss per player ID\n",
+			"/radio\t\t\ttoggles the internet radio stream\n",
 			"/reset ID\t\tresets cash for a player\n",
 			"/spectate ID\t\tsets the spectate mode on a player ID\n",
 			"/vehicle ID\t\tspawns a vehicle by ID\n",
@@ -303,12 +307,13 @@ stock ShowAdminCommandsDialog(playerid)
 		return ShowPlayerDialog(playerid, DIALOG_ADMIN_CMDS, DIALOG_STYLE_MSGBOX, "Admin Commands", stringToPrint, "Close", "");
 	}
 
-	format(stringToPrint, sizeof(stringToPrint), "%s\n{FFD700}Level 4{FFFFFF}\n\n%s%s%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "%s\n{FFD700}Level 4{FFFFFF}\n\n%s%s%s%s%s%s",
 			stringToPrint,
 			"/ban ID\t\t\tbans the player ID (via IP)\n",
 			"/edit\t\t\tshows a dialog window with all common editors\n",
 			"/fakechat ID TEXT\tsends the fake chat TEXT as the player ID\n",
 			"/lvl pID LVL\t\tsets the Admin LVL to player ID\n",
+			"/npcrec\t\t\trecords an NPC route, or stops the recording\n",
 			"/restart\t\t\tsets the countdown for 60 seconds to restart the server\n"
 		);
 
@@ -320,7 +325,7 @@ stock ShowCommonCommandsDialog(playerid)
 	new 
 		stringToPrint[2048];
 
-	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Common Commands{FFFFFF}\n\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Common Commands{FFFFFF}\n\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
     		"/acc\t\t\tgame account info dump\n",
 			"/admins\t\t\tlists admins online\n",
 			"/afk\t\t\t(un)sets the Away-From-Keyboard state\n",
@@ -332,8 +337,10 @@ stock ShowCommonCommandsDialog(playerid)
 			"/deathmatch SUBCMD\tlists subcommands for the deathmatch module\n",
 			"/drugz\t\t\tlists substances in pockets\n",
 			"/dwarp\t\t\tteleports the player in vehicle to racing the common location\n",
+			"/fuel\t\t\tbuys a fill-up at a petrol station\n",
 
 			"/givecash ID CASH\tsends cash to other player\n",
+			"/hd\t\t\t(un)sets the HUD layout for the HD (widescreen) GTA SA\n",
 			"/help\t\t\tlists helper information\n",
 			"/kill\t\t\tto commit suicide\n",
 			"/lay\t\t\tenables special animations (laying)\n",
@@ -347,6 +354,7 @@ stock ShowCommonCommandsDialog(playerid)
 
 			"/prizes\t\t\tdumps the information about available prizes\n",
 			"/property\t\tlists subcommands for property ID handling\n",
+			"/quest\t\t\tlists the quests and your progress\n",
 			"/race\t\t\tlists subcommands for racing module\n",
 			"/rules\t\t\tdumps the server rules information\n",
 			"/scores\t\t\tshows the High Scores table\n",
@@ -357,7 +365,7 @@ stock ShowCommonCommandsDialog(playerid)
 			"/tow\t\t\tstarts a Tow mission\n",
 			"/truck\t\t\tenables/disables the Trucking missions\n",
 
-			"/tut\t\t\tshows the tutorial statistics\n",
+			"/tut\t\t\tsame as /quest\n",
 			"/unlock\t\t\tunlocks the player's vehicle\n",
 			//
 			"\n{FFD700}Special Team-related Commands{FFFFFF}\n\n",
@@ -1105,12 +1113,13 @@ stock ShowCreditsDialog(playerid)
 	new 
 		stringToPrint[1024];
 
-	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%d.%d.%d",
+	format(stringToPrint, sizeof(stringToPrint), "%s%s%s, %s%s%d.%d.%d",
 			"{FFD700}CrazyRaceLife2{FFFFFF} (CRL2)\n\n",
 			"Credits: {00FF00}",
-			GAMEMODE_CREDITS,
-			"{FFFFFF} (2008-2010, 2025){FFFFFF}\nVersion: {FFD700}",
-		       	CRAZY_RACE_LIFE_2_VERSION_MAJOR,
+			GAMEMODE_CREDITS_OG,
+			GAMEMODE_CREDITS_NEW,
+			"{FFFFFF}\nVersion: {00FF00}",
+		    CRAZY_RACE_LIFE_2_VERSION_MAJOR,
 			CRAZY_RACE_LIFE_2_VERSION_MINOR,
 			CRAZY_RACE_LIFE_2_VERSION_PATCH
 	      );
@@ -1122,7 +1131,7 @@ stock ShowWantedListDialog(playerid)
 {
 	new 
 		playerName[MAX_PLAYER_NAME], 
-		stringToPrint[1024];
+		stringToPrint[1024] = "{FFD700}Wanted levels by players{FFFFFF}:\n\n";
 
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -1133,7 +1142,12 @@ stock ShowWantedListDialog(playerid)
 
 		GetPlayerName(i, playerName, sizeof(playerName));
 
-		format(stringToPrint, sizeof(stringToPrint), "%s{FFD700}%24s{FFFFFF} [ID: %2d]\t\tWanted Level: {00FF00}%2d{FFFFFF}\n", stringToPrint, playerName, i, GetPlayerWantedLevel(i));
+		format(stringToPrint, sizeof(stringToPrint), "%sWanted Level: {00FF00}%3d{FFFFFF}\t\t{FFD700}%s{FFFFFF} [ID: {00FF00}%2d{FFFFFF}]\n",
+				stringToPrint,
+				GetPlayerWantedLevel(i),
+				playerName,
+				i
+			);
 	}
 
 	return ShowPlayerDialog(playerid, DIALOG_WANTED_LIST, DIALOG_STYLE_MSGBOX, "Wanted List", stringToPrint, "Close", "");
@@ -1232,7 +1246,7 @@ stock ShowHighScoresOptionsDialog(playerid)
 stock ShowHighScoresPlayTimeDialog(playerid)
 {
 	new 
-		query[512] = "SELECT id, nickname, playtime FROM users WHERE playtime IS NOT 0 ORDER BY playtime DESC LIMIT 20";
+		query[512] = "SELECT id, nickname, playtime FROM users WHERE playtime IS NOT 0 ORDER BY playtime DESC LIMIT 30";
 
 	new 
 		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
@@ -1252,7 +1266,7 @@ stock ShowHighScoresPlayTimeDialog(playerid)
 
 	new 
 		i = 1, 
-		stringToPrint[2048] = "{FFD700}Top 20 players by Playtime:{FFFFFF}\n";
+		stringToPrint[2048] = "{FFD700}Top 30 players by Playtime:{FFFFFF}\n";
 
 	do
 	{
@@ -1461,10 +1475,11 @@ stock ShowHighScoresMissionListDialog(playerid)
 {
 	new
 		stringToPrint[256];
-	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%s%s", 
+	format(stringToPrint, sizeof(stringToPrint), "%s%s%s%s%s%s%s",
 			"Combat\n",
 			"Drug\n",
 			"Rampage\n",
+			"Rob\n",
 			"Taxi\n",
 			"Tow\n",
 			"Truck"
@@ -1747,7 +1762,10 @@ stock ShowHighScoresRampageDialog(playerid)
 {
 	new
 		stringToPrint[4096],
-		query[512] = "SELECT s.value, s.spec_id, u.nickname, s.time, r.name AS rampage_name FROM ( SELECT type, value, spec_id, time, user_id, ROW_NUMBER() OVER (PARTITION BY type ORDER BY value DESC) AS rank FROM high_scores ) s JOIN users u ON u.id = s.user_id LEFT JOIN rampages r ON r.id = s.spec_id WHERE s.rank <= 10 AND s.type = 7 ORDER BY s.spec_id DESC, s.rank";
+		// Top runs across every mission, ranked by kills. `time` is the
+		// countdown left at the end, so more of it means a faster run and
+		// breaks ties.
+		query[512] = "SELECT s.value, s.spec_id, u.nickname, s.time, r.name AS rampage_name FROM high_scores s JOIN users u ON u.id = s.user_id LEFT JOIN rampages r ON r.id = s.spec_id WHERE s.type = 7 AND s.value > 0 ORDER BY s.value DESC, s.time DESC LIMIT 10";
 
 	new
 		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
@@ -1760,7 +1778,7 @@ stock ShowHighScoresRampageDialog(playerid)
 
 	new
 		i = 1;
-	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Top 10 rampages and players{FFFFFF}\n");
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Top 10 rampage runs (all missions){FFFFFF}\n");
 
 	do
 	{
@@ -1787,7 +1805,9 @@ stock ShowHighScoresRampageDialog(playerid)
 
 	DB_FreeResultSet(result);
 
-	query = "SELECT ROW_NUMBER() OVER (ORDER BY MAX(value) DESC) AS rank, u.nickname, time, spec_id, r.name AS rampage_name, MAX(value) AS killed FROM high_scores AS h JOIN users AS u ON u.id = user_id LEFT JOIN rampages AS r ON r.id = h.spec_id WHERE type = 7 GROUP BY user_id ORDER BY spec_id DESC LIMIT 10;";
+	// Each player's best run, again ranked by kills. With MAX() SQLite takes
+	// the bare columns (time, mission) from the row that holds the maximum.
+	query = "SELECT u.nickname, h.time, h.spec_id, r.name AS rampage_name, MAX(h.value) AS killed FROM high_scores AS h JOIN users AS u ON u.id = h.user_id LEFT JOIN rampages AS r ON r.id = h.spec_id WHERE h.type = 7 AND h.value > 0 GROUP BY h.user_id ORDER BY killed DESC, h.time DESC LIMIT 10";
 
 	result = DB_ExecuteQuery(gDbConnectionHandle, query);
 	if (!result)
@@ -1797,7 +1817,7 @@ stock ShowHighScoresRampageDialog(playerid)
 		return 0;
 	}
 
-	format(stringToPrint, sizeof(stringToPrint), "%s\n", stringToPrint);
+	format(stringToPrint, sizeof(stringToPrint), "%s\n\n{FFD700}Best run per player{FFFFFF}\n", stringToPrint);
 	i = 1;
 
 	do
@@ -1827,6 +1847,91 @@ stock ShowHighScoresRampageDialog(playerid)
 	DB_FreeResultSet(result);
 
 	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_RAMPAGE, DIALOG_STYLE_MSGBOX, "High Scores: Rampages", stringToPrint, "Back", "");
+}
+
+stock ShowHighScoresMissionRobDialog(playerid)
+{
+	new
+		stringToPrint[2048],
+		// Top runs ranked by money earned; the robbed property count (spec_id)
+		// breaks ties.
+		query[512] = "SELECT s.value, s.spec_id, u.nickname FROM high_scores s JOIN users u ON u.id = s.user_id WHERE s.type = 9 AND s.value > 0 ORDER BY s.value DESC, s.spec_id DESC LIMIT 10";
+
+	new
+		DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for rob missions!");
+		print(query);
+		return 0;
+	}
+
+	new
+		i = 1;
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Top 10 Rob missions{FFFFFF}\n");
+
+	do
+	{
+		new
+			nickname[MAX_PLAYER_NAME],
+			earned,
+			robbed;
+
+		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+		earned = DB_GetFieldIntByName(result, "value");
+		robbed = DB_GetFieldIntByName(result, "spec_id");
+
+		if (!earned)
+		{
+			continue;
+		}
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}$%d{FFFFFF} ({00FF00}%d{FFFFFF} robbed)\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, earned, robbed, nickname);
+		i++;
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	// Each player's best run. With MAX() SQLite takes the bare spec_id from
+	// the row that holds the maximum.
+	query = "SELECT u.nickname, h.spec_id, MAX(h.value) AS earned FROM high_scores AS h JOIN users AS u ON u.id = h.user_id WHERE h.type = 9 AND h.value > 0 GROUP BY h.user_id ORDER BY earned DESC LIMIT 10";
+
+	result = DB_ExecuteQuery(gDbConnectionHandle, query);
+	if (!result)
+	{
+		print("Database error: cannot read high_scores data for rob missions (2)!");
+		print(query);
+		return 0;
+	}
+
+	format(stringToPrint, sizeof(stringToPrint), "%s\n\n{FFD700}Best run per player{FFFFFF}\n", stringToPrint);
+	i = 1;
+
+	do
+	{
+		new
+			nickname[MAX_PLAYER_NAME],
+			earned,
+			robbed;
+
+		DB_GetFieldStringByName(result, "nickname", nickname, sizeof(nickname));
+		earned = DB_GetFieldIntByName(result, "earned");
+		robbed = DB_GetFieldIntByName(result, "spec_id");
+
+		if (!earned)
+		{
+			continue;
+		}
+
+		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}$%d{FFFFFF} ({00FF00}%d{FFFFFF} robbed)\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, earned, robbed, nickname);
+		i++;
+	}
+	while (DB_SelectNextRow(result));
+
+	DB_FreeResultSet(result);
+
+	return ShowPlayerDialog(playerid, DIALOG_HIGH_SCORES_MISSION_ROB, DIALOG_STYLE_MSGBOX, "High Scores: Rob Missions", stringToPrint, "Back", "");
 }
 
 stock ShowHighScoresMissionDrugDialog(playerid)
@@ -1864,7 +1969,7 @@ stock ShowHighScoresMissionDrugDialog(playerid)
 			continue;
 		}
 			
-		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}%3d{FFFFFF}\t %2d:%02d\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, amount, time / 1000 / 60, time / 1000 % 60, nickname);
+		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}%3d{FFFFFF}\t %3d:%02d min\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, amount, time / 1000 / 60, time / 1000 % 60, nickname);
 		i++;
 	}
 	while (DB_SelectNextRow(result));
@@ -1900,7 +2005,7 @@ stock ShowHighScoresMissionDrugDialog(playerid)
 			continue;
 		}
 			
-		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}%3d{FFFFFF}\t %2d:%02d\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, amount, time / 1000 / 60, time / 1000 % 60, nickname);
+		format(stringToPrint, sizeof(stringToPrint), "%s\n{FFFFFF}%d: {00FF00}%3d{FFFFFF}\t %3d:%02d min\t\t {FFD700}%s{FFFFFF}", stringToPrint, i, amount, time / 1000 / 60, time / 1000 % 60, nickname);
 		i++;
 	}
 	while (DB_SelectNextRow(result));
@@ -2150,12 +2255,72 @@ stock ShowBlackMarketItemListDialog(playerid)
 	return ShowPlayerDialog(playerid, DIALOG_BLACK_MARKET_LIST, DIALOG_STYLE_LIST, "Black Market Items", stringToPrint, "Buy", "Close");
 }
 
-stock ShowBlackMarketMainDialog(playerid)
+stock ShowBlackMarketMainDialog(playerid, bool: withFence = false)
 {
 	new 
 		stringToPrint[128] = "List actual market items\nPlace new offer";
 
+	if (withFence)
+	{
+		strcat(stringToPrint, "\nSell to the fence (Dealerz)");
+	}
+
 	return ShowPlayerDialog(playerid, DIALOG_BLACK_MARKET_MAIN, DIALOG_STYLE_LIST, "Black Market Mainmenu", stringToPrint, "Select", "Close");
+}
+
+stock ShowFenceDialog(playerid)
+{
+	if (gPlayers[playerid][TeamID] != TEAM_DEALERS)
+	{
+		return SendClientMessageLocalized(playerid, I18N_FENCE_DEALERZ_ONLY);
+	}
+
+	new
+		unitsLeft,
+		dollarsLeft;
+
+	if (!GetFenceAllowance(playerid, unitsLeft, dollarsLeft))
+	{
+		return SendClientMessageLocalized(playerid, I18N_FENCE_CLOSED);
+	}
+
+	new 
+		caption[64],
+		stringToPrint[512] = "Substance/stuff\tIn pockets\tFence pays per unit";
+
+	for (new i = 0; i < MAX_DRUG_TYPES; i++)
+	{
+		new 
+			partial[64];
+
+		format(partial, sizeof(partial), "\n%s\t%d\t$%.2f", gDrugz[i][DrugName], gPlayers[playerid][Drugs][i], GetFenceUnitPrice(i));
+		strcat(stringToPrint, partial, sizeof(stringToPrint));
+	}
+
+	format(caption, sizeof(caption), "Fence (left this hour: %d g, $%d)", unitsLeft, dollarsLeft);
+
+	return ShowPlayerDialog(playerid, DIALOG_FENCE_LIST, DIALOG_STYLE_TABLIST_HEADERS, caption, stringToPrint, "Select", "Close");
+}
+
+stock ShowFenceAmountDialog(playerid)
+{
+	new
+		drugid = _: gFenceSelectedDrug[playerid] - 1;
+
+	if (drugid < 0 || drugid >= MAX_DRUG_TYPES)
+	{
+		return 1;
+	}
+
+	new 
+		stringToPrint[256];
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}Fence{FFFFFF}\n\nSubstance: {FFD700}%s{FFFFFF}\nIn pockets: {00FF00}%d{FFFFFF}\nFence pays (per unit): {00FF00}$%.2f{FFFFFF}\n\nSet the amount you want to sell:",
+			gDrugz[drugid][DrugName],
+			gPlayers[playerid][Drugs][drugid],
+			GetFenceUnitPrice(drugid)
+		);
+
+	return ShowPlayerDialog(playerid, DIALOG_FENCE_AMOUNT, DIALOG_STYLE_INPUT, "Fence", stringToPrint, "Sell", "Close");
 }
 
 stock ShowBlackMarketNewDialog(playerid)
@@ -2324,26 +2489,43 @@ stock ShowDealConfirmationDialog(playerid)
 stock ShowRampageEditorMainDialog(playerid)
 {
 	new
-		stringToPrint[128] = "Rampage Name\nRampage Location Type\nRampage Pickup Coords\nRampage NPC Coords\nRampage Weapon\nHealth Pickup Coords\nSave Rampage";
+		stringToPrint[192] = "Rampage Name\nRampage Location Type\nRampage Pickup Coords\nRampage NPC Coords\nRampage Weapon\nHealth Pickup Coords\nSave Rampage\nDiscard Recordings";
 
-	gPlayers[playerid][EditingMode] = true;
-	gRampageEdit[playerid][Active] = true;
-
-	new
-        query[512] = "SELECT id FROM rampages ORDER BY id DESC LIMIT 1";
-
-	new
-        DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-
-	new
-        missionid = 1;
-
-	if (DB_GetRowCount(result))
+	// A fresh session (see ResetRampageEditor) takes the next free slot; a
+	// running one keeps its slot so recordings never split across two.
+	if (!gRampageEdit[playerid][Active])
 	{
-    	missionid = DB_GetFieldIntByName(result, "id") + 1;
+		new
+			query[128] = "SELECT id FROM rampages ORDER BY id DESC LIMIT 1",
+			slotid = 1;
+
+		new
+			DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+		if (result)
+		{
+			if (DB_GetRowCount(result))
+			{
+				slotid = DB_GetFieldIntByName(result, "id") + 1;
+			}
+
+			DB_FreeResultSet(result);
+		}
+
+		if (slotid >= MAX_RAMPAGE_MISSION_COUNT)
+		{
+			new
+				msg[128];
+
+			format(msg, sizeof(msg), "[ EDIT ] All %d rampage slots are in use, raise MAX_RAMPAGE_MISSION_COUNT to add more!", MAX_RAMPAGE_MISSION_COUNT);
+			return SendClientMessage(playerid, COLOR_RED, msg);
+		}
+
+		gRampageEdit[playerid][MissionID] = slotid;
+		gRampageEdit[playerid][Active] = true;
 	}
 
-	gRampageEdit[playerid][MissionID] = missionid;
+	gPlayers[playerid][EditingMode] = true;
 
 	return ShowPlayerDialog(playerid, DIALOG_RAMPAGE_EDITOR_MAIN, DIALOG_STYLE_LIST, "Rampage Editor", stringToPrint, "Select", "Close");
 }
@@ -2359,7 +2541,7 @@ stock ShowRampageEditorNameDialog(playerid)
 stock ShowRampageEditorWeaponDialog(playerid)
 {
 	new
-		stringToPrint[128] = "Type in the weapon ID (type). Leave blank to select the ID randomly:";
+		stringToPrint[128] = "Type in the weapon ID (1-46). Leave blank for a random gun on every run:";
 
 	return ShowPlayerDialog(playerid, DIALOG_RAMPAGE_EDITOR_WEAPON, DIALOG_STYLE_INPUT, "Rampage Editor: Weapon ID", stringToPrint, "Apply", "Close");
 }
@@ -2380,7 +2562,8 @@ stock ShowNPCRecordingDialog(playerid)
 stock ShowPlayerQuestListDialog(playerid)
 {
 	new
-		stringToPrint[1024] = "Quest ID and Name\tReward\tProgress\tTarget";
+		// 17 quests come to ~900 characters, room to grow before rows get cut off.
+		stringToPrint[2048] = "Quest ID and Name\tReward\tProgress\tTarget";
 
 
 	for (new i = 1; i < MAX_QUESTS; i++)
@@ -2391,19 +2574,15 @@ stock ShowPlayerQuestListDialog(playerid)
 		}
 
 		new
-			color = 0xFFFFFF,
+			color = (gPlayerQuests[playerid][i][Completed]) ? 0x00FF00 : 0xFFFFFF,
 			PlayerLocale: locale = gPlayers[playerid][Locale];
 
-		if (gPlayerQuests[playerid][i][Completed])
-		{
-			color = 0x00FF00;
-		}
-
-		format(stringToPrint, sizeof(stringToPrint), "%s\n{%06x}%s\t%d\t%d\t%d",
+		format(stringToPrint, sizeof(stringToPrint), "%s\n{%06x}%s\t%d\t{%06x}%d\t%d",
 				stringToPrint,
 				color,
 				gQuestLabels[i][locale],
 				gQuests[i][Reward],
+				color,
 				gPlayerQuests[playerid][i][Progress],
 				gQuests[i][Target]
 			);
@@ -2418,7 +2597,7 @@ stock ShowPlayerQuestDescDialog(playerid, questid)
 		PlayerLocale: locale = gPlayers[playerid][Locale],
 		stringToPrint[512];
 
-	format(stringToPrint, sizeof(stringToPrint), "%s\n\n%s",
+	format(stringToPrint, sizeof(stringToPrint), "{FFD700}%s{FFFFFF}\n\n%s",
 			gQuestLabels[questid][locale],
 			gQuestDesc[questid][locale]
 		);

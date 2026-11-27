@@ -12,6 +12,14 @@
 #define MAX_RAMPAGE_WEAPON_COUNT            16
 #define MAX_RAMPAGE_HEALTH_POINTS_COUNT     16
 
+#define RAMPAGE_NPC_HEALTH                  50.0
+#define RAMPAGE_NPC_AMMO                    500
+#define RAMPAGE_NPC_ACCURACY                0.15
+#define RAMPAGE_NPC_SHOOT_DELAY             500
+// Recreate delay for a mission NPC killed by its own player vs. anyone else.
+#define RAMPAGE_RECREATE_DELAY_OWNER_KILL   60000
+#define RAMPAGE_RECREATE_DELAY_CROSSFIRE    250
+
 enum RMType
 {
     RM_NONE,
@@ -123,6 +131,8 @@ new
 
 forward UpdateRampageMissionInfoText(playerid);
 forward RecreateRampageNPC(playerid, missionid, npcindex);
+forward bool: IsValidRampageWeapon(weaponid);
+forward bool: IsRampageMissionRunning(missionid);
 
 public UpdateRampageMissionInfoText(playerid)
 {
@@ -149,9 +159,107 @@ public UpdateRampageMissionInfoText(playerid)
     return 1;
 }
 
+// Gives a mission NPC its health, skin, a random weapon and, in the same
+// breath, the accuracy for that weapon. Accuracy is stored per weapon, so a
+// weapon change that does not go through here leaves the NPC on the
+// component's default (full) accuracy.
+stock ArmRampageNPC(npcid)
+{
+    NPC_SetHealth(npcid, RAMPAGE_NPC_HEALTH);
+    NPC_SetInvulnerable(npcid, false);
+    NPC_SetSkin(npcid, random(300));
+    NPC_SetWeapon(npcid, WEAPON: (random(13) + 22));
+    NPC_SetAmmo(npcid, RAMPAGE_NPC_AMMO);
+    NPC_EnableInfiniteAmmo(npcid, true);
+    NPC_SetWeaponAccuracy(npcid, NPC_GetWeapon(npcid), RAMPAGE_NPC_ACCURACY);
+
+    return 1;
+}
+
+// Finds the active mission that owns `npcid`. Returns the owning player's id
+// and fills missionid/npcindex, or INVALID_PLAYER_ID when none does.
+stock FindRampageNPC(npcid, &missionid, &npcindex)
+{
+    if (npcid == INVALID_NPC_ID)
+    {
+        return INVALID_PLAYER_ID;
+    }
+
+    for (new playerid = 0; playerid < MAX_PLAYERS; playerid++)
+    {
+        if (!gRampageMission[playerid][Active])
+        {
+            continue;
+        }
+
+        new
+            mission = gRampageMission[playerid][ID];
+
+        for (new i = 0; i < MAX_RAMPAGE_NPC_COUNT; i++)
+        {
+            if (gRampageNPCs[mission][i][ID] == npcid)
+            {
+                missionid = mission;
+                npcindex = i;
+                return playerid;
+            }
+        }
+    }
+
+    return INVALID_PLAYER_ID;
+}
+
+// Picks who a mission NPC shoots at: a random other live NPC of the same
+// mission, or the player when there is none. NPCs outside the mission
+// (drivers, customers) are never targets.
+stock GetRampageNPCTarget(playerid, missionid, selfid)
+{
+    new
+        candidates[MAX_RAMPAGE_NPC_COUNT],
+        count = 0;
+
+    for (new i = 0; i < MAX_RAMPAGE_NPC_COUNT; i++)
+    {
+        new
+            otherid = gRampageNPCs[missionid][i][ID];
+
+        if (otherid == INVALID_NPC_ID || otherid == selfid || !NPC_IsValid(otherid) || NPC_IsDead(otherid))
+        {
+            continue;
+        }
+
+        candidates[count++] = otherid;
+    }
+
+    if (!count)
+    {
+        return playerid;
+    }
+
+    return candidates[random(count)];
+}
+
+// Points a mission NPC at a target and lets its aim loop fire at the
+// configured accuracy. Deliberately no scripted NPC_Shoot(): with
+// isHit = true that is a guaranteed hit that bypasses accuracy entirely.
+stock RampageNPCEngage(npcid, targetid)
+{
+    NPC_AimAtPlayer(npcid, targetid, true, RAMPAGE_NPC_SHOOT_DELAY, true, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, NPC_ENTITY_CHECK_PLAYER);
+
+    return 1;
+}
+
 public RecreateRampageNPC(playerid, missionid, npcindex)
 {
-    NPC_Destroy(gRampageNPCs[missionid][npcindex][ID]);
+    new
+        oldid = gRampageNPCs[missionid][npcindex][ID];
+
+    if (oldid != INVALID_NPC_ID && NPC_IsValid(oldid))
+    {
+        NPC_Destroy(oldid);
+    }
+
+    gRampageNPCs[missionid][npcindex][ID] = INVALID_NPC_ID;
 
     if (!gRampageMission[playerid][Active])
     {
@@ -171,13 +279,7 @@ public RecreateRampageNPC(playerid, missionid, npcindex)
         gRampageNPCs[missionid][npcindex][Primary][CoordY],
         gRampageNPCs[missionid][npcindex][Primary][CoordZ]);
 
-    NPC_SetHealth(npcid, 50.0);
-    NPC_SetInvulnerable(npcid, false);
-    NPC_SetSkin(npcid, random(300));
-    NPC_SetWeapon(npcid, WEAPON: (random(13) + 22));
-    NPC_SetAmmo(npcid, 500);
-    NPC_EnableInfiniteAmmo(npcid, true);
-    NPC_SetWeaponAccuracy(npcid, WEAPON: NPC_GetWeapon(npcid), 0.15);
+    ArmRampageNPC(npcid);
 
     NPC_Move(npcid, 
         gRampageNPCs[missionid][npcindex][Secondary][CoordX],
@@ -185,53 +287,30 @@ public RecreateRampageNPC(playerid, missionid, npcindex)
         gRampageNPCs[missionid][npcindex][Secondary][CoordZ], 
         NPC_MOVE_TYPE_JOG, NPC_MOVE_SPEED_JOG, 0.05);
 
-    const NPC_COUNT = 128;
+    RampageNPCEngage(npcid, GetRampageNPCTarget(playerid, missionid, npcid));
 
-    new
-        targetid = playerid,
-        npcs[NPC_COUNT];
-
-    NPC_GetAll(npcs, sizeof(npcs));
-
-    for (new j = 0; j < NPC_COUNT; j++)
-    {
-        if (NPC_IsValid(npcs[j]) && npcs[j] != npcid)
-        {
-            targetid = npcs[j];
-            break;
-        }
-    }
-
-    new 
-        Float: tX, 
-        Float: tY, 
-        Float: tZ;
-
-    GetPlayerPos(targetid, tX, tY, tZ);
-
-    NPC_AimAtPlayer(npcid, targetid, true, 500, true, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, NPC_ENTITY_CHECK_ALL);
-    NPC_Shoot(npcid, WEAPON: NPC_GetWeapon(npcid), targetid, true, tX, tY, tZ, 0.0, 0.0, 0.0, true, NPC_ENTITY_CHECK_ALL);
-
-    // Redirect all other surviving mission NPCs back to the player
-    new Float: pX, Float: pY, Float: pZ;
-    GetPlayerPos(playerid, pX, pY, pZ);
-
+    // Point the other surviving mission NPCs back at the player.
     for (new k = 0; k < MAX_RAMPAGE_NPC_COUNT; k++)
     {
         if (k == npcindex)
+        {
             continue;
+        }
 
-        new otherid = gRampageNPCs[missionid][k][ID];
+        new
+            otherid = gRampageNPCs[missionid][k][ID];
 
-        if (!NPC_IsValid(otherid))
+        if (otherid == INVALID_NPC_ID || !NPC_IsValid(otherid))
+        {
             continue;
+        }
 
-        NPC_AimAtPlayer(otherid, playerid, true, 500, true, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, NPC_ENTITY_CHECK_PLAYER);
-        NPC_Shoot(otherid, WEAPON: NPC_GetWeapon(otherid), playerid, true, pX, pY, pZ, 0.0, 0.0, 0.0, true, NPC_ENTITY_CHECK_ALL);
+        RampageNPCEngage(otherid, playerid);
     }
 
     return 1;
 }
+
 
 stock bool: CheckRampagePickup(playerid, pickupid)
 {
@@ -245,10 +324,32 @@ stock bool: CheckRampagePickup(playerid, pickupid)
                 {
                     case RMPT_START:
                         {
-                            gRampageMission[playerid][ID] = gRampagePickups[i][j][MissionID];
+                            new
+                                missionid = gRampagePickups[i][j][MissionID];
+
+                            // Already on a rampage (or in another minigame):
+                            // this start pickup is scenery. Taking its id would
+                            // switch the running rampage over, and its abort
+                            // would then tear down the wrong gunmen.
+                            if (gRampageMission[playerid][Active] || gPlayers[playerid][InMinigame])
+                            {
+                                return true;
+                            }
+
+                            // One run per rampage at a time, see SetRampageMission()
+                            if (IsRampageMissionRunning(missionid))
+                            {
+                                SendClientMessageLocalized(playerid, I18N_RAMPAGE_MISS_TAKEN);
+                                return true;
+                            }
+
+                            gRampageMission[playerid][ID] = missionid;
                             SetRampageMission(playerid);
 
-                            SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ RAMPAGE ] Rampage started!");
+                            if (gRampageMission[playerid][Active])
+                            {
+                                SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ RAMPAGE ] Rampage started!");
+                            }
                         }
                     case RMPT_HEALTH:
                         {
@@ -257,7 +358,11 @@ stock bool: CheckRampagePickup(playerid, pickupid)
 
                             SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ RAMPAGE ] Health 100.0 + armour 100.0!");
 
+                            // Forget the id too: the server hands it to the
+                            // next pickup made, which would then count as this
+                            // one, and the abort would destroy it
                             DestroyPickup(gRampagePickups[i][j][PickupID]);
+                            gRampagePickups[i][j][PickupID] = INVALID_PICKUP;
                         }
                     case RMPT_WEAPON:
                         {
@@ -268,6 +373,7 @@ stock bool: CheckRampagePickup(playerid, pickupid)
                             SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ RAMPAGE ] Weapon picked!");
 
                             DestroyPickup(gRampagePickups[i][j][PickupID]);
+                            gRampagePickups[i][j][PickupID] = INVALID_PICKUP;
                         }
                     default:
                         {}
@@ -281,33 +387,53 @@ stock bool: CheckRampagePickup(playerid, pickupid)
     return false;
 }
 
+// Slots start out (and NPC slots are reset to) their INVALID_* sentinels.
+// Zeroed slots are not "empty": 0 is a real NPC id, a real pickup id and a
+// real label id, so a zeroed slot would match or destroy somebody else's.
+stock InitRampageSlots()
+{
+    for (new m = 0; m < MAX_RAMPAGE_MISSION_COUNT; m++)
+    {
+        for (new i = 0; i < MAX_RAMPAGE_NPC_COUNT; i++)
+        {
+            gRampageNPCs[m][i][ID] = INVALID_NPC_ID;
+        }
+
+        for (new k = 0; k < 3 * MAX_RAMPAGE_HEALTH_POINTS_COUNT; k++)
+        {
+            gRampagePickups[m][k][PickupID] = INVALID_PICKUP;
+            gRampagePickups[m][k][Text3D] = INVALID_3DTEXT_ID;
+        }
+    }
+
+    return 1;
+}
+
+// Creates the start pickup and name label of every saved rampage. Runs at
+// startup and again after each save, replacing what it created last time.
 stock InitRampagePickups()
 {
     new 
-		query[256] = "SELECT r.id, r.name, c.primary_x, c.primary_y, c.primary_z FROM rampages AS r JOIN rampage_coords AS c ON c.rampage_id = r.id WHERE c.type = 1",	
-        i = 0,	
+        query[256] = "SELECT r.id, r.name, c.primary_x, c.primary_y, c.primary_z FROM rampages AS r JOIN rampage_coords AS c ON c.rampage_id = r.id WHERE c.type = 1",
         DBResult: result = DB_ExecuteQuery(gDbConnectionHandle, query);
-        
-    if (!result)
-	{
-		printf("Database error: cannot list rampage pickups");
-		print(query);
 
-		return 0;
-	}
+    if (!result)
+    {
+        print("Database error: cannot list rampage pickups");
+        print(query);
+
+        return 0;
+    }
 
     if (!DB_GetRowCount(result))
     {
+        DB_FreeResultSet(result);
+
         return 1;
     }
 
     do
     {
-        if (i >= MAX_RAMPAGE_MISSION_COUNT)
-        {
-            break;
-        }
-
         new
             id = DB_GetFieldIntByName(result, "id"),
             name[64],
@@ -315,20 +441,29 @@ stock InitRampagePickups()
             Float: Y = DB_GetFieldFloatByName(result, "primary_y"),
             Float: Z = DB_GetFieldFloatByName(result, "primary_z");
 
-        DB_GetFieldStringByName(result, "name", name, sizeof(name));
-
-        if (gRampagePickups[id][0][PickupID] > -1)
+        if (id < 0 || id >= MAX_RAMPAGE_MISSION_COUNT)
         {
-            DestroyPickup(gRampagePickups[id][0][PickupID]);
-            Delete3DTextLabel(gRampagePickups[id][0][Text3D]);
+            printf("Rampage %d skipped: id is beyond MAX_RAMPAGE_MISSION_COUNT (%d)", id, MAX_RAMPAGE_MISSION_COUNT);
         }
+        else
+        {
+            DB_GetFieldStringByName(result, "name", name, sizeof(name));
 
-        gRampagePickups[id][0][MissionID] = id;
-        gRampagePickups[id][0][PickupType] = RMPT_START;
-        gRampagePickups[id][0][PickupID] = EnsurePickupCreated(PICKUP_RAMPAGE, 1, X, Y, Z);
-        gRampagePickups[id][0][Text3D] = Create3DTextLabel("%s", COLOR_ORANGE, X, Y, Z, 15.0, -1, false, name);
+            if (gRampagePickups[id][0][PickupID] != INVALID_PICKUP)
+            {
+                DestroyPickup(gRampagePickups[id][0][PickupID]);
+            }
 
-        i++;
+            if (gRampagePickups[id][0][Text3D] != INVALID_3DTEXT_ID)
+            {
+                Delete3DTextLabel(gRampagePickups[id][0][Text3D]);
+            }
+
+            gRampagePickups[id][0][MissionID] = id;
+            gRampagePickups[id][0][PickupType] = RMPT_START;
+            gRampagePickups[id][0][PickupID] = EnsurePickupCreated(PICKUP_RAMPAGE, 1, X, Y, Z);
+            gRampagePickups[id][0][Text3D] = Create3DTextLabel("%s", COLOR_ORANGE, X, Y, Z, 15.0, -1, false, name);
+        }
     }
     while (DB_SelectNextRow(result));
 
@@ -360,13 +495,14 @@ stock AbortRampageMission(playerid)
             NPC_Destroy(gRampageNPCs[missionid][j][ID]);
         }
 
-        gRampageNPCs[missionid][j][ID] = 0;
+        gRampageNPCs[missionid][j][ID] = INVALID_NPC_ID;
         gRampageNPCs[missionid][j][Set] = false;
     }
 
-    for (new k = 0; k < MAX_RAMPAGE_WEAPON_COUNT; k++)
+    // Every slot a run can fill: weapons and then health points, from 1 on
+    for (new k = 0; k < 3 * MAX_RAMPAGE_HEALTH_POINTS_COUNT; k++)
     {
-        if (gRampagePickups[missionid][k][PickupType] == RMPT_START)
+        if (gRampagePickups[missionid][k][PickupType] == RMPT_START || gRampagePickups[missionid][k][PickupID] == INVALID_PICKUP)
         {
             continue;
         }
@@ -406,6 +542,13 @@ stock SetRampageMission(playerid)
         return 1;
     }
 
+    // The gunmen and pickups are one set per rampage, so a second run of one
+    // under way would overwrite the first run's and leave them behind
+    if (IsRampageMissionRunning(gRampageMission[playerid][ID]))
+    {
+        return 0;
+    }
+
     new
         pickupcount = 1,
         missionid = gRampageMission[playerid][ID],
@@ -435,7 +578,7 @@ stock SetRampageMission(playerid)
                 Float: Y = DB_GetFieldFloatByName(result, "primary_y"),
                 Float: Z = DB_GetFieldFloatByName(result, "primary_z");
 
-            if (!weaponid)
+            if (!IsValidRampageWeapon(weaponid))
             {
                 weaponid = random(13) + 22;
             }
@@ -443,7 +586,7 @@ stock SetRampageMission(playerid)
             gRampagePickups[id][pickupcount][MissionID] = id;
             gRampagePickups[id][pickupcount][PickupType] = RMPT_WEAPON;
             gRampagePickups[id][pickupcount][WeaponID] = weaponid;
-            gRampagePickups[id][pickupcount][PickupID] = EnsurePickupCreated(324 + weaponid, 1, X, Y, Z);            
+            gRampagePickups[id][pickupcount][PickupID] = EnsurePickupCreated(GetWeaponModel(weaponid), 1, X, Y, Z);            
 
             pickupcount++;
         }
@@ -526,53 +669,14 @@ stock SetRampageMission(playerid)
                 gRampageNPCs[missionid][i][Secondary][CoordZ] = sZ;
 
                 NPC_SetPos(npcid, pX, pY, pZ);
-                NPC_SetWeapon(npcid, WEAPON: (random(13) + 22));
-                NPC_SetAmmo(npcid, 500);
-                NPC_SetSkin(npcid, random(300));
-                NPC_EnableInfiniteAmmo(npcid, true);
-                NPC_SetWeaponAccuracy(npcid, WEAPON: NPC_GetWeapon(npcid), 0.15);
-                NPC_SetHealth(npcid, 50.0);
-                NPC_SetInvulnerable(npcid, false); 
+
+                ArmRampageNPC(npcid);
 
                 NPC_Move(npcid, sX, sY, sZ, NPC_MOVE_TYPE_JOG, NPC_MOVE_SPEED_JOG, 0.05);
 
-                const NPC_COUNT = 128;
-
-                new
-                    targetid = playerid,
-                    npcs[NPC_COUNT];
-
-                NPC_GetAll(npcs, sizeof(npcs));
-                
-                for (new j = 0; j < NPC_COUNT; j++)
-                {
-                    if (NPC_IsValid(npcs[j]))
-                    {
-                        targetid = npcs[j];
-                        break;
-                    }
-                }
-
-                new
-                    Float: tX,
-                    Float: tY,
-                    Float: tZ;                   
-
-                switch (random(1))
-                {
-                    case 0:
-                        {
-                            GetPlayerPos(targetid, tX, tY, tZ);
-                            NPC_AimAtPlayer(npcid, targetid, true, 500, true, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, NPC_ENTITY_CHECK_PLAYER);
-                            NPC_Shoot(npcid, WEAPON: NPC_GetWeapon(npcid), targetid, true, tX, tY, tZ, 0.0, 0.0, 0.0, true, NPC_ENTITY_CHECK_ALL);
-                        }
-                    case 1:
-                        {
-                            GetPlayerPos(playerid, tX, tY, tZ);
-                            NPC_AimAtPlayer(npcid, playerid, true, 500, true, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, NPC_ENTITY_CHECK_PLAYER);
-                            NPC_Shoot(npcid, WEAPON: NPC_GetWeapon(npcid), playerid, true, tX, tY, tZ, 0.0, 0.0, 0.0, true, NPC_ENTITY_CHECK_ALL);
-                        }
-                }
+                // Half open on the player, the rest on a mission mate spawned
+                // before them (the player while there is none yet).
+                RampageNPCEngage(npcid, random(2) ? playerid : GetRampageNPCTarget(playerid, missionid, npcid));
 
                 i++;
             }
@@ -617,7 +721,6 @@ stock SetRampageNPC(playerid, missionid, npcarrayid)
 
     if (preid == -1)
     {
-	    //return SendClientMessageLocalized(playerid, I18N_TAXI_MISS_TOO_MANY_CUSTOMERS);
         return 0;
     }
 
@@ -673,13 +776,115 @@ stock SaveRampageMissionScore(playerid)
 	return 1;
 }
 
-stock SaveRampageMission(playerid)
+// Rampage weapon pickups accept any real weapon id; 0 means "random gun on
+// every run" and is what an empty or invalid editor input becomes.
+stock bool: IsValidRampageWeapon(weaponid)
+{
+    return (weaponid >= 1 && weaponid <= 46 && (weaponid < 19 || weaponid > 21));
+}
+
+stock bool: IsRampageMissionRunning(missionid)
+{
+    for (new playerid = 0; playerid < MAX_PLAYERS; playerid++)
+    {
+        if (gRampageMission[playerid][Active] && gRampageMission[playerid][ID] == missionid)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// Wipes a player's editor session: their cached fields plus every slot
+// recorded under the prospective mission id, which is how an abandoned
+// session used to leak into the next one. The shared slots are skipped if a
+// live run happens to use that id.
+stock ResetRampageEditor(playerid)
 {
     new
-        missionid = gRampageEdit[playerid][MissionID],
-        query[512];
+        missionid = gRampageEdit[playerid][MissionID];
 
-    format(query, sizeof(query), "INSERT INTO rampages (name, location_type) VALUES ('%s', %d)",
+    if (missionid >= 0 && missionid < MAX_RAMPAGE_MISSION_COUNT && !IsRampageMissionRunning(missionid))
+    {
+        for (new i = 0; i < MAX_RAMPAGE_NPC_COUNT; i++)
+        {
+            gRampageNPCs[missionid][i][Set] = false;
+        }
+
+        for (new i = 0; i < MAX_RAMPAGE_WEAPON_COUNT; i++)
+        {
+            gRampageWeapons[missionid][i][Set] = false;
+            gRampageWeapons[missionid][i][WeaponID] = 0;
+        }
+
+        for (new i = 0; i < MAX_RAMPAGE_HEALTH_POINTS_COUNT; i++)
+        {
+            gRampageHealthPoints[missionid][i][Set] = false;
+        }
+    }
+
+    gRampageEdit[playerid][Active] = false;
+    gRampageEdit[playerid][EditType] = RMET_NONE;
+    gRampageEdit[playerid][MissionID] = 0;
+    gRampageEdit[playerid][MissionName][0] = EOS;
+    gRampageEdit[playerid][NPCCount] = 0;
+    gRampageEdit[playerid][WeaponNo] = 0;
+    gRampageEdit[playerid][HealthNo] = 0;
+    gRampageEdit[playerid][Location] = RM_NONE;
+    gRampageEdit[playerid][PickupCoords][CoordX] = 0.0;
+    gRampageEdit[playerid][PickupCoords][CoordY] = 0.0;
+    gRampageEdit[playerid][PickupCoords][CoordZ] = 0.0;
+
+    return 1;
+}
+
+
+// Logs the failed step, tells the editing player, and returns 0 so the
+// caller can bail out with it.
+stock RampageSaveFailed(playerid, const what[], const query[])
+{
+    printf("Database error: cannot write rampage %s!", what);
+    print(query);
+
+    new
+        stringToPrint[128];
+
+    format(stringToPrint, sizeof(stringToPrint), "[ EDIT ] Saving the rampage failed at the %s, see the server log!", what);
+    SendClientMessage(playerid, COLOR_RED, stringToPrint);
+
+    return 0;
+}
+
+stock SaveRampageMission(playerid)
+{
+    // Recordings live under the slot the editor picked; rows are written
+    // under the id the database actually hands out (see below).
+    new
+        slotid = gRampageEdit[playerid][MissionID],
+        query[512],
+        stringToPrint[144];
+
+    if (!gRampageEdit[playerid][Active] || slotid < 0 || slotid >= MAX_RAMPAGE_MISSION_COUNT)
+    {
+        SendClientMessage(playerid, COLOR_RED, "[ EDIT ] There is no rampage editor session to save!");
+        return 0;
+    }
+
+    if (!strlen(gRampageEdit[playerid][MissionName]))
+    {
+        SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Set the rampage name before saving!");
+        return 0;
+    }
+
+    if (gRampageEdit[playerid][PickupCoords][CoordX] == 0.0 && gRampageEdit[playerid][PickupCoords][CoordY] == 0.0 && gRampageEdit[playerid][PickupCoords][CoordZ] == 0.0)
+    {
+        SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Record the rampage start pickup position before saving!");
+        return 0;
+    }
+
+    // %q: the name is typed in by an admin and may contain an apostrophe
+    format(query, sizeof(query), "INSERT INTO rampages (name, location_type) VALUES ('%q', %d)",
             gRampageEdit[playerid][MissionName],
             _: gRampageEdit[playerid][Location]
         );
@@ -689,15 +894,36 @@ stock SaveRampageMission(playerid)
 
     if (!result)
     {
-		print("Database error: cannot write rampage data!");
-		print(query);
-		return 0;
-	}
-    
+        return RampageSaveFailed(playerid, "mission row", query);
+    }
+
     DB_FreeResultSet(result);
 
-    // Pickup
+    // AUTOINCREMENT never reuses a deleted id, so the id the editor guessed
+    // (highest + 1) can be lower than the one just assigned. Coordinates
+    // written under the guess would belong to no mission.
+    new
+        missionid = 0;
 
+    format(query, sizeof(query), "SELECT last_insert_rowid() AS id");
+    result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+    if (result)
+    {
+        if (DB_GetRowCount(result))
+        {
+            missionid = DB_GetFieldIntByName(result, "id");
+        }
+
+        DB_FreeResultSet(result);
+    }
+
+    if (missionid <= 0)
+    {
+        return RampageSaveFailed(playerid, "mission id lookup", query);
+    }
+
+    // Start pickup
     format(query, sizeof(query), "INSERT INTO rampage_coords (rampage_id, type, primary_x, primary_y, primary_z) VALUES (%d, %d, %.2f, %.2f, %.2f)",
             missionid,
             1,
@@ -710,90 +936,119 @@ stock SaveRampageMission(playerid)
 
     if (!result)
     {
-		print("Database error: cannot write rampage pickup data!");
-		print(query);
-		return 0;
-	}
-    
-    DB_FreeResultSet(result);
-
-    for (new i = 0; i < MAX_RAMPAGE_MISSION_COUNT; i++)
-    {
-        // Save all health points
-        if (gRampageHealthPoints[missionid][i][Set])
-        {
-            format(query, sizeof(query), "INSERT INTO rampage_coords (rampage_id, type, primary_x, primary_y, primary_z) VALUES (%d, %d, %.2f, %.2f, %.2f)",
-                    missionid,
-                    5,
-                    gRampageHealthPoints[missionid][i][Position][CoordX],
-                    gRampageHealthPoints[missionid][i][Position][CoordY],
-                    gRampageHealthPoints[missionid][i][Position][CoordZ]
-                );
-
-            result = DB_ExecuteQuery(gDbConnectionHandle, query);
-
-            if (!result)
-            {
-                print("Database error: cannot write rampage health point data!");
-                print(query);
-                return 0;
-    	    }   
-
-            DB_FreeResultSet(result); 
-        }
-
-        if (gRampageWeapons[missionid][i][Set])
-        {
-            format(query, sizeof(query), "INSERT INTO rampage_coords (rampage_id, type, primary_x, primary_y, primary_z) VALUES (%d, %d, %.2f, %.2f, %.2f)",
-                    missionid,
-                    4,
-                    gRampageWeapons[missionid][i][Position][CoordX],
-                    gRampageWeapons[missionid][i][Position][CoordY],
-                    gRampageWeapons[missionid][i][Position][CoordZ]
-                );
-
-            result = DB_ExecuteQuery(gDbConnectionHandle, query);
-
-            if (!result)
-            {
-                print("Database error: cannot write rampage weapon data!");
-                print(query);
-                return 0;
-    	    }   
-
-            DB_FreeResultSet(result); 
-        }
-
-        if (gRampageNPCs[missionid][i][Set])
-        {
-            format(query, sizeof(query), "INSERT INTO rampage_coords (rampage_id, type, primary_x, primary_y, primary_z, secondary_x, secondary_y, secondary_z) VALUES (%d, %d, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f)",
-                    missionid,
-                    2,
-                    gRampageNPCs[missionid][i][Primary][CoordX],
-                    gRampageNPCs[missionid][i][Primary][CoordY],
-                    gRampageNPCs[missionid][i][Primary][CoordZ],
-                    gRampageNPCs[missionid][i][Secondary][CoordX],
-                    gRampageNPCs[missionid][i][Secondary][CoordY],
-                    gRampageNPCs[missionid][i][Secondary][CoordZ]
-                );
-
-            result = DB_ExecuteQuery(gDbConnectionHandle, query);
-
-            if (!result)
-            {
-                print("Database error: cannot write rampage weapon data!");
-                print(query);
-                return 0;
-    	    }   
-
-            DB_FreeResultSet(result); 
-        }
+        return RampageSaveFailed(playerid, "start pickup", query);
     }
 
-    InitRampagePickups();
+    DB_FreeResultSet(result);
+
+    new
+        healths = 0,
+        weapons = 0,
+        npcs = 0;
+
+    for (new i = 0; i < MAX_RAMPAGE_HEALTH_POINTS_COUNT; i++)
+    {
+        if (!gRampageHealthPoints[slotid][i][Set])
+        {
+            continue;
+        }
+
+        format(query, sizeof(query), "INSERT INTO rampage_coords (rampage_id, type, primary_x, primary_y, primary_z) VALUES (%d, %d, %.2f, %.2f, %.2f)",
+                missionid,
+                5,
+                gRampageHealthPoints[slotid][i][Position][CoordX],
+                gRampageHealthPoints[slotid][i][Position][CoordY],
+                gRampageHealthPoints[slotid][i][Position][CoordZ]
+            );
+
+        result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+        if (!result)
+        {
+            return RampageSaveFailed(playerid, "health point", query);
+        }
+
+        DB_FreeResultSet(result);
+        healths++;
+    }
+
+    for (new i = 0; i < MAX_RAMPAGE_WEAPON_COUNT; i++)
+    {
+        if (!gRampageWeapons[slotid][i][Set])
+        {
+            continue;
+        }
+
+        // weapon_id 0 means "random gun each run" (see SetRampageMission).
+        format(query, sizeof(query), "INSERT INTO rampage_coords (rampage_id, type, weapon_id, primary_x, primary_y, primary_z) VALUES (%d, %d, %d, %.2f, %.2f, %.2f)",
+                missionid,
+                4,
+                gRampageWeapons[slotid][i][WeaponID],
+                gRampageWeapons[slotid][i][Position][CoordX],
+                gRampageWeapons[slotid][i][Position][CoordY],
+                gRampageWeapons[slotid][i][Position][CoordZ]
+            );
+
+        result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+        if (!result)
+        {
+            return RampageSaveFailed(playerid, "weapon pickup", query);
+        }
+
+        DB_FreeResultSet(result);
+        weapons++;
+    }
+
+    for (new i = 0; i < MAX_RAMPAGE_NPC_COUNT; i++)
+    {
+        if (!gRampageNPCs[slotid][i][Set])
+        {
+            continue;
+        }
+
+        format(query, sizeof(query), "INSERT INTO rampage_coords (rampage_id, type, primary_x, primary_y, primary_z, secondary_x, secondary_y, secondary_z) VALUES (%d, %d, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f)",
+                missionid,
+                2,
+                gRampageNPCs[slotid][i][Primary][CoordX],
+                gRampageNPCs[slotid][i][Primary][CoordY],
+                gRampageNPCs[slotid][i][Primary][CoordZ],
+                gRampageNPCs[slotid][i][Secondary][CoordX],
+                gRampageNPCs[slotid][i][Secondary][CoordY],
+                gRampageNPCs[slotid][i][Secondary][CoordZ]
+            );
+
+        result = DB_ExecuteQuery(gDbConnectionHandle, query);
+
+        if (!result)
+        {
+            return RampageSaveFailed(playerid, "NPC", query);
+        }
+
+        DB_FreeResultSet(result);
+        npcs++;
+    }
+
+    format(stringToPrint, sizeof(stringToPrint), "[ EDIT ] Rampage '%s' saved as mission #%d with %d NPC(s), %d weapon(s), %d health pack(s).",
+            gRampageEdit[playerid][MissionName], missionid, npcs, weapons, healths);
+    SendClientMessage(playerid, COLOR_LIGHTGREEN, stringToPrint);
+
+    if (missionid >= MAX_RAMPAGE_MISSION_COUNT)
+    {
+        format(stringToPrint, sizeof(stringToPrint), "[ EDIT ] Mission #%d is beyond MAX_RAMPAGE_MISSION_COUNT (%d) and cannot load until that limit is raised!", missionid, MAX_RAMPAGE_MISSION_COUNT);
+        SendClientMessage(playerid, COLOR_RED, stringToPrint);
+    }
+    else if (InitRampagePickups())
+    {
+        SendClientMessage(playerid, COLOR_LIGHTGREEN, "[ EDIT ] Rampage pickups reloaded, the new mission is live now.");
+    }
+    else
+    {
+        SendClientMessage(playerid, COLOR_RED, "[ EDIT ] Saved, but reloading the rampage pickups failed, see the server log!");
+    }
 
     gPlayers[playerid][EditingMode] = false;
-    gRampageMission[playerid][Active] = false;
+    ResetRampageEditor(playerid);
 
     return 1;
 }

@@ -19,7 +19,7 @@ public InitTexts()
 	//  DrawTexts initialization.
 	//
 
-	gGameModeText = TextDrawCreate(20.0, 425.0, MINIMAP_TEXT);
+	gGameModeText = TextDrawCreate(20.0, 430.0, MINIMAP_TEXT);
 
 	TextDrawLetterSize(gGameModeText, 0.5, 1.5);
 	TextDrawFont(gGameModeText, TEXT_DRAW_FONT: 3);
@@ -30,6 +30,15 @@ public InitTexts()
 	TextDrawLetterSize(gClockText, 0.6, 1.8);
 	TextDrawFont(gClockText, TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gClockText, 1);
+
+	// The HD (widescreen) HUD is squeezed horizontally, so the clock is right-aligned
+	// to the health/armour bars' edge and narrowed to fit next to the weapon icon.
+	gClockTextHD = TextDrawCreate(617.0, 19.0, "loading");
+
+	TextDrawLetterSize(gClockTextHD, 0.38, 1.8);
+	TextDrawFont(gClockTextHD, TEXT_DRAW_FONT: 3);
+	TextDrawSetOutline(gClockTextHD, 1);
+	TextDrawAlignment(gClockTextHD, TEXT_DRAW_ALIGN_RIGHT);
 }
 
 public AddTexts(playerid)
@@ -40,6 +49,7 @@ public AddTexts(playerid)
 	}
 
 	gRampageMission[playerid][InfoText] = TextDrawCreate(460.0, 400.0, "");
+	gRobMission[playerid][InfoText] = TextDrawCreate(460.0, 386.0, "");
 	gDrugMission[playerid][InfoText] = TextDrawCreate(460.0, 400.0, "");
 	gVehicleStatesText[playerid] = TextDrawCreate(256, 410, "");
 	gRaceInfoText[playerid] = TextDrawCreate(460.0, 380.0, "");
@@ -50,7 +60,11 @@ public AddTexts(playerid)
 	TextDrawLetterSize(gRampageMission[playerid][InfoText], 0.5, 1.5);
 	TextDrawFont(gRampageMission[playerid][InfoText], TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gRampageMission[playerid][InfoText], 1);
-	
+
+	TextDrawLetterSize(gRobMission[playerid][InfoText], 0.5, 1.5);
+	TextDrawFont(gRobMission[playerid][InfoText], TEXT_DRAW_FONT: 3);
+	TextDrawSetOutline(gRobMission[playerid][InfoText], 1);
+
 	TextDrawLetterSize(gDrugMission[playerid][InfoText], 0.5, 1.5);
 	TextDrawFont(gDrugMission[playerid][InfoText], TEXT_DRAW_FONT: 3);
 	TextDrawSetOutline(gDrugMission[playerid][InfoText], 1);
@@ -76,7 +90,7 @@ public AddTexts(playerid)
 	TextDrawSetOutline(gDeathmatchText[playerid], 1);
 
 	// Show the game clock.
-	TextDrawShowForPlayer(playerid, gClockText);
+	ShowPlayerClock(playerid);
 	TextDrawShowForPlayer(playerid, gGameModeText);
 
 	return 1;

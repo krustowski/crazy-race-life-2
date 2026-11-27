@@ -711,9 +711,660 @@ public InitVehicles()
 	AddStaticVehicle(489, -762.1500, -136.2600, 65.6636, 21.7100, -1, -1); // Rancher //
 	AddStaticVehicle(568, -535.2800, -176.9100, 78.4088, 180.0000, -1, -1); // Bandito //
 
-	// Route 68 gas station
-	//AddStaticVehicle(551, 905.0000, 55.0000, 74.2676, 0.0000, -1, -1); // Merit
-	//AddStaticVehicle(422, 895.0000, 45.0000, 83.6456, 90.0000, -1, -1); // Bobcat
+	//-------------------------------------------------------------------------------------------
+	// Additional map-filler vehicles: car parks, parking lots and roadside spots.
+
+	// LS East Beach multi-storey car park
+	AddStaticVehicle(401, 2796.2899, -1428.5924, 20.0349, 1.1940, -1, -1); // Bravura //
+	AddStaticVehicle(426, 2799.6544, -1428.7884, 19.9742, 1.0655, -1, -1); // Premier //
+	AddStaticVehicle(474, 2809.6126, -1428.6956, 20.0294, 180.1395, -1, -1); // Hermes //
+	AddStaticVehicle(496, 2796.5029, -1428.7634, 23.8986, 0.7926, -1, -1); // Blista Compact //
+	AddStaticVehicle(581, 2809.6657, -1427.5696, 23.8348, 359.3583, -1, -1); // BF-400 //
+	AddStaticVehicle(540, 2816.8198, -1435.6099, 24.1069, 270.1723, -1, -1); // Vincent //
+	AddStaticVehicle(550, 2802.9220, -1428.7820, 28.0575, 359.9112, -1, -1); // Sunrise //
+	AddStaticVehicle(474, 2816.8353, -1455.3908, 27.9659, 270.7324, -1, -1); // Hermes //
+	AddStaticVehicle(516, 2799.8094, -1428.6190, 32.0242, 359.2245, -1, -1); // Nebula //
+	AddStaticVehicle(561, 2816.9367, -1435.4705, 31.9884, 268.9677, -1, -1); // Stratum //
+	AddStaticVehicle(474, 2816.7131, -1445.3356, 35.9034, 270.4318, -1, -1); // Hermes //
+	AddStaticVehicle(585, 2816.7346, -1438.7707, 35.7274, 269.7694, -1, -1); // Emperor //
+	AddStaticVehicle(477, 2816.7706, -1445.3927, 39.8062, 269.2929, -1, -1); // ZR-350 //
+	AddStaticVehicle(461, 2817.9395, -1448.6735, 39.6825, 269.2659, -1, -1); // PCJ-600 //
+
+	// LS Conference Center parking
+	AddStaticVehicle(422, 1062.0699, -1746.1801, 13.4547, 269.9998, -1, -1); // Bobcat //
+	AddStaticVehicle(400, 1099.0000, -1766.6600, 13.4407, 269.9998, -1, -1); // Landstalker //
+
+	// LS East Beach parking
+	AddStaticVehicle(547, 2656.5422, -1701.8273, 9.1067, 269.6266, -1, -1); // Primo //
+	AddStaticVehicle(554, 2657.3649, -1807.7244, 9.3918, 94.9158, -1, -1); // Yosemite //
+	AddStaticVehicle(445, 2676.5130, -1821.2541, 9.3056, 309.7163, -1, -1); // Admiral //
+	AddStaticVehicle(576, 2696.5255, -1671.3138, 9.1402, 0.2570, -1, -1); // Tornado //
+	AddStaticVehicle(600, 2771.3014, -1841.0341, 9.5429, 19.0967, -1, -1); // Picador //
+	AddStaticVehicle(474, 2798.1399, -1562.6300, 10.7352, 90.0002, -1, -1); // Hermes //
+	AddStaticVehicle(467, 2802.9371, -1539.9295, 10.7200, 179.7696, -1, -1); // Oceanic //
+	AddStaticVehicle(500, 2811.4720, -1827.0814, 10.0985, 268.7693, -1, -1); // Mesa //
+	AddStaticVehicle(554, 2812.7300, -1673.4000, 10.0270, 0.0000, -1, -1); // Yosemite //
+	AddStaticVehicle(566, 2822.0967, -1562.1660, 10.7200, 268.7059, -1, -1); // Tahoma //
+
+	// LS East Los Santos parking
+	AddStaticVehicle(475, 2390.7600, -1510.2200, 23.6970, 90.0002, -1, -1); // Sabre //
+
+	// LS El Corona parking
+	AddStaticVehicle(475, 1946.9253, -2136.5282, 13.3900, 90.2605, -1, -1); // Sabre //
+
+	// LS Jefferson parking
+	AddStaticVehicle(445, 2147.9500, -1175.6500, 23.7525, 90.0002, -1, -1); // Admiral //
+	AddStaticVehicle(436, 2161.4800, -1192.3700, 23.6157, 90.0002, -1, -1); // Previon //
+	AddStaticVehicle(400, 2205.6083, -1164.9358, 25.8283, 91.0797, -1, -1); // Landstalker //
+	AddStaticVehicle(517, 2216.9031, -1166.0314, 25.6114, 269.5744, -1, -1); // Majestic //
+
+	// LS Los Santos International parking
+	AddStaticVehicle(533, 1364.9380, -2354.8451, 13.3450, 271.2261, -1, -1); // Feltzer //
+	AddStaticVehicle(554, 1365.3127, -2228.4104, 13.6434, 269.6859, -1, -1); // Yosemite //
+	AddStaticVehicle(561, 1388.1790, -2225.1951, 13.4103, 180.0228, -1, -1); // Stratum //
+	AddStaticVehicle(421, 1388.2026, -2207.8497, 13.4883, 181.2604, -1, -1); // Washington //
+	AddStaticVehicle(413, 1390.6056, -2261.9802, 13.6485, 179.7061, -1, -1); // Pony //
+	AddStaticVehicle(458, 1391.3721, -2347.8433, 13.4464, 181.2381, -1, -1); // Solair //
+	AddStaticVehicle(550, 1394.9427, -2242.0899, 13.4490, 181.8359, -1, -1); // Sunrise //
+	AddStaticVehicle(459, 1404.5955, -2207.5720, 13.6384, 180.5521, -1, -1); // Berkley's RC Van //
+	AddStaticVehicle(550, 1407.9385, -2207.6489, 13.4490, 178.8071, -1, -1); // Sunrise //
+	AddStaticVehicle(436, 1407.9827, -2364.8594, 13.3430, 178.8122, -1, -1); // Previon //
+	AddStaticVehicle(527, 1408.0100, -2349.7600, 13.3482, 179.9999, -1, -1); // Cadrona //
+	AddStaticVehicle(526, 1408.0100, -2332.6101, 13.3956, 179.9999, -1, -1); // Fortune //
+	AddStaticVehicle(458, 1411.0458, -2313.7108, 13.4464, 180.3623, -1, -1); // Solair //
+	AddStaticVehicle(477, 1515.3399, -2361.1448, 13.2936, 181.5448, -1, -1); // ZR-350 //
+	AddStaticVehicle(554, 1515.3799, -2211.4042, 13.6434, 179.0871, -1, -1); // Yosemite //
+	AddStaticVehicle(440, 1560.3273, -2240.9590, 13.7510, 271.3972, -1, -1); // Rumpo //
+	AddStaticVehicle(558, 1560.3590, -2315.3935, 13.2459, 271.0913, -1, -1); // Uranus //
+
+	// LS Marina parking
+	AddStaticVehicle(401, 782.2610, -1633.6823, 13.1989, 90.2990, -1, -1); // Bravura //
+
+	// LS Mulholland Intersection parking
+	AddStaticVehicle(477, 1571.7281, -1011.5907, 23.6529, 181.6807, -1, -1); // ZR-350 //
+	AddStaticVehicle(527, 1583.9100, -1047.5200, 23.7075, 307.4892, -1, -1); // Cadrona //
+	AddStaticVehicle(551, 1594.7505, -1009.7779, 23.8055, 187.6737, -1, -1); // Merit //
+	AddStaticVehicle(422, 1616.7900, -1123.6500, 23.9066, 90.0002, -1, -1); // Bobcat //
+	AddStaticVehicle(566, 1617.6789, -1008.6890, 23.7012, 357.1762, -1, -1); // Tahoma //
+	AddStaticVehicle(401, 1619.8449, -1098.3613, 23.7223, 268.0860, -1, -1); // Bravura //
+	AddStaticVehicle(550, 1678.4888, -1011.6283, 23.8005, 197.3553, -1, -1); // Sunrise //
+	AddStaticVehicle(551, 1696.8413, -1085.1787, 23.8055, 179.1735, -1, -1); // Merit //
+	AddStaticVehicle(565, 1704.9700, -1069.0300, 23.5906, 360.0000, -1, -1); // Flash //
+	AddStaticVehicle(517, 1707.6300, -1035.7800, 23.7910, 360.0000, -1, -1); // Majestic //
+	AddStaticVehicle(533, 1744.2633, -1012.0481, 23.7590, 346.8654, -1, -1); // Feltzer //
+	AddStaticVehicle(527, 1744.4900, -1085.7600, 23.7622, 360.0000, -1, -1); // Cadrona //
+	AddStaticVehicle(405, 1758.0262, -1085.0660, 23.8859, 178.5051, -1, -1); // Sentinel //
+	AddStaticVehicle(517, 1771.3900, -1061.6400, 23.8457, 360.0000, -1, -1); // Majestic //
+	AddStaticVehicle(566, 1779.4197, -1023.7501, 23.7590, 333.4279, -1, -1); // Tahoma //
+
+	// LS Playa del Seville parking
+	AddStaticVehicle(466, 2767.8130, -1876.3750, 9.5365, 179.0655, -1, -1); // Glendale //
+
+	// LS Rodeo parking
+	AddStaticVehicle(411, 200.8150, -1439.3400, 12.8746, 320.0000, -1, -1); // Infernus //
+	AddStaticVehicle(521, 339.2860, -1342.9200, 14.1278, 299.9999, -1, -1); // FCR-900 //
+
+	// LS Verona Beach parking
+	AddStaticVehicle(540, 878.8840, -1658.8000, 13.4664, 0.0000, -1, -1); // Vincent //
+
+	// LS Willowfield parking
+	AddStaticVehicle(439, 1987.3892, -1995.8910, 13.4462, 180.3623, -1, -1); // Stallion //
+	AddStaticVehicle(404, 2065.4600, -1919.4000, 13.3312, 179.9999, -1, -1); // Pereniel //
+	AddStaticVehicle(546, 2065.6599, -1902.6300, 13.3368, 0.0000, -1, -1); // Intruder //
+	AddStaticVehicle(482, 2380.0266, -1928.2498, 13.5172, 0.7357, -1, -1); // Burrito //
+
+	// LS Downtown Los Santos roadside
+	AddStaticVehicle(477, 1524.8196, -1307.0123, 14.9334, 269.5490, -1, -1); // ZR-350 //
+	AddStaticVehicle(507, 1599.5518, -1359.6049, 15.5739, 177.8485, -1, -1); // Elegant //
+	AddStaticVehicle(579, 1685.5585, -1307.0122, 13.6646, 269.9136, -1, -1); // Huntley //
+
+	// LS East Beach roadside
+	AddStaticVehicle(467, 2674.2251, -1483.0225, 30.2494, 192.2676, -1, -1); // Oceanic //
+	AddStaticVehicle(507, 2841.8392, -1133.1708, 12.6980, 97.0516, -1, -1); // Elegant //
+	AddStaticVehicle(576, 2878.6826, -1457.8145, 10.4655, 357.2313, -1, -1); // Tornado //
+
+	// LS East Los Santos roadside
+	AddStaticVehicle(404, 2393.9057, -1149.9005, 28.5965, 90.0721, -1, -1); // Pereniel //
+	AddStaticVehicle(534, 2490.5273, -1146.6132, 37.8601, 91.1627, -1, -1); // Remington //
+
+	// LS Glen Park roadside
+	AddStaticVehicle(536, 1843.2376, -1423.3421, 13.1887, 180.4865, -1, -1); // Blade //
+	AddStaticVehicle(479, 1843.3000, -1291.7500, 13.2443, 179.1437, -1, -1); // Regina //
+
+	// LS Idlewood roadside
+	AddStaticVehicle(536, 1881.3125, -1457.3000, 13.1809, 90.9086, -1, -1); // Blade //
+	AddStaticVehicle(483, 1914.9375, -1758.7000, 13.5237, 269.9730, -1, -1); // Camper //
+	AddStaticVehicle(439, 1933.9875, -1457.3000, 13.2821, 90.5842, -1, -1); // Stallion //
+	AddStaticVehicle(536, 2087.8658, -1457.3629, 23.5483, 91.0380, -1, -1); // Blade //
+
+	// LS Market roadside
+	AddStaticVehicle(547, 894.8125, -1316.6750, 13.2164, 90.4998, -1, -1); // Primo //
+	AddStaticVehicle(533, 983.6880, -1137.6700, 23.5640, 90.0002, -1, -1); // Feltzer //
+	AddStaticVehicle(555, 1050.5800, -1275.6200, 13.2640, 179.9999, -1, -1); // Windsor //
+	AddStaticVehicle(415, 1050.5800, -1192.4800, 19.9409, 179.9999, -1, -1); // Cheetah //
+	AddStaticVehicle(477, 1065.7500, -1336.5500, 13.1295, 0.0000, -1, -1); // ZR-350 //
+	AddStaticVehicle(585, 1191.6750, -1351.6250, 13.0392, 180.4910, -1, -1); // Emperor //
+	AddStaticVehicle(402, 1264.6373, -1328.4862, 13.1826, 359.4302, -1, -1); // Buffalo //
+	AddStaticVehicle(561, 1302.5625, -1152.9500, 23.5196, 270.5872, -1, -1); // Stratum //
+
+	// LS Pershing Square roadside
+	AddStaticVehicle(401, 1536.2000, -1672.1875, 13.1989, 359.7997, -1, -1); // Bravura //
+
+	// LS Richman roadside
+	AddStaticVehicle(422, 213.3684, -1367.6415, 50.2034, 311.1976, -1, -1); // Bobcat //
+	AddStaticVehicle(533, 297.5884, -1293.5051, 53.8676, 121.5895, -1, -1); // Feltzer //
+	AddStaticVehicle(535, 351.8389, -1264.1366, 53.4615, 115.6112, -1, -1); // Slamvan //
+
+	// LS Rodeo roadside
+	AddStaticVehicle(421, 276.9462, -1639.8841, 33.0876, 260.2972, -1, -1); // Washington //
+	AddStaticVehicle(463, 298.2850, -1536.3199, 24.1842, 55.0001, -1, -1); // Freeway //
+	AddStaticVehicle(415, 401.6363, -1578.6836, 27.6677, 87.1913, -1, -1); // Cheetah //
+	AddStaticVehicle(429, 409.7237, -1428.1122, 32.5441, 36.0549, -1, -1); // Banshee //
+	AddStaticVehicle(521, 438.3346, -1509.1963, 30.4746, 187.5170, -1, -1); // FCR-900 //
+	AddStaticVehicle(562, 455.3238, -1619.6375, 25.6215, 359.2819, -1, -1); // Elegy //
+	AddStaticVehicle(587, 489.0313, -1356.1783, 17.0028, 296.5188, -1, -1); // Euros //
+	AddStaticVehicle(506, 543.6987, -1474.3500, 14.3684, 1.8132, -1, -1); // Super GT //
+	AddStaticVehicle(480, 543.8250, -1613.8750, 16.1238, 0.6138, -1, -1); // Comet //
+	AddStaticVehicle(411, 604.4375, -1578.6750, 15.7699, 89.7361, -1, -1); // Infernus //
+
+	// LS Verdant Bluffs roadside
+	AddStaticVehicle(492, 1268.2000, -2047.8750, 59.0117, 0.0650, -1, -1); // Greenwood //
+
+	// LS Vinewood roadside
+	AddStaticVehicle(562, 882.5000, -1137.1750, 23.4013, 90.2647, -1, -1); // Elegy //
+
+	// LS Willowfield roadside
+	AddStaticVehicle(413, 2393.3101, -1927.6899, 13.4844, 179.9999, -1, -1); // Pony //
+
+	// LS East Beach
+	AddStaticVehicle(522, 2815.6899, -1430.6801, 39.6770, 269.9998, -1, -1); // NRG-500 //
+
+	// LS Jefferson
+	AddStaticVehicle(404, 2135.2600, -1132.4100, 25.4682, 45.0000, -1, -1); // Pereniel //
+
+	// LS Mulholland Intersection
+	AddStaticVehicle(507, 1657.4600, -1111.5000, 23.8055, 90.0002, -1, -1); // Elegant //
+	AddStaticVehicle(507, 1752.6500, -1045.9301, 23.8602, 360.0000, -1, -1); // Elegant //
+
+	// LS Ocean Docks
+	AddStaticVehicle(530, 2164.6799, -2306.1299, 13.2873, 0.0000, -1, -1); // Forklift //
+	AddStaticVehicle(530, 2456.1599, -2521.6899, 13.3924, 269.9998, -1, -1); // Forklift //
+	AddStaticVehicle(530, 2496.1399, -2375.5400, 13.3654, 225.0003, -1, -1); // Forklift //
+
+	// LS Playa del Seville
+	AddStaticVehicle(574, 2860.1201, -1920.4000, 10.7273, 360.0000, -1, -1); // Sweeper //
+
+	// LS Richman
+	AddStaticVehicle(572, 298.5010, -1196.3600, 80.6414, 84.4998, -1, -1); // Mower //
+
+	// LS Verona Beach
+	AddStaticVehicle(481, 850.7870, -2053.7200, 12.4256, 0.0000, -1, -1); // BMX //
+
+	// SF Downtown underground car park
+	AddStaticVehicle(426, -1687.9399, 1007.8300, 17.3414, 269.9998, -1, -1); // Premier //
+
+	// SF Easter Bay Airport car park
+	AddStaticVehicle(558, -1424.7425, -212.1020, 5.7008, 269.8644, -1, -1); // Uranus //
+	AddStaticVehicle(585, -1425.4045, -232.5797, 5.6345, 269.5692, -1, -1); // Emperor //
+	AddStaticVehicle(445, -1436.1149, -247.7959, 5.9322, 178.9963, -1, -1); // Admiral //
+	AddStaticVehicle(458, -1440.3199, -143.2400, 5.8995, 359.4015, -1, -1); // Solair //
+	AddStaticVehicle(540, -1386.7646, -212.0974, 5.9195, 89.6251, -1, -1); // Vincent //
+	AddStaticVehicle(421, -1384.3411, -247.1171, 5.9414, 181.3998, -1, -1); // Washington //
+	AddStaticVehicle(482, -1476.3134, -17.1096, 6.1016, 89.9098, -1, -1); // Burrito //
+	AddStaticVehicle(561, -1476.1985, -29.6351, 5.8634, 89.4270, -1, -1); // Stratum //
+	AddStaticVehicle(558, -1427.9167, -0.7500, 5.7008, 269.6169, -1, -1); // Uranus //
+	AddStaticVehicle(551, -1426.1000, 11.5858, 5.8993, 269.4016, -1, -1); // Merit //
+	AddStaticVehicle(516, -1425.2216, 32.1773, 5.8993, 270.1078, -1, -1); // Nebula //
+	AddStaticVehicle(440, -1452.4913, -40.4850, 6.2058, 179.6627, -1, -1); // Rumpo //
+	AddStaticVehicle(516, -1460.7430, -60.5489, 5.8993, 0.0353, -1, -1); // Nebula //
+	AddStaticVehicle(581, -1476.8307, -63.2232, 5.6478, 89.1703, -1, -1); // BF-400 //
+	AddStaticVehicle(516, -1475.8170, -83.7894, 5.8993, 89.2293, -1, -1); // Nebula //
+	AddStaticVehicle(554, -1428.0589, -91.9927, 6.0965, 269.0159, -1, -1); // Yosemite //
+	AddStaticVehicle(458, -1425.2208, -79.7922, 5.8995, 270.2695, -1, -1); // Solair //
+	AddStaticVehicle(551, -1458.4295, -83.7307, 5.8993, 269.2441, -1, -1); // Merit //
+	AddStaticVehicle(426, -1440.2194, 43.4480, 5.7555, 179.1084, -1, -1); // Premier //
+	AddStaticVehicle(516, -1387.1645, -21.2017, 5.8993, 90.8310, -1, -1); // Nebula //
+	AddStaticVehicle(496, -1385.7100, -25.2674, 5.7111, 89.4015, -1, -1); // Blista Compact //
+	AddStaticVehicle(585, -1336.3407, -25.5673, 5.6345, 269.1741, -1, -1); // Emperor //
+	AddStaticVehicle(496, -1335.5900, 23.9433, 5.7111, 268.6362, -1, -1); // Blista Compact //
+	AddStaticVehicle(558, -1355.6548, -40.9582, 5.7008, 0.4403, -1, -1); // Uranus //
+	AddStaticVehicle(421, -1376.1606, -60.5515, 5.9414, 359.1259, -1, -1); // Washington //
+	AddStaticVehicle(436, -1337.9800, -83.7477, 5.7961, 269.4016, -1, -1); // Previon //
+	AddStaticVehicle(558, -1335.9444, -96.1611, 5.7008, 269.6707, -1, -1); // Uranus //
+	AddStaticVehicle(413, -1387.3416, -71.4521, 6.1016, 90.8739, -1, -1); // Pony //
+	AddStaticVehicle(581, -1476.6526, -232.7436, 5.6478, 90.8459, -1, -1); // BF-400 //
+	AddStaticVehicle(527, -1476.2865, -224.4519, 5.8013, 90.1376, -1, -1); // Cadrona //
+	AddStaticVehicle(561, -1372.2106, 43.2960, 5.8634, 359.5741, -1, -1); // Stratum //
+
+	// SF Queens hotel car park
+	AddStaticVehicle(603, -2482.7534, 396.9315, 27.6628, 144.5662, -1, -1); // Phoenix //
+	AddStaticVehicle(602, -2516.5738, 309.9721, 34.9732, 247.0985, -1, -1); // Alpha //
+	AddStaticVehicle(575, -2497.6799, 370.2890, 27.4625, 60.4998, -1, -1); // Broadway //
+	AddStaticVehicle(402, -2493.0601, 378.8060, 27.6427, 60.4998, -1, -1); // Buffalo //
+	AddStaticVehicle(579, -2479.9500, 416.2120, 27.7658, 135.4999, -1, -1); // Huntley //
+
+	// SF Santa Flora Medical Center car park
+	AddStaticVehicle(421, -2589.5144, 627.5709, 14.3945, 90.6843, -1, -1); // Washington //
+	AddStaticVehicle(526, -2546.2700, 631.8320, 14.3018, 270.3871, -1, -1); // Fortune //
+
+	// SF Doherty parking
+	AddStaticVehicle(421, -2068.6668, -83.9233, 35.1055, 359.9586, -1, -1); // Washington //
+
+	// SF Esplanade North parking
+	AddStaticVehicle(554, -1649.2200, 1307.2800, 7.1330, 315.0000, -1, -1); // Yosemite //
+
+	// SF Foster Valley parking
+	AddStaticVehicle(461, -2149.1846, -760.4520, 31.6434, 270.7898, -1, -1); // PCJ-600 //
+	AddStaticVehicle(496, -2149.0752, -859.9667, 31.7345, 268.7902, -1, -1); // Blista Compact //
+	AddStaticVehicle(533, -2148.9960, -913.9416, 31.8215, 269.1268, -1, -1); // Feltzer //
+	AddStaticVehicle(507, -2148.9593, -817.9581, 31.9227, 270.5012, -1, -1); // Elegant //
+	AddStaticVehicle(507, -2134.2300, -885.5350, 31.9227, 269.9998, -1, -1); // Elegant //
+	AddStaticVehicle(533, -2134.0687, -775.4720, 31.8215, 271.1731, -1, -1); // Feltzer //
+	AddStaticVehicle(533, -2125.4199, -814.8890, 31.8215, 90.4998, -1, -1); // Feltzer //
+	AddStaticVehicle(533, -2125.2000, -760.5340, 31.8215, 88.9998, -1, -1); // Feltzer //
+	AddStaticVehicle(526, -2125.1141, -953.1111, 31.8721, 268.7475, -1, -1); // Fortune //
+	AddStaticVehicle(576, -1897.4100, -852.9840, 31.6843, 91.0000, -1, -1); // Tornado //
+	AddStaticVehicle(507, -1897.3700, -900.0290, 31.9227, 269.0000, -1, -1); // Elegant //
+	AddStaticVehicle(526, -1888.4689, -924.5212, 31.8612, 269.5830, -1, -1); // Fortune //
+	AddStaticVehicle(401, -1888.4407, -963.6649, 31.8286, 268.7829, -1, -1); // Bravura //
+	AddStaticVehicle(401, -1888.4308, -846.6172, 31.8286, 271.8711, -1, -1); // Bravura //
+	AddStaticVehicle(579, -1888.2085, -900.1077, 31.9971, 272.0176, -1, -1); // Huntley //
+	AddStaticVehicle(526, -1887.3300, -753.9730, 31.8721, 91.0000, -1, -1); // Fortune //
+	AddStaticVehicle(422, -1886.7401, -786.9874, 32.0238, 270.8978, -1, -1); // Bobcat //
+	AddStaticVehicle(551, -1886.5244, -960.4353, 31.9227, 268.7079, -1, -1); // Merit //
+	AddStaticVehicle(461, -1872.2800, -930.6400, 31.6434, 269.0000, -1, -1); // PCJ-600 //
+	AddStaticVehicle(400, -1872.1000, -823.8960, 32.1211, 269.0000, -1, -1); // Landstalker //
+	AddStaticVehicle(533, -1872.0986, -864.5016, 31.8215, 270.4525, -1, -1); // Feltzer //
+
+	// SF Garcia parking
+	AddStaticVehicle(543, -2265.2500, 204.8340, 35.0634, 90.4998, -1, -1); // Sadler //
+	AddStaticVehicle(404, -2265.1799, 133.0720, 34.9484, 90.4998, -1, -1); // Pereniel //
+
+	// SF Hashbury parking
+	AddStaticVehicle(418, -2461.1805, -5.4913, 28.0724, 89.7883, -1, -1); // Moonbeam //
+
+	// SF Juniper Hill parking
+	AddStaticVehicle(445, -2499.8279, 741.5195, 34.9478, 181.1383, -1, -1); // Admiral //
+	AddStaticVehicle(551, -2438.5400, 741.7180, 34.9149, 180.3869, -1, -1); // Merit //
+
+	// SF Juniper Hollow parking
+	AddStaticVehicle(526, -2526.7100, 1229.5200, 37.2706, 27.6016, -1, -1); // Fortune //
+	AddStaticVehicle(547, -2491.6299, 1214.3800, 37.2200, 321.7356, -1, -1); // Primo //
+
+	// SF King's parking
+	AddStaticVehicle(526, -2222.7800, 306.5180, 34.9659, 0.0000, -1, -1); // Fortune //
+	AddStaticVehicle(603, -2175.8385, 306.3275, 34.9964, 358.9661, -1, -1); // Phoenix //
+	AddStaticVehicle(527, -2167.3501, 293.3720, 34.9185, 0.0000, -1, -1); // Cadrona //
+
+	// SF Missionary Hill parking
+	AddStaticVehicle(582, -2531.9500, -601.3450, 132.6988, 0.0000, -1, -1); // Newsvan //
+
+	// SF Ocean Flats parking
+	AddStaticVehicle(550, -2686.5601, -55.0934, 4.2380, 0.5000, -1, -1); // Sunrise //
+	AddStaticVehicle(547, -2658.5978, 268.1178, 4.1340, 181.1022, -1, -1); // Primo //
+	AddStaticVehicle(576, -2627.1001, -55.2050, 3.9968, 0.5000, -1, -1); // Tornado //
+
+	// SF Battery Point roadside
+	AddStaticVehicle(579, -2573.3742, 1364.3077, 7.0276, 128.4238, -1, -1); // Huntley //
+
+	// SF Calton Heights roadside
+	AddStaticVehicle(587, -2251.1351, 1257.0969, 41.8434, 304.3456, -1, -1); // Euros //
+	AddStaticVehicle(422, -2150.8701, 1220.1500, 47.2738, 269.9998, -1, -1); // Bobcat //
+	AddStaticVehicle(551, -2135.8000, 950.9375, 79.7509, 359.6572, -1, -1); // Merit //
+	AddStaticVehicle(422, -2135.8000, 1052.0625, 79.8520, 359.2805, -1, -1); // Bobcat //
+	AddStaticVehicle(436, -2135.5500, 771.2500, 69.2102, 0.0805, -1, -1); // Previon //
+	AddStaticVehicle(436, -2046.3700, 1112.7800, 53.0852, 330.0000, -1, -1); // Previon //
+	AddStaticVehicle(436, -2010.3250, 899.2000, 45.0930, 179.2621, -1, -1); // Previon //
+
+	// SF Doherty roadside
+	AddStaticVehicle(541, -1818.9301, -182.7010, 9.1206, 88.9998, -1, -1); // Bullet //
+
+	// SF Downtown roadside
+	AddStaticVehicle(526, -1926.6250, 1184.2000, 45.1456, 90.9175, -1, -1); // Fortune //
+	AddStaticVehicle(540, -1875.3906, 539.0295, 34.1811, 235.5215, -1, -1); // Vincent //
+	AddStaticVehicle(507, -1565.2624, 636.2724, 6.9384, 179.7659, -1, -1); // Elegant //
+
+	// SF Easter Basin roadside
+	AddStaticVehicle(410, -1720.4270, 341.1535, 6.7281, 133.7763, -1, -1); // Manana //
+
+	// SF Easter Bay Airport roadside
+	AddStaticVehicle(405, -1459.5900, -5.0622, 5.9250, 89.4015, -1, -1); // Sentinel //
+
+	// SF Financial roadside
+	AddStaticVehicle(533, -1736.3800, 1032.5699, 17.3840, 94.9998, -1, -1); // Feltzer //
+	AddStaticVehicle(421, -1720.3250, 757.1125, 24.6758, 179.2209, -1, -1); // Washington //
+
+	// SF Juniper Hollow roadside
+	AddStaticVehicle(458, -2520.1637, 1248.2812, 34.9359, 74.6467, -1, -1); // Solair //
+
+	// SF King's roadside
+	AddStaticVehicle(579, -1998.1750, 428.3125, 35.0002, 0.9454, -1, -1); // Huntley //
+
+	// SF Santa Flora roadside
+	AddStaticVehicle(576, -2628.7500, 559.8000, 14.1218, 270.8999, -1, -1); // Tornado //
+
+	// SF Easter Bay Airport
+	AddStaticVehicle(583, -1315.6200, -273.0850, 13.8371, 34.3959, -1, -1); // Tug //
+	AddStaticVehicle(522, -1302.4900, -676.7710, 13.7629, 360.0000, -1, -1); // NRG-500 //
+	AddStaticVehicle(506, -1245.5100, 48.3457, 13.9288, 315.0000, -1, -1); // Super GT //
+	AddStaticVehicle(485, -1238.5000, -107.4220, 13.8453, 75.0002, -1, -1); // Baggage //
+
+	// SF Missionary Hill
+	AddStaticVehicle(437, -2399.3101, -603.8310, 132.7500, 275.0000, -1, -1); // Coach //
+
+	// SF Ocean Flats
+	AddStaticVehicle(510, -2796.5300, 140.5910, 6.8075, 90.4998, -1, -1); // Mountain Bike //
+
+	// LV Pilson Intersection stadium car park
+	AddStaticVehicle(566, 1125.9601, 2296.7666, 10.6184, 88.8944, -1, -1); // Tahoma //
+	AddStaticVehicle(496, 1148.2690, 2300.1737, 10.5314, 89.2861, -1, -1); // Blista Compact //
+	AddStaticVehicle(445, 1135.9968, 2267.9860, 10.7525, 269.0377, -1, -1); // Admiral //
+	AddStaticVehicle(401, 1106.3635, 2251.2533, 10.6364, 0.2196, -1, -1); // Bravura //
+
+	// LV Roca Escalante underground car park
+	AddStaticVehicle(579, 2528.7528, 2399.0707, 4.1955, 359.3534, -1, -1); // Huntley //
+
+	// LV Royal Casino multi-storey car park
+	AddStaticVehicle(540, 2292.8296, 1455.1722, 39.6679, 89.3220, -1, -1); // Vincent //
+	AddStaticVehicle(451, 2292.9857, 1480.2374, 41.1098, 271.1274, -1, -1); // Turismo //
+	AddStaticVehicle(411, 2353.1292, 1483.6546, 42.6005, 270.3574, -1, -1); // Infernus //
+	AddStaticVehicle(589, 2353.5532, 1444.5293, 42.5284, 270.6847, -1, -1); // Club //
+	AddStaticVehicle(585, 2353.0484, 1430.1942, 10.4548, 270.6173, -1, -1); // Emperor //
+	AddStaticVehicle(526, 2353.2702, 1465.7855, 19.4669, 271.1810, -1, -1); // Fortune //
+	AddStaticVehicle(477, 2352.9476, 1455.2820, 20.0379, 90.6346, -1, -1); // ZR-350 //
+	AddStaticVehicle(507, 2352.9442, 1433.6779, 34.3716, 270.5939, -1, -1); // Elegant //
+	AddStaticVehicle(559, 2353.2154, 1408.6402, 35.7776, 269.1296, -1, -1); // Jester //
+	AddStaticVehicle(480, 2295.6836, 1519.5059, 36.2574, 180.4732, -1, -1); // Comet //
+	AddStaticVehicle(426, 2319.0118, 1519.2163, 23.3805, 359.8663, -1, -1); // Premier //
+	AddStaticVehicle(405, 2312.4884, 1519.2552, 29.9484, 1.2101, -1, -1); // Sentinel //
+	AddStaticVehicle(540, 2325.6108, 1519.3063, 17.1383, 359.1160, -1, -1); // Vincent //
+
+	// LV Royal Casino covered parking
+	AddStaticVehicle(463, 2103.8388, 1408.2215, 10.4107, 181.1530, -1, -1); // Freeway //
+	AddStaticVehicle(561, 2142.2317, 1408.6047, 10.7462, 179.2619, -1, -1); // Stratum //
+
+	// LV Starfish Casino multi-storey car park
+	AddStaticVehicle(587, 2221.6272, 1944.4043, 9.6007, 268.6325, -1, -1); // Euros //
+	AddStaticVehicle(579, 2223.6536, 1940.4317, 9.8517, 270.3921, -1, -1); // Huntley //
+	AddStaticVehicle(541, 2221.2959, 1940.4153, 15.0686, 89.0167, -1, -1); // Bullet //
+	AddStaticVehicle(535, 2223.6169, 1944.2793, 15.1449, 269.9494, -1, -1); // Slamvan //
+	AddStaticVehicle(545, 2223.6169, 1956.5025, 26.1601, 268.7820, -1, -1); // Hustler //
+	AddStaticVehicle(541, 2223.6229, 1952.3693, 26.0215, 271.3111, -1, -1); // Bullet //
+	AddStaticVehicle(575, 2221.7577, 1936.2699, 20.5190, 88.7365, -1, -1); // Broadway //
+	AddStaticVehicle(535, 2223.6835, 1948.3790, 20.6206, 269.3079, -1, -1); // Slamvan //
+	AddStaticVehicle(585, 2222.0643, 1936.2582, 31.4143, 89.8707, -1, -1); // Emperor //
+	AddStaticVehicle(579, 2223.6928, 1956.3638, 31.7643, 268.5115, -1, -1); // Huntley //
+	AddStaticVehicle(587, 2232.3999, 1998.9000, 15.0800, 179.9999, -1, -1); // Euros //
+	AddStaticVehicle(426, 2268.2399, 1999.3583, 15.1019, 179.9239, -1, -1); // Premier //
+
+	// LV The Emerald Isle multi-storey car park
+	AddStaticVehicle(402, 2078.7110, 2416.5076, 23.6425, 270.5351, -1, -1); // Buffalo //
+	AddStaticVehicle(429, 2096.0357, 2393.0958, 23.4535, 270.0849, -1, -1); // Banshee //
+	AddStaticVehicle(565, 2096.1572, 2396.0906, 23.4032, 270.2602, -1, -1); // Flash //
+	AddStaticVehicle(426, 2104.1601, 2404.8309, 23.5237, 270.6322, -1, -1); // Premier //
+	AddStaticVehicle(415, 2078.5361, 2401.9516, 40.7837, 271.1701, -1, -1); // Cheetah //
+	AddStaticVehicle(458, 2078.5511, 2393.2119, 40.8708, 269.8946, -1, -1); // Solair //
+	AddStaticVehicle(550, 2078.6119, 2416.5562, 40.8734, 90.2020, -1, -1); // Sunrise //
+	AddStaticVehicle(535, 2078.6009, 2416.5644, 36.4651, 269.5782, -1, -1); // Slamvan //
+	AddStaticVehicle(526, 2086.3814, 2398.9787, 36.5153, 90.6676, -1, -1); // Fortune //
+	AddStaticVehicle(555, 2086.4201, 2422.4659, 36.4449, 269.8450, -1, -1); // Windsor //
+	AddStaticVehicle(405, 2086.5109, 2410.8811, 19.3963, 90.5412, -1, -1); // Sentinel //
+	AddStaticVehicle(575, 2096.0626, 2393.0385, 19.1683, 271.0509, -1, -1); // Broadway //
+	AddStaticVehicle(436, 2104.1499, 2416.6512, 19.2674, 90.0684, -1, -1); // Previon //
+	AddStaticVehicle(589, 2078.4489, 2422.5546, 14.8253, 269.4020, -1, -1); // Club //
+	AddStaticVehicle(422, 2095.9554, 2404.8246, 15.1176, 270.4254, -1, -1); // Bobcat //
+	AddStaticVehicle(602, 2096.1534, 2410.7621, 15.0226, 270.9311, -1, -1); // Alpha //
+	AddStaticVehicle(581, 2085.9263, 2393.0059, 31.9681, 90.1494, -1, -1); // BF-400 //
+	AddStaticVehicle(555, 2086.4710, 2416.6204, 32.1480, 90.8037, -1, -1); // Windsor //
+	AddStaticVehicle(506, 2095.9503, 2404.8014, 32.1104, 269.8510, -1, -1); // Super GT //
+	AddStaticVehicle(575, 2096.2174, 2393.0474, 49.2698, 271.0294, -1, -1); // Broadway //
+	AddStaticVehicle(426, 2104.1116, 2393.1881, 49.3283, 89.5035, -1, -1); // Premier //
+	AddStaticVehicle(562, 2104.3127, 2422.5337, 49.2339, 89.2714, -1, -1); // Elegy //
+	AddStaticVehicle(533, 2086.5569, 2393.1446, 10.6678, 89.9479, -1, -1); // Feltzer //
+	AddStaticVehicle(527, 2086.4004, 2419.5818, 45.0695, 90.7302, -1, -1); // Cadrona //
+	AddStaticVehicle(521, 2096.6207, 2395.9727, 44.8388, 270.9838, -1, -1); // FCR-900 //
+	AddStaticVehicle(545, 2104.2054, 2401.9694, 45.0796, 88.8712, -1, -1); // Hustler //
+	AddStaticVehicle(555, 2086.4291, 2413.7488, 27.8511, 90.4758, -1, -1); // Windsor //
+	AddStaticVehicle(415, 2096.1590, 2401.9746, 27.9017, 269.9733, -1, -1); // Cheetah //
+	AddStaticVehicle(429, 2104.2286, 2393.0170, 27.7581, 90.4976, -1, -1); // Banshee //
+
+	// LV The Visage car park
+	AddStaticVehicle(422, 1946.0310, 1784.1522, 18.9050, 181.6606, -1, -1); // Bobcat //
+	AddStaticVehicle(603, 1942.4547, 1761.1122, 18.7838, 178.5624, -1, -1); // Phoenix //
+	AddStaticVehicle(540, 1980.4889, 1751.3723, 18.8534, 359.9248, -1, -1); // Vincent //
+	AddStaticVehicle(541, 1924.4543, 1760.7534, 12.4366, 359.1755, -1, -1); // Bullet //
+	AddStaticVehicle(527, 2009.0461, 1728.2440, 12.5450, 178.9632, -1, -1); // Cadrona //
+	AddStaticVehicle(426, 1901.8239, 1933.6278, 7.3501, 178.8678, -1, -1); // Premier //
+	AddStaticVehicle(402, 1920.3865, 1816.7698, 12.6180, 0.0989, -1, -1); // Buffalo //
+	AddStaticVehicle(565, 1891.1176, 1784.6983, 12.4281, 0.1887, -1, -1); // Flash //
+	AddStaticVehicle(401, 2001.3608, 1751.2606, 12.5598, 358.7807, -1, -1); // Bravura //
+	AddStaticVehicle(426, 1893.6157, 1989.3456, 13.5403, 179.9139, -1, -1); // Premier //
+	AddStaticVehicle(507, 1893.5359, 1966.4629, 13.6841, 358.7055, -1, -1); // Elegant //
+
+	// LV Whitewood Estates stadium car park
+	AddStaticVehicle(526, 1135.7368, 2231.6502, 16.5675, 270.9737, -1, -1); // Fortune //
+	AddStaticVehicle(547, 1067.9912, 2185.1800, 16.5169, 90.1250, -1, -1); // Primo //
+	AddStaticVehicle(477, 1092.8857, 2228.9591, 10.5670, 359.6069, -1, -1); // ZR-350 //
+	AddStaticVehicle(576, 1068.0292, 2203.4828, 10.4812, 270.2127, -1, -1); // Tornado //
+	AddStaticVehicle(527, 1096.1991, 2217.0981, 10.6216, 359.0215, -1, -1); // Cadrona //
+	AddStaticVehicle(507, 1116.5314, 2194.4608, 10.7196, 179.1098, -1, -1); // Elegant //
+	AddStaticVehicle(400, 1113.1899, 2171.6744, 10.9180, 178.5303, -1, -1); // Landstalker //
+
+	// LV Blackfield Chapel parking
+	AddStaticVehicle(600, 1412.8000, 708.1320, 10.6102, 0.0000, -1, -1); // Picador //
+	AddStaticVehicle(496, 1412.8000, 746.4200, 10.5314, 0.0000, -1, -1); // Blista Compact //
+	AddStaticVehicle(401, 1522.3300, 787.6960, 10.6770, 0.0000, -1, -1); // Bravura //
+
+	// LV Caligula's Palace parking
+	AddStaticVehicle(603, 2365.1001, 1658.9900, 10.6995, 90.0002, -1, -1); // Phoenix //
+
+	// LV Come-A-Lot parking
+	AddStaticVehicle(402, 2131.1299, 1025.7600, 10.6946, 269.9998, -1, -1); // Buffalo //
+	AddStaticVehicle(405, 2154.3732, 987.6007, 10.8057, 179.3453, -1, -1); // Sentinel //
+	AddStaticVehicle(589, 2160.8701, 1028.9100, 10.5284, 269.9998, -1, -1); // Club //
+
+	// LV Creek parking
+	AddStaticVehicle(445, 2815.2322, 2349.7470, 10.7525, 89.1828, -1, -1); // Admiral //
+	AddStaticVehicle(547, 2827.1738, 2353.4622, 10.6184, 91.4047, -1, -1); // Primo //
+	AddStaticVehicle(550, 2830.9870, 2027.1297, 10.7224, 180.3021, -1, -1); // Sunrise //
+	AddStaticVehicle(579, 2841.1299, 2338.4700, 10.8049, 269.9998, -1, -1); // Huntley //
+	AddStaticVehicle(551, 2853.0500, 2372.0200, 10.7196, 90.0002, -1, -1); // Merit //
+	AddStaticVehicle(401, 2856.8090, 2309.4312, 10.6364, 1.2079, -1, -1); // Bravura //
+	AddStaticVehicle(533, 2866.6332, 2330.8610, 10.6184, 271.1262, -1, -1); // Feltzer //
+	AddStaticVehicle(561, 2878.7136, 2368.5534, 10.6837, 90.6192, -1, -1); // Stratum //
+	AddStaticVehicle(600, 2890.9268, 2342.2485, 10.6102, 269.5242, -1, -1); // Picador //
+
+	// LV Julius Thruway East parking
+	AddStaticVehicle(436, 2661.9556, 2246.4920, 10.5247, 89.0980, -1, -1); // Previon //
+
+	// LV Julius Thruway North parking
+	AddStaticVehicle(551, 2366.1127, 2579.5961, 10.7184, 1.8502, -1, -1); // Merit //
+	AddStaticVehicle(547, 2423.3621, 2570.0240, 10.6184, 346.4835, -1, -1); // Primo //
+	AddStaticVehicle(421, 2447.5056, 2562.6846, 21.8164, 346.0430, -1, -1); // Washington //
+
+	// LV Las Venturas parking
+	AddStaticVehicle(587, 2511.0500, 934.9750, 10.5539, 360.0000, -1, -1); // Euros //
+
+	// LV Las Venturas Airport parking
+	AddStaticVehicle(586, 1685.8400, 1297.9399, 10.3839, 0.0000, -1, -1); // Wayfarer //
+
+	// LV Old Venturas Strip parking
+	AddStaticVehicle(589, 2588.2500, 2053.1201, 10.5284, 273.4524, -1, -1); // Club //
+	AddStaticVehicle(560, 2605.3899, 2086.1299, 10.5771, 179.9999, -1, -1); // Sultan //
+
+	// LV Pilgrim parking
+	AddStaticVehicle(579, 2511.6932, 1671.4131, 10.8455, 270.8693, -1, -1); // Huntley //
+
+	// LV Pilson Intersection parking
+	AddStaticVehicle(445, 1329.4220, 2249.6668, 10.7525, 268.9616, -1, -1); // Admiral //
+	AddStaticVehicle(445, 1357.7412, 2286.8494, 10.7525, 269.8155, -1, -1); // Admiral //
+
+	// LV Redsands West parking
+	AddStaticVehicle(413, 1385.8700, 2246.1699, 10.9219, 90.0002, -1, -1); // Pony //
+	AddStaticVehicle(405, 1492.1100, 2291.3000, 10.7453, 0.0000, -1, -1); // Sentinel //
+	AddStaticVehicle(482, 1499.1400, 2268.5500, 10.9219, 0.0000, -1, -1); // Burrito //
+	AddStaticVehicle(554, 1537.7800, 2214.4199, 10.9168, 0.0000, -1, -1); // Yosemite //
+
+	// LV Roca Escalante parking
+	AddStaticVehicle(405, 2512.9586, 2355.2143, 10.7859, 270.9230, -1, -1); // Sentinel //
+	AddStaticVehicle(428, 2530.4199, 2491.3799, 11.0228, 269.9998, -1, -1); // Securicar //
+	AddStaticVehicle(477, 2530.4199, 2520.9800, 21.6217, 269.9998, -1, -1); // ZR-350 //
+	AddStaticVehicle(400, 2564.7300, 2271.1201, 10.9180, 90.0002, -1, -1); // Landstalker //
+
+	// LV The Clown's Pocket parking
+	AddStaticVehicle(575, 2183.7202, 1879.2754, 10.5172, 0.2543, -1, -1); // Broadway //
+	AddStaticVehicle(541, 2186.0230, 1786.9522, 10.5425, 182.4537, -1, -1); // Bullet //
+
+	// LV The Emerald Isle parking
+	AddStaticVehicle(565, 2015.6053, 2239.4922, 23.5984, 271.2441, -1, -1); // Flash //
+	AddStaticVehicle(507, 2076.4500, 2468.6899, 10.7196, 180.0001, -1, -1); // Elegant //
+	AddStaticVehicle(560, 2153.5500, 2490.7200, 10.5755, 269.9998, -1, -1); // Sultan //
+
+	// LV The Pink Swan parking
+	AddStaticVehicle(579, 1844.8600, 1161.5000, 10.8187, 90.0002, -1, -1); // Huntley //
+
+	// LV Yellow Bell Golf Course parking
+	AddStaticVehicle(457, 1421.7000, 2830.2300, 10.5166, 269.9998, -1, -1); // Caddy //
+
+	// LV Rockshore West roadside
+	AddStaticVehicle(461, 2266.1899, 649.3470, 10.9206, 0.0000, -1, -1); // PCJ-600 //
+	AddStaticVehicle(496, 2441.9099, 654.8950, 10.8958, 269.9998, -1, -1); // Blista Compact //
+
+	// LV Spinybed roadside
+	AddStaticVehicle(499, 2146.5901, 2756.5901, 10.8713, 269.9998, -1, -1); // Benson //
+
+	// LV The Strip roadside
+	AddStaticVehicle(401, 2040.1500, 1351.4800, 10.4880, 180.0001, -1, -1); // Bravura //
+	AddStaticVehicle(507, 2074.6499, 1135.5500, 10.5712, 0.0000, -1, -1); // Elegant //
+	AddStaticVehicle(535, 2074.6499, 1660.0500, 10.4704, 0.0000, -1, -1); // Slamvan //
+	AddStaticVehicle(545, 2119.9800, 1988.4600, 10.5327, 180.0001, -1, -1); // Hustler //
+	AddStaticVehicle(506, 2119.9800, 2163.6799, 10.4620, 180.0001, -1, -1); // Super GT //
+
+	// LV Blackfield Chapel
+	AddStaticVehicle(442, 1491.0300, 727.1910, 10.7194, 90.0002, -1, -1); // Romero //
+
+	// LV Creek
+	AddStaticVehicle(510, 2822.3999, 2160.0100, 13.4922, 269.9998, -1, -1); // Mountain Bike //
+
+	// LV LVA Freight Depot
+	AddStaticVehicle(477, 1487.4800, 1017.8200, 10.5670, 0.0000, -1, -1); // ZR-350 //
+
+	// LV Rockshore East
+	AddStaticVehicle(486, 2711.8301, 822.5040, 10.9897, 0.0000, -1, -1); // Dozer //
+
+	// LV Spinybed
+	AddStaticVehicle(574, 2261.4299, 2770.6201, 10.6123, 90.0002, -1, -1); // Sweeper //
+	AddStaticVehicle(443, 2399.9800, 2799.8899, 11.4281, 269.9998, -1, -1); // Packer //
+
+	// Bone County parking
+	AddStaticVehicle(478, 521.2230, 2372.1499, 30.3149, 143.9998, -1, -1); // Walton //
+
+	// Easter Bay Chemicals parking
+	AddStaticVehicle(440, -1030.1500, -643.4020, 32.2136, 89.7091, -1, -1); // Rumpo //
+	AddStaticVehicle(498, -1003.9000, -641.6150, 32.0689, 89.7091, -1, -1); // Boxville //
+	AddStaticVehicle(413, -982.7960, -663.7680, 32.1094, 270.4914, -1, -1); // Pony //
+
+	// Fallen Tree parking
+	AddStaticVehicle(482, -560.1540, -488.4590, 25.6250, 180.8160, -1, -1); // Burrito //
+	AddStaticVehicle(459, -560.0550, -473.0050, 25.6149, 0.0000, -1, -1); // Berkley's RC Van //
+	AddStaticVehicle(440, -519.4780, -472.1770, 25.7292, 180.5439, -1, -1); // Rumpo //
+	AddStaticVehicle(456, -485.2610, -488.1870, 25.6250, 0.0000, -1, -1); // Yankee //
+
+	// Flint County parking
+	AddStaticVehicle(463, -572.3670, -1050.6300, 23.3847, 55.3339, -1, -1); // Freeway //
+	AddStaticVehicle(463, -567.5980, -1045.0300, 23.5287, 237.5612, -1, -1); // Freeway //
+	AddStaticVehicle(468, -36.6128, -2496.9900, 36.3728, 214.8772, -1, -1); // Sanchez //
+	AddStaticVehicle(491, -17.8053, -2500.5000, 36.4971, 120.3767, -1, -1); // Virgo //
+
+	// Montgomery parking
+	AddStaticVehicle(478, 1396.7116, 395.4903, 19.7582, 67.4137, -1, -1); // Walton //
+
+	// Regular Tom parking
+	AddStaticVehicle(489, -301.0640, 1750.8000, 42.9047, 89.5000, -1, -1); // Rancher //
+
+	// Angel Pine roadside
+	AddStaticVehicle(463, -2217.2500, -2405.1201, 30.9531, 229.9999, -1, -1); // Freeway //
+	AddStaticVehicle(419, -2099.0200, -2241.9500, 30.4737, 139.9999, -1, -1); // Esperanto //
+
+	// Las Payasadas roadside
+	AddStaticVehicle(482, -290.5010, 2721.3201, 62.4319, 180.0001, -1, -1); // Burrito //
+
+	// Whetstone roadside
+	AddStaticVehicle(478, -1220.2100, -2632.0500, 9.9911, 85.5002, -1, -1); // Walton //
+
+	// 'The Big Ear'
+	AddStaticVehicle(495, -346.6070, 1609.0601, 76.0030, 93.0002, -1, -1); // Sandking //
+
+	// Angel Pine
+	AddStaticVehicle(478, -1994.6200, -2382.6599, 30.6254, 341.0000, -1, -1); // Walton //
+
+	// Back o Beyond
+	AddStaticVehicle(510, -891.0140, -2634.8201, 96.8824, 308.9499, -1, -1); // Mountain Bike //
+	AddStaticVehicle(478, -623.4540, -2409.9299, 29.7165, 0.0000, -1, -1); // Walton //
+
+	// Beacon Hill
+	AddStaticVehicle(605, -360.9830, -1046.1500, 59.2270, 0.0000, -1, -1); // Sadler //
+
+	// Bone County
+	AddStaticVehicle(588, 680.8410, 1831.3199, 5.1723, 9.5000, -1, -1); // Hotdog //
+
+	// El Castillo del Diablo
+	AddStaticVehicle(424, -17.4257, 2355.7400, 23.9795, 143.9998, -1, -1); // BF Injection //
+
+	// Fallen Tree
+	AddStaticVehicle(514, -605.4790, -492.1890, 26.1305, 0.0000, -1, -1); // Tanker //
+
+	// Flint County
+	AddStaticVehicle(531, -1144.3199, -1466.3300, 125.7017, 100.0000, -1, -1); // Tractor //
+	AddStaticVehicle(604, -141.1320, -2516.5701, 30.7977, 120.3767, -1, -1); // Glendale //
+
+	// Flint Intersection
+	AddStaticVehicle(422, -73.2554, -1587.4800, 2.6176, 145.0001, -1, -1); // Bobcat //
+
+	// Flint Range
+	AddStaticVehicle(543, -371.9530, -1436.9100, 25.6259, 83.3568, -1, -1); // Sadler //
+
+	// Fort Carson
+	AddStaticVehicle(442, -304.2210, 1023.7800, 19.4929, 269.9998, -1, -1); // Romero //
+	AddStaticVehicle(510, -263.3210, 1170.7900, 19.6492, 5.0000, -1, -1); // Mountain Bike //
+	AddStaticVehicle(543, 70.7797, 1000.1900, 14.0363, 180.0001, -1, -1); // Sadler //
+
+	// Las Payasadas
+	AddStaticVehicle(586, -201.5940, 2595.9700, 62.2667, 51.0000, -1, -1); // Wayfarer //
+	AddStaticVehicle(471, -158.2160, 2701.6001, 61.8244, 340.0000, -1, -1); // Quad //
+
+	// Lil' Probe Inn
+	AddStaticVehicle(604, -20.7622, 1341.1400, 9.0064, 299.9999, -1, -1); // Glendale //
+
+	// Los Santos Inlet
+	AddStaticVehicle(531, -287.4430, -2171.6799, 29.0313, 111.9611, -1, -1); // Tractor //
+
+	// Red County
+	AddStaticVehicle(468, -923.7040, -532.6830, 25.6853, 273.8088, -1, -1); // Sanchez //
+	AddStaticVehicle(543, -414.3970, -443.0050, 17.8122, 206.4777, -1, -1); // Sadler //
+
+	// Shady Creeks
+	AddStaticVehicle(471, -1347.8500, -2268.3201, 36.3182, 327.0000, -1, -1); // Quad //
+	AddStaticVehicle(605, -1305.1700, -2394.7400, 23.8503, 0.0000, -1, -1); // Sadler //
+
+	// The Farm
+	AddStaticVehicle(572, -1076.6000, -1207.1801, 128.9461, 177.4869, -1, -1); // Mower //
+
+	// The Sherman Dam
+	AddStaticVehicle(588, -907.4870, 1991.8700, 60.8609, 334.0000, -1, -1); // Hotdog //
+
+	// Tierra Robada
+	AddStaticVehicle(510, -1665.5500, 2557.8701, 84.8789, 281.0000, -1, -1); // Mountain Bike //
+	AddStaticVehicle(605, -1432.0200, 2182.4900, 50.2047, 0.0000, -1, -1); // Sadler //
+	AddStaticVehicle(468, -1055.0699, 1543.5100, 33.2541, 0.0000, -1, -1); // Sanchez //
+	AddStaticVehicle(471, -938.2540, 1432.0400, 29.5725, 322.0000, -1, -1); // Quad //
+	AddStaticVehicle(421, -680.5810, 948.1980, 12.0742, 37.0000, -1, -1); // Washington //
+	AddStaticVehicle(471, -595.7800, 2709.1299, 71.8949, 180.4998, -1, -1); // Quad //
+
+	// Whetstone
+	AddStaticVehicle(525, -1915.4900, -1638.5900, 21.6897, 250.0001, -1, -1); // Tow Truck //
+	AddStaticVehicle(481, -1862.4000, -1561.8400, 21.3084, 87.0002, -1, -1); // BMX //
+	AddStaticVehicle(604, -1826.4399, -1638.6300, 21.5845, 59.4999, -1, -1); // Glendale //
 
 	// Set the unique Vehlicle Plate for all vehicles possible.
 	for (new i = 0; i < MAX_VEHICLES; i++)

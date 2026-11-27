@@ -17,7 +17,8 @@ public WebhookResponse(index, response_code, data[])
 	}
 }
 
-static const WEBHOOK_URL[] = "crl2.krusty.space/hooks/samp-webhook-player";
+// TODO: Move URL to DB
+static const WEBHOOK_URL[] = "crl2.n0p.cz/hooks/samp-webhook-player";
 
 forward SendMessageToWebhook(playerid, const message[], reasonid);
 

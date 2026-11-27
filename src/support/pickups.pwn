@@ -42,9 +42,14 @@
 #include "modules/bank.pwn"
 #include "modules/team.pwn"
 
-//
-//  Global static team objects.
-//
+// Repeat hits on the *same* pickup are ignored for this long, so the player gets
+// a window to leave. Standing there past the window re-opens it, which is the
+// old behaviour, just slower
+#define PICKUP_RETRIGGER_DELAY_MS	5000
+
+new
+	gLastPickupID[MAX_PLAYERS],
+	gLastPickupTick[MAX_PLAYERS];
 
 new 
 	gAdminRoomHealth,

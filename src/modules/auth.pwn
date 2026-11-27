@@ -52,6 +52,10 @@ stock SetPlayerAccountLogin(playerid, const text[])
 	LoadPlayerProperties(playerid);
 	LoadPlayerQuests(playerid);
 
+	// Picks up the commercial properties a player already rents, which no
+	// rent event reports until they rent another one.
+	FireQuestLevelEvent(playerid, QUEST_EVT_COMMERCIAL_SHARE, GetPlayerCommercialShare(playerid));
+
 	RedrawRealZones(playerid);
 
 	// Draw mapicons for the user.
@@ -102,9 +106,11 @@ stock SetPlayerAccountRegistration(playerid, const text[])
 
 	SHA256_Hash(text, salt, hashedPwd, sizeof(hashedPwd));
 
-	new 
+	// The salt alphabet includes the apostrophe (ASCII 39), so the salt must be
+	// escaped with %q, or roughly one in six registrations breaks the INSERT.
+	new
 		query[512];
-	format(query, sizeof(query), "INSERT INTO users (nickname, pwdhash, salt, cash, bank, adminlvl, wanted, team, class, health, armour, spawn, properties) VALUES ('%s', '%s', '%s', %d, %d, %d, %d, %d, %d, %.2f, %.2f, %d, '%s');", 
+	format(query, sizeof(query), "INSERT INTO users (nickname, pwdhash, salt, cash, bank, adminlvl, wanted, team, class, health, armour, spawn, properties) VALUES ('%s', '%s', '%q', %d, %d, %d, %d, %d, %d, %.2f, %.2f, %d, '%s');",
 			gPlayers[playerid][Name], 
 			hashedPwd, 
 			salt, 
@@ -167,8 +173,9 @@ forward ShowAuthDialog(playerid);
 
 public ShowAuthDialog(playerid)
 {
-	new query[256];
-	new stringToPrint[128];
+	new
+		query[256],
+		stringToPrint[256];
 
 	format(query, sizeof(query), "SELECT pwdhash, salt FROM users WHERE nickname = '%s'", gPlayers[playerid][Name]);
 
@@ -184,7 +191,7 @@ public ShowAuthDialog(playerid)
 
 	if (DB_GetRowCount(result))
 	{
-		format(stringToPrint, sizeof(stringToPrint), "{FFD700}Login{FFFFFF}\n\nPlayer (%s) has already registered their account. Log-in using your password:", gPlayers[playerid][Name]);
+		format(stringToPrint, sizeof(stringToPrint), "{FFD700}Login{FFFFFF}\n\nPlayer ({00FF00}%s{FFFFFF}) has already registered their account. Log-in using your password:", gPlayers[playerid][Name]);
 
 		ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", stringToPrint, "Log-in", "Cancel");
 
@@ -193,7 +200,7 @@ public ShowAuthDialog(playerid)
 	}
 	else 
 	{
-		format(stringToPrint, sizeof(stringToPrint), "{FFD700}Register{FFFFFF}\n\nWelcome %s! Register your account by entering a password:", gPlayers[playerid][Name]);
+		format(stringToPrint, sizeof(stringToPrint), "{FFD700}Register{FFFFFF}\n\nWelcome {00FF00}%s{FFFFFF}! Register your account by entering a password:", gPlayers[playerid][Name]);
 
 		ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registration", stringToPrint, "Register", "Cancel");
 	}
